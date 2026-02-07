@@ -236,15 +236,16 @@
         resize();
         loop();
 
-        // Initialize Typed.js
-        const typed = new Typed('#typed-text', {
-            strings: ['hello w0rld'],
-            typeSpeed: 50,
-            startDelay: 1000,
-            showCursor: true,
-            cursorChar: '|',
-            autoInsertCss: true,
-        });
+        // Initialize Typed.js after 1s delay
+        setTimeout(() => {
+            const typed = new Typed('#typed-text', {
+                strings: ['hello w0rld'],
+                typeSpeed: 50,
+                showCursor: true,
+                cursorChar: '|',
+                autoInsertCss: true,
+            });
+        }, 1000);
     </script>
 </body>
 
