@@ -1,0 +1,432 @@
+[
+  {
+    "id": "day-1",
+    "path": "100days/day-1",
+    "description": "Interactive entropy visualization with animated particles"
+  },
+  {
+    "id": "day-2",
+    "path": "100days/day-2",
+    "description": "Vicsek model flocking behavior simulation"
+  },
+  {
+    "id": "day-3",
+    "path": "100days/day-3",
+    "description": "Particle clustering with chaotic agents"
+  },
+  {
+    "id": "day-4",
+    "path": "100days/day-4",
+    "description": "Stochastic random walk patterns on canvas"
+  },
+  {
+    "id": "day-5",
+    "path": "100days/day-5",
+    "description": "Gravity and particle physics with falling objects"
+  },
+  {
+    "id": "day-6",
+    "path": "100days/day-6",
+    "description": "Celestial mechanics with orbital planets"
+  },
+  {
+    "id": "Day-7",
+    "path": "100days/Day-7",
+    "description": "Apophenia proximity links on grid"
+  },
+  {
+    "id": "Day-8",
+    "path": "100days/Day-8",
+    "description": "Cluster detection with parameter tuning"
+  },
+  {
+    "id": "day-9",
+    "path": "100days/day-9",
+    "description": "Linked agents network visualization"
+  },
+  {
+    "id": "day-10",
+    "path": "100days/day-10",
+    "description": "Audio-reactive agents with spatial positioning"
+  },
+  {
+    "id": "day-11",
+    "path": "100days/day-11",
+    "description": "Interactive message storage system (Node.js/Express)"
+  },
+  {
+    "id": "day-12",
+    "path": "100days/day-12",
+    "description": "Perlin noise wind simulation"
+  },
+  {
+    "id": "day-13",
+    "path": "100days/day-13",
+    "description": "Wave pattern generation with ripple effects"
+  },
+  {
+    "id": "day-14",
+    "path": "100days/day-14",
+    "description": "Dynamic cluster visualization with signals"
+  },
+  {
+    "id": "day-15",
+    "path": "100days/day-15",
+    "description": "Interactive 2D grid navigation with zoom"
+  },
+  {
+    "id": "day-15-2",
+    "path": "100days/day-15-2",
+    "description": "Grid camera variant"
+  },
+  {
+    "id": "day-16",
+    "path": "100days/day-16",
+    "description": "Force graph visualization"
+  },
+  {
+    "id": "day-17",
+    "path": "100days/day-17",
+    "description": "Text-to-speech with animated typography"
+  },
+  {
+    "id": "day-18",
+    "path": "100days/day-18",
+    "description": "Conway's Game of Life variant"
+  },
+  {
+    "id": "day-19",
+    "path": "100days/day-19",
+    "description": "Force-directed graph of coworker interactions (React/D3)"
+  },
+  {
+    "id": "day-20",
+    "path": "100days/day-20",
+    "description": "Schelling model of segregation simulation"
+  },
+  {
+    "id": "day-21",
+    "path": "100days/day-21",
+    "description": "30-day agent interaction heatmap"
+  },
+  {
+    "id": "day-22",
+    "path": "100days/day-22",
+    "description": "Graph network visualization"
+  },
+  {
+    "id": "day-23",
+    "path": "100days/day-23",
+    "description": "Touch/mouse event handler demo"
+  },
+  {
+    "id": "day-24",
+    "path": "100days/day-24",
+    "description": "Rock paper scissors game"
+  },
+  {
+    "id": "day-25",
+    "path": "100days/day-25",
+    "description": "Density and color-controlled particle effect"
+  },
+  {
+    "id": "day-26",
+    "path": "100days/day-26",
+    "description": "Dynamic widget dashboard layout"
+  },
+  {
+    "id": "day-27",
+    "path": "100days/day-27",
+    "description": "Muse v0 - music/creative tool prototype"
+  },
+  {
+    "id": "day-28",
+    "path": "100days/day-28",
+    "description": "Liquid glass morphism effect"
+  },
+  {
+    "id": "day-29",
+    "path": "100days/day-29",
+    "description": "Text generation UI showing thinking states"
+  },
+  {
+    "id": "day-31",
+    "path": "100days/day-31",
+    "description": "CLI material color palette"
+  },
+  {
+    "id": "day-32",
+    "path": "100days/day-32",
+    "description": "Chaotic entropy pattern generation"
+  },
+  {
+    "id": "day-33",
+    "path": "100days/day-33",
+    "description": "Temporal slitscan imaging effect"
+  },
+  {
+    "id": "day-34",
+    "path": "100days/day-34",
+    "description": "Text morphing with particle transitions"
+  },
+  {
+    "id": "day-35 (flights)",
+    "path": "100days/day-35 (flights)",
+    "description": "Great circle flight path animation (Leaflet/Turf.js)"
+  },
+  {
+    "id": "day-36",
+    "path": "100days/day-36",
+    "description": "Vite React TypeScript project"
+  },
+  {
+    "id": "day-38",
+    "path": "100days/day-38",
+    "description": "Generative Baltic pattern"
+  },
+  {
+    "id": "day-39",
+    "path": "100days/day-39",
+    "description": "Morphing wave patterns"
+  },
+  {
+    "id": "day-40",
+    "path": "100days/day-40",
+    "description": "Cube grid rules engine"
+  },
+  {
+    "id": "day-41",
+    "path": "100days/day-41",
+    "description": "Metaball physics and animation"
+  },
+  {
+    "id": "day-42",
+    "path": "100days/day-42",
+    "description": "Grid-based metaball effects"
+  },
+  {
+    "id": "day-43",
+    "path": "100days/day-43",
+    "description": "Sketch project"
+  },
+  {
+    "id": "day-44",
+    "path": "100days/day-44",
+    "description": "Whiff project"
+  },
+  {
+    "id": "day-45",
+    "path": "100days/day-45",
+    "description": "Gravity pills particle simulation"
+  },
+  {
+    "id": "day-46",
+    "path": "100days/day-46",
+    "description": "OKLCH vs HSL gradient comparison"
+  },
+  {
+    "id": "day-47",
+    "path": "100days/day-47",
+    "description": "Sketch project"
+  },
+  {
+    "id": "aflow",
+    "path": "aflow",
+    "description": "Agentic data experience framework with deck/widget UI"
+  },
+  {
+    "id": "agents",
+    "path": "agents",
+    "description": "Entropy simulator with 10 interactive agents"
+  },
+  {
+    "id": "apophenia",
+    "path": "apophenia",
+    "description": "Force-directed graph visualization (D3.js)"
+  },
+  {
+    "id": "baime",
+    "path": "baime",
+    "description": "Retro CRT-style particle trail drawing (p5.js)"
+  },
+  {
+    "id": "campaign-creation",
+    "path": "campaign-creation",
+    "description": "Campaign manager with product selection workflow"
+  },
+  {
+    "id": "cc",
+    "path": "cc",
+    "description": "Relationship advice UI for humans and machines"
+  },
+  {
+    "id": "chaos",
+    "path": "chaos",
+    "description": "Dense visual taxonomy of computational thinking patterns"
+  },
+  {
+    "id": "creative-feed",
+    "path": "creative-feed",
+    "description": "Creative content feed (Next.js)"
+  },
+  {
+    "id": "dictate",
+    "path": "dictate",
+    "description": "Browser-native voice-to-text interface"
+  },
+  {
+    "id": "eixample",
+    "path": "eixample",
+    "description": "16x16 grid visual project"
+  },
+  {
+    "id": "emergence",
+    "path": "emergence",
+    "description": "5-day generative design framework with scrollable cards"
+  },
+  {
+    "id": "hello",
+    "path": "hello",
+    "description": "Liquid blob v2 animation"
+  },
+  {
+    "id": "images",
+    "path": "images",
+    "description": "Asset storage"
+  },
+  {
+    "id": "json-render-1",
+    "path": "json-render-1",
+    "description": "Observability UI using JSON-render core library"
+  },
+  {
+    "id": "letters-1",
+    "path": "letters-1",
+    "description": "CSS grid of animated squares"
+  },
+  {
+    "id": "letters-2",
+    "path": "letters-2",
+    "description": "Text to grid-based stylized patterns library"
+  },
+  {
+    "id": "mcc1",
+    "path": "mcc1",
+    "description": "\"Approaching uncertainty with curiosity\" interface"
+  },
+  {
+    "id": "Memory1",
+    "path": "Memory1",
+    "description": "Three-column layout template"
+  },
+  {
+    "id": "milda",
+    "path": "milda",
+    "description": "Marketing portfolio website"
+  },
+  {
+    "id": "mintis",
+    "path": "mintis",
+    "description": "Days widget system with card-based content"
+  },
+  {
+    "id": "mirc",
+    "path": "mirc",
+    "description": "Classic mIRC chat client UI recreation"
+  },
+  {
+    "id": "notebook",
+    "path": "notebook",
+    "description": "Markdown note-taking system"
+  },
+  {
+    "id": "nyc",
+    "path": "nyc",
+    "description": "Empty placeholder"
+  },
+  {
+    "id": "ost",
+    "path": "ost",
+    "description": "Street view multi-panel layout"
+  },
+  {
+    "id": "point-map",
+    "path": "point-map",
+    "description": "Image to point cloud conversion"
+  },
+  {
+    "id": "react-graph",
+    "path": "react-graph",
+    "description": "Vite React graph prototype"
+  },
+  {
+    "id": "receptukai",
+    "path": "receptukai",
+    "description": "Recipe scraper web app (Next.js)"
+  },
+  {
+    "id": "rutuliukas",
+    "path": "rutuliukas",
+    "description": "Isometric ball game prototype"
+  },
+  {
+    "id": "semantic-1",
+    "path": "semantic-1",
+    "description": "Knowledge/concept exploration with seed documents"
+  },
+  {
+    "id": "skanaus",
+    "path": "skanaus",
+    "description": "Recipe extraction agent (Python/OpenAI)"
+  },
+  {
+    "id": "snapshots",
+    "path": "snapshots",
+    "description": "Image geocoding and map visualization"
+  },
+  {
+    "id": "spotlight",
+    "path": "spotlight",
+    "description": "Adjustable density spotlight effect"
+  },
+  {
+    "id": "squared-py",
+    "path": "squared-py",
+    "description": "Image segmentation script"
+  },
+  {
+    "id": "tonejs-helloworld",
+    "path": "tonejs-helloworld",
+    "description": "Interactive music visualization (Tone.js)"
+  },
+  {
+    "id": "txt",
+    "path": "txt",
+    "description": "Writing/journal notes collection"
+  },
+  {
+    "id": "uiui",
+    "path": "uiui",
+    "description": "React TypeScript UI component framework"
+  },
+  {
+    "id": "uiiuii",
+    "path": "uiiuii",
+    "description": "React TypeScript prototype"
+  },
+  {
+    "id": "uiuiuiui",
+    "path": "uiuiuiui",
+    "description": "Sidebar layout template"
+  },
+  {
+    "id": "video-hover",
+    "path": "video-hover",
+    "description": "Interactive media hover effects"
+  },
+  {
+    "id": "day-49",
+    "path": "100days/day-49",
+    "description": "Grid Trace - Interactive grid path visualization with Geist Pixel font"
+  }
+]

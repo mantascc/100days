@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg id="canvas"></svg>
+    <div id="side-panel" class="collapsed">
+        <button id="toggle-chevron">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 10l5 5 5-5z"/>
+            </svg>
+        </button>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="data.js"></script>
+    <script>
+        // Toggle side panel
+        const sidePanel = document.getElementById('side-panel');
+        const toggleChevron = document.getElementById('toggle-chevron');
+
+        toggleChevron.addEventListener('click', () => {
+            sidePanel.classList.toggle('collapsed');
+        });
+    </script>
+    <script>
+
+        // SVG setup
+        const svg = d3.select("#canvas");
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Arrow marker
+        svg.append("defs").append("marker")
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 10)
+            .attr("refY", 0)
+            .attr("markerWidth", 8)
+            .attr("markerHeight", 8)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("class", "arrow");
+
+        // Create groups
+        const linkGroup = svg.append("g");
+        const nodeGroup = svg.append("g");
+
+        // Force simulation
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(edges)
+                .id(d => d.id)
+                .distance(80))
+            .force("charge", d3.forceManyBody().strength(-240))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(50))
+            .force("x", d3.forceX(width / 2).strength(0.05))
+            .force("y", d3.forceY(height / 2).strength(0.05));
+
+        // Draw links
+        const link = linkGroup.selectAll(".link")
+            .data(edges)
+            .enter()
+            .append("line")
+            .attr("class", "link")
+            .attr("marker-end", "url(#arrowhead)");
+
+        // Draw nodes
+        const node = nodeGroup.selectAll(".node")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .call(d3.drag()
+                .on("start", dragStarted)
+                .on("drag", dragged)
+                .on("end", dragEnded));
+
+        // Measure text
+        const tempText = svg.append("text")
+            .style("font-size", "14px")
+            .style("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif")
+            .style("visibility", "hidden");
+
+        nodes.forEach(d => {
+            tempText.text(d.label);
+            const bbox = tempText.node().getBBox();
+            d.width = bbox.width + 28;
+            d.height = 28;
+        });
+        tempText.remove();
+
+        // Add rectangles
+        node.append("rect")
+            .attr("class", "node-rect")
+            .attr("width", d => d.width)
+            .attr("height", d => d.height)
+            .attr("x", d => -d.width / 2)
+            .attr("y", d => -d.height / 2)
+            .style("fill", d => colorMap[d.group] || "#2a2a2a");
+
+        // Add text
+        node.append("text")
+            .attr("class", "node-text")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .text(d => d.label);
+
+        // Helper function for edge intersection
+        function getRectEdgePoint(x, y, width, height, angle) {
+            const hw = width / 2;
+            const hh = height / 2;
+            const tx = Math.cos(angle);
+            const ty = Math.sin(angle);
+
+            let intersectX, intersectY;
+
+            if (Math.abs(tx) > Math.abs(ty * hw / hh)) {
+                intersectX = tx > 0 ? hw : -hw;
+                intersectY = intersectX * ty / tx;
+            } else {
+                intersectY = ty > 0 ? hh : -hh;
+                intersectX = intersectY * tx / ty;
+            }
+
+            return {x: x + intersectX, y: y + intersectY};
+        }
+
+        // Update positions
+        simulation.on("tick", () => {
+            link.each(function(d) {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const angle = Math.atan2(dy, dx);
+
+                const sourceEdge = getRectEdgePoint(d.source.x, d.source.y, d.source.width, d.source.height, angle);
+                const targetEdge = getRectEdgePoint(d.target.x, d.target.y, d.target.width, d.target.height, angle + Math.PI);
+
+                d3.select(this)
+                    .attr("x1", sourceEdge.x)
+                    .attr("y1", sourceEdge.y)
+                    .attr("x2", targetEdge.x)
+                    .attr("y2", targetEdge.y);
+            });
+
+            node.attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+
+        // Drag functions
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // Handle resize
+        window.addEventListener("resize", () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            svg.attr("width", newWidth).attr("height", newHeight);
+            simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
+            simulation.force("x", d3.forceX(newWidth / 2).strength(0.05));
+            simulation.force("y", d3.forceY(newWidth / 2).strength(0.05));
+            simulation.alpha(0.3).restart();
+        });
+    </script>
+</body>
+</html>

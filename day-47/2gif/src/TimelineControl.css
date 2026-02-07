@@ -1,0 +1,158 @@
+.timeline-control {
+    position: relative;
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.timeline-track {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background-color: var(--surface-2);
+    border-radius: 4px;
+    overflow: visible;
+}
+
+.timeline-active-region {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: #333;
+    /* Darker than track */
+    border-top: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
+    box-sizing: border-box;
+}
+
+.timeline-zoom-region {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: rgba(39, 174, 96, 0.2);
+    border-top: 2px dashed var(--success);
+    border-bottom: 2px dashed var(--success);
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+/* Base Handle Styles */
+.timeline-handle {
+    position: absolute;
+    top: -4px;
+    width: 14px;
+    height: 32px;
+    background-color: var(--text-secondary);
+    cursor: ew-resize;
+    z-index: 10;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+    transition: background-color 0.2s;
+}
+
+.timeline-handle:hover {
+    background-color: var(--text-primary);
+    z-index: 11;
+}
+
+.timeline-handle.handle-start {
+    border-radius: 4px 0 0 4px;
+}
+
+.timeline-handle.handle-end {
+    border-radius: 0 4px 4px 0;
+}
+
+.handle-grip {
+    width: 2px;
+    height: 12px;
+    background-color: var(--surface-1);
+    border-radius: 1px;
+}
+
+/* Zoom Markers */
+.timeline-zoom-marker {
+    position: absolute;
+    top: -24px;
+    bottom: 0;
+    width: 20px;
+    transform: translateX(-50%);
+    z-index: 15;
+    cursor: ew-resize;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeline-zoom-marker.marker-in .zoom-icon {
+    background-color: var(--success);
+}
+
+.timeline-zoom-marker.marker-in .zoom-line {
+    background-color: var(--success);
+}
+
+.timeline-zoom-marker.marker-out .zoom-icon {
+    background-color: #e67e22;
+    /* Orange */
+}
+
+.timeline-zoom-marker.marker-out .zoom-line {
+    background-color: #e67e22;
+}
+
+.zoom-icon {
+    width: 18px;
+    height: 18px;
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s;
+}
+
+.timeline-zoom-marker:hover .zoom-icon {
+    transform: scale(1.1);
+}
+
+.zoom-line {
+    width: 2px;
+    height: 100%;
+    margin-top: 2px;
+    pointer-events: none;
+}
+
+/* Playhead */
+.timeline-playhead {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background-color: var(--accent);
+    z-index: 20;
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.timeline-playhead::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+}

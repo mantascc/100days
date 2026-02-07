@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grid camera</title>
+<style>
+  html, body { height:100%; margin:0; background:#0f0f12; overflow:hidden; color:#cfcfd5; }
+  body { 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    justify-content:center; 
+    gap:clamp(10px, 2vh, 20px); 
+    padding:clamp(10px, 2vh, 20px); 
+    box-sizing:border-box;
+  }
+  #wrap{ 
+    width:min(90vw, 90vh - 120px); 
+    height:min(90vw, 90vh - 120px); 
+    flex-shrink:0;
+    position: relative;
+  }
+  canvas{ width:100%; height:100%; display:block; image-rendering:pixelated; background:#000; }
+  .ui { 
+    display:flex; 
+    gap:clamp(6px, 1vw, 12px); 
+    flex-wrap:wrap; 
+    justify-content:center; 
+    flex-shrink:0;
+    max-width:100%;
+  }
+  .pill{
+    background:#0f0f12cc; 
+    border:1px solid #1a1a1f; 
+    border-radius:clamp(6px, 1vw, 10px); 
+    padding:clamp(4px, 0.8vw, 8px) clamp(6px, 1.2vw, 12px);
+    display:flex; 
+    align-items:center; 
+    gap:clamp(4px, 0.8vw, 8px);
+    flex-shrink:0;
+  }
+  .pill label{ 
+    color:#7a7a84; 
+    font:clamp(10px, 1.5vw, 12px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; 
+  }
+  .pill input[type="range"]{ 
+    min-width:clamp(100px, 15vw, 140px); 
+    max-width:clamp(120px, 20vw, 160px);
+  }
+  .pill button, .pill input[type="checkbox"]+span, .pill select{
+    background:#0f0f12; color:#cfcfd5; border:1px solid #1a1a1f; border-radius:6px; padding:4px 8px; cursor:pointer;
+  }
+  .tag { position:absolute; top:8px; left:8px; font:11px ui-monospace, monospace; opacity:.7; background:#0f0f12; border:1px solid #1a1a1f; border-radius:6px; padding:3px 6px; }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="stage"></canvas>
+    <video id="cam" autoplay playsinline muted style="display:none"></video>
+  </div>
+  <div class="ui">
+    <div class="pill">
+      <label for="th">Threshold</label>
+      <input id="th" type="range" min="0" max="255" step="1" value="128"/>
+    </div>
+    <div class="pill">
+      <label for="gridSize">Size</label>
+      <input id="gridSize" type="range" min="1" max="10" step="1" value="5"/>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // ——— Canvas & DPR ———
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const video = document.getElementById('cam');
+  const off = document.createElement('canvas');
+  const octx = off.getContext('2d', { willReadFrequently: true });
+
+  const thInput = document.getElementById('th');
+  const gridSizeInput = document.getElementById('gridSize');
+
+  function dpr(){ return Math.max(1, Math.min(2, window.devicePixelRatio || 1)); }
+  function agentSize(){ return parseInt(gridSizeInput.value, 10) * dpr(); } // configurable size in device pixels
+
+  function fit(){
+    const wrap = document.getElementById('wrap');
+    const r = wrap.getBoundingClientRect();
+    const scale = dpr();
+    canvas.width = Math.floor(r.width * scale);
+    canvas.height = Math.floor(r.height * scale);
+  }
+  window.addEventListener('resize', fit, { passive:true });
+  fit();
+
+  // ——— Camera ———
+  async function init(){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio:false });
+      video.srcObject = stream;
+      await video.play();
+      requestAnimationFrame(tick);
+    }catch(e){
+      console.error(e);
+      alert('Camera access failed: '+ (e.message||e));
+    }
+  }
+
+  function tick(){
+    if (video.videoWidth > 0) render();
+    requestAnimationFrame(tick);
+  }
+
+  function render(){
+    const W = canvas.width, H = canvas.height;
+    const cell = agentSize();
+    const cols = Math.max(1, Math.floor(W / cell));
+    const rows = Math.max(1, Math.floor(H / cell));
+
+    // Offscreen at grid resolution
+    off.width = cols; off.height = rows;
+
+    // Cover-fit crop from video -> offscreen (cols×rows)
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const vidAspect = vw / vh;
+    const canAspect = cols / rows;
+    let sx, sy, sw, sh;
+    if (vidAspect > canAspect){ sh = vh; sw = Math.floor(vh * canAspect); sx = Math.floor((vw - sw)/2); sy = 0; }
+    else { sw = vw; sh = Math.floor(vw / canAspect); sx = 0; sy = Math.floor((vh - sh)/2); }
+
+    octx.save();
+    octx.clearRect(0,0,cols,rows);
+    octx.translate(cols, 0); octx.scale(-1, 1); // Always mirror
+    octx.drawImage(video, sx, sy, sw, sh, 0, 0, cols, rows);
+    octx.restore();
+
+    // Read, grayscale, threshold
+    const img = octx.getImageData(0,0,cols,rows);
+    const d = img.data;
+    const T = parseInt(thInput.value, 10);
+
+    // Paint black background
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,W,H);
+
+    ctx.fillStyle = '#fff';
+    for (let y=0; y<rows; y++){
+      for (let x=0; x<cols; x++){
+        const i = (y*cols + x)*4;
+        const r = d[i], g = d[i+1], b = d[i+2];
+        const Y = (r*299 + g*587 + b*114)/1000; // luma
+        const on = Y >= T; // Higher threshold = more light needed to activate
+        if (on){ ctx.fillRect(x*cell, y*cell, cell, cell); }
+      }
+    }
+
+    drawGrid(W,H,cell);
+  }
+
+  function drawGrid(W,H,cell){
+    ctx.save();
+    ctx.strokeStyle = '#1a1a1f';
+    ctx.lineWidth = 1; // device pixels
+    ctx.beginPath();
+    for (let x=0; x<=W; x+=cell){ ctx.moveTo(x+0.5, 0); ctx.lineTo(x+0.5, H); }
+    for (let y=0; y<=H; y+=cell){ ctx.moveTo(0, y+0.5); ctx.lineTo(W, y+0.5); }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ——— UI ———
+  // No UI event listeners needed for simplified controls
+
+  init();
+})();
+</script>
+</body>
+</html>

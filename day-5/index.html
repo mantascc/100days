@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fall</title>
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --fg: #e6e6e6;
+      --grid: rgba(255,255,255,.06);
+    }
+    html, body { height: 100%; margin: 0; background: var(--bg); }
+    body { display: grid; place-items: center; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: var(--fg); }
+
+    #stage { position: relative; width: 80vmin; height: 80vmin; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--grid); overflow: hidden; }
+    canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; image-rendering: crisp-edges; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="c" width="600" height="600"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid settings
+    const grid = 10;
+
+    // Agent settings
+    const step = 2;           // agents move on a 2px lattice
+    const AGENT_SIZE = 2;     // visual size of agents in px
+    const AGENT_COUNT = 400;  // change to spawn more/fewer agents
+
+    // URL params
+    const params = new URLSearchParams(window.location.search);
+
+    // Lifetime (seconds): ?life=10
+    const lifetime = Math.max(0.5, parseFloat(params.get('life')) || 5);
+
+    // Single color (agents + trail)
+    const COLOR = '#FFFFFF'; // blue
+
+    // Force-diagonal cadence: every Nth step all agents move down-left (45°)
+    const FORCE_EVERY = 4; // "every 4th step"
+
+    // Create agents
+    const agents = Array.from({ length: AGENT_COUNT }, () => ({
+      x: Math.floor(Math.random() * (W / step)) * step,
+      y: Math.floor(Math.random() * (H / step)) * step,
+    }));
+
+    // Trail: shared array of {x,y,t}
+    const trail = [];
+
+    // Fixed-timestep walker
+    let stepAccumulator = 0;
+    const stepInterval = 70; // ms
+    let globalStepCount = 0; // counts how many randomWalkStep ticks have occurred
+
+    function randomWalkStep() {
+      const now = performance.now();
+      globalStepCount++;
+      const forceDiag = (FORCE_EVERY > 0) && (globalStepCount % FORCE_EVERY === 0);
+
+      for (let i = 0; i < agents.length; i++) {
+        const a = agents[i];
+
+        if (forceDiag) {
+          // Forced DOWN-LEFT (south-west, 45°)
+          a.x -= step;
+          a.y += step;
+        } else {
+          // Independent random step
+          const r = Math.floor(Math.random() * 4);
+          if (r === 0) a.x += step;      // right (east)
+          else if (r === 1) a.x -= step; // left  (west)
+          else if (r === 2) a.y += step; // down  (south)
+          else a.y -= step;              // up    (north)
+        }
+
+        // Wrap
+        if (a.x < 0) a.x = W - step;
+        if (a.y < 0) a.y = H - step;
+        if (a.x >= W) a.x = 0;
+        if (a.y >= H) a.y = 0;
+
+        // Breadcrumb
+        trail.push({ x: a.x, y: a.y, t: now });
+      }
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += grid) {
+        ctx.moveTo(x + 0.5, 0);
+        ctx.lineTo(x + 0.5, H);
+      }
+      for (let y = 0; y <= H; y += grid) {
+        ctx.moveTo(0, y + 0.5);
+        ctx.lineTo(W, y + 0.5);
+      }
+      ctx.stroke();
+    }
+
+    function render(now) {
+      // Background
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#0f0f12';
+      ctx.fillRect(0, 0, W, H);
+
+      // Grid
+      drawGrid();
+
+      // Step logic
+      stepAccumulator += (render.lastNow ? (now - render.lastNow) : 0);
+      while (stepAccumulator >= stepInterval) {
+        randomWalkStep();
+        stepAccumulator -= stepInterval;
+      }
+      render.lastNow = now;
+
+      // Draw fading trail (blue, fading to 0 over `lifetime` seconds)
+      const cutoff = now - lifetime * 1000;
+      while (trail.length && trail[0].t < cutoff - 1000) trail.shift();
+
+      ctx.save();
+      ctx.fillStyle = COLOR;
+      for (let i = 0; i < trail.length; i++) {
+        const p = trail[i];
+        const age = (now - p.t) / 1000;
+        if (age > lifetime) continue;
+        const alpha = Math.max(0, 1 - age / lifetime) * 0.75; // max opacity factor
+        ctx.globalAlpha = alpha;
+        ctx.fillRect(p.x, p.y, AGENT_SIZE, AGENT_SIZE);
+      }
+      ctx.restore();
+
+      // Draw agents (solid blue)
+      ctx.fillStyle = COLOR;
+      for (let i = 0; i < agents.length; i++) {
+        const a = agents[i];
+        ctx.fillRect(a.x, a.y, AGENT_SIZE, AGENT_SIZE);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // Seed initial breadcrumbs so something is visible immediately
+    const now0 = performance.now();
+    for (let i = 0; i < agents.length; i++) {
+      const a = agents[i];
+      trail.push({ x: a.x, y: a.y, t: now0 });
+    }
+
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid glass v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      min-height: 100vh;
+      background: white;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      display: flex;
+    }
+    
+    /* Background image layer */
+    .scene {
+      position: relative;
+      flex: 1;
+      height: 100vh;
+      background: url('../1.avif') center/cover;
+      overflow: hidden;
+    }
+    
+    /* Text overlay */
+    .text-overlay {
+      position: absolute;
+      bottom: 20%;
+      right: 20%;
+      font-family: 'Instrument Serif', serif;
+      font-size: 48px;
+      color: white;
+      z-index: 1;
+    }
+    
+    /* Glass pane */
+    .glass {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 300px;
+      cursor: move;
+      user-select: none;
+      z-index: 2;
+      
+      /* Editable variables */
+      --blur: 2px;
+      --saturation: 180%;
+      --brightness: 110%;
+      --contrast: 100%;
+      --bg-alpha: 0.1;
+      --border-alpha: 0;
+      --shape: 16px;
+      --hue: 0deg;
+      
+      background: rgba(255, 255, 255, var(--bg-alpha));
+      backdrop-filter: 
+        blur(var(--blur)) 
+        saturate(var(--saturation))
+        brightness(var(--brightness))
+        contrast(var(--contrast))
+        hue-rotate(var(--hue));
+      border: 1px solid rgba(255, 255, 255, var(--border-alpha));
+      border-radius: var(--shape);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Glass hover border highlight */
+    .glass:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* Controls panel */
+    .controls {
+      width: 280px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 0 16px 16px;
+      color: white;
+      overflow-y: auto;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .controls-content {
+      flex: 1;
+    }
+    
+    .controls-footer {
+      margin-top: auto;
+      padding-top: 16px;
+    }
+    
+    .control-group {
+      margin-bottom: 16px;
+      margin-right: 16px;
+    }
+    
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      letter-spacing: 0.5px;
+    }
+    
+    .control-group input[type="range"] {
+      width: 100%;
+      margin-bottom: 5px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #1e1e1e;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    /* Range slider track */
+    .control-group input[type="range"]::-webkit-slider-track {
+      background: rgba(255, 255, 255, 0.2);
+      height: 4px;
+      border-radius: 2px;
+    }
+    
+    .control-group input[type="range"]::-moz-range-track {
+      background: rgba(255, 255, 255, 0.2);
+      height: 4px;
+      border-radius: 2px;
+    }
+    
+    /* Range slider thumb */
+    .control-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #999999;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .control-group input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #999999;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .control-group input[type="range"]::-webkit-slider-thumb:hover {
+      background: #cccccc;
+    }
+    
+    .control-group input[type="range"]::-moz-range-thumb:hover {
+      background: #cccccc;
+    }
+    
+    .control-group .value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    button {
+      width: calc(100% - 16px);
+      margin-right: 16px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    h3 {
+      margin-right: 16px;
+      margin-bottom: 16px;
+    }
+    
+    /* Animation header row with compact icon controls */
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-right: 16px;
+      margin-bottom: 8px;
+    }
+    .icon-toggle {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      padding: 6px;
+      margin: 0;
+      cursor: pointer;
+      line-height: 0;
+      border-radius: 4px;
+      opacity: 0.7;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-btn:hover { opacity: 0.9; }
+    .icon-btn.active { 
+      opacity: 1; 
+      background: #1e1e1e; /* match slider background */
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .icon-btn svg { width: 14px; height: 14px; color: #ffffff; }
+    .hidden { display: none; }
+    
+    hr {
+      margin: 16px 16px 16px 0;
+    }
+    
+    /* Liquid intensity buttons - Segmented Control */
+    .intensity-group {
+      display: flex;
+      gap: 0;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .intensity-btn {
+      flex: 1;
+      padding: 8px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+      border: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin: 0;
+      border-radius: 0;
+    }
+    
+    .intensity-btn:last-child {
+      border-right: none;
+    }
+    
+    .intensity-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .intensity-btn.active {
+      background: #1e1e1e; /* match slider background */
+      color: white;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    
+    /* SVG filters container */
+    svg {
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- SVG Filters -->
+  <svg>
+    <defs>
+      <filter id="liquid">
+        <feTurbulence 
+          type="fractalNoise" 
+          baseFrequency="0.012" 
+          numOctaves="3"
+          id="turbulence"/>
+        <feDisplacementMap 
+          in="SourceGraphic" 
+          scale="25"
+          id="displacement"/>
+      </filter>
+    </defs>
+  </svg>
+  
+  <!-- Scene -->
+  <div class="scene">
+    <div class="text-overlay">Mintis</div>
+    <div class="glass" id="glass">
+    </div>
+  </div>
+  
+  <!-- Controls -->
+  <div class="controls">
+    <div class="controls-content">
+      <h3>Properties</h3>
+      
+    <div class="control-group">
+      <label>Blur</label>
+      <input type="range" id="blur" min="0" max="50" value="2" step="1">
+      <span class="value" id="blur-value">2px</span>
+    </div>
+      
+      <div class="control-group">
+        <label>Saturation</label>
+        <input type="range" id="saturation" min="50" max="300" value="180" step="10">
+        <span class="value" id="saturation-value">180%</span>
+      </div>
+      
+      <div class="control-group">
+        <label>Brightness</label>
+        <input type="range" id="brightness" min="50" max="200" value="110" step="5">
+        <span class="value" id="brightness-value">110%</span>
+      </div>
+      
+      <div class="control-group">
+        <label>Contrast</label>
+        <input type="range" id="contrast" min="50" max="200" value="100" step="5">
+        <span class="value" id="contrast-value">100%</span>
+      </div>
+      
+      <div class="control-group">
+        <label>Hue</label>
+        <input type="range" id="hue" min="0" max="360" value="0" step="1">
+        <span class="value" id="hue-value">0deg</span>
+      </div>
+      
+      <div class="control-group">
+        <label>Background Alpha</label>
+        <input type="range" id="bg-alpha" min="0" max="1" value="0.1" step="0.01">
+        <span class="value" id="bg-alpha-value">0.1</span>
+      </div>
+      
+      <hr style="opacity: 0.2;">
+      
+      <div class="control-group">
+        <label>Liquid Distortion</label>
+        <div class="intensity-group">
+          <button class="intensity-btn" onclick="setLiquidIntensity('low', this)">Low</button>
+          <button class="intensity-btn" onclick="setLiquidIntensity('medium', this)">Medium</button>
+          <button class="intensity-btn active" onclick="setLiquidIntensity('high', this)">High</button>
+        </div>
+      </div>
+      
+      <hr style="opacity: 0.2;">
+      
+      <button onclick="randomizeProperties()">Suffle parameters</button>
+
+      <hr style="opacity: 0.2;">
+      
+      <div class="header-row">
+        <h3 style="margin-bottom: 0;">Animation</h3>
+        <div class="icon-toggle" aria-label="Animation controls">
+          <button id="anim-play" class="icon-btn active" title="Play" aria-label="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+          <button id="anim-pause" class="icon-btn" title="Pause" aria-label="Pause">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6 5h4v14H6zM14 5h4v14h-4z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="control-group" id="speed-group">
+        <label>Speed</label>
+        <input type="range" id="anim-speed" min="0.25" max="2" value="1" step="0.05">
+        <span class="value" id="anim-speed-value">1.00×</span>
+      </div>
+    </div>
+    
+    <div class="controls-footer">
+      <button onclick="exportCSS()">Export CSS</button>
+    </div>
+  </div>
+  
+  <script>
+    const glass = document.getElementById('glass');
+    let currentLiquidIntensity = 'high';
+    let isAnimating = false;
+    // Dynamic style only
+    let speedMultiplier = 1.0;
+    let rafId = null;
+    let animationStartMs = 0;
+    let baseline = { scale: 25, frequency: 0.012 };
+    
+    // Initialize liquid filter with high intensity
+    glass.style.filter = 'url(#liquid)';
+    document.getElementById('displacement').setAttribute('scale', '25');
+    document.getElementById('turbulence').setAttribute('baseFrequency', '0.012');
+    // Initialize hue filter composition
+    applyGlassFilterString();
+    
+    // Dragging functionality
+    let isDragging = false;
+    let currentX = 0;
+    let currentY = 0;
+    let initialX = 0;
+    let initialY = 0;
+    let xOffset = 0;
+    let yOffset = 0;
+    
+    glass.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+    
+    function dragStart(e) {
+      initialX = e.clientX - xOffset;
+      initialY = e.clientY - yOffset;
+      
+      if (e.target === glass || e.target.closest('.drag-handle')) {
+        isDragging = true;
+        glass.style.cursor = 'grabbing';
+      }
+    }
+    
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        
+        xOffset = currentX;
+        yOffset = currentY;
+        
+        setTranslate(currentX, currentY, glass);
+      }
+    }
+    
+    function dragEnd(e) {
+      if (isDragging) {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+        glass.style.cursor = 'move';
+      }
+    }
+    
+    function setTranslate(xPos, yPos, el) {
+      el.style.transform = `translate(calc(-50% + ${xPos}px), calc(-50% + ${yPos}px))`;
+    }
+    
+    // Control mapping
+    const controls = {
+      blur: { elem: 'blur', prop: '--blur', unit: 'px' },
+      saturation: { elem: 'saturation', prop: '--saturation', unit: '%' },
+      brightness: { elem: 'brightness', prop: '--brightness', unit: '%' },
+      contrast: { elem: 'contrast', prop: '--contrast', unit: '%' },
+      'bg-alpha': { elem: 'bg-alpha', prop: '--bg-alpha', unit: '' },
+      hue: { elem: 'hue', prop: '--hue', unit: 'deg' }
+    };
+    
+    // Initialize controls
+    Object.keys(controls).forEach(key => {
+      const control = controls[key];
+      const input = document.getElementById(control.elem);
+      const display = document.getElementById(`${control.elem}-value`);
+      
+      input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        glass.style.setProperty(control.prop, value + control.unit);
+        display.textContent = value + control.unit;
+        if (control.elem === 'hue') {
+          applyGlassFilterString();
+        }
+      });
+    });
+
+    function applyGlassFilterString() {
+      const styles = getComputedStyle(glass);
+      const hue = styles.getPropertyValue('--hue').trim();
+      glass.style.filter = `url(#liquid) hue-rotate(${hue})`;
+    }
+    
+    // Liquid distortion intensity settings
+    const liquidIntensities = {
+      low: { scale: 8, frequency: 0.008 },
+      medium: { scale: 15, frequency: 0.01 },
+      high: { scale: 25, frequency: 0.012 }
+    };
+    
+    function setLiquidIntensity(intensity, element) {
+      currentLiquidIntensity = intensity;
+      const settings = liquidIntensities[intensity];
+      
+      // Update SVG filter parameters
+      const displacement = document.getElementById('displacement');
+      const turbulence = document.getElementById('turbulence');
+      
+      displacement.setAttribute('scale', settings.scale);
+      turbulence.setAttribute('baseFrequency', settings.frequency);
+      baseline = { scale: settings.scale, frequency: settings.frequency };
+      
+      // Update active button state
+      document.querySelectorAll('.intensity-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+    
+    // Randomize all properties
+    function randomizeProperties() {
+      const randomValues = {
+        blur: Math.floor(Math.random() * 51), // 0-50
+        saturation: Math.floor(Math.random() * 251) + 50, // 50-300
+        brightness: Math.floor(Math.random() * 151) + 50, // 50-200
+        contrast: Math.floor(Math.random() * 151) + 50, // 50-200
+        'bg-alpha': Math.round((Math.random() * 0.3) * 100) / 100 // 0-0.3
+      };
+      
+      // Update all controls
+      Object.keys(randomValues).forEach(key => {
+        const control = controls[key];
+        const input = document.getElementById(control.elem);
+        const display = document.getElementById(`${control.elem}-value`);
+        
+        input.value = randomValues[key];
+        glass.style.setProperty(control.prop, randomValues[key] + control.unit);
+        display.textContent = randomValues[key] + control.unit;
+      });
+      
+      // Randomize liquid distortion intensity
+      const intensities = ['low', 'medium', 'high'];
+      const randomIntensity = intensities[Math.floor(Math.random() * 3)];
+      const buttons = document.querySelectorAll('.intensity-btn');
+      buttons.forEach((btn, index) => {
+        if (btn.textContent.toLowerCase() === randomIntensity) {
+          setLiquidIntensity(randomIntensity, btn);
+        }
+      });
+    }
+    
+    // Export CSS
+    function exportCSS() {
+      const styles = window.getComputedStyle(glass);
+      const settings = liquidIntensities[currentLiquidIntensity];
+      const css = `.glass {
+  background: ${styles.background};
+  backdrop-filter: ${styles.backdropFilter};
+  border: ${styles.border};
+  border-radius: ${styles.borderRadius};
+  box-shadow: ${styles.boxShadow};
+  filter: url(#liquid);
+}
+
+/* Liquid distortion (${currentLiquidIntensity}) */
+/* Add this SVG filter to your HTML:
+<filter id="liquid">
+  <feTurbulence type="fractalNoise" baseFrequency="${settings.frequency}" numOctaves="3"/>
+  <feDisplacementMap in="SourceGraphic" scale="${settings.scale}"/>
+</filter>
+*/`;
+      
+      console.log(css);
+      alert('CSS exported to console!');
+    }
+
+    // Animation
+    function animationFrame(nowMs) {
+      if (!isAnimating) return;
+      if (!animationStartMs) animationStartMs = nowMs;
+      const t = ((nowMs - animationStartMs) / 1000) * speedMultiplier;
+
+      const profiles = {
+        dynamic: { scaleAmp: 10, freqAmp: 0.006, scaleSpeed: 1.2, freqSpeed: 0.9 }
+      };
+      const p = profiles.dynamic;
+
+      const scale = baseline.scale + Math.sin(t * p.scaleSpeed) * p.scaleAmp;
+      const freq = Math.max(0.002, baseline.frequency + Math.cos(t * p.freqSpeed) * p.freqAmp);
+
+      document.getElementById('displacement').setAttribute('scale', scale.toFixed(2));
+      document.getElementById('turbulence').setAttribute('baseFrequency', freq.toFixed(4));
+
+      rafId = requestAnimationFrame(animationFrame);
+    }
+
+    // Animation style selector removed; dynamic profile is always used
+
+    const playBtn = document.getElementById('anim-play');
+    const pauseBtn = document.getElementById('anim-pause');
+
+    function setAnimationRunning(running) {
+      isAnimating = running;
+      if (playBtn && pauseBtn) {
+        playBtn.classList.toggle('active', running);
+        pauseBtn.classList.toggle('active', !running);
+      }
+      const speedGroup = document.getElementById('speed-group');
+      if (speedGroup) {
+        speedGroup.classList.toggle('hidden', !running);
+      }
+      if (running) {
+        animationStartMs = 0;
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(animationFrame);
+      } else {
+        cancelAnimationFrame(rafId);
+      }
+    }
+
+    if (playBtn) playBtn.addEventListener('click', () => setAnimationRunning(true));
+    if (pauseBtn) pauseBtn.addEventListener('click', () => setAnimationRunning(false));
+
+    const speedInput = document.getElementById('anim-speed');
+    const speedDisplay = document.getElementById('anim-speed-value');
+    if (speedInput) {
+      speedInput.addEventListener('input', (e) => {
+        speedMultiplier = parseFloat(e.target.value);
+        speedDisplay.textContent = speedMultiplier.toFixed(2) + '×';
+      });
+    }
+
+    // Start animating by default (Play preselected)
+    setAnimationRunning(true);
+  </script>
+  
+</body>
+</html>
+
+

@@ -1,0 +1,20 @@
+[
+  {
+    "email": "test@tets.com",
+    "category": "Bug Report",
+    "rating": "1",
+    "message": "Aahhh!!!",
+    "wouldRecommend": "No",
+    "timestamp": "2026-01-14T10:20:20.617Z",
+    "submittedAt": "1/14/2026, 11:20:20 AM"
+  },
+  {
+    "email": "Test@wow.com",
+    "category": "Praise",
+    "rating": "5",
+    "message": "So nice!",
+    "wouldRecommend": "No",
+    "timestamp": "2026-01-14T10:22:14.322Z",
+    "submittedAt": "1/14/2026, 11:22:14 AM"
+  }
+]

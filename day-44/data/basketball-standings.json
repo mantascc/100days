@@ -1,0 +1,92 @@
+[
+  {
+    "rank": 1,
+    "team": "Phoenix Suns",
+    "wins": 42,
+    "losses": 18,
+    "pct": ".700",
+    "gb": "-",
+    "streak": "W5"
+  },
+  {
+    "rank": 2,
+    "team": "Denver Nuggets",
+    "wins": 40,
+    "losses": 20,
+    "pct": ".667",
+    "gb": "2.0",
+    "streak": "W3"
+  },
+  {
+    "rank": 3,
+    "team": "Memphis Tigers",
+    "wins": 38,
+    "losses": 22,
+    "pct": ".633",
+    "gb": "4.0",
+    "streak": "L1"
+  },
+  {
+    "rank": 4,
+    "team": "Golden State Warriors",
+    "wins": 35,
+    "losses": 25,
+    "pct": ".583",
+    "gb": "7.0",
+    "streak": "W2"
+  },
+  {
+    "rank": 5,
+    "team": "Dallas Mavericks",
+    "wins": 33,
+    "losses": 27,
+    "pct": ".550",
+    "gb": "9.0",
+    "streak": "L2"
+  },
+  {
+    "rank": 6,
+    "team": "LA Clippers",
+    "wins": 31,
+    "losses": 29,
+    "pct": ".517",
+    "gb": "11.0",
+    "streak": "W1"
+  },
+  {
+    "rank": 7,
+    "team": "Minnesota Wolves",
+    "wins": 28,
+    "losses": 32,
+    "pct": ".467",
+    "gb": "14.0",
+    "streak": "L3"
+  },
+  {
+    "rank": 8,
+    "team": "Portland Blazers",
+    "wins": 25,
+    "losses": 35,
+    "pct": ".417",
+    "gb": "17.0",
+    "streak": "L1"
+  },
+  {
+    "rank": 9,
+    "team": "Sacramento Kings",
+    "wins": 22,
+    "losses": 38,
+    "pct": ".367",
+    "gb": "20.0",
+    "streak": "W1"
+  },
+  {
+    "rank": 10,
+    "team": "New Orleans Pelicans",
+    "wins": 18,
+    "losses": 42,
+    "pct": ".300",
+    "gb": "24.0",
+    "streak": "L7"
+  }
+]

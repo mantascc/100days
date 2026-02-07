@@ -1,0 +1,20 @@
+{
+    "metadata": { "time_utc": "2025-10-16T18:00:00Z" },
+    "phase": {
+      "name": "Waxing Gibbous",
+      "illumination_fraction": 0.78,
+      "illumination_percent": 78,
+      "age_days": 11.5,
+      "phase_angle_deg": 128.4,
+      "elongation_deg": 128.4,
+      "energy": {
+        "phase": "Waxing Gibbous",
+        "keywords": ["refine","polish","prepare"],
+        "energy": "Focused, perfecting.",
+        "focus": ["iterate","QA/crit","prepare launch"],
+        "polarity": "balanced",
+        "cycle_stage": "refine"
+      }
+    }
+  }
+  

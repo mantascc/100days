@@ -1,0 +1,10 @@
+[
+  { "team": "PHX", "wins": 42 },
+  { "team": "DEN", "wins": 40 },
+  { "team": "MEM", "wins": 38 },
+  { "team": "GSW", "wins": 35 },
+  { "team": "DAL", "wins": 33 },
+  { "team": "LAC", "wins": 31 },
+  { "team": "MIN", "wins": 28 },
+  { "team": "POR", "wins": 25 }
+]

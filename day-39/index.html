@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Morph Sketch</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Preload fonts if possible, or just let them load via CSS -->
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="hero-title">Wave Morph</h1>
+        </header>
+
+        <main class="visual-card">
+            <canvas id="visualizer"></canvas>
+        </main>
+
+        <footer class="controls-bar">
+            <button id="toggle-btn" class="control-btn" aria-label="Play/Pause">
+                <span class="icon-play">PLAY</span>
+            </button>
+
+            <div class="slider-container">
+                <input type="range" id="morph-slider" min="0" max="3" step="0.01" value="0">
+                <div class="slider-labels">
+                    <span>SIN</span>
+                    <span>TRI</span>
+                    <span>SQR</span>
+                    <span>SAW</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

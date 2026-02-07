@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linked agents</title>
+<style>
+  :root{
+    --bg:#0f0f12;       /* black stage */
+    --grid:#1e1e25;     /* grid lines */
+    --ink:#e6e6e6;      /* text */
+    --pt:#ffffff;       /* agents */
+    --edge-mst:#444444; /* MST edges */
+    --edge-extra:#444444; /* extra edges */
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+  body{display:grid;place-items:center}
+  #stage{position:relative;width:420px;height:420px;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);overflow:hidden}
+  canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+  .note{position:absolute;left:10px;bottom:10px;opacity:.7;font-size:12px}
+</style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="c"></canvas>
+  </div>
+<script>
+(() => {
+  const N = 200;          // agents in the cluster
+  const PT = 2;         // agent size (px)
+  const GRID = 20;      // grid spacing (px)
+  const MAX_DEG = 3;    // degree cap for extra edges
+  const MAX_EXTRA = 12; // max extra edges beyond MST
+  const DRIFT = 0.30;   // gentle motion per tick
+  const JITTER = 0.02;  // noise on velocity
+  const EDGE_MIN = 8;   // clamp very short lines
+  const EDGE_MAX = 80; // clamp very long lines
+
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.max(1, Math.min(2, devicePixelRatio||1));
+
+  function resize(){
+    const r = stage.getBoundingClientRect();
+    canvas.width = Math.round(r.width*dpr);
+    canvas.height = Math.round(r.height*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  const W = () => stage.getBoundingClientRect().width;
+  const H = () => stage.getBoundingClientRect().height;
+
+  // init a tight cluster near center
+  const cx = W()/2, cy = H()/2;
+  const rad = Math.min(W(),H())*0.18; // cluster radius
+  const pts = new Array(N).fill(0).map((_,i)=>{
+    const a = (i/N)*Math.PI*2 + Math.random()*0.6; // rough ring
+    return {
+      x: cx + Math.cos(a)*rad*(0.6+Math.random()*0.4),
+      y: cy + Math.sin(a)*rad*(0.6+Math.random()*0.4),
+      vx: (Math.random()*2-1)*DRIFT,
+      vy: (Math.random()*2-1)*DRIFT
+    };
+  });
+
+  // mouse nudge
+  let mouse = null;
+  stage.addEventListener('pointerdown', e=>mouse={x:e.offsetX,y:e.offsetY});
+  stage.addEventListener('pointermove', e=>{ if(mouse){ mouse.x=e.offsetX; mouse.y=e.offsetY; }});
+  addEventListener('pointerup', ()=>mouse=null);
+
+  function step(){
+    const w=W(), h=H();
+    // move points with gentle drift and boundary reflect
+    for(const p of pts){
+      p.vx += (Math.random()*2-1)*JITTER;
+      p.vy += (Math.random()*2-1)*JITTER;
+      p.vx = clamp(p.vx,-DRIFT,DRIFT);
+      p.vy = clamp(p.vy,-DRIFT,DRIFT);
+
+      // repel from mouse
+      if(mouse){
+        const dx=p.x-mouse.x, dy=p.y-mouse.y, d2=dx*dx+dy*dy;
+        if(d2<2000){ p.vx += dx*0.0012; p.vy += dy*0.0012; }
+      }
+
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0||p.x>w){ p.vx*=-1; p.x = clamp(p.x,0,w); }
+      if(p.y<0||p.y>h){ p.vy*=-1; p.y = clamp(p.y,0,h); }
+    }
+
+    const edges = buildPlanarEdges(pts);
+    draw(pts, edges);
+    requestAnimationFrame(step);
+  }
+
+  // === Planar builder ===
+  function buildPlanarEdges(pts){
+    const all = [];
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const len = dist(pts[i], pts[j]);
+        if(len<EDGE_MIN || len>EDGE_MAX) continue;
+        all.push({i,j,len});
+      }
+    }
+    all.sort((a,b)=>a.len-b.len);
+
+    const uf = new UnionFind(pts.length);
+    const mst = [];
+    for(const e of all){
+      if(uf.find(e.i)!==uf.find(e.j)){
+        if(!intersectsAny(e, mst, pts)){
+          uf.union(e.i,e.j); mst.push(e);
+          if(mst.length===pts.length-1) break;
+        }
+      }
+    }
+
+    const deg = new Uint8Array(pts.length);
+    for(const e of mst){ deg[e.i]++; deg[e.j]++; }
+    const extra = [];
+    for(const e of all){
+      if(mst.includes(e)) continue;
+      if(deg[e.i]>=MAX_DEG || deg[e.j]>=MAX_DEG) continue;
+      if(intersectsAny(e, mst, pts)) continue;
+      if(intersectsAny(e, extra, pts)) continue;
+      extra.push(e); deg[e.i]++; deg[e.j]++;
+      if(extra.length>=MAX_EXTRA) break;
+    }
+
+    return { mst, extra };
+  }
+
+  function dist(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
+  function clamp(v,a,b){ return v<a?a : v>b?b : v; }
+
+  function intersectsAny(e, list, pts){
+    const a=pts[e.i], b=pts[e.j];
+    for(const f of list){
+      const c=pts[f.i], d=pts[f.j];
+      if(e.i===f.i||e.i===f.j||e.j===f.i||e.j===f.j) continue;
+      if(segmentsIntersect(a,b,c,d)) return true;
+    }
+    return false;
+  }
+
+  function segmentsIntersect(a,b,c,d){
+    const o1 = orient(a,b,c);
+    const o2 = orient(a,b,d);
+    const o3 = orient(c,d,a);
+    const o4 = orient(c,d,b);
+    if(o1===0 && onSeg(a,b,c)) return true;
+    if(o2===0 && onSeg(a,b,d)) return true;
+    if(o3===0 && onSeg(c,d,a)) return true;
+    if(o4===0 && onSeg(c,d,b)) return true;
+    return (o1>0)!==(o2>0) && (o3>0)!==(o4>0);
+  }
+  function orient(p,q,r){ return Math.sign((q.y-p.y)*(r.x-q.x) - (q.x-p.x)*(r.y-q.y)); }
+  function onSeg(p,q,r){
+    return r.x>=Math.min(p.x,q.x)-1e-9 && r.x<=Math.max(p.x,q.x)+1e-9 &&
+           r.y>=Math.min(p.y,q.y)-1e-9 && r.y<=Math.max(p.y,q.y)+1e-9;
+  }
+
+  function draw(pts, edges){
+    const w=W(), h=H();
+    ctx.clearRect(0,0,w,h);
+
+    // grid
+    ctx.beginPath();
+    for(let x=0;x<=w;x+=GRID){ ctx.moveTo(x,0); ctx.lineTo(x,h); }
+    for(let y=0;y<=h;y+=GRID){ ctx.moveTo(0,y); ctx.lineTo(w,y); }
+    ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.stroke();
+
+    // MST edges
+    ctx.beginPath();
+    for(const e of edges.mst){
+      const a=pts[e.i], b=pts[e.j];
+      ctx.moveTo(a.x+0.5,a.y+0.5);
+      ctx.lineTo(b.x+0.5,b.y+0.5);
+    }
+    ctx.strokeStyle=varGet('--edge-mst','#cfcfd4');
+    ctx.lineWidth=1; ctx.stroke();
+
+    // Extra edges
+    ctx.beginPath();
+    for(const e of edges.extra){
+      const a=pts[e.i], b=pts[e.j];
+      ctx.moveTo(a.x+0.5,a.y+0.5);
+      ctx.lineTo(b.x+0.5,b.y+0.5);
+    }
+    ctx.strokeStyle=varGet('--edge-extra','#aaaaaa');
+    ctx.lineWidth=1; ctx.stroke();
+
+    // agents
+    ctx.fillStyle=varGet('--pt','#ffffff');
+    for(const p of pts){
+      ctx.fillRect(Math.round(p.x)-1, Math.round(p.y)-1, PT, PT);
+    }
+  }
+
+  function varGet(name, fallback){
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+
+  function UnionFind(n){ this.p=new Int16Array(n).fill(-1); }
+  UnionFind.prototype.find=function(x){
+    let p=x; while(this.p[p]>=0) p=this.p[p];
+    while(x!==p){ const n=this.p[x]; this.p[x]=p; x=n; }
+    return p;
+  }
+  UnionFind.prototype.union=function(a,b){
+    a=this.find(a); b=this.find(b); if(a===b) return false;
+    if(this.p[a]>this.p[b]){ const t=a;a=b;b=t; }
+    this.p[a]+=this.p[b]; this.p[b]=a; return true;
+  }
+
+  requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>

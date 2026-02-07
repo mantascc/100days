@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>metaball</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            cursor: crosshair;
+            font-family: 'Courier New', Monaco, 'Lucida Console', monospace;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .info {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            color: #666;
+            font-size: 11px;
+            letter-spacing: 1px;
+            line-height: 1.6;
+            text-transform: lowercase;
+            pointer-events: none;
+        }
+
+        .help-btn {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #333;
+            background: #0a0a0a;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .help-btn:hover {
+            color: #999;
+            border-color: #666;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            cursor: default;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            width: 75%;
+            max-height: 85vh;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            overflow-y: auto;
+            padding: 60px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #333;
+            background: #0a0a0a;
+            color: #666;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #999;
+            border-color: #666;
+        }
+
+        .modal h1 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+            margin-bottom: 40px;
+        }
+
+        .modal h2 {
+            color: #666;
+            font-size: 13px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            text-transform: lowercase;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 8px;
+        }
+
+        .modal p {
+            color: #999;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .modal code {
+            color: #fff;
+            background: #0f0f0f;
+            padding: 2px 6px;
+            font-size: 13px;
+        }
+
+        .modal .formula {
+            text-align: center;
+            padding: 30px;
+            font-size: 16px;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        .modal ul,
+        .modal ol {
+            list-style: none;
+            margin: 16px 0;
+            color: #999;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .modal ul li,
+        .modal ol li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .modal ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: #333;
+        }
+
+        .modal ol {
+            counter-reset: step;
+        }
+
+        .modal ol li {
+            counter-increment: step;
+        }
+
+        .modal ol li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            color: #333;
+            font-size: 11px;
+        }
+
+        .diagram {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .diagram-item {
+            flex: 1;
+            text-align: center;
+            padding: 16px;
+            border: 1px solid #1a1a1a;
+        }
+
+        .diagram-item .label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .diagram-item .desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Mobile fallback */
+        .mobile-fallback {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 50;
+            padding: 40px;
+        }
+
+        .mobile-fallback .message {
+            color: #666;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: lowercase;
+            margin-bottom: 30px;
+        }
+
+        .mobile-fallback .what-btn {
+            border: 1px solid #333;
+            background: #0a0a0a;
+            color: #666;
+            font-size: 13px;
+            font-family: inherit;
+            letter-spacing: 1px;
+            text-transform: lowercase;
+            padding: 12px 24px;
+            cursor: pointer;
+        }
+
+        .mobile-fallback .what-btn:hover {
+            color: #999;
+            border-color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-fallback {
+                display: flex;
+            }
+
+            canvas,
+            .info,
+            .help-btn {
+                display: none;
+            }
+
+            .modal {
+                width: 90%;
+                padding: 30px;
+            }
+
+            .diagram {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-fallback" id="mobileFallback">
+        <div class="message">mobile is not available :(</div>
+        <button class="what-btn" id="whatBtn">what is it?</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <div class="info">
+        metaball / marching squares<br>
+        move cursor to interact
+    </div>
+
+    <button class="help-btn" id="helpBtn">?</button>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <button class="modal-close" id="modalClose">×</button>
+        <div class="modal">
+            <h1>metaball / explanation</h1>
+
+            <h2>what is metaball</h2>
+            <p>
+                a metaball is a surface defined by summed influence fields. each point generates
+                an invisible force that weakens with distance. where multiple fields overlap
+                strongly enough, surfaces merge organically.
+            </p>
+
+            <h2>the math</h2>
+            <div class="formula">strength = r² / distance²</div>
+            <p>
+                close to center = strong field<br>
+                far from center = weak field<br>
+                sum all circles at any point<br>
+                where sum ≥ 1.0 = visible surface
+            </p>
+
+            <h2>emergence</h2>
+            <div class="diagram">
+                <div class="diagram-item">
+                    <div class="label">far</div>
+                    <div class="desc">fields don't overlap</div>
+                </div>
+                <div class="diagram-item">
+                    <div class="label">closer</div>
+                    <div class="desc">fields begin to sum</div>
+                </div>
+                <div class="diagram-item">
+                    <div class="label">threshold</div>
+                    <div class="desc">connection appears</div>
+                </div>
+                <div class="diagram-item">
+                    <div class="label">merged</div>
+                    <div class="desc">single unified blob</div>
+                </div>
+            </div>
+
+            <h2>marching squares</h2>
+            <ol>
+                <li>create grid over space</li>
+                <li>sample field strength at each point</li>
+                <li>mark points above/below threshold</li>
+                <li>draw lines where boundary crosses</li>
+                <li>connect lines into contours</li>
+            </ol>
+
+            <h2>applications</h2>
+            <ul>
+                <li>molecular visualization</li>
+                <li>fluid simulation rendering</li>
+                <li>organic 3d modeling</li>
+                <li>motion graphics</li>
+                <li>game effects (slime, water)</li>
+            </ul>
+
+            <h2>variations</h2>
+            <ul>
+                <li><code>charge</code> — negative = repulsion field</li>
+                <li><code>radii</code> — larger circles dominate</li>
+                <li><code>falloff</code> — exponential or linear decay</li>
+                <li><code>bodies</code> — multiple autonomous circles</li>
+                <li><code>3d</code> — metaspheres via marching cubes</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const GRID = 10;
+        const THRESHOLD = 1.0;
+        const R1 = 80;
+        const R2 = 60;
+
+        // Canvas setup
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+
+        // Circle positions
+        let cx1, cy1; // fixed center
+        let cx2, cy2; // cursor follower
+
+        // Field strength at point
+        const field = (px, py) => {
+            const d1_sq = (px - cx1) ** 2 + (py - cy1) ** 2;
+            const d2_sq = (px - cx2) ** 2 + (py - cy2) ** 2;
+            const s1 = d1_sq > 0 ? (R1 * R1) / d1_sq : 999;
+            const s2 = d2_sq > 0 ? (R2 * R2) / d2_sq : 999;
+            return s1 + s2;
+        };
+
+        // Linear interpolation for edge crossing
+        const interp = (v1, v2, p1, p2) => {
+            if (Math.abs(v2 - v1) < 0.0001) return p1;
+            const t = (THRESHOLD - v1) / (v2 - v1);
+            return p1 + t * (p2 - p1);
+        };
+
+        // Resize handler
+        const resize = () => {
+            W = window.innerWidth;
+            H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+            cx1 = W / 2;
+            cy1 = H / 2;
+        };
+
+        // Mouse handler
+        const on_mouse = (e) => {
+            cx2 = e.clientX;
+            cy2 = e.clientY;
+        };
+
+        // Draw frame
+        const draw = () => {
+            // Clear
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+
+            // March through grid
+            for (let gy = 0; gy < H; gy += GRID) {
+                for (let gx = 0; gx < W; gx += GRID) {
+                    // Sample corners: TL, TR, BR, BL
+                    const x0 = gx, y0 = gy;
+                    const x1 = gx + GRID, y1 = gy + GRID;
+
+                    const fTL = field(x0, y0);
+                    const fTR = field(x1, y0);
+                    const fBR = field(x1, y1);
+                    const fBL = field(x0, y1);
+
+                    // Build case index (bit order: TL=1, TR=2, BR=4, BL=8)
+                    let idx = 0;
+                    if (fTL >= THRESHOLD) idx |= 1;
+                    if (fTR >= THRESHOLD) idx |= 2;
+                    if (fBR >= THRESHOLD) idx |= 4;
+                    if (fBL >= THRESHOLD) idx |= 8;
+
+                    // Skip empty/full cells
+                    if (idx === 0 || idx === 15) continue;
+
+                    // Edge midpoints (interpolated)
+                    const top = [interp(fTL, fTR, x0, x1), y0];
+                    const right = [x1, interp(fTR, fBR, y0, y1)];
+                    const bottom = [interp(fBL, fBR, x0, x1), y1];
+                    const left = [x0, interp(fTL, fBL, y0, y1)];
+
+                    // Draw lines based on case
+                    const line = (a, b) => {
+                        ctx.moveTo(a[0], a[1]);
+                        ctx.lineTo(b[0], b[1]);
+                    };
+
+                    switch (idx) {
+                        case 1: line(left, top); break;
+                        case 2: line(top, right); break;
+                        case 3: line(left, right); break;
+                        case 4: line(right, bottom); break;
+                        case 5: line(left, top); line(right, bottom); break;
+                        case 6: line(top, bottom); break;
+                        case 7: line(left, bottom); break;
+                        case 8: line(bottom, left); break;
+                        case 9: line(bottom, top); break;
+                        case 10: line(top, right); line(bottom, left); break;
+                        case 11: line(bottom, right); break;
+                        case 12: line(right, left); break;
+                        case 13: line(right, top); break;
+                        case 14: line(top, left); break;
+                    }
+                }
+            }
+
+            ctx.stroke();
+
+            // Center dots
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(cx1, cy1, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(cx2, cy2, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            requestAnimationFrame(draw);
+        };
+
+        // Init
+        resize();
+        cx2 = W / 2 + 150;
+        cy2 = H / 2;
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', on_mouse);
+
+        // Modal controls
+        const helpBtn = document.getElementById('helpBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const whatBtn = document.getElementById('whatBtn');
+
+        helpBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+        });
+
+        whatBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+        });
+
+        modalClose.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        draw();
+    </script>
+</body>
+
+</html>

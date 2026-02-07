@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative Baltic Pattern</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #faf9f6;
+            --text-color: #2a2a2a;
+            --accent-color: #8b2d2d;
+            --accent-hover: #a63c3c;
+            --shadow: 0 10px 30px rgba(139, 45, 45, 0.08);
+            --radius: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .info-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+            background: transparent;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .info-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(139, 45, 45, 0.05);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        h1 {
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: -0.5rem;
+        }
+
+        .canvas-wrapper {
+            background: #fff;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .canvas-wrapper:hover {
+            transform: translateY(-2px);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .randomize-btn {
+            padding: 1rem 2.5rem;
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(139, 45, 45, 0.2);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.02em;
+        }
+
+        .randomize-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(139, 45, 45, 0.3);
+        }
+
+        .randomize-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .modal-text {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .stat-box {
+            background: #faf9f6;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+        }
+
+        .formula {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: 1px solid #e0e0e0;
+            padding: 0.75rem 2rem;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            .canvas-wrapper {
+                padding: 1.5rem;
+            }
+
+            .info-btn {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="info-btn" id="infoBtn" aria-label="About">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+    </button>
+
+    <div class="container">
+        <h1>Generative Baltic Pattern</h1>
+
+        <div class="canvas-wrapper">
+            <canvas id="canvas" width="400" height="400"></canvas>
+        </div>
+
+        <button id="randomize" class="randomize-btn">New pattern</button>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card">
+            <h2 class="modal-title">About</h2>
+            <p class="modal-text">
+                This generator creates geometric patterns inspired by traditional Baltic ethnography, such as the
+                Auseklis star.
+            </p>
+
+            <div class="stat-box">
+                <span class="stat-number">23,040</span>
+                <span class="stat-label">Unique Combinations</span>
+                <span class="formula">5 × 4 × 8 × 3 × 3 × 16</span>
+            </div>
+
+            <button class="close-btn" id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const GRID_SIZE = 41;
+        const CELL_SIZE = Math.floor(canvas.width / GRID_SIZE);
+        const OFFSET = Math.floor((canvas.width - GRID_SIZE * CELL_SIZE) / 2);
+        const CENTER = Math.floor(GRID_SIZE / 2);
+
+        const COLOR_FILL = '#8b2d2d';
+        const COLOR_BG = '#ffffff';
+
+        let grid = new Set();
+
+        // Default state: Auseklis
+        let currentParams = {
+            armLength: 4,
+            hollowSize: 2,
+            satelliteDistance: 9,
+            satelliteSize: 2,
+            bridgeWidth: 1,
+            cardinalSatellites: true,
+            diagonalSatellites: true,
+            showBridges: true,
+            hollowSatellites: true
+        };
+
+        function cellKey(x, y) {
+            return `${x},${y}`;
+        }
+
+        function addCell(x, y) {
+            grid.add(cellKey(x, y));
+        }
+
+        function addSymmetric4(x, y, cx = CENTER, cy = CENTER) {
+            const dx = x - cx;
+            const dy = y - cy;
+            addCell(cx + dx, cy + dy);
+            addCell(cx - dx, cy + dy);
+            addCell(cx + dx, cy - dy);
+            addCell(cx - dx, cy - dy);
+        }
+
+        function drawStar(cx, cy, armLength, hollowSize) {
+            if (hollowSize === 0) addCell(cx, cy);
+
+            for (let i = 1; i <= armLength; i++) {
+                addCell(cx + i, cy);
+                addCell(cx - i, cy);
+                addCell(cx, cy + i);
+                addCell(cx, cy - i);
+                addCell(cx + i, cy + i);
+                addCell(cx - i, cy + i);
+                addCell(cx + i, cy - i);
+                addCell(cx - i, cy - i);
+            }
+
+            for (let i = 0; i <= armLength; i++) {
+                for (let j = 0; j <= armLength - i; j++) {
+                    if (i <= hollowSize && j <= hollowSize && i + j <= hollowSize) continue;
+                    addSymmetric4(cx + i, cy + j, cx, cy);
+                }
+            }
+        }
+
+        function drawSmallCross(cx, cy, size, hollow = false) {
+            for (let i = 0; i <= size; i++) {
+                for (let j = 0; j <= size - i; j++) {
+                    if (hollow && i === 0 && j === 0) continue;
+                    addCell(cx + i, cy + j);
+                    addCell(cx - i, cy + j);
+                    addCell(cx + i, cy - j);
+                    addCell(cx - i, cy - j);
+                }
+            }
+        }
+
+        function drawBridge(x1, y1, x2, y2, width) {
+            const dx = Math.sign(x2 - x1);
+            const dy = Math.sign(y2 - y1);
+            let x = x1;
+            let y = y1;
+
+            while (x !== x2 && y !== y2) {
+                addCell(x, y);
+                if (width >= 1) {
+                    addCell(x + dx, y);
+                    addCell(x, y + dy);
+                }
+                if (width >= 2) {
+                    addCell(x - dx, y);
+                    addCell(x, y - dy);
+                }
+                x += dx;
+                y += dy;
+            }
+        }
+
+        function generate() {
+            grid = new Set();
+            const p = currentParams;
+
+            // Central star
+            drawStar(CENTER, CENTER, p.armLength, p.hollowSize);
+
+            // Cardinal satellites
+            if (p.cardinalSatellites) {
+                const positions = [
+                    [CENTER, CENTER - p.satelliteDistance],
+                    [CENTER, CENTER + p.satelliteDistance],
+                    [CENTER - p.satelliteDistance, CENTER],
+                    [CENTER + p.satelliteDistance, CENTER],
+                ];
+                positions.forEach(([x, y]) => {
+                    drawSmallCross(x, y, p.satelliteSize, p.hollowSatellites);
+                });
+
+                if (p.showBridges) {
+                    const bridgeStart = p.armLength + 1;
+                    drawBridge(CENTER, CENTER - bridgeStart, CENTER, CENTER - p.satelliteDistance + p.satelliteSize, p.bridgeWidth);
+                    drawBridge(CENTER, CENTER + bridgeStart, CENTER, CENTER + p.satelliteDistance - p.satelliteSize, p.bridgeWidth);
+                    drawBridge(CENTER - bridgeStart, CENTER, CENTER - p.satelliteDistance + p.satelliteSize, CENTER, p.bridgeWidth);
+                    drawBridge(CENTER + bridgeStart, CENTER, CENTER + p.satelliteDistance - p.satelliteSize, CENTER, p.bridgeWidth);
+                }
+            }
+
+            // Diagonal satellites
+            if (p.diagonalSatellites) {
+                const diagDist = Math.round(p.satelliteDistance * 0.85);
+                const positions = [
+                    [CENTER - diagDist, CENTER - diagDist],
+                    [CENTER + diagDist, CENTER - diagDist],
+                    [CENTER - diagDist, CENTER + diagDist],
+                    [CENTER + diagDist, CENTER + diagDist],
+                ];
+                positions.forEach(([x, y]) => {
+                    drawSmallCross(x, y, p.satelliteSize, p.hollowSatellites);
+                });
+
+                if (p.showBridges) {
+                    const bridgeStart = p.armLength + 1;
+                    const bridgeEnd = diagDist - p.satelliteSize;
+                    drawBridge(CENTER - bridgeStart, CENTER - bridgeStart, CENTER - bridgeEnd, CENTER - bridgeEnd, p.bridgeWidth);
+                    drawBridge(CENTER + bridgeStart, CENTER - bridgeStart, CENTER + bridgeEnd, CENTER - bridgeEnd, p.bridgeWidth);
+                    drawBridge(CENTER - bridgeStart, CENTER + bridgeStart, CENTER - bridgeEnd, CENTER + bridgeEnd, p.bridgeWidth);
+                    drawBridge(CENTER + bridgeStart, CENTER + bridgeStart, CENTER + bridgeEnd, CENTER + bridgeEnd, p.bridgeWidth);
+                }
+            }
+
+            render();
+        }
+
+        function render() {
+            // Clear
+            ctx.fillStyle = COLOR_BG;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw
+            ctx.fillStyle = COLOR_FILL;
+            grid.forEach(key => {
+                const [x, y] = key.split(',').map(Number);
+                ctx.fillRect(
+                    OFFSET + x * CELL_SIZE,
+                    OFFSET + y * CELL_SIZE,
+                    CELL_SIZE - 1,
+                    CELL_SIZE - 1
+                );
+            });
+        }
+
+        document.getElementById('randomize').addEventListener('click', () => {
+            currentParams = {
+                armLength: 2 + Math.floor(Math.random() * 5),
+                hollowSize: Math.floor(Math.random() * 4),
+                satelliteDistance: 5 + Math.floor(Math.random() * 8),
+                satelliteSize: 1 + Math.floor(Math.random() * 3),
+                bridgeWidth: Math.floor(Math.random() * 3),
+                cardinalSatellites: Math.random() > 0.3,
+                diagonalSatellites: Math.random() > 0.4,
+                showBridges: Math.random() > 0.3,
+                hollowSatellites: Math.random() > 0.5
+            };
+            generate();
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('modalOverlay');
+        const infoBtn = document.getElementById('infoBtn');
+        const closeBtn = document.getElementById('closeModal');
+
+        function openModal() {
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        infoBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initial render
+        generate();
+    </script>
+</body>
+
+</html>

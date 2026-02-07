@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Mantas Lilis - Interaction designer</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<script src="background.js"></script>
+<script src="content.js"></script>
+<script>
+(() => {
+  // ---------- Config ----------
+  
+  // Detect mobile/small screens
+  const isMobile = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+  
+  const desktopCFG = {
+    agentCount: 300,          // number of points
+    agentSize: 2,             // px (drawn in device pixels)
+    speed: 0.18,              // base speed in px/frame (pre-DPR)
+    jitter: 0.35,             // per-frame random wobble
+    linkDist: 60,            // max distance to draw a link (css px)
+    linkAlphaNear: 0.6,      // opacity at distance 0
+    linkAlphaFar: 0.02,       // opacity near cutoff
+    gridGap: 24,              // set to 0 to disable grid
+    gridAlpha: 0.05,          // grid line opacity
+    clockFontSize: 64,        // clock font size in px
+    bodyTextSize: 16          // body text font size (3x smaller than clock)
+  };
+
+  const mobileCFG = {
+    agentCount: 50,          // fewer points for better performance
+    agentSize: 2,             // slightly larger for touch screens
+    speed: 0.12,              // slower movement for mobile
+    jitter: 0.25,             // less jitter for smoother feel
+    linkDist: 60,            // longer links work better on narrow screens
+    linkAlphaNear: 0.7,      // slightly more visible links
+    linkAlphaFar: 0.05,       // keep far links more visible
+    gridGap: 16,              // larger grid for mobile
+    gridAlpha: 0.08,          // slightly more visible grid
+    clockFontSize: 48,        // smaller clock font for mobile
+    bodyTextSize: 11          // body text font size (3x smaller than clock)
+  };
+
+  const CFG = isMobile ? mobileCFG : desktopCFG;
+
+  // ---------- Initialization ----------
+  const canvas = document.getElementById('c');
+  
+  // Initialize all modules
+  initBackground(canvas, CFG);
+  initContent(CFG, getCanvasContext());
+
+  // ---------- Main Animation Loop ----------
+  function frame() {
+    // Clear and render background
+    clearBackground();
+    renderBackground();
+    
+    // Render content on top
+    renderContent(getCanvasDimensions());
+    
+    // Update all systems
+    updateBackground();
+    updateContent();
+    
+    // Continue animation
+    requestAnimationFrame(frame);
+  }
+
+  // Start the animation
+  frame();
+})();
+</script>
+</body>
+</html>

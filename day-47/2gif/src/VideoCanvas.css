@@ -1,0 +1,86 @@
+.video-canvas-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-component);
+  padding: var(--margin-panel);
+  overflow: hidden;
+  /* Ensure it doesn't spill out */
+}
+
+.canvas-wrapper {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.video-canvas {
+  max-width: 100%;
+  max-height: 100%;
+  cursor: crosshair;
+  border: 1px solid var(--border-subtle);
+  object-fit: contain;
+}
+
+.video-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  max-width: 800px;
+  padding: 12px;
+  background-color: var(--surface-1);
+  border-radius: var(--radius);
+}
+
+.control-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--timing-fast);
+}
+
+.control-button:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-emphasis);
+}
+
+.timeline-scrubber {
+  flex: 1;
+  height: 8px;
+  background-color: var(--surface-2);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+}
+
+.timeline-progress {
+  height: 100%;
+  background-color: var(--accent);
+  border-radius: 4px;
+  transition: width 100ms linear;
+}
+
+.time-display {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 90px;
+  text-align: right;
+}

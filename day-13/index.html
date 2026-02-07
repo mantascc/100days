@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wavy</title>
+<style>
+  html, body { height:100%; margin:0; background:#0f0f12; overflow:hidden; }
+  body { 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    justify-content:center; 
+    gap:clamp(10px, 2vh, 20px); 
+    padding:clamp(10px, 2vh, 20px); 
+    box-sizing:border-box;
+  }
+  #wrap{ 
+    width:min(90vw, 90vh - 120px); 
+    height:min(90vw, 90vh - 120px); 
+    flex-shrink:0;
+  }
+  canvas{ width:100%; height:100%; display:block; image-rendering:pixelated; }
+  .ui { 
+    display:flex; 
+    gap:clamp(6px, 1vw, 12px); 
+    flex-wrap:wrap; 
+    justify-content:center; 
+    flex-shrink:0;
+    max-width:100%;
+  }
+  .pill{
+    background:#0f0f12cc; 
+    border:1px solid #1a1a1f; 
+    border-radius:clamp(6px, 1vw, 10px); 
+    padding:clamp(4px, 0.8vw, 8px) clamp(6px, 1.2vw, 12px);
+    display:flex; 
+    align-items:center; 
+    gap:clamp(4px, 0.8vw, 8px);
+    flex-shrink:0;
+  }
+  .pill label{ 
+    color:#7a7a84; 
+    font:clamp(10px, 1.5vw, 12px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; 
+  }
+  .pill input[type="range"]{ 
+    min-width:clamp(100px, 15vw, 140px); 
+    max-width:clamp(120px, 20vw, 160px);
+  }
+  .pill input[type="text"]{ 
+    width:clamp(120px, 20vw, 180px); 
+    background:#0f0f12; 
+    color:#cfcfd5; 
+    border:1px solid #1a1a1f; 
+    border-radius:6px; 
+    padding:4px 6px; 
+  }
+  .pill button, .pill select{
+    background:#0f0f12; color:#cfcfd5; border:1px solid #1a1a1f; border-radius:6px; padding:4px 8px; cursor:pointer;
+  }
+  .pill input[type="file"]{ 
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .pill input[type="file"]::-webkit-file-upload-button { display: none; }
+  .pill input[type="file"]::file-selector-button { display: none; }
+  .file-upload-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .file-upload-button {
+    background: #0f0f12;
+    color: #cfcfd5;
+    border: 1px solid #1a1a1f;
+    border-radius: 6px;
+    padding: clamp(3px, 0.6vw, 6px) clamp(6px, 1.2vw, 10px);
+    cursor: pointer;
+    font: clamp(10px, 1.5vw, 12px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .file-upload-wrapper:hover .file-upload-button {
+    color: #ffffff;
+  }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="stage"></canvas>
+  </div>
+  <div class="ui">
+    <div class="pill">
+      <div class="file-upload-wrapper">
+        <input id="upload" type="file" accept="image/*" />
+        <div class="file-upload-button">Upload image</div>
+      </div>
+    </div>
+    <div class="pill">
+      <label for="wave">wave</label>
+      <input id="wave" type="range" min="3" max="10" step="0.5" />
+    </div>
+  </div>
+
+<script>
+// ——— Mobile Detection ———
+function isMobile() {
+  return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// ——— Config ———
+const CFG = {
+  // Desktop config
+  grid: 4,
+  size: 2,
+  // Mobile config (higher density, smaller agents)
+  mobileGrid: 4,     // Higher density for mobile
+  mobileSize: 2,     // Smaller agents for mobile
+  amplitude: 20,
+  frequency: 0.009,
+  speed: 0.012,
+  octaves: 3,
+  persistence: 0.5,
+  lacunarity: 1.5,
+  flowMode: 2,       // 1=line, 2=ocean, 3=radial
+  showGrid: true,
+  pause: false,
+  wave: 6,           // 3..10 via slider
+  alphaThreshold: 5,
+  fallback: '#0f0f12' // bg when skipping transparent cells
+};
+const WAVE_TARGETS = { ampMax: 40, freqMax: 0.01, speedMax: 0.02 };
+
+// ——— Canvas & grid ———
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+let W, H, cols, rows;
+
+// Cached per-cell colors (Uint8ClampedArray length cols*rows*4)
+let cellRGBA = null;
+
+// Offscreen canvas used to downsample the image to grid resolution
+const off = document.createElement('canvas');
+const octx = off.getContext('2d', { willReadFrequently: true });
+
+// Keep reference to last loaded image for resampling on resize
+let lastImg = null;
+let lastImgIsLoaded = false;
+
+function resize(){
+  const wrap = document.getElementById('wrap');
+  const r = wrap.getBoundingClientRect();
+  canvas.width = Math.floor(r.width);
+  canvas.height = Math.floor(r.height);
+  W = canvas.width; H = canvas.height;
+  
+  // Use mobile config if on mobile device
+  const gridSize = isMobile() ? CFG.mobileGrid : CFG.grid;
+  cols = Math.floor(W / gridSize);
+  rows = Math.floor(H / gridSize);
+  
+  // Offscreen at cell resolution
+  off.width = cols;
+  off.height = rows;
+  // Recompute colors if we have an image
+  if (lastImgIsLoaded) sampleImageToGrid(lastImg);
+}
+window.addEventListener('resize', resize);
+
+// ——— Image loading ———
+// Loads placeholder 1.png and handles uploaded images
+
+// Function to crop image to 1:1 aspect ratio (center crop)
+function cropToSquare(img) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  const size = Math.min(img.width, img.height);
+  canvas.width = size;
+  canvas.height = size;
+  
+  const offsetX = (img.width - size) / 2;
+  const offsetY = (img.height - size) / 2;
+  
+  ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, size, size);
+  
+  return canvas;
+}
+
+// ——— Downsample with center-contain fit into offscreen (cols×rows) ———
+function sampleImageToGrid(img){
+  // Clear
+  octx.clearRect(0,0,off.width,off.height);
+
+  // Compute contain-fit rect in offscreen pixel space (which equals grid cells)
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  const scale = Math.min(off.width / iw, off.height / ih);
+  const dw = Math.max(1, Math.floor(iw * scale));
+  const dh = Math.max(1, Math.floor(ih * scale));
+  const dx = Math.floor((off.width  - dw) / 2);
+  const dy = Math.floor((off.height - dh) / 2);
+
+  // Draw with imageSmoothing disabled to preserve crispness after integer sampling
+  const prev = octx.imageSmoothingEnabled;
+  octx.imageSmoothingEnabled = true; // true is fine here; we sample per-cell anyway
+  octx.drawImage(img, dx, dy, dw, dh);
+  octx.imageSmoothingEnabled = prev;
+
+  // Read back pixels
+  const imgData = octx.getImageData(0, 0, off.width, off.height).data; // Uint8ClampedArray
+  cellRGBA = imgData; // already 4*cols*rows
+}
+
+// ——— Grid helper ———
+function drawGrid(){
+  ctx.save();
+  ctx.strokeStyle = '#1a1a1f';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  const s = isMobile() ? CFG.mobileGrid : CFG.grid;
+  for(let x=0; x<=W; x+=s){ ctx.moveTo(x+.5, 0); ctx.lineTo(x+.5, H); }
+  for(let y=0; y<=H; y+=s){ ctx.moveTo(0, y+.5); ctx.lineTo(W, y+.5); }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ——— Perlin Noise (improved) + fbm ———
+const PERM = new Uint8Array(512);
+(function initPerm(){
+  const p = new Uint8Array(256);
+  for (let i=0; i<256; i++) p[i]=i;
+  for (let i=255; i>0; i--) { const j = (Math.random()*(i+1))|0; const t=p[i]; p[i]=p[j]; p[j]=t; }
+  for (let i=0; i<512; i++) PERM[i]=p[i&255];
+})();
+function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+function lerp(a,b,t){ return a + t*(b-a); }
+function grad(h, x, y){
+  switch(h & 3){
+    case 0: return  x + y;
+    case 1: return -x + y;
+    case 2: return  x - y;
+    default:return -x - y;
+  }
+}
+function perlin2(x, y){
+  const X = Math.floor(x) & 255;
+  const Y = Math.floor(y) & 255;
+  x -= Math.floor(x); y -= Math.floor(y);
+  const u = fade(x), v = fade(y);
+  const A  = PERM[X] + Y;
+  const B  = PERM[X+1] + Y;
+  const g00 = grad(PERM[A],   x,   y);
+  const g10 = grad(PERM[B],   x-1, y);
+  const g01 = grad(PERM[A+1], x,   y-1);
+  const g11 = grad(PERM[B+1], x-1, y-1);
+  return lerp( lerp(g00, g10, u), lerp(g01, g11, u), v );
+}
+function fbm2(x, y, octaves=3, persistence=.5, lacunarity=2.0){
+  let amp = 1, freq = 1, sum = 0, max = 0;
+  for(let i=0; i<octaves; i++){
+    sum += perlin2(x*freq, y*freq) * amp;
+    max += amp; amp *= persistence; freq *= lacunarity;
+  }
+  return sum / max;
+}
+
+// ——— Wave mapping ———
+function applyWave(){
+  const k = CFG.wave / 10; // 0..1
+  CFG.amplitude = WAVE_TARGETS.ampMax * k;
+  CFG.frequency = WAVE_TARGETS.freqMax * k;
+  CFG.speed     = WAVE_TARGETS.speedMax * k;
+}
+
+// ——— Animation ———
+let t = 0;
+function tick(){
+  if (!CFG.pause) t += CFG.speed;
+  ctx.clearRect(0,0,W,H);
+  if (CFG.showGrid) drawGrid();
+
+  if (!cellRGBA){ requestAnimationFrame(tick); return; }
+
+  // Use mobile config if on mobile device
+  const g = isMobile() ? CFG.mobileGrid : CFG.grid;
+  const agentSize = isMobile() ? CFG.mobileSize : CFG.size;
+  const half = agentSize/2;
+
+  for(let r=0; r<rows; r++){
+    for(let c=0; c<cols; c++){
+      const x0 = c*g + g/2;
+      const y0 = r*g + g/2;
+
+      let x = x0, y = y0;
+      const amp = CFG.amplitude;
+      const f = CFG.frequency;
+
+      if (CFG.flowMode === 1){
+        const n = fbm2(x0*f, t, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        y = y0 + n * amp;
+      } else if (CFG.flowMode === 2){
+        const nx = fbm2(x0*f + 13.37, y0*f + t,      CFG.octaves, CFG.persistence, CFG.lacunarity);
+        const ny = fbm2(x0*f + t,      y0*f + 42.42, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        x = x0 + nx * amp;
+        y = y0 + ny * amp;
+      } else if (CFG.flowMode === 3){
+        const cx = W/2, cy = H/2;
+        const dx = x0 - cx, dy = y0 - cy;
+        const dist = Math.hypot(dx, dy);
+        const n = fbm2(dist*f, t, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        const dir = Math.atan2(dy, dx);
+        const off = n * amp;
+        x = x0 + Math.cos(dir) * off*0.3;
+        y = y0 + Math.sin(dir) * off;
+      }
+
+      // Look up the pre-sampled color for this grid cell (static, pinned)
+      const idx = (r*cols + c)*4;
+      const R = cellRGBA[idx  ];
+      const G = cellRGBA[idx+1];
+      const B = cellRGBA[idx+2];
+      const A = cellRGBA[idx+3];
+
+      if (A < CFG.alphaThreshold) continue; // skip if too transparent
+
+      ctx.fillStyle = `rgba(${R},${G},${B},${A/255})`;
+      ctx.fillRect(Math.round(x - half), Math.round(y - half), agentSize, agentSize);
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// ——— UI wiring ———
+const waveInput  = document.getElementById('wave');
+const uploadInput = document.getElementById('upload');
+
+waveInput.value = CFG.wave;
+
+applyWave();
+resize();
+requestAnimationFrame(tick);
+
+waveInput.addEventListener('input', (e)=>{ CFG.wave = +e.target.value; applyWave(); });
+
+// ——— Drag and Drop ———
+canvas.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  canvas.style.border = '2px dashed #ffffff';
+  canvas.style.opacity = '0.8';
+});
+
+canvas.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  canvas.style.border = 'none';
+  canvas.style.opacity = '1';
+});
+
+canvas.addEventListener('drop', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  canvas.style.border = 'none';
+  canvas.style.opacity = '1';
+  
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    processImageFile(files[0]);
+  }
+});
+
+// Also add drag and drop to the wrap div for better UX
+const wrap = document.getElementById('wrap');
+wrap.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  wrap.style.border = '2px dashed #ffffff';
+  wrap.style.opacity = '0.8';
+});
+
+wrap.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  wrap.style.border = 'none';
+  wrap.style.opacity = '1';
+});
+
+wrap.addEventListener('drop', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  wrap.style.border = 'none';
+  wrap.style.opacity = '1';
+  
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    processImageFile(files[0]);
+  }
+});
+
+// ——— File Processing ———
+function processImageFile(file) {
+  // Check if file is an image
+  if (!file.type.startsWith('image/')) {
+    console.warn('File is not an image:', file.type);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const img = new Image();
+    img.onload = () => {
+      // Crop to square and use as new image
+      const croppedCanvas = cropToSquare(img);
+      const croppedImg = new Image();
+      croppedImg.onload = () => {
+        lastImg = croppedImg;
+        lastImgIsLoaded = true;
+        sampleImageToGrid(croppedImg);
+      };
+      croppedImg.src = croppedCanvas.toDataURL();
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Handle file upload
+uploadInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    processImageFile(file);
+  }
+});
+
+// Load the 1.png image automatically
+(function loadDefault(){
+  const img = new Image();
+  img.onload = ()=>{ lastImg = img; lastImgIsLoaded = true; sampleImageToGrid(img); };
+  img.onerror = () => { console.warn('Failed to load 1.png image.'); };
+  img.src = "1.png";
+})();
+</script>
+</body>
+</html>

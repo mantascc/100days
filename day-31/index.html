@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI Material Palette</title>
+    <meta property="og:title" content="CLI Material Palette">
+    <meta property="og:description" content="Design reference for CLI interfaces">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CLI Material Palette</h1>
+            <div class="intro">
+                <p>A design reference for the fundamental materials of command-line interfaces.</p>
+                <p> Compiled by <a href="https://linkedin.com/in/mantaslilis" target="_blank">Mantas Lilis</a></p>
+            </div>
+        </header>
+
+        <nav>
+            <a href="#spatial">Spatial</a>
+            <a href="#temporal">Temporal</a>
+            <a href="#typography">Typography</a>
+            <a href="#colors">Colors</a>
+            <a href="#symbols">Symbols</a>
+            <a href="#interactive">Interactive</a>
+        </nav>
+
+        <main>
+            <!-- Spatial Materials -->
+            <section id="spatial">
+                <h2>Spatial Materials</h2>
+
+                <h3>The Character Grid</h3>
+                <p>Everything exists on a monospace grid. Each cell is one character wide, one line tall.</p>
+
+                <ul>
+                    <li>Standard width: 80-120 characters</li>
+                    <li>Vertical rhythm: Line-by-line flow</li>
+                    <li>Grid snap: All elements align to character boundaries</li>
+                </ul>
+
+                <div class="example">
+                    <p class="try-label">Try in terminal</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="grid">Run</button>
+                        <button class="copy-lang-btn" data-code="tput cols
+printf '=%.0s' {1..80} && echo">Copy Bash</button>
+                    </div>
+
+                    <div class="output" id="output-grid"></div>
+                </div>
+
+                <h3>Whitespace Hierarchy</h3>
+                <p>Space is semantic structure.</p>
+
+                <div class="demo-box">command
+  ├─ nested item
+  │  └─ deeper nesting
+  └─ sibling item
+
+command output
+  (blank line = conceptual break)
+next command</div>
+
+                <div class="example">
+                    <p class="try-label">Try in terminal</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="tree">Run</button>
+                        <button class="copy-lang-btn" data-code="echo 'project'
+echo '├── src'
+echo '│   ├── index.js'
+echo '│   └── utils.js'
+echo '└── package.json'">Copy Bash</button>
+                    </div>
+
+                    <div class="output" id="output-tree"></div>
+                </div>
+
+                <h3>Status with Details</h3>
+                <p>Use indentation to show task status and nested information.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="status">Run</button>
+                    </div>
+
+                    <div class="output" id="output-status"></div>
+                </div>
+            </section>
+
+            <!-- Typography -->
+            <section id="typography">
+                <h2>Typographic Materials</h2>
+
+                <h3>Weight & Style</h3>
+                <p>Limited but powerful modifiers.</p>
+
+                <ul>
+                    <li>Bold — emphasis, headers, current selection</li>
+                    <li>Dim — secondary information</li>
+                    <li>Underline — links, input fields</li>
+                    <li>Inverse — highlights, selected items</li>
+                    <li>Strikethrough — completed tasks</li>
+                </ul>
+
+                <div class="example">
+                    <p class="try-label">Try in terminal</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="styles">Run</button>
+                        <button class="copy-lang-btn" data-code="echo -e '\033[1mBold text\033[0m'
+echo -e '\033[2mDim text\033[0m'
+echo -e '\033[4mUnderlined\033[0m'
+echo -e '\033[7mInverse\033[0m'
+echo -e '\033[9mStrikethrough\033[0m'">Copy Bash</button>
+                    </div>
+
+                    <div class="output" id="output-styles"></div>
+                </div>
+            </section>
+
+            <!-- Colors -->
+            <section id="colors">
+                <h2>Color Materials</h2>
+
+                <h3>ANSI 16-Color Palette</h3>
+                <p>The base vocabulary. Terminal themes remap these colors.</p>
+
+                <ul>
+                    <li>Black (30) / Bright Black (90) → default text, dimmed text</li>
+                    <li>Red (31) / Bright Red (91) → errors, warnings</li>
+                    <li>Green (32) / Bright Green (92) → success, completion</li>
+                    <li>Yellow (33) / Bright Yellow (93) → warnings, attention</li>
+                    <li>Blue (34) / Bright Blue (94) → information, links</li>
+                    <li>Magenta (35) / Bright Magenta (95) → highlights, special states</li>
+                    <li>Cyan (36) / Bright Cyan (96) → emphasis, metadata</li>
+                    <li>White (37) / Bright White (97) → primary text, headers</li>
+                </ul>
+
+                <div class="example">
+                    <p class="try-label">Try in terminal</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="colors">Run</button>
+                        <button class="copy-lang-btn" data-code="echo -e '\033[30mBlack\033[0m (30) / \033[90mBright Black\033[0m (90)'
+echo -e '\033[31mRed\033[0m (31) / \033[91mBright Red\033[0m (91)'
+echo -e '\033[32mGreen\033[0m (32) / \033[92mBright Green\033[0m (92)'
+echo -e '\033[33mYellow\033[0m (33) / \033[93mBright Yellow\033[0m (93)'
+echo -e '\033[34mBlue\033[0m (34) / \033[94mBright Blue\033[0m (94)'
+echo -e '\033[35mMagenta\033[0m (35) / \033[95mBright Magenta\033[0m (95)'
+echo -e '\033[36mCyan\033[0m (36) / \033[96mBright Cyan\033[0m (96)'
+echo -e '\033[37mWhite\033[0m (37) / \033[97mBright White\033[0m (97)'">Copy Bash</button>
+                    </div>
+
+                    <div class="output" id="output-colors"></div>
+                </div>
+
+                <h3>Diff Highlighting</h3>
+                <p>Show code changes with color-coded additions and deletions.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="diff">Run</button>
+                    </div>
+
+                    <div class="output" id="output-diff"></div>
+                </div>
+            </section>
+
+            <!-- Symbols -->
+            <section id="symbols">
+                <h2>Symbol Vocabulary</h2>
+
+                <h3>Status & Completion</h3>
+                <ul>
+                    <li>✓ ✔ ✅ — success, complete</li>
+                    <li>✗ ✘ ❌ — error, failed</li>
+                    <li>⚠ ⚡ — warning, attention</li>
+                    <li>ℹ ⓘ 💡 — information, hint</li>
+                    <li>● ○ ◉ ◯ — selection, radio</li>
+                    <li>■ □ ▪ ▫ ☐ ☑ ☒ — checkbox states</li>
+                </ul>
+
+                <h3>Tree & Structure</h3>
+                <ul>
+                    <li>├── └── │ ─ — tree branches</li>
+                    <li>▸ ▾ ► ▼ — collapsed/expanded</li>
+                    <li>⌙ ↳ └─→ — continuation, return</li>
+                </ul>
+
+                <h3>Arrows & Direction</h3>
+                <ul>
+                    <li>→ ← ↑ ↓ — basic arrows</li>
+                    <li>⇒ ⇐ ⇑ ⇓ — double arrows</li>
+                    <li>➜ ➔ ➤ — pointer arrows</li>
+                    <li>↩ ↪ ⤴ ⤵ — curved arrows</li>
+                </ul>
+
+                <h3>Progress & Loading</h3>
+                <ul>
+                    <li>⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏ — spinner frames</li>
+                    <li>▏ ▎ ▍ ▌ ▋ ▊ ▉ █ — progress blocks</li>
+                    <li>◐ ◓ ◑ ◒ — rotating circle</li>
+                    <li>⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷ — dots spinner</li>
+                </ul>
+
+                <h3>Symbols & Icons</h3>
+                <ul>
+                    <li>★ ☆ — starred, rating</li>
+                    <li>♥ ♡ — favorited</li>
+                    <li>⚙ ⚡ — settings, power</li>
+                    <li>🔒 🔓 — locked, unlocked</li>
+                    <li>📁 📂 📄 — file/folder</li>
+                    <li>🔍 🔎 — search</li>
+                </ul>
+
+                <div class="example">
+                    <p class="try-label">Try in terminal</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="symbols">Run</button>
+                        <button class="copy-lang-btn" data-code="echo 'Status & Completion:'
+echo '  ✓ Success  ✗ Failed  ⚠ Warning  ℹ Info'
+echo ''
+echo 'Tree Structure:'
+echo '  ├── src'
+echo '  │   └── index.js'
+echo '  └── package.json'
+echo ''
+echo 'Progress:'
+echo '  ● ○ ○ ○ ○  [20%]'
+echo '  ■ ■ ■ □ □  [60%]'
+echo ''
+echo 'Arrows & Navigation:'
+echo '  → Next  ← Back  ↑ Up  ↓ Down'">Copy Bash</button>
+                    </div>
+
+                    <div class="output" id="output-symbols"></div>
+                </div>
+            </section>
+
+            <!-- Temporal -->
+            <section id="temporal">
+                <h2>Temporal Materials</h2>
+
+                <h3>Progress Indicators</h3>
+                <p>Character-based animations for "working" states.</p>
+
+                <div class="demo-box"><strong>Spinning:</strong>
+⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏  — braille spinner
+⣾⣽⣻⢿⡿⣟⣯⣷  — dots spinner
+◐◓◑◒  — half circles
+
+<strong>Progress Bars:</strong>
+▏▎▍▌▋▊▉█  — eighth blocks
+
+<strong>Block Style:</strong>
+░▒▓█  — shading progression
+▁▂▃▄▅▆▇█  — vertical growth
+
+<strong>Corner Arcs:</strong>
+◜◝◞◟  — rotating corners
+
+<strong>Corner Boxes:</strong>
+▖▘▝▗  — box corners
+
+<strong>Size Progression:</strong>
+⋅∙·•●  — growing dots
+
+<strong>Block Shading:</strong>
+░░▒▒▓▓██  — gradient fill
+
+<strong>Size Pulsing:</strong>
+·•●•·  — dot pulse
+∘○◯○∘  — circle pulse
+
+<strong>Star Bursts:</strong>
+✦✧★✧✦  — twinkling
+✶✷✸✹  — burst pattern</div>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="progress">Run</button>
+                    </div>
+
+                    <div class="output" id="output-progress"></div>
+                </div>
+
+                <h3>Blinking Text Animation</h3>
+                <p>Cycle through characters to create attention-grabbing effects.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="blink">Run</button>
+                    </div>
+
+                    <div class="output" id="output-blink"></div>
+                </div>
+
+                <h3>Task List Execution</h3>
+                <p>Show real-time progress through multiple tasks.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="tasks">Run</button>
+                    </div>
+
+                    <div class="output" id="output-tasks"></div>
+                </div>
+            </section>
+
+            <!-- Interactive -->
+            <section id="interactive">
+                <h2>Interactive Patterns</h2>
+
+                <h3>Menu Selection</h3>
+                <p>Navigate through options with visual feedback.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="menu">Run</button>
+                    </div>
+
+                    <div class="output" id="output-menu"></div>
+                </div>
+
+                <h3>Checkbox & Radio Groups</h3>
+                <p>Toggle selections with interactive controls.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="checkbox">Run</button>
+                    </div>
+
+                    <div class="output" id="output-checkbox"></div>
+                </div>
+
+                <h3>Confirmation Dialogs</h3>
+                <p>Standard patterns for user confirmation.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="confirm">Run</button>
+                    </div>
+
+                    <div class="output" id="output-confirm"></div>
+                </div>
+
+                <h3>Tab Navigation</h3>
+                <p>Switch between different views or contexts.</p>
+
+                <div class="example">
+                    <p class="try-label">Try in browser</p>
+                    <div class="example-header">
+                        <button class="execute-btn" data-example="tabs">Run</button>
+                    </div>
+
+                    <div class="output" id="output-tabs"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>This is information architecture expressed through constrained materials.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

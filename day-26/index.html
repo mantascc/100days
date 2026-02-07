@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic widget dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="widgets.js"></script>
+</head>
+<body>
+    <div id="container">
+        <div class="grid-lines" id="gridLines"></div>
+        <div class="drop-placeholder" id="dropPlaceholder"></div>
+    </div>
+
+    <div id="toolbar">
+        <button id="addChart">+ Chart</button>
+        <button id="addMetric">+ Metric</button>
+        <button id="addMoonPhase">+ Moon Phase</button>
+        <button id="addAgent">+ Agent Usage</button>
+    </div>
+
+    <script>
+        // Configuration
+        const MAX_WIDTH = 800;
+        const CONTAINER_PADDING = 16;
+        const VERTICAL_GAP = 16;
+
+        // State
+        let widgets = [];
+        let widgetIdCounter = 0;
+        let draggedWidget = null;
+        let dragOffset = { x: 0, y: 0 };
+        let modalWidget = null;
+
+        // Embedded moon phase data
+        let moonPhaseData = {
+            "metadata": { "time_utc": "2025-10-16T18:00:00Z" },
+            "phase": {
+                "name": "Waxing Gibbous",
+                "illumination_fraction": 0.78,
+                "illumination_percent": 78,
+                "age_days": 11.5,
+                "phase_angle_deg": 128.4,
+                "elongation_deg": 128.4,
+                "energy": {
+                    "phase": "Waxing Gibbous",
+                    "keywords": ["refine","polish","prepare"],
+                    "energy": "Focused, perfecting.",
+                    "focus": ["iterate","QA/crit","prepare launch"],
+                    "polarity": "balanced",
+                    "cycle_stage": "refine"
+                }
+            }
+        };
+
+        // Agent usage data (will be loaded from agent.json)
+        let agentUsageData = null;
+
+        // Load agent usage data
+        fetch('agent.json')
+            .then(response => response.json())
+            .then(data => {
+                agentUsageData = data;
+            })
+            .catch(error => {
+                console.error('Error loading agent data:', error);
+            });
+
+        // Get container and calculate column width
+        const container = document.getElementById('container');
+        const dropPlaceholder = document.getElementById('dropPlaceholder');
+
+        function getColumnWidth() {
+            const containerWidth = Math.min(container.clientWidth - (CONTAINER_PADDING * 2), MAX_WIDTH);
+            return containerWidth;
+        }
+
+        // Create widget element
+        function createWidgetElement(widget) {
+            const div = document.createElement('div');
+            div.className = `widget widget-type-${widget.type}`;
+            div.dataset.id = widget.id;
+            div.draggable = false; // Will be enabled only on drag handle
+
+            const header = document.createElement('div');
+            header.className = 'widget-header';
+
+            const title = document.createElement('div');
+            title.className = 'widget-title';
+            title.textContent = getWidgetTitle(widget.type);
+
+            const actions = document.createElement('div');
+            actions.className = 'widget-actions';
+
+            const dragHandle = document.createElement('div');
+            dragHandle.className = 'widget-action drag-handle';
+            dragHandle.innerHTML = '⋮⋮';
+            dragHandle.title = 'Drag to reorder';
+
+            // Enable dragging only when handle is pressed
+            dragHandle.addEventListener('mousedown', (e) => {
+                div.draggable = true;
+            });
+
+            dragHandle.addEventListener('mouseup', (e) => {
+                div.draggable = false;
+            });
+
+            const modalBtn = document.createElement('div');
+            modalBtn.className = 'widget-action modal-btn';
+            modalBtn.innerHTML = '⛶';
+            modalBtn.title = 'Expand';
+            modalBtn.onclick = (e) => {
+                e.stopPropagation();
+                openModal(widget.id);
+            };
+
+            actions.appendChild(dragHandle);
+            actions.appendChild(modalBtn);
+
+            header.appendChild(title);
+            header.appendChild(actions);
+
+            const body = document.createElement('div');
+            body.className = 'widget-body';
+
+            // Render widget body based on type
+            let widgetData = null;
+            if (widget.type === 'moonphase') {
+                widgetData = moonPhaseData;
+            } else if (widget.type === 'agent') {
+                widgetData = agentUsageData;
+            }
+            body.innerHTML = renderWidgetBody(widget.type, widgetData);
+
+            div.appendChild(header);
+            div.appendChild(body);
+
+            positionWidget(div, widget);
+
+            return div;
+        }
+
+        // Position widget element
+        function positionWidget(element, widget) {
+            const columnWidth = getColumnWidth();
+
+            element.style.left = CONTAINER_PADDING + 'px';
+            element.style.top = widget.y + 'px';
+            element.style.width = columnWidth + 'px';
+            element.style.height = 'auto';
+        }
+
+        // Render all widgets
+        function render() {
+            // Remove existing widgets
+            document.querySelectorAll('.widget').forEach(el => el.remove());
+
+            // Recalculate positions with actual heights
+            layoutWidgets();
+
+            // Create new widgets
+            widgets.forEach(widget => {
+                const element = createWidgetElement(widget);
+                container.appendChild(element);
+            });
+
+            // Update container height based on last widget position and height
+            updateContainerHeight();
+        }
+
+        // Layout widgets with dynamic heights
+        function layoutWidgets() {
+            let currentY = CONTAINER_PADDING;
+
+            // Sort widgets by their order (we'll use an order property)
+            widgets.sort((a, b) => a.order - b.order);
+
+            widgets.forEach(widget => {
+                widget.y = currentY;
+
+                // Temporarily create element to measure height if needed
+                const tempElement = createWidgetElement(widget);
+                tempElement.style.visibility = 'hidden';
+                container.appendChild(tempElement);
+
+                const height = tempElement.offsetHeight;
+                tempElement.remove();
+
+                widget.height = height;
+                currentY += height + VERTICAL_GAP;
+            });
+        }
+
+        // Update container height
+        function updateContainerHeight() {
+            if (widgets.length === 0) {
+                container.style.minHeight = '100vh';
+                return;
+            }
+
+            const lastWidget = widgets[widgets.length - 1];
+            const totalHeight = lastWidget.y + lastWidget.height + CONTAINER_PADDING + 100;
+            container.style.minHeight = totalHeight + 'px';
+        }
+
+        // Add widget
+        function addWidget(type) {
+            const widget = {
+                id: widgetIdCounter++,
+                type: type,
+                order: widgets.length, // Add to end
+                y: CONTAINER_PADDING,
+                height: 0
+            };
+
+            widgets.push(widget);
+            render();
+        }
+
+        // Toolbar events
+        document.getElementById('addChart').addEventListener('click', () => {
+            addWidget(WidgetTypes.CHART);
+        });
+
+        document.getElementById('addMetric').addEventListener('click', () => {
+            addWidget(WidgetTypes.METRIC);
+        });
+
+        document.getElementById('addMoonPhase').addEventListener('click', () => {
+            addWidget(WidgetTypes.MOONPHASE);
+        });
+
+        document.getElementById('addAgent').addEventListener('click', () => {
+            addWidget(WidgetTypes.AGENT);
+        });
+
+        // Drag and drop events
+        container.addEventListener('dragstart', (e) => {
+            if (!e.target.classList.contains('widget')) return;
+
+            const widgetId = parseInt(e.target.dataset.id);
+            draggedWidget = widgets.find(w => w.id === widgetId);
+
+            e.target.classList.add('dragging');
+
+            // Store offset from mouse to widget top-left
+            const rect = e.target.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            if (!draggedWidget) return;
+
+            // Calculate where the widget would be dropped
+            const y = e.clientY - dragOffset.y;
+            const newY = Math.max(CONTAINER_PADDING, y);
+
+            // Find insertion position
+            let insertionY = CONTAINER_PADDING;
+            let insertBeforeIndex = -1;
+
+            for (let i = 0; i < widgets.length; i++) {
+                if (widgets[i].id === draggedWidget.id) continue;
+
+                if (newY > widgets[i].y + widgets[i].height / 2) {
+                    insertionY = widgets[i].y + widgets[i].height + VERTICAL_GAP;
+                    insertBeforeIndex = i + 1;
+                } else {
+                    break;
+                }
+            }
+
+            // Show placeholder at insertion point
+            dropPlaceholder.style.top = insertionY + 'px';
+            dropPlaceholder.classList.add('visible');
+        });
+
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            if (!draggedWidget) return;
+
+            // Calculate new Y position
+            const y = e.clientY - dragOffset.y;
+            const newY = Math.max(CONTAINER_PADDING, y);
+
+            // Store the old order of the dragged widget
+            const oldOrder = draggedWidget.order;
+
+            // Find where to insert the widget in the order (excluding the dragged widget)
+            let newOrder = 0;
+            for (let i = 0; i < widgets.length; i++) {
+                if (widgets[i].id === draggedWidget.id) continue;
+                if (newY > widgets[i].y + widgets[i].height / 2) {
+                    newOrder++;
+                }
+            }
+
+            // Only reorder if position changed
+            if (oldOrder !== newOrder) {
+                // Remove widget from old position and insert at new position
+                widgets.forEach((widget) => {
+                    if (widget.id === draggedWidget.id) {
+                        // Skip the dragged widget for now
+                        return;
+                    }
+
+                    if (oldOrder < newOrder) {
+                        // Moving down: shift widgets up that are between old and new position
+                        if (widget.order > oldOrder && widget.order <= newOrder) {
+                            widget.order--;
+                        }
+                    } else {
+                        // Moving up: shift widgets down that are between new and old position
+                        if (widget.order >= newOrder && widget.order < oldOrder) {
+                            widget.order++;
+                        }
+                    }
+                });
+
+                // Update dragged widget's order
+                draggedWidget.order = newOrder;
+            }
+
+            // Normalize orders (ensure they're sequential)
+            widgets.sort((a, b) => a.order - b.order);
+            widgets.forEach((widget, index) => {
+                widget.order = index;
+            });
+
+            // Clean up
+            document.querySelectorAll('.widget.dragging').forEach(el => {
+                el.classList.remove('dragging');
+            });
+            dropPlaceholder.classList.remove('visible');
+            draggedWidget = null;
+
+            render();
+        });
+
+        container.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('widget')) {
+                e.target.classList.remove('dragging');
+                e.target.draggable = false; // Disable dragging after drop
+            }
+            dropPlaceholder.classList.remove('visible');
+            draggedWidget = null;
+        });
+
+        // Open modal
+        function openModal(widgetId) {
+            const widget = widgets.find(w => w.id === widgetId);
+            if (!widget) return;
+
+            modalWidget = widget;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.id = 'modal-overlay';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-content';
+
+            const header = document.createElement('div');
+            header.className = 'modal-header';
+
+            const title = document.createElement('div');
+            title.textContent = getWidgetTitle(widget.type);
+
+            const closeBtn = document.createElement('div');
+            closeBtn.className = 'modal-close';
+            closeBtn.innerHTML = '✕';
+            closeBtn.onclick = closeModal;
+
+            header.appendChild(title);
+            header.appendChild(closeBtn);
+
+            const body = document.createElement('div');
+            body.className = 'modal-body';
+
+            // Render modal content based on type
+            let widgetData = null;
+            if (widget.type === 'moonphase') {
+                widgetData = moonPhaseData;
+            } else if (widget.type === 'agent') {
+                widgetData = agentUsageData;
+            }
+            body.innerHTML = renderModalContent(widget.type, widgetData);
+
+            modal.appendChild(header);
+            modal.appendChild(body);
+            overlay.appendChild(modal);
+
+            document.body.appendChild(overlay);
+
+            // Close on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Close modal
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+            modalWidget = null;
+        }
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            render();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gravity Pills</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: #e8e8e8;
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #f5f5f5;
+    }
+
+    @media (min-width: 768px) {
+      #container {
+        max-width: 800px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+      }
+    }
+    
+    canvas {
+      display: block;
+    }
+    
+    .pill {
+      position: absolute;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: grab;
+      user-select: none;
+      white-space: nowrap;
+      transform-origin: center;
+      pointer-events: none;
+    }
+    
+    .pill:active { cursor: grabbing; }
+    
+    #controls {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    #controls label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    #controls input {
+      width: 60px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    
+    #controls button {
+      padding: 8px 16px;
+      background: #222;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    #controls button:hover { background: #444; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label>Words:</label>
+    <input type="number" id="wordCount" value="50" min="3" max="50">
+    <button id="regenerate">Regenerate</button>
+  </div>
+  
+  <div id="container">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script>
+    // Set default word count based on device
+    const isMobile = window.innerWidth < 768;
+    document.getElementById('wordCount').value = isMobile ? 25 : 50;
+
+    const WORDS = [
+      'Traces', 'Spans', 'Latency', 'Drift', 'Anomaly',
+      'Lineage', 'Provenance', 'Telemetry', 'Signals', 'Thresholds',
+      'Baselines', 'Residuals', 'Entropy', 'Feedback', 'Loops',
+      'Delegation', 'Handoff', 'Orchestration', 'Intent', 'Goals',
+      'Plans', 'Actions', 'Memory', 'Context', 'Reasoning',
+      'Reflection', 'Affordances', 'Agency', 'Autonomy', 'Emergence',
+      'Legibility', 'Opacity', 'Uncertainty', 'Confidence', 'Probability',
+      'Approximation', 'Inference', 'Interpretation', 'Attention', 'Salience',
+      'Noise', 'Signal', 'Truth', 'Belief', 'Coupling',
+      'Boundaries', 'State', 'Transitions', 'Flows', 'Gradients'
+    ];
+    
+    const COLORS = [
+      { bg: '#3D3A6D', text: '#fff' },    // indigo - dominant background
+      { bg: '#F26B4E', text: '#fff' },    // coral - primary accent
+      { bg: '#F9A825', text: '#222' },    // marigold - warm highlight
+      { bg: '#C4B5D8', text: '#222' },    // lavender - soft neutral
+      { bg: '#F5F0E6', text: '#222' },    // cream - light ground
+      { bg: '#E991B0', text: '#222' },    // bubblegum - pink accent
+      { bg: '#5C5A7A', text: '#fff' },    // slate - mid-tone
+    ];
+
+    const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Events } = Matter;
+
+    let engine, render, world, pills = [], pillElements = [], animationId;
+    
+    function getRandomWords(count) {
+      const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count);
+    }
+    
+    function measureText(text) {
+      const span = document.createElement('span');
+      span.style.cssText = `
+        position: absolute; visibility: hidden; white-space: nowrap;
+        font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px;
+        padding: 12px 24px;
+      `;
+      span.textContent = text;
+      document.body.appendChild(span);
+      const width = span.offsetWidth;
+      const height = span.offsetHeight;
+      document.body.removeChild(span);
+      return { width, height };
+    }
+    
+    function createPillElement(text, color, id) {
+      const el = document.createElement('div');
+      el.className = 'pill';
+      el.id = `pill-${id}`;
+      el.textContent = text;
+      el.style.background = color.bg;
+      el.style.color = color.text;
+      document.getElementById('container').appendChild(el);
+      return el;
+    }
+    
+    function init() {
+      // Clear existing
+      if (animationId) cancelAnimationFrame(animationId);
+      pillElements.forEach(el => el.remove());
+      pillElements = [];
+      pills = [];
+      if (world) World.clear(world);
+      if (engine) Engine.clear(engine);
+      if (render) {
+        Render.stop(render);
+        render.canvas.remove();
+      }
+      
+      const container = document.getElementById('container');
+      const width = container.offsetWidth;
+      const height = container.offsetHeight;
+      
+      engine = Engine.create();
+      engine.gravity.y = 0.4;
+      world = engine.world;
+      
+      render = Render.create({
+        element: container,
+        engine: engine,
+        options: {
+          width: width,
+          height: height,
+          wireframes: false,
+          background: 'transparent',
+          pixelRatio: window.devicePixelRatio
+        }
+      });
+      
+      // Walls
+      const wallOptions = { isStatic: true, render: { visible: false } };
+      World.add(world, [
+        Bodies.rectangle(width / 2, height + 30, width, 60, wallOptions),
+        Bodies.rectangle(-30, height / 2, 60, height, wallOptions),
+        Bodies.rectangle(width + 30, height / 2, 60, height, wallOptions),
+      ]);
+      
+      // Create pills
+      const wordCount = parseInt(document.getElementById('wordCount').value) || 12;
+      const words = getRandomWords(wordCount);
+      
+      words.forEach((word, i) => {
+        const { width: w, height: h } = measureText(word);
+        const color = COLORS[i % COLORS.length];
+        
+        const x = Math.random() * (width - 200) + 100;
+        const y = -100 - Math.random() * 400;
+        
+        const pill = Bodies.rectangle(x, y, w, h, {
+          chamfer: { radius: h / 2 },
+          restitution: 0.6,
+          friction: 0.1,
+          frictionAir: 0.01,
+          render: { visible: false },
+          label: `pill-${i}`
+        });
+        
+        pills.push({ body: pill, width: w, height: h });
+        World.add(world, pill);
+        
+        const el = createPillElement(word, color, i);
+        pillElements.push(el);
+      });
+      
+      // Mouse control
+      const mouse = Mouse.create(render.canvas);
+      const mouseConstraint = MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: {
+          stiffness: 0.2,
+          render: { visible: false }
+        }
+      });
+      
+      World.add(world, mouseConstraint);
+      render.mouse = mouse;
+      
+      // Update DOM positions
+      Events.on(engine, 'afterUpdate', () => {
+        pills.forEach((pill, i) => {
+          const el = pillElements[i];
+          if (el && pill.body) {
+            el.style.left = `${pill.body.position.x - pill.width / 2}px`;
+            el.style.top = `${pill.body.position.y - pill.height / 2}px`;
+            el.style.transform = `rotate(${pill.body.angle}rad)`;
+          }
+        });
+      });
+      
+      Render.run(render);
+
+      // Run engine
+      (function run() {
+        Engine.update(engine, 1000 / 60);
+        animationId = requestAnimationFrame(run);
+      })();
+    }
+    
+    document.getElementById('regenerate').addEventListener('click', init);
+
+    const wordCountInput = document.getElementById('wordCount');
+    wordCountInput.addEventListener('change', init);
+    wordCountInput.addEventListener('input', (e) => {
+      if (parseInt(e.target.value) > 50) {
+        e.target.value = 50;
+      }
+    });
+
+    window.addEventListener('resize', init);
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>

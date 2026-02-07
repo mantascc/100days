@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slitscan</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000;
+            font-family: monospace;
+            color: #fff;
+        }
+        #onboarding {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 500px;
+            padding: 40px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #onboarding.hidden {
+            display: none;
+        }
+        #onboarding h1 {
+            margin: 0 0 20px 0;
+            font-size: 32px;
+            font-weight: normal;
+        }
+        #onboardingVideoWrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        #onboarding video {
+            width: 320px;
+            height: 240px;
+            border: 1px solid #333;
+            transform: scaleX(-1);
+            display: block;
+        }
+        #onboardingIndicator {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #onboarding ul {
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 20px;
+            line-height: 1.8;
+            color: #aaa;
+        }
+        #onboarding ul li {
+            margin-bottom: 10px;
+        }
+        #scanningArea {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        #scanningArea.active {
+            display: flex;
+        }
+        #canvasWrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        canvas {
+            image-rendering: pixelated;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #scanLine {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                        0 0 20px rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            left: 0%;
+            transition: left 0.05s linear;
+        }
+        #scanLine.hidden {
+            display: none;
+        }
+        #status {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        #controls {
+            display: flex;
+            gap: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #controls.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        button {
+            padding: 12px 24px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #333;
+        }
+        button.primary {
+            background: #0066ff;
+            border-color: #0066ff;
+        }
+        button.primary:hover {
+            background: #0052cc;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            #onboarding {
+                max-width: 90%;
+                padding: 30px 20px;
+            }
+            #onboarding h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+            #onboardingVideoWrapper {
+                width: 100%;
+                max-width: 280px;
+            }
+            #onboarding video {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 4/3;
+            }
+            #onboarding ul {
+                font-size: 13px;
+                line-height: 1.6;
+                margin: 15px 0;
+            }
+            #onboarding ul li {
+                margin-bottom: 8px;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+            #scanningArea {
+                padding: 20px 10px;
+            }
+            canvas {
+                max-width: 100%;
+                height: auto;
+            }
+            #status {
+                font-size: 12px;
+                margin-bottom: 15px;
+            }
+            #controls {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+                max-width: 280px;
+            }
+            #controls button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #onboarding {
+                padding: 20px 15px;
+            }
+            #onboarding h1 {
+                font-size: 20px;
+            }
+            #onboardingVideoWrapper {
+                max-width: 240px;
+            }
+            #onboarding ul {
+                font-size: 12px;
+                padding-left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Onboarding Card -->
+    <div id="onboarding">
+        <h1>Slit-scan</h1>
+        <div id="onboardingVideoWrapper">
+            <video id="onboardingVideo" autoplay playsinline></video>
+            <div id="onboardingIndicator"></div>
+        </div>
+        <ul>
+            <li>Scanner reads a single vertical column</li>
+            <li>Move around to create playful results</li>
+            <li>The scan takes 30 seconds</li>
+        </ul>
+        <button id="startBtn">Scan me</button>
+    </div>
+
+    <!-- Scanning Area -->
+    <div id="scanningArea">
+        <div id="canvasWrapper">
+            <canvas id="canvas"></canvas>
+            <div id="scanLine"></div>
+        </div>
+        <div id="status">Scanning...</div>
+        <div id="controls">
+            <button id="scanAgainBtn">Scan again</button>
+            <button id="copyBtn">Copy image</button>
+        </div>
+    </div>
+
+    <!-- Hidden video for scanning -->
+    <video id="video" autoplay playsinline style="display: none;"></video>
+
+    <script>
+        // UI Elements
+        const onboarding = document.getElementById('onboarding');
+        const onboardingVideo = document.getElementById('onboardingVideo');
+        const startBtn = document.getElementById('startBtn');
+        const scanningArea = document.getElementById('scanningArea');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+        const controls = document.getElementById('controls');
+        const scanAgainBtn = document.getElementById('scanAgainBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const scanLine = document.getElementById('scanLine');
+
+        const MAX_WIDTH = 1000;
+        let currentX = 0;
+        let isComplete = false;
+        let animationId = null;
+        let lastCaptureTime = 0;
+        const CAPTURE_INTERVAL = 30; // milliseconds between captures (~33 captures/sec = 30 seconds total)
+
+        // Color parameters
+        let numColors = 150;
+        let contrastLevel = 155;
+
+        // Cinematic parameters (static)
+        const grainIntensity = 15;
+
+        // Programmatic vignette strength that spikes at 60% of scan
+        // Sharp spike: 0 at 50%, 70 at 60%, 0 at 70%
+        function getVignetteForPosition(x) {
+            const position = x / MAX_WIDTH; // 0 to 1
+
+            if (position < 0.5) {
+                // Before 50%: vignette is 0
+                return 0;
+            } else if (position < 0.6) {
+                // 50% to 60%: ramp up from 0 to 70
+                return ((position - 0.5) / 0.1) * 70;
+            } else if (position < 0.7) {
+                // 60% to 70%: ramp down from 70 to 0
+                return 70 - ((position - 0.6) / 0.1) * 70;
+            } else {
+                // After 70%: vignette is 0
+                return 0;
+            }
+        }
+
+        // Programmatic hue distribution with smooth transitions
+        // 70% at hue 150 (middle), 20% at hue 250, 10% at hue 60
+        function getHueForPosition(x) {
+            const position = x / MAX_WIDTH; // 0 to 1
+            const blendWidth = 0.05; // 5% blend zone on each transition
+
+            // Transition from 250 to 150 (0% to 15%)
+            if (position < 0.15) {
+                // Blend from 250 to 150
+                if (position < 0.15 - blendWidth) {
+                    return 250; // Pure hue 250
+                } else {
+                    const t = (position - (0.15 - blendWidth)) / blendWidth;
+                    return lerp(250, 150, smoothstep(t));
+                }
+            }
+            // Middle section at 150 (15% to 85%)
+            else if (position < 0.85) {
+                // Blend into 150 at the start if needed
+                if (position < 0.15 + blendWidth) {
+                    const t = (position - 0.15) / blendWidth;
+                    return lerp(250, 150, smoothstep(t));
+                }
+                // Blend out of 150 at the end
+                else if (position > 0.85 - blendWidth) {
+                    const t = (position - (0.85 - blendWidth)) / blendWidth;
+                    return lerp(150, 60, smoothstep(t));
+                }
+                return 150; // Pure hue 150
+            }
+            // Transition from 150 to 60 (85% to 90%)
+            else if (position < 0.90) {
+                if (position < 0.85 + blendWidth) {
+                    const t = (position - 0.85) / blendWidth;
+                    return lerp(150, 60, smoothstep(t));
+                }
+                // Blend from 60 to 250
+                else if (position > 0.90 - blendWidth) {
+                    const t = (position - (0.90 - blendWidth)) / blendWidth;
+                    return lerp(60, 250, smoothstep(t));
+                }
+                return 60; // Pure hue 60
+            }
+            // End section transitioning from 60 to 250 (90% to 100%)
+            else {
+                if (position < 0.90 + blendWidth) {
+                    const t = (position - 0.90) / blendWidth;
+                    return lerp(60, 250, smoothstep(t));
+                }
+                return 250; // Pure hue 250
+            }
+        }
+
+        // Linear interpolation
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        // Smooth step function for easing
+        function smoothstep(t) {
+            return t * t * (3 - 2 * t);
+        }
+
+        // Initialize onboarding camera
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }
+        })
+        .then(stream => {
+            onboardingVideo.srcObject = stream;
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            status.textContent = 'Camera access denied';
+            console.error(err);
+        });
+
+        // Start button handler
+        startBtn.addEventListener('click', () => {
+            onboarding.classList.add('hidden');
+            scanningArea.classList.add('active');
+
+            // Video is already loaded from onboarding, start immediately
+            if (video.videoWidth > 0) {
+                initCanvas();
+                startSlitscan();
+            } else {
+                // Fallback if video isn't ready yet
+                video.addEventListener('loadedmetadata', () => {
+                    initCanvas();
+                    startSlitscan();
+                }, { once: true });
+            }
+        });
+
+        function initCanvas() {
+            // Set canvas to be horizontal: width is MAX_WIDTH, height matches video
+            canvas.width = MAX_WIDTH;
+            canvas.height = video.videoHeight;
+
+            // Clear canvas to black
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, MAX_WIDTH, canvas.height);
+        }
+
+        function applyColorEffects(imageData, hueRotation, xPosition, vignetteStrength) {
+            const data = imageData.data;
+            const height = imageData.height;
+
+            for (let i = 0; i < data.length; i += 4) {
+                let r = data[i];
+                let g = data[i + 1];
+                let b = data[i + 2];
+
+                // Apply contrast
+                if (contrastLevel !== 100) {
+                    const factor = (259 * (contrastLevel + 255)) / (255 * (259 - contrastLevel));
+                    r = Math.max(0, Math.min(255, factor * (r - 128) + 128));
+                    g = Math.max(0, Math.min(255, factor * (g - 128) + 128));
+                    b = Math.max(0, Math.min(255, factor * (b - 128) + 128));
+                }
+
+                // Apply hue rotation (convert to HSL and back)
+                if (hueRotation !== 0) {
+                    const [h, s, l] = rgbToHsl(r, g, b);
+                    const newH = (h + hueRotation) % 360;
+                    [r, g, b] = hslToRgb(newH, s, l);
+                }
+
+                // Apply posterization (reduce number of colors)
+                if (numColors < 256) {
+                    const levels = numColors;
+                    r = Math.round(r / 255 * (levels - 1)) * (255 / (levels - 1));
+                    g = Math.round(g / 255 * (levels - 1)) * (255 / (levels - 1));
+                    b = Math.round(b / 255 * (levels - 1)) * (255 / (levels - 1));
+                }
+
+                // Apply vignette (darken edges)
+                if (vignetteStrength > 0) {
+                    const yPos = (i / 4) % height;
+                    const normalizedY = (yPos / height) - 0.5; // -0.5 to 0.5
+                    const normalizedX = (xPosition / MAX_WIDTH) - 0.5; // -0.5 to 0.5
+                    const distance = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+                    const vignette = 1 - Math.min(1, distance * 2) * (vignetteStrength / 100);
+                    r *= vignette;
+                    g *= vignette;
+                    b *= vignette;
+                }
+
+                // Apply film grain (always at 15%)
+                const yPos = (i / 4);
+                // Pseudo-random noise based on position
+                const noise = (Math.sin(xPosition * 12.9898 + yPos * 78.233) * 43758.5453) % 1;
+                const grain = (noise - 0.5) * grainIntensity * 2.55; // Convert % to 0-255 range
+
+                // Calculate luminance for luminance-based grain
+                const luminance = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+                // More grain in midtones (peaks at 0.5 luminance)
+                const grainMultiplier = 1 - Math.abs(luminance - 0.5) * 2;
+
+                const finalGrain = grain * grainMultiplier;
+                r = Math.max(0, Math.min(255, r + finalGrain));
+                g = Math.max(0, Math.min(255, g + finalGrain));
+                b = Math.max(0, Math.min(255, b + finalGrain));
+
+                data[i] = r;
+                data[i + 1] = g;
+                data[i + 2] = b;
+            }
+
+            return imageData;
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+
+            return [h * 360, s, l];
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360;
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
+
+        function startSlitscan() {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = video.videoWidth;
+            tempCanvas.height = video.videoHeight;
+
+            function capture(timestamp) {
+                if (isComplete) return;
+
+                // Time-based capture for consistent speed across devices
+                if (timestamp - lastCaptureTime < CAPTURE_INTERVAL) {
+                    animationId = requestAnimationFrame(capture);
+                    return;
+                }
+
+                lastCaptureTime = timestamp;
+
+                // Draw current video frame
+                tempCtx.drawImage(video, 0, 0);
+
+                // Get one vertical slice from the center of the video
+                const sliceX = Math.floor(video.videoWidth / 2);
+                let sliceData = tempCtx.getImageData(sliceX, 0, 1, video.videoHeight);
+
+                // Get hue and vignette for this position
+                const hueRotation = getHueForPosition(currentX);
+                const vignetteStrength = getVignetteForPosition(currentX);
+
+                // Apply color effects with position-specific hue and dynamic vignette
+                sliceData = applyColorEffects(sliceData, hueRotation, currentX, vignetteStrength);
+
+                // Draw it as a vertical column on the canvas
+                ctx.putImageData(sliceData, currentX, 0);
+
+                currentX++;
+
+                // Update scan line position as percentage
+                const progressPercent = (currentX / MAX_WIDTH) * 100;
+                scanLine.style.left = progressPercent + '%';
+
+                status.textContent = `${currentX} / ${MAX_WIDTH} px`;
+
+                if (currentX >= MAX_WIDTH) {
+                    isComplete = true;
+                    status.textContent = 'That worked out!';
+                    controls.classList.add('visible');
+                    scanLine.classList.add('hidden');
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    return;
+                }
+
+                animationId = requestAnimationFrame(capture);
+            }
+
+            capture();
+        }
+
+        function restart() {
+            // Reset state
+            currentX = 0;
+            isComplete = false;
+            lastCaptureTime = 0;
+            controls.classList.remove('visible');
+            scanLine.classList.remove('hidden');
+            scanLine.style.left = '0%';
+
+            // Cancel any ongoing animation
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+
+            // Clear and reinitialize canvas
+            initCanvas();
+
+            // Restart camera if needed
+            if (!video.srcObject || !video.srcObject.active) {
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                })
+                .then(stream => {
+                    video.srcObject = stream;
+                    status.textContent = 'Scanning...';
+                    video.addEventListener('loadedmetadata', () => {
+                        startSlitscan();
+                    }, { once: true });
+                })
+                .catch(err => {
+                    status.textContent = 'Camera access denied';
+                    console.error(err);
+                });
+            } else {
+                status.textContent = 'Scanning...';
+                startSlitscan();
+            }
+        }
+
+        // Button handlers
+        scanAgainBtn.addEventListener('click', restart);
+
+        copyBtn.addEventListener('click', async () => {
+            try {
+                // Try clipboard API first (works on desktop)
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+                // Check if clipboard API is supported
+                if (navigator.clipboard && ClipboardItem) {
+                    try {
+                        const item = new ClipboardItem({ 'image/png': blob });
+                        await navigator.clipboard.write([item]);
+
+                        // Show subtle feedback
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied';
+
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                        }, 2000);
+                        return;
+                    } catch (clipErr) {
+                        console.log('Clipboard API failed, falling back to download');
+                    }
+                }
+
+                // Fallback: Download the image (works on all mobile devices)
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `slitscan-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Show feedback
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Downloaded';
+
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+
+            } catch (err) {
+                console.error('Copy/download failed:', err);
+                copyBtn.textContent = 'Error';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy image';
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

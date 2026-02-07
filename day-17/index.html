@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Speaking...</title>
+<style>
+  html, body { height:100%; margin:0; background:#000; }
+  body { overflow:hidden; }
+  canvas { display:block; width:100vw; height:100vh; image-rendering: pixelated; }
+  .hint { position:fixed; left:10px; bottom:10px; font:12px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:#7a7a7a; opacity:0.9; }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .enable-button {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    background: #e4e4e4;
+    color: #272727;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .enable-button:hover {
+    background: #b3b3b3;
+    transform: scale(1.05);
+  }
+  
+  .overlay.hidden {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<div class="overlay" id="overlay">
+  <button class="enable-button" id="enableButton">Enable microphone</button>
+</div>
+<script type="module">
+import { forceSimulation, forceManyBody, forceCenter, forceLink, forceCollide } from 'https://cdn.skypack.dev/d3-force@3';
+
+// --- Config ---
+const N = 160;                      // agents
+const HUB_COUNT = 3;                // fixed number of hubs
+const SHARED_RATIO = 1;           // 50% of non-hubs connect to ALL hubs
+const EXTRA_MIN = 0, EXTRA_MAX = 2; // extra non-hub↔non-hub links per node
+const EDGE_COLOR = '#2a2a2a';       // 1px dark grey
+const NODE_COLOR = '#fff';          // white
+const NODE_SIZE = 2;                // 2x2 pixels (CSS px)
+
+// --- Canvas setup (HiDPI aware) ---
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+function resize() {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const w = Math.floor(window.innerWidth);
+  const h = Math.floor(window.innerHeight);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = Math.floor(w * dpr);
+  canvas.height = Math.floor(h * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
+}
+window.addEventListener('resize', resize);
+resize();
+
+// --- Utilities ---
+function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function key(u,v){ return u<v ? u+','+v : v+','+u; }
+function getNodeRef(n){ return (typeof n === 'object') ? n : graph.nodes[n]; }
+function safeXY(n){ return n && Number.isFinite(n.x) && Number.isFinite(n.y); }
+
+// --- Graph generation ---
+function makeGraph(n=N){
+  const nodes = Array.from({length:n}, (_,i)=>({id:i}));
+  const ids = nodes.map(n=>n.id);
+
+  // 1) Choose hubs (exact HUB_COUNT)
+  const hubs = new Set();
+  while(hubs.size < Math.min(HUB_COUNT, n)) { hubs.add(randPick(ids)); }
+  for (const id of ids) nodes[id].hub = hubs.has(id); // mark hubs
+
+  const nonHubs = ids.filter(id=>!hubs.has(id));
+
+  // 2) Edge store helpers
+  const links = [];
+  const edgeSet = new Set();
+  const addEdge = (u,v)=>{
+    if(u===v) return false; // no self-loops
+    const k = key(u,v);
+    if(edgeSet.has(k)) return false; // no duplicates
+    edgeSet.add(k); links.push({source:u, target:v}); return true;
+  };
+
+  // 3) Split non-hubs into SHARED set S and EXCLUSIVE buckets for each hub
+  const shuffled = nonHubs.slice().sort(()=>Math.random()-0.5);
+  const sharedCount = Math.floor(shuffled.length * SHARED_RATIO);
+  const S = new Set(shuffled.slice(0, sharedCount));
+  const R = shuffled.slice(sharedCount);
+
+  // Distribute R (exclusive agents) across hubs as evenly as possible
+  const hubList = [...hubs];
+  const buckets = new Map(hubList.map(h=>[h, []]));
+  for (let i=0; i<R.length; i++) {
+    const h = hubList[i % hubList.length];
+    buckets.get(h).push(R[i]);
+  }
+
+  // 4) Wire connections
+  // 4a) Shared agents connect to ALL hubs
+  for (const a of S) for (const h of hubList) addEdge(h, a);
+  // 4b) Exclusive agents connect ONLY to their assigned hub
+  for (const h of hubList) for (const a of buckets.get(h)) addEdge(h, a);
+
+  // 5) Extra non-hub↔non-hub links (occasional)
+  const extraTargets = new Map(nonHubs.map(id=>[id, randInt(EXTRA_MIN, EXTRA_MAX)]));
+  let guard = 100000;
+  function remainingTotal(){ let s=0; for(const v of extraTargets.values()) s+=v; return s; }
+  while(remainingTotal()>0 && guard--){
+    const needers = nonHubs.filter(id=>extraTargets.get(id)>0);
+    if(!needers.length) break;
+    const u = randPick(needers);
+    let candidates = nonHubs.filter(v=>v!==u);
+    let tries = 20, linked=false;
+    while(tries-- && candidates.length){
+      const v = randPick(candidates);
+      if(addEdge(u, v)){
+        extraTargets.set(u, extraTargets.get(u)-1);
+        extraTargets.set(v, Math.max(0, extraTargets.get(v)-1));
+        linked=true; break;
+      } else {
+        candidates = candidates.filter(x=>x!==v);
+      }
+    }
+    if(!linked){ extraTargets.set(u, Math.max(0, extraTargets.get(u)-1)); }
+  }
+
+  return {nodes, links, hubs, shared:S};
+}
+
+let graph = makeGraph();
+
+// --- Sanity tests ("test cases") ---
+function runTests({nodes, links, hubs, shared}){
+  // Build adjacency
+  const adj = new Map(nodes.map(n=>[n.id, new Set()]));
+  for(const e of links){
+    const s = (typeof e.source === 'object') ? e.source.id : e.source;
+    const t = (typeof e.target === 'object') ? e.target.id : e.target;
+    console.assert(s!==t, 'Self-loop detected at node', s);
+    const k = key(s,t);
+    console.assert(k, 'Key issue');
+    adj.get(s).add(t); adj.get(t).add(s);
+  }
+  // No duplicate edges
+  const seen = new Set();
+  for(const e of links){
+    const s = (typeof e.source === 'object') ? e.source.id : e.source;
+    const t = (typeof e.target === 'object') ? e.target.id : e.target;
+    const k = key(s,t);
+    console.assert(!seen.has(k), 'Duplicate edge detected', k);
+    seen.add(k);
+  }
+  const hubIds = new Set([...hubs]);
+  const nonHubs = nodes.filter(n=>!hubIds.has(n.id));
+
+  // Test: hub↔hub edges should NOT exist
+  for(const h of hubs){
+    for(const h2 of hubs){ if(h2===h) continue; console.assert(!adj.get(h).has(h2), 'Forbidden hub↔hub edge exists', h, '<->', h2); }
+  }
+
+  // Test: shared agents connect to ALL hubs
+  for(const a of shared){
+    for(const h of hubs){ console.assert(adj.get(a).has(h), 'Shared agent missing hub', a, '<->', h); }
+  }
+
+  // Test: exclusive agents connect to EXACTLY one hub
+  for(const u of nonHubs){
+    const hubNeighbors = [...adj.get(u.id)].filter(v=>hubIds.has(v));
+    if(shared.has(u.id)){
+      console.assert(hubNeighbors.length===hubIds.size, 'Shared agent does not connect to all hubs', u.id, hubNeighbors.length);
+    } else {
+      console.assert(hubNeighbors.length===1, 'Exclusive agent must connect to exactly one hub', u.id, hubNeighbors.length);
+    }
+  }
+
+  // Connectivity: Each agent should have >=1 hub neighbor
+  for(const u of nonHubs){
+    const hubNeighbors = [...adj.get(u.id)].filter(v=>hubIds.has(v));
+    console.assert(hubNeighbors.length>=1, 'Agent without hub connection', u.id);
+  }
+
+  // Additional tests
+  const expectedShared = Math.floor(nonHubs.length * SHARED_RATIO);
+  console.assert(shared.size === expectedShared, 'Shared set size mismatch', shared.size, 'expected', expectedShared);
+  console.assert(hubs.size === Math.min(HUB_COUNT, nodes.length), 'Hub count mismatch', hubs.size);
+
+  // New: whole-graph connectivity via DFS
+  const visited = new Set();
+  const stack = [0]; visited.add(0);
+  while(stack.length){
+    const x = stack.pop();
+    for(const y of adj.get(x)) if(!visited.has(y)){ visited.add(y); stack.push(y); }
+  }
+  console.assert(visited.size === nodes.length, 'Graph is not connected!', visited.size, '/', nodes.length);
+}
+runTests(graph);
+
+// --- Force simulation ---
+// keep references to forces so we can modulate them with mic volume
+const linkForce = forceLink(graph.links).id(d=>d.id).distance(30).strength(0.9);
+const chargeForce = forceManyBody().strength(-30);
+let sim = forceSimulation(graph.nodes)
+  .force('charge', chargeForce)
+  .force('center', forceCenter(window.innerWidth/2, window.innerHeight/2))
+  .force('link', linkForce)
+  .force('collide', forceCollide(2));
+
+// keep centered on resize
+window.addEventListener('resize', ()=>{
+  sim.force('center', forceCenter(window.innerWidth/2, window.innerHeight/2));
+});
+
+// --- Draw ---
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // edges
+  ctx.strokeStyle = EDGE_COLOR;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 1;
+  for(const e of graph.links){
+    const s = getNodeRef(e.source);
+    const t = getNodeRef(e.target);
+    if(!safeXY(s) || !safeXY(t)) continue;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(t.x, t.y);
+    ctx.stroke();
+  }
+  // nodes (2x2 or 3x3 px squares) with faint halo for hubs
+  for(const n of graph.nodes){
+    if(!safeXY(n)) continue;
+    const size = n.hub ? 3 : NODE_SIZE;
+    const x = Math.round(n.x) - Math.floor(size/2);
+    const y = Math.round(n.y) - Math.floor(size/2);
+    if(n.hub){
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = NODE_COLOR;
+      ctx.beginPath();
+      ctx.arc(Math.round(n.x)+0.5, Math.round(n.y)+0.5, 8, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.fillStyle = NODE_COLOR;
+    ctx.fillRect(x, y, size, size);
+  }
+}
+
+sim.on('tick', draw);
+
+// --- Microphone → volume → force mapping ---
+let audioCtx = null, analyser = null, dataArray = null;
+let vol = 0, volSmooth = 0; // 0..1
+const VOL_SMOOTH_A = 0.4; // EMA factor (increased for more responsiveness)
+
+function computeVolume(){
+  if(!analyser || !dataArray) return 0;
+  analyser.getByteTimeDomainData(dataArray);
+  
+  // RMS of centered waveform
+  let sum = 0;
+  for(let i=0;i<dataArray.length;i++){
+    const v = (dataArray[i]-128)/128; 
+    sum += v*v;
+  }
+  const rms = Math.sqrt(sum / dataArray.length);
+  
+  // More sensitive scaling
+  return Math.min(1, rms * 8);
+}
+
+function updateForcesFromVolume(){
+  // Map 0..1 -> distances and charge
+  const dist = 20 + 80 * volSmooth;          // 20..100 px
+  const charge = -10 - 140 * volSmooth;      // -10..-150
+  
+  // Update forces directly on the simulation
+  sim.force('link').distance(dist);
+  sim.force('charge').strength(charge);
+  
+  // reheat gently so changes take effect
+  sim.alphaTarget(0.15).restart();
+}
+
+function micLoop(){
+  vol = computeVolume();
+  volSmooth = volSmooth*(1-VOL_SMOOTH_A) + vol*VOL_SMOOTH_A;
+  updateForcesFromVolume();
+  requestAnimationFrame(micLoop);
+}
+
+async function setupMic(){
+  try{
+    console.log('Setting up microphone...');
+    
+    // Resume audio context if suspended
+    if(!audioCtx){ 
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+    }
+    if(audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+      console.log('Audio context resumed');
+    }
+    
+    // Get microphone with higher quality settings
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+        sampleRate: 44100
+      }
+    });
+    console.log('Got microphone stream');
+    
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024; // small window
+    analyser.smoothingTimeConstant = 0.8; // less smoothing for more responsiveness
+    dataArray = new Uint8Array(analyser.fftSize);
+    source.connect(analyser);
+    
+    console.log('Microphone setup complete, starting audio loop');
+    console.log('Audio context state:', audioCtx.state);
+    console.log('Sample rate:', audioCtx.sampleRate);
+    
+    micLoop();
+  } catch(err){
+    console.error('Mic setup failed:', err);
+  }
+}
+
+
+// Start microphone on button click
+let micStarted = false;
+
+function startMic() {
+  if (micStarted) return;
+  micStarted = true;
+  
+  // Hide the overlay
+  const overlay = document.getElementById('overlay');
+  overlay.classList.add('hidden');
+  
+  // Start microphone
+  console.log('Starting microphone...');
+  setupMic();
+}
+
+// Set up button click handler
+document.getElementById('enableButton').addEventListener('click', startMic);
+</script>
+</body>
+</html>

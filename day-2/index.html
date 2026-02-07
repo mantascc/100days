@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Emergence — Vicsek Model</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #0f0f12; }
+    body { display: grid; place-items: center; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: #e6e6e6; }
+    #stage { position: relative; width: 80vmin; height: 80vmin; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); overflow: hidden; }
+    canvas { position:absolute; inset:0; width:100%; height:100%; }
+    #controls{ position:absolute; left:50%; bottom:10px; transform: translateX(-50%); z-index:2; }
+    .floatCard{ display:flex; gap:12px; align-items:center; padding:8px 12px; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(20,20,24,.9); box-shadow:0 6px 18px rgba(0,0,0,.35); flex-wrap: wrap; }
+    .ctrl{ display:flex; gap:8px; align-items:center; }
+    .label{ font-size:11px; opacity:.85; width:64px; }
+    .hslider{ width:150px; }
+    .btn{ appearance:none; border:1px solid rgba(255,255,255,.12); background:#17171b; color:#e6e6e6; padding:6px 10px; border-radius:10px; cursor:pointer; }
+    .btn:hover{ background:#1e1e24; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="controls" title="Local alignment with noise">
+      <div class="floatCard">
+        <div class="ctrl">
+          <span class="label">Noise</span>
+          <input id="noise" class="hslider" type="range" min="0" max="100" step="1" value="10">
+        </div>
+        <div class="ctrl">
+          <span class="label">Radius</span>
+          <input id="radius" class="hslider" type="range" min="5" max="80" step="1" value="10">
+        </div>
+        <div class="ctrl">
+          <span class="label">Speed</span>
+          <input id="speed" class="hslider" type="range" min="10" max="120" step="1" value="60">
+        </div>
+        <div class="ctrl">
+          <span class="label">Agents</span>
+          <input id="agents" class="hslider" type="range" min="50" max="800" step="10" value="800">
+        </div>
+        <button id="reset" class="btn">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const cv = document.getElementById('cv');
+    const ctx = cv.getContext('2d');
+    const noiseEl = document.getElementById('noise');
+    const radiusEl = document.getElementById('radius');
+    const speedEl = document.getElementById('speed');
+    const agentsEl = document.getElementById('agents');
+    const resetBtn = document.getElementById('reset');
+
+    let W=0, H=0, dpr=1;
+    let boids = [];
+    let last = performance.now();
+
+    function resize(){
+      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      W = stage.clientWidth;
+      H = stage.clientHeight;
+      cv.width = Math.floor(W * dpr);
+      cv.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    new ResizeObserver(resize).observe(stage);
+
+    function rand(a,b){ return a + Math.random()*(b-a); }
+
+    function seed(){
+      const N = +agentsEl.value;
+      boids = new Array(N).fill(0).map(()=>({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        th: rand(0, Math.PI*2)
+      }));
+    }
+
+    function wrap(b){
+      if (b.x < 0) b.x += W;
+      if (b.x >= W) b.x -= W;
+      if (b.y < 0) b.y += H;
+      if (b.y >= H) b.y -= H;
+    }
+
+    function step(dt){
+      // parameters
+      const R = +radiusEl.value; // neighbor radius (px)
+      const v = +speedEl.value / 60; // px per frame (scaled)
+      const eta = (+noiseEl.value)/100; // 0..1 noise
+      const twoPI = Math.PI*2;
+
+      // simple cell list for speed (grid hashing)
+      const cell = Math.max(8, R|0);
+      const cols = Math.ceil(W/cell), rows = Math.ceil(H/cell);
+      const grid = Array(cols*rows);
+      for (let i=0;i<grid.length;i++) grid[i]=[];
+      for (let i=0;i<boids.length;i++){
+        const b = boids[i];
+        const cx = (b.x/cell)|0, cy = (b.y/cell)|0;
+        grid[cy*cols+cx].push(i);
+      }
+
+      // update headings
+      for (let i=0;i<boids.length;i++){
+        const b = boids[i];
+        const cx = (b.x/cell)|0, cy = (b.y/cell)|0;
+        let sx=0, sy=0, count=0;
+        for (let gy=cy-1; gy<=cy+1; gy++){
+          if (gy<0||gy>=rows) continue;
+          for (let gx=cx-1; gx<=cx+1; gx++){
+            if (gx<0||gx>=cols) continue;
+            const bucket = grid[gy*cols+gx];
+            for (let k=0;k<bucket.length;k++){
+              const j = bucket[k];
+              if (j===i) continue;
+              const n = boids[j];
+              const dx = n.x - b.x, dy = n.y - b.y;
+              if (dx*dx + dy*dy <= R*R){
+                sx += Math.cos(n.th);
+                sy += Math.sin(n.th);
+                count++;
+              }
+            }
+          }
+        }
+        if (count>0){
+          const desired = Math.atan2(sy, sx);
+          // Add uniform noise in [-eta*pi, eta*pi]
+          const jitter = (Math.random()*2-1) * eta * Math.PI;
+          b.th = desired + jitter;
+        }else{
+          // random walk when isolated
+          b.th += (Math.random()*2-1) * eta * 0.2;
+        }
+      }
+
+      // move
+      for (let i=0;i<boids.length;i++){
+        const b = boids[i];
+        b.x += Math.cos(b.th) * v * dt * 60; // scale by dt
+        b.y += Math.sin(b.th) * v * dt * 60; // scale by dt
+        wrap(b);
+      }
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+
+      // trail/fade for nicer emergent textures (optional: comment next two lines to disable)
+      ctx.fillStyle = 'rgba(15,15,18,0.08)';
+      ctx.fillRect(0,0,W,H);
+
+      ctx.fillStyle = '#e6e6e6';
+      for (let i=0;i<boids.length;i++){
+        const b = boids[i];
+        // tiny oriented triangle for heading, or dot for speed
+        const r = 2; // radius
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 1.2, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    function loop(now){
+      const dt = Math.min(0.05, (now - last)/1000);
+      last = now;
+      step(dt);
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    // init
+    resize();
+    seed();
+    requestAnimationFrame(loop);
+
+    // interactions
+    resetBtn.addEventListener('click', seed);
+    // reseed automatically if agent count changes
+    agentsEl.addEventListener('input', seed);
+  </script>
+</body>
+</html>
+
+

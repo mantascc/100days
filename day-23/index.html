@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click, hover, tap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&family=Instrument+Serif:ital@1&family=Lato:wght@300&family=Montserrat:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #2A2D43;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .text-container {
+            font-size: 120px;
+            color: #0000FF;
+            text-align: center;
+            user-select: none;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 768px) {
+            .text-container {
+                font-size: 64px;
+            }
+        }
+
+        .letter {
+            display: inline-block;
+            font-family: 'Roboto', sans-serif;
+            transition: font-family 0.3s ease, font-size 0.3s ease;
+            cursor: default;
+            vertical-align: baseline;
+        }
+
+        .letter.space {
+            width: 0.3em;
+        }
+
+        .letter:hover {
+            color: #0000de;
+        }
+    </style>
+</head>
+<body>
+    <div class="text-container">
+        <span class="letter">H</span><span class="letter">e</span><span class="letter">l</span><span class="letter">l</span><span class="letter">o</span><span class="letter space"> </span><span class="letter">W</span><span class="letter">o</span><span class="letter">r</span><span class="letter">l</span><span class="letter">d</span>
+    </div>
+
+    <script>
+        const fonts = [
+            'Roboto',
+            'Instrument Serif',
+            'Lato',
+            'Montserrat',
+            'Oswald'
+        ];
+
+        const letters = document.querySelectorAll('.letter:not(.space)');
+
+        // Desktop: hover to cycle through fonts
+        letters.forEach(letter => {
+            let letterFontIndex = 0;
+
+            letter.addEventListener('mouseenter', () => {
+                letterFontIndex = (letterFontIndex + 1) % fonts.length;
+                const newFont = fonts[letterFontIndex];
+                letter.style.fontFamily = `'${newFont}', sans-serif`;
+            });
+        });
+
+        // Mobile: tap anywhere to randomize
+        // 40% of letters get one dominant font, rest are random
+        document.body.addEventListener('click', () => {
+            const lettersArray = Array.from(letters);
+            const totalLetters = lettersArray.length;
+            const dominantCount = Math.floor(totalLetters * 0.4);
+
+            // Pick a random dominant font
+            const dominantFont = fonts[Math.floor(Math.random() * fonts.length)];
+
+            // Shuffle letters array to randomize which ones get dominant font
+            const shuffled = lettersArray.sort(() => Math.random() - 0.5);
+
+            // Apply dominant font to 40% of letters
+            shuffled.slice(0, dominantCount).forEach(letter => {
+                letter.style.fontFamily = `'${dominantFont}', sans-serif`;
+            });
+
+            // Apply random fonts to the rest
+            shuffled.slice(dominantCount).forEach(letter => {
+                const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+                letter.style.fontFamily = `'${randomFont}', sans-serif`;
+            });
+        });
+    </script>
+</body>
+</html>

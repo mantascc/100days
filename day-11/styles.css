@@ -1,0 +1,22 @@
+:root { 
+  color-scheme: dark; 
+}
+
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  background: #2A2D43; 
+}
+
+body { 
+  overflow: hidden; 
+}
+
+canvas { 
+  position: fixed; 
+  inset: 0; 
+  width: 100vw; 
+  height: 100vh; 
+  image-rendering: pixelated; 
+}
+

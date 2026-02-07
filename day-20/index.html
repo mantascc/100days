@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schelling model of segregation</title>
+<style>
+  :root { --bg:#0f0f12; --fg:#cfcfd6; --muted:#8b8b95; --accent:#6ee7ff; }
+  html,body { height:100%; margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  body { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; box-sizing:border-box; position:relative; min-height:100vh; }
+  #wrap { width:100%; max-width:min(90vw, 90vh); aspect-ratio:1; }
+  .ui { display:flex; flex-direction:column; gap:8px; align-items:stretch; background:#131318; border:1px solid #1d1d24; border-radius:12px; padding:12px; box-shadow:0 0 0 1px #0b0b10 inset; }
+  .ui .group { display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px; background:#0f0f14; border:1px solid #1a1a22; border-radius:10px; padding:8px 12px; }
+  .ui label { color:var(--muted); font-size:12px; text-align:right; }
+  .ui input[type="range"] { width:100%; min-width:100px; }
+  .ui button { background:#161621; color:var(--fg); border:1px solid #242436; border-radius:10px; padding:6px 10px; cursor:pointer; }
+  .ui button:hover { border-color:#2f2f46; }
+  .ui .pill { padding:4px 8px; border:1px solid #2a2a3c; border-radius:999px; font-size:12px; color:var(--muted); min-width:60px; text-align:center; }
+  canvas{ width:100%; height:100%; display:block; image-rendering:pixelated; background:#0b0b0f; border:1px solid #1d1d24; border-radius:12px; }
+  .legend { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .sw{ width:12px; height:12px; border-radius:3px; border:1px solid #0a0a0a; }
+  #paramsBtn { position:fixed; bottom:16px; right:16px; background:#161621; color:var(--fg); border:1px solid #242436; border-radius:12px; padding:10px 16px; cursor:pointer; font:14px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; box-shadow:0 4px 12px rgba(0,0,0,0.4); z-index:1000; }
+  #paramsBtn:hover { border-color:#2f2f46; background:#1a1a2a; }
+  .ui { position:fixed; bottom:70px; right:16px; left:16px; max-width:calc(100vw - 32px); z-index:999; }
+  .ui.hidden { display:none; }
+  #info { display:flex; gap:12px; align-items:center; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+  #controls { display:flex; gap:8px; align-items:center; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+  #controls button { background:#161621; color:var(--fg); border:1px solid #242436; border-radius:10px; padding:8px 14px; cursor:pointer; font:14px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  #controls button:hover { border-color:#2f2f46; background:#1a1a2a; }
+
+  @media (min-width: 768px) {
+    body { padding:10vh 24px; }
+    #wrap { max-width:min(80vw, 80vh); }
+    .ui { max-width:480px; right:24px; left:auto; bottom:80px; }
+    #paramsBtn { bottom:24px; right:24px; }
+    .ui input[type="range"] { min-width:140px; }
+  }
+</style>
+</head>
+<body>
+  <button id="paramsBtn">Parameters</button>
+  <div class="ui hidden">
+      <div class="group">
+        <label>Tolerance</label>
+        <input id="tol" type="range" min="0" max="1" step="0.05" value="0.65">
+        <span id="tolv" class="pill">0.65</span>
+      </div>
+      <div class="group">
+        <label>Density</label>
+        <input id="dens" type="range" min="0.3" max="0.98" step="0.02" value="0.50">
+        <span id="densv" class="pill">0.50</span>
+      </div>
+      <div class="group">
+        <label>Radius</label>
+        <input id="rad" type="range" min="1" max="3" step="1" value="2">
+        <span id="radv" class="pill">2</span>
+      </div>
+      <div class="group">
+        <label>Grid</label>
+        <input id="grid" type="range" min="40" max="200" step="4" value="200">
+        <span id="gridv" class="pill">200×200</span>
+      </div>
+    </div>
+  </div>
+  <div id="controls">
+    <button id="reset">Reset</button>
+    <button id="play">▶︎ Play</button>
+    <button id="step">Step</button>
+  </div>
+  <div id="wrap">
+    <canvas id="c"></canvas>
+  </div>
+  <div id="info">
+    <span id="stats" class="pill">iteration 0</span>
+    <div class="legend">
+      <div class="sw" style="background:#002FFF"></div><span class="pill">A</span>
+      <div class="sw" style="background:#B4E03C"></div><span class="pill">B</span>
+      <div class="sw" style="background:#0b0b0f; border-color:#1d1d24"></div><span class="pill">empty</span>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // Colors (mintis agent palette vibe)
+  const COL_A = [0x00,0x2f,0xff,0xff]; // #002FFF blue
+  const COL_B = [0xb4,0xe0,0x3c,0xff]; // #B4E03C yellow-green
+  const COL_BG = [0x0b,0x0b,0x0f,0xff]; // empty
+
+  const $ = sel => document.querySelector(sel);
+  const canvas = $('#c'), ctx = canvas.getContext('2d', { willReadFrequently:true });
+  const tol = $('#tol'), tolv = $('#tolv');
+  const dens = $('#dens'), densv = $('#densv');
+  const rad = $('#rad'), radv = $('#radv');
+  const grid = $('#grid'), gridv = $('#gridv');
+  const playBtn = $('#play'), stepBtn = $('#step'), resetBtn = $('#reset'), stats = $('#stats');
+  const paramsBtn = $('#paramsBtn'), uiPanel = $('.ui');
+
+  let N=200, T=0.65, D=0.50, R=2;
+  let gridArr, empties, W, H, iter=0, playing=false, rafId=null;
+
+  function syncUI() {
+    T = +tol.value; tolv.textContent = T.toFixed(2);
+    D = +dens.value; densv.textContent = D.toFixed(2);
+    R = +rad.value|0; radv.textContent = R;
+    N = +grid.value|0; gridv.textContent = `${N}×${N}`;
+  }
+  [tol,dens,rad,grid].forEach(el => el.addEventListener('input', syncUI));
+
+  function init() {
+    syncUI();
+    // pick pixel size to fill canvas cleanly
+    const px = Math.floor(Math.min(window.innerWidth, window.innerHeight) / Math.max(16, N));
+    canvas.width = N;
+    canvas.height = N;
+    W=N; H=N;
+
+    gridArr = new Uint8Array(W*H); // 0 empty, 1=A, 2=B
+    const total = W*H;
+    const filled = Math.floor(total * D);
+    const half = Math.floor(filled/2);
+
+    // random placement
+    const idxs = Array.from({length:total}, (_,i)=>i);
+    for (let i=total-1;i>0;i--){ const j=(Math.random()* (i+1))|0; const t=idxs[i]; idxs[i]=idxs[j]; idxs[j]=t; }
+    for (let i=0;i<filled;i++){
+      gridArr[idxs[i]] = (i<half)?1:2;
+    }
+    empties = idxs.slice(filled);
+    iter=0;
+    draw();
+    updateStats(0);
+  }
+
+  function updateStats(unhappyCount){
+    stats.textContent = `iteration ${iter}`;
+  }
+
+  function inb(x,y){ return x>=0 && y>=0 && x<W && y<H; }
+
+  function happyAt(ix,iy){
+    const me = gridArr[iy*W+ix];
+    if (me===0) return true;
+    let same=0, total=0;
+    for(let dy=-R; dy<=R; dy++){
+      for(let dx=-R; dx<=R; dx++){
+        if (dx===0 && dy===0) continue;
+        const x=ix+dx, y=iy+dy;
+        if(!inb(x,y)) continue;
+        const v = gridArr[y*W+x];
+        if (v===0) continue;
+        total++;
+        if (v===me) same++;
+      }
+    }
+    if (total===0) return true; // isolated is fine
+    return (same/total) >= T;
+  }
+
+  // One iteration: collect unhappy agents; move them to random empty spots.
+  function step() {
+    const unhappyIdxs = [];
+    for (let i=0;i<gridArr.length;i++){
+      const v = gridArr[i];
+      if (v===0) continue;
+      const x=i%W, y=(i/W)|0;
+      if (!happyAt(x,y)) unhappyIdxs.push(i);
+    }
+    if (unhappyIdxs.length===0){ updateStats(0); return false; }
+
+    // Shuffle unhappy, also shuffle empties for fairness
+    shuffle(unhappyIdxs); shuffle(empties);
+
+    const moves = Math.min(unhappyIdxs.length, empties.length);
+    for (let k=0;k<moves;k++){
+      const from = unhappyIdxs[k];
+      const to = empties[k];
+      gridArr[to] = gridArr[from];
+      gridArr[from] = 0;
+      empties[k] = from; // from becomes empty
+    }
+    // If there were more empties than moves, keep tail; else slice
+    empties = empties.slice(0, empties.length); // no-op but keeps it explicit
+    iter++;
+    draw();
+    updateStats(unhappyIdxs.length);
+    return true;
+  }
+
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  function draw(){
+    const img = ctx.createImageData(W,H);
+    const d = img.data;
+    for (let i=0;i<gridArr.length;i++){
+      const v = gridArr[i];
+      const o = i*4;
+      const col = (v===1)?COL_A : (v===2)?COL_B : COL_BG;
+      d[o]=col[0]; d[o+1]=col[1]; d[o+2]=col[2]; d[o+3]=col[3];
+    }
+    ctx.putImageData(img,0,0);
+  }
+
+  function loop(){
+    if (!playing) return;
+    const progressed = step();
+    if (!progressed) { playing=false; playBtn.textContent='▶︎ Play'; return; }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  playBtn.addEventListener('click', ()=>{
+    playing = !playing;
+    playBtn.textContent = playing ? '⏸ Pause' : '▶︎ Play';
+    if (playing) loop();
+    else if (rafId) cancelAnimationFrame(rafId);
+  });
+
+  stepBtn.addEventListener('click', ()=>{ if (!playing) step(); });
+  resetBtn.addEventListener('click', ()=>{ if (rafId) cancelAnimationFrame(rafId); playing=false; playBtn.textContent='▶︎ Play'; init(); });
+
+  paramsBtn.addEventListener('click', ()=>{ uiPanel.classList.toggle('hidden'); });
+
+  window.addEventListener('resize', ()=>{ /* canvas scales via CSS; pixel buffer is N×N */ });
+
+  // start
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Interaction Heatmap - 30 Days</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      font-family: 'Courier New', monospace;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+
+    #container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      padding: 40px;
+    }
+
+    #heatmap-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid #00ffff;
+      padding: 8px 12px;
+      border-radius: 3px;
+      font-size: 11px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    #tooltip.visible {
+      opacity: 1;
+    }
+
+    #info-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid #222;
+      padding: 20px;
+      border-radius: 4px;
+      font-size: 11px;
+      z-index: 50;
+      min-width: 200px;
+    }
+
+    #info-panel h3 {
+      color: #ffffff;
+      font-size: 13px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .info-line {
+      margin: 6px 0;
+      color: #ffffff;
+    }
+
+    .info-value {
+      color: #00ffff;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="heatmap-wrapper">
+      <div id="heatmap"></div>
+    </div>
+
+    <div id="info-panel">
+      <h3>Dataset Info</h3>
+      <div class="info-line">Period: <span class="info-value" id="period">30 days</span></div>
+      <div class="info-line">Agents: <span class="info-value" id="agent-count">0</span></div>
+      <div class="info-line">Users: <span class="info-value" id="user-count">0</span></div>
+      <div class="info-line">Interactions: <span class="info-value" id="interaction-count">0</span></div>
+      <div class="info-line">Success Rate: <span class="info-value" id="success-rate">0%</span></div>
+    </div>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <script src="heatmap.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

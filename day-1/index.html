@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Entropy</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #0f0f12; }
+    body { display: grid; place-items: center; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: #e6e6e6; }
+
+    /* Stage */
+    #stage { position: relative; width: 80vmin; height: 80vmin; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+
+    /* The 4×4 square */
+    #dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: #e6e6e6; transform-origin: 50% 50%; }
+
+    /* Entropy control anchored to stage bottom */
+    #entropyFloat{ position:absolute; left:50%; bottom:10px; transform: translateX(-50%); z-index:2; }
+    .floatCard{ display:flex; gap:10px; align-items:center; padding:8px 12px; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(20,20,24,.9); box-shadow:0 6px 18px rgba(0,0,0,.35); }
+    .floatCard .label{ font-size:11px; opacity:.8; }
+    .hslider{ width:170px; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <div id="dot"></div>
+    <div id="entropyFloat" title="Entropy">
+      <div class="floatCard">
+        <span class="label">Entropy</span>
+        <input id="entropyRange" class="hslider" type="range" min="0" max="100" step="1" value="0" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const dot = document.getElementById('dot');
+    const entropyRange = document.getElementById('entropyRange');
+
+    let t = 0;              // parametric angle for orbit
+    let u = 0;              // time for chaotic wobble
+    let a = 0, b = 0;       // ellipse radii (px)
+    const speed = 0.5;      // base orbit speed factor (constant across entropy)
+    const spinMul = 2;      // spins per orbit (base)
+
+    let entropy = 0;       // 0..100
+
+    // random frequencies for smooth unpredictable component
+    const fx1 = 0.6 + Math.random()*1.0;
+    const fx2 = 0.2 + Math.random()*0.9;
+    const fy1 = 0.5 + Math.random()*1.1;
+    const fy2 = 0.3 + Math.random()*0.8;
+    const fang = 0.5 + Math.random()*1.8;
+
+    function recalc(){
+      a = stage.clientWidth * 0.35;  // semi-major axis (x)
+      b = stage.clientHeight * 0.20; // semi-minor axis (y)
+    }
+
+    function mapWanderMix(e){
+      // Piecewise mapping per spec:
+      // 0 → axis-only (no wander), 35 → perfect ellipse (still no wander),
+      // 50 → wobbly ellipse, 75 → chaotic ellipse, 100 → total chaos.
+      if (e <= 35) return 0;                                   // pure ellipse/axis, no wander
+      if (e <= 50) return ((e - 35) / 15) * 0.25;              // up to 0.25
+      if (e <= 75) return 0.25 + ((e - 50) / 25) * 0.45;       // 0.25→0.70
+      return 0.70 + ((e - 75) / 25) * 0.30;                    // 0.70→1.00
+    }
+
+    function tick(){
+      const e = entropy; // 0..100
+
+      // Keep constant tempo so entropy=0 still moves
+      t += 0.016 * speed;
+
+      // Base ellipse components
+      const ex = a * Math.cos(t);
+      const ey = b * Math.sin(t);
+
+      // Axis-only component (very predictable): horizontal line
+      const ax1 = ex; // same phase
+      const ay1 = 0;
+
+      // Blend axis→ellipse between 0..35
+      const axisMix = Math.max(0, (35 - e) / 35); // 1 at 0, 0 at >=35
+      const bx = ax1 * axisMix + ex * (1 - axisMix);
+      const by = ay1 * axisMix + ey * (1 - axisMix);
+
+      // Chaotic wander target (bounded Lissajous blend)
+      const wanderMix = mapWanderMix(e);
+      u += 0.016 * (1 + wanderMix * 4); // faster wander with more chaos
+      const wx = stage.clientWidth  * 0.25 * (Math.sin(u*fx1) + Math.sin(u*fx2*1.31)) * 0.5;
+      const wy = stage.clientHeight * 0.25 * (Math.sin(u*fy1*0.97 + 0.7) + Math.sin(u*fy2*1.71)) * 0.5;
+
+      // Position: ellipse/axis base blended with wander
+      const x = bx * (1 - wanderMix) + wx * wanderMix;
+      const y = by * (1 - wanderMix) + wy * wanderMix;
+
+      // Spin: base spin + wobble scaled by wander
+      const baseAngle = (t * 180/Math.PI) * spinMul;
+      const wobble = Math.sin(u * fang) * 720;
+      const angle = baseAngle + wobble * wanderMix;
+
+      dot.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${angle}deg)`;
+      requestAnimationFrame(tick);
+    }
+
+    // UI
+    entropyRange.addEventListener('input', () => { entropy = +entropyRange.value; });
+
+    // keep ellipse responsive
+    new ResizeObserver(recalc).observe(stage);
+    recalc();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

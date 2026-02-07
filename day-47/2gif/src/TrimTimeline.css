@@ -1,0 +1,105 @@
+.trim-timeline-wrapper {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.timeline-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.trim-timeline-control {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.trim-timeline-track {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background-color: var(--surface-2);
+    border-radius: 3px;
+    overflow: visible;
+}
+
+.trim-active-region {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: #2a2a2a;
+    border-top: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
+    box-sizing: border-box;
+}
+
+.trim-handle {
+    position: absolute;
+    top: -4px;
+    width: 12px;
+    height: 28px;
+    background-color: var(--text-secondary);
+    cursor: ew-resize;
+    z-index: 10;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+    transition: background-color 0.15s, transform 0.15s;
+}
+
+.trim-handle:hover {
+    background-color: var(--text-primary);
+    transform: translateX(-50%) scale(1.1);
+}
+
+.trim-handle:active {
+    background-color: var(--accent);
+}
+
+.trim-handle.handle-start {
+    border-radius: 3px 0 0 3px;
+}
+
+.trim-handle.handle-end {
+    border-radius: 0 3px 3px 0;
+}
+
+.handle-grip {
+    width: 2px;
+    height: 10px;
+    background-color: var(--surface-1);
+    border-radius: 1px;
+}
+
+.trim-playhead {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background-color: var(--accent);
+    z-index: 20;
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(0, 168, 255, 0.5);
+}
+
+.trim-playhead::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+}

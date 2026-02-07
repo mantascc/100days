@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #666;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #controls {
+            padding: 12px 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: #111;
+            border-bottom: 1px solid #222;
+        }
+
+        button {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #888;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #222;
+            color: #aaa;
+        }
+
+        #stats {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            margin-left: auto;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #afafaf;
+        }
+
+        canvas {
+            flex: 1;
+            display: block;
+        }
+
+        #winOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #winOverlay.active {
+            display: flex;
+        }
+
+        #winContent {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #winText {
+            color: white;
+            font-size: 48px;
+            font-weight: normal;
+            font-family: 'Workbench', monospace;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            #controls {
+                padding: 8px 12px;
+                gap: 12px;
+            }
+
+            button {
+                padding: 4px 12px;
+                font-size: 11px;
+            }
+
+            #stats {
+                gap: 12px;
+                font-size: 10px;
+            }
+
+            #winContent {
+                padding: 30px 40px;
+            }
+
+            #winText {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button id="playPause">Pause</button>
+        <button id="reset">Reset</button>
+        <div id="stats">
+            <div class="stat">
+                <span>rock: <span id="rockCount">0</span></span>
+            </div>
+            <div class="stat">
+                <span>scissors: <span id="scissorsCount">0</span></span>
+            </div>
+            <div class="stat">
+                <span>paper: <span id="paperCount">0</span></span>
+            </div>
+        </div>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <div id="winOverlay">
+        <div id="winContent">
+            <div id="winText"></div>
+            <button id="playAgain">Play again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 45;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Constants
+        const SPECIES = {
+            ROCK: 0,
+            PAPER: 1,
+            SCISSORS: 2
+        };
+
+        const isMobile = window.innerWidth <= 768;
+        const N_AGENTS = 66;
+        const SPEED = isMobile ? 1.25 : 2; // Slower speed on mobile
+        const TURN_JITTER = 0.08;
+        const ROTATION_SPEED = 0.005;
+        const IMAGE_SCALE = isMobile ? 0.5 : 1; // Scale for mobile
+
+        const SPECIES_NAMES = {
+            [SPECIES.ROCK]: 'Rock',
+            [SPECIES.PAPER]: 'Paper',
+            [SPECIES.SCISSORS]: 'Scissors'
+        };
+
+        let agents = [];
+        let running = true;
+        let images = {};
+        let imagesLoaded = 0;
+        let gameWon = false;
+
+        // Agent class
+        class Agent {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                const angle = Math.random() * Math.PI * 2;
+                this.vx = Math.cos(angle) * SPEED;
+                this.vy = Math.sin(angle) * SPEED;
+                this.species = Math.floor(Math.random() * 3);
+                this.rotation = Math.random() * Math.PI * 2;
+            }
+
+            move() {
+                // Apply random turn
+                const angle = Math.atan2(this.vy, this.vx);
+                const newAngle = angle + (Math.random() - 0.5) * TURN_JITTER * 2;
+                this.vx = Math.cos(newAngle) * SPEED;
+                this.vy = Math.sin(newAngle) * SPEED;
+
+                // Update rotation
+                this.rotation += ROTATION_SPEED;
+
+                // Move
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Toroidal wrap
+                if (this.x < 0) this.x += canvas.width;
+                if (this.x > canvas.width) this.x -= canvas.width;
+                if (this.y < 0) this.y += canvas.height;
+                if (this.y > canvas.height) this.y -= canvas.height;
+            }
+
+            draw() {
+                const img = images[this.species];
+                if (img) {
+                    const width = img.width * IMAGE_SCALE;
+                    const height = img.height * IMAGE_SCALE;
+
+                    ctx.save();
+                    ctx.translate(this.x + width / 2, this.y + height / 2);
+                    ctx.rotate(this.rotation);
+                    ctx.drawImage(img, -width / 2, -height / 2, width, height);
+                    ctx.restore();
+                }
+            }
+
+            getWidth() {
+                return (images[this.species]?.width || 0) * IMAGE_SCALE;
+            }
+
+            getHeight() {
+                return (images[this.species]?.height || 0) * IMAGE_SCALE;
+            }
+        }
+
+        // Determine winner in RPS
+        function beats(a, b) {
+            if (a === b) return a;
+            if ((a === SPECIES.ROCK && b === SPECIES.SCISSORS) ||
+                (a === SPECIES.SCISSORS && b === SPECIES.PAPER) ||
+                (a === SPECIES.PAPER && b === SPECIES.ROCK)) {
+                return a;
+            }
+            return b;
+        }
+
+        // Bounding box collision detection
+        function boxesOverlap(a, b) {
+            const aWidth = a.getWidth();
+            const aHeight = a.getHeight();
+            const bWidth = b.getWidth();
+            const bHeight = b.getHeight();
+
+            // Simple AABB collision (without toroidal wrapping for now)
+            return a.x < b.x + bWidth &&
+                   a.x + aWidth > b.x &&
+                   a.y < b.y + bHeight &&
+                   a.y + aHeight > b.y;
+        }
+
+        // Apply bounce effect between two agents
+        function applyBounce(a, b) {
+            // Calculate center positions
+            const aCenterX = a.x + a.getWidth() / 2;
+            const aCenterY = a.y + a.getHeight() / 2;
+            const bCenterX = b.x + b.getWidth() / 2;
+            const bCenterY = b.y + b.getHeight() / 2;
+
+            // Calculate direction from a to b
+            const dx = bCenterX - aCenterX;
+            const dy = bCenterY - aCenterY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance === 0) return; // Avoid division by zero
+
+            // Normalize direction
+            const nx = dx / distance;
+            const ny = dy / distance;
+
+            // Simply reverse both velocities away from each other
+            // Agent a bounces away from b (opposite to collision normal)
+            a.vx = -nx * SPEED;
+            a.vy = -ny * SPEED;
+
+            // Agent b bounces away from a (along collision normal)
+            b.vx = nx * SPEED;
+            b.vy = ny * SPEED;
+        }
+
+        // Load images
+        function loadImages() {
+            const imageFiles = [
+                { species: SPECIES.ROCK, src: 'image 1.png' },
+                { species: SPECIES.SCISSORS, src: 'image 2.png' },
+                { species: SPECIES.PAPER, src: 'image 3.png' }
+            ];
+
+            imageFiles.forEach(({ species, src }) => {
+                const img = new Image();
+                img.onload = () => {
+                    images[species] = img;
+                    imagesLoaded++;
+                    if (imagesLoaded === 3) {
+                        init();
+                        tick();
+                    }
+                };
+                img.src = src;
+            });
+        }
+
+        // Initialize agents
+        function init() {
+            agents = [];
+            gameWon = false;
+            document.getElementById('winOverlay').classList.remove('active');
+            for (let i = 0; i < N_AGENTS; i++) {
+                agents.push(new Agent());
+            }
+        }
+
+        // Check for winning condition
+        function checkWin() {
+            if (gameWon) return;
+
+            const counts = [0, 0, 0];
+            agents.forEach(a => counts[a.species]++);
+
+            // Check if only one species remains
+            const nonZero = counts.filter(c => c > 0);
+            if (nonZero.length === 1) {
+                gameWon = true;
+                running = false;
+
+                // Find winner species
+                const winnerSpecies = counts.indexOf(nonZero[0]);
+                const winnerName = SPECIES_NAMES[winnerSpecies];
+
+                // Show overlay
+                document.getElementById('winText').textContent = `GG ${winnerName}!!1`;
+                document.getElementById('winOverlay').classList.add('active');
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const counts = [0, 0, 0];
+            agents.forEach(a => counts[a.species]++);
+            document.getElementById('rockCount').textContent = counts[SPECIES.ROCK];
+            document.getElementById('paperCount').textContent = counts[SPECIES.PAPER];
+            document.getElementById('scissorsCount').textContent = counts[SPECIES.SCISSORS];
+        }
+
+        // Main simulation loop
+        function tick() {
+            // Move all agents
+            agents.forEach(a => a.move());
+
+            // Detect collisions
+            const conversions = new Map();
+            for (let i = 0; i < agents.length; i++) {
+                for (let j = i + 1; j < agents.length; j++) {
+                    const a = agents[i];
+                    const b = agents[j];
+
+                    if (a.species !== b.species && boxesOverlap(a, b)) {
+                        // Apply bounce effect
+                        applyBounce(a, b);
+
+                        const winner = beats(a.species, b.species);
+                        if (winner === a.species) {
+                            conversions.set(j, winner);
+                        } else {
+                            conversions.set(i, winner);
+                        }
+                    }
+                }
+            }
+
+            // Apply conversions
+            conversions.forEach((newSpecies, idx) => {
+                agents[idx].species = newSpecies;
+            });
+
+            // Render
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            agents.forEach(a => a.draw());
+
+            // Update stats
+            updateStats();
+
+            // Check win condition
+            checkWin();
+
+            if (running) {
+                requestAnimationFrame(tick);
+            }
+        }
+
+        // Controls
+        document.getElementById('playPause').addEventListener('click', (e) => {
+            running = !running;
+            e.target.textContent = running ? 'Pause' : 'Play';
+            if (running) tick();
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            init();
+            if (!running) {
+                running = true;
+                document.getElementById('playPause').textContent = 'Pause';
+                tick();
+            }
+        });
+
+        document.getElementById('playAgain').addEventListener('click', () => {
+            init();
+            running = true;
+            document.getElementById('playPause').textContent = 'Pause';
+            tick();
+        });
+
+        // Start
+        loadImages();
+    </script>
+</body>
+</html>

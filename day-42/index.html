@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>metaball grid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #666;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding-bottom: 20px;
+      /* Reduced since we are centering */
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 20px;
+      max-width: 800px;
+      width: 100%;
+      box-sizing: border-box;
+      /* Ensure padding doesn't overflow width */
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 600px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 10px;
+        gap: 8px;
+        /* Slightly larger gap for touch targets/visual separation */
+      }
+    }
+
+    .sketch-wrapper {
+      position: relative;
+      aspect-ratio: 1;
+      background: #0f0f0f;
+      display: none;
+      /* Hidden by default for pagination */
+    }
+
+    .sketch-wrapper.visible {
+      display: block;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .controls {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid #333;
+      color: #666;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: inherit;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .btn:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+      border-color: #333;
+      color: #666;
+    }
+
+    .page-indicator {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .label {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      font-size: 10px;
+      opacity: 0.5;
+      pointer-events: none;
+      font-weight: bold;
+    }
+
+    .info {
+      margin-top: 20px;
+      font-size: 12px;
+      text-align: center;
+      color: #333;
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-weight: 400;
+      font-style: italic;
+      font-size: 3rem;
+      color: #B4E03C;
+      margin: 0 0 20px 0;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Scanline effect for treatment 16 */
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 2;
+      background-size: 100% 2px, 3px 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Metaball grid</h1>
+
+  <div class="grid-container" id="grid">
+    <!-- canvases injected by script -->
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" onclick="changePage(-1)">Prev</button>
+    <div class="page-indicator" id="pageIndicator">1 / 4</div>
+    <button class="btn" id="nextBtn" onclick="changePage(1)">Next</button>
+  </div>
+
+  <div class="info">
+    32 treatments • synchronized physics
+  </div>
+  <script>
+    // --- Configuration ---
+    const GRID_COLS = 4;
+    const GRID_ROWS = 8; // Total rows across all pages
+    const ITEMS_PER_PAGE = 8;
+    const TOTAL_PAGES = Math.ceil(32 / ITEMS_PER_PAGE);
+    const COUNT = 32;
+    const CANVAS_SIZE = 200; // internal resolution
+    const CELL_SIZE = 5;     // marching squares grid size
+    const NUM_CIRCLES = 5;
+
+    let currentPage = 1;
+
+    const COLORS = {
+      bg: '#0a0a0a',
+      white: '#ffffff',
+      grey: '#666666',
+      lime: '#B4E03C',
+      blue: '#002FFF'
+    };
+
+    // --- Utilities ---
+    // Simple pseudo-noise
+    const Noise = {
+      p: new Uint8Array(512),
+      init: function () {
+        for (let i = 0; i < 512; i++) this.p[i] = Math.floor(Math.random() * 256);
+      },
+      fade: t => t * t * t * (t * (t * 6 - 15) + 10),
+      lerp: (t, a, b) => a + t * (b - a),
+      grad: (hash, x, y, z) => {
+        const h = hash & 15;
+        const u = h < 8 ? x : y, v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+        return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+      },
+      noise: function (x, y, z) {
+        if (!this.p[0]) this.init();
+        const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+        x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+        const u = this.fade(x), v = this.fade(y), w = this.fade(z);
+        const A = this.p[X] + Y, AA = this.p[A] + Z, AB = this.p[A + 1] + Z, B = this.p[X + 1] + Y, BA = this.p[B] + Z, BB = this.p[B + 1] + Z;
+        return this.lerp(w, this.lerp(v, this.lerp(u, this.grad(this.p[AA], x, y, z), this.grad(this.p[BA], x - 1, y, z)),
+          this.lerp(u, this.grad(this.p[AB], x, y - 1, z), this.grad(this.p[BB], x - 1, y - 1, z))),
+          this.lerp(v, this.lerp(u, this.grad(this.p[AA + 1], x, y, z - 1), this.grad(this.p[BA + 1], x - 1, y, z - 1)),
+            this.lerp(u, this.grad(this.p[AB + 1], x, y - 1, z - 1), this.grad(this.p[BB + 1], x - 1, y - 1, z - 1))));
+      }
+    };
+    Noise.init();
+
+    // --- Pattern Cache ---
+    const Patterns = {
+      cache: {},
+      get: function (type, ctx) {
+        if (this.cache[type]) return this.cache[type];
+
+        const pCanvas = document.createElement('canvas');
+        const pCtx = pCanvas.getContext('2d');
+
+        if (type === 'hatch-diag') {
+          pCanvas.width = 10; pCanvas.height = 10;
+          pCtx.strokeStyle = COLORS.white; pCtx.lineWidth = 1;
+          pCtx.beginPath();
+          // Draw diagonal line for tiling
+          pCtx.moveTo(-5, 5); pCtx.lineTo(5, -5);
+          pCtx.moveTo(0, 10); pCtx.lineTo(10, 0);
+          pCtx.moveTo(5, 15); pCtx.lineTo(15, 5);
+          pCtx.stroke();
+        } else if (type === 'hatch-cross') {
+          pCanvas.width = 10; pCanvas.height = 10;
+          pCtx.strokeStyle = COLORS.white; pCtx.lineWidth = 1;
+          pCtx.beginPath();
+          // Diagonals
+          pCtx.moveTo(-5, 5); pCtx.lineTo(5, -5);
+          pCtx.moveTo(0, 10); pCtx.lineTo(10, 0);
+          pCtx.moveTo(5, 15); pCtx.lineTo(15, 5);
+          // Cross
+          pCtx.moveTo(5, -5); pCtx.lineTo(-5, 5);
+          pCtx.moveTo(10, 0); pCtx.lineTo(0, 10);
+          pCtx.moveTo(15, 5); pCtx.lineTo(5, 15);
+          pCtx.stroke();
+        } else if (type === 'dot') {
+          pCanvas.width = 4; pCanvas.height = 4;
+          pCtx.fillStyle = COLORS.white;
+          pCtx.fillRect(0, 0, 2, 2);
+        }
+
+        this.cache[type] = ctx.createPattern(pCanvas, 'repeat');
+        return this.cache[type];
+      }
+    };
+
+    // --- Metaball Engine ---
+    const Engine = {
+      // Field function: returns strength at (x,y)
+      // metric: 'euclidean' (circles) or 'superellipse' (rounded squares)
+      field: (x, y, circles, config) => {
+        let sum = 0;
+
+        // Apply Distortion (Noise)
+        if (config.distortion) {
+          const scale = 0.02;
+          const n = Noise.noise(x * scale, y * scale, performance.now() / 1000) * config.distortion;
+          x += n;
+          y += n;
+        }
+
+        for (let c of circles) {
+          const dx = x - c.x;
+          const dy = y - c.y;
+          let distSq = 0;
+
+          if (config.shape === 'superellipse') {
+            const dist4 = (dx * dx * dx * dx) + (dy * dy * dy * dy);
+            distSq = Math.sqrt(dist4); // this is dist^2
+          } else {
+            // standard euclidean
+            distSq = dx * dx + dy * dy;
+          }
+
+          // Custom Falloff (exponent)
+          // Standard is r^2 / d^2 (exp=2)
+          // We generalize to r^exp / d^exp
+          const exp = config.exponent || 2;
+
+          if (distSq > 0.001) {
+            if (exp === 2) {
+              sum += (c.r * c.r) / distSq;
+            } else {
+              // convert distSq to dist
+              const d = Math.sqrt(distSq);
+              sum += Math.pow(c.r / d, exp);
+            }
+          } else {
+            sum += 100;
+          }
+        }
+        return sum;
+      },
+
+      // Marching Squares Algorithm
+      march: (ctx, circles, config) => {
+        const { width, height } = ctx.canvas;
+        const res = config.gridSize || CELL_SIZE;
+        const cols = Math.ceil(width / res);
+        const rows = Math.ceil(height / res);
+        const threshold = config.threshold || 1.0;
+
+        ctx.beginPath();
+
+        // Pre-calculate field values for the grid
+        // (Optimization: could computed only once per frame for all same-metric sketches, 
+        // but varied treatments might modify threshold/metric, so we compute per sketch for safety/flexibility)
+
+        // If 'pixel-grid' treatment, we draw cells directly
+        if (config.type === 'pixel' || config.type === 'pixel-inverted' || config.type === 'ascii') {
+          // Optimization: Draw background for inverted
+          if (config.type === 'pixel-inverted') {
+            ctx.fillStyle = COLORS.white;
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = COLORS.bg; // Draw "holes" (or just bg color)
+          } else if (config.type === 'ascii') {
+            ctx.fillStyle = COLORS.white;
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+          } else if (config.pattern) {
+            ctx.fillStyle = Patterns.get(config.pattern, ctx);
+          } else {
+            ctx.fillStyle = config.color || COLORS.white;
+          }
+
+          for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+              const val = Engine.field(x * res, y * res, circles, config);
+
+              const isInside = val >= threshold;
+
+              if (config.type === 'pixel') {
+                if (isInside) ctx.fillRect(x * res, y * res, res, res);
+              } else if (config.type === 'pixel-inverted') {
+                if (isInside) ctx.fillRect(x * res, y * res, res, res);
+              } else if (config.type === 'ascii') {
+                if (isInside) ctx.fillText('@', x * res + res / 2, y * res + res / 2);
+                else if (val > 0.5) ctx.fillText('.', x * res + res / 2, y * res + res / 2);
+              }
+            }
+          }
+          return;
+        }
+
+        // Standard Marching Squares
+        // 0--1
+        // |  |
+        // 3--2
+
+        // Helper to interpolate between points based on field strength
+        // For simplicity in this demo, linear midpoint is often enough (0.5), 
+        // but linear interpolation gives smoother curves.
+        const lerp = (v0, v1, p0, p1) => {
+          if (Math.abs(v1 - v0) < 0.0001) return (p0 + p1) / 2;
+          const t = (threshold - v0) / (v1 - v0);
+          return p0 + t * (p1 - p0);
+        };
+
+        // Reuse field values to avoid recalc
+        // Row buffer strategy to minimize memory
+        let currentRow = new Float32Array(cols + 1);
+        let nextRow = new Float32Array(cols + 1);
+
+        // Pre-fill first row
+        for (let i = 0; i <= cols; i++) {
+          currentRow[i] = Engine.field(i * res, 0, circles, config);
+        }
+
+        for (let y = 0; y < rows; y++) {
+          // Calculate next row
+          for (let i = 0; i <= cols; i++) {
+            nextRow[i] = Engine.field(i * res, (y + 1) * res, circles, config);
+          }
+
+          for (let x = 0; x < cols; x++) {
+            const val0 = currentRow[x];      // TL
+            const val1 = currentRow[x + 1];  // TR
+            const val2 = nextRow[x + 1];     // BR
+            const val3 = nextRow[x];         // BL
+
+            let code = 0;
+            if (val0 >= threshold) code += 8;
+            if (val1 >= threshold) code += 4;
+            if (val2 >= threshold) code += 2;
+            if (val3 >= threshold) code += 1;
+
+            if (code === 0 || code === 15) continue;
+
+            // Cell coordinates
+            const x0 = x * res;
+            const x1 = (x + 1) * res;
+            const y0 = y * res;
+            const y1 = (y + 1) * res;
+
+            // Interpolated edge points
+            // a: Top, b: Right, c: Bottom, d: Left
+            const a = [lerp(val0, val1, x0, x1), y0];
+            const b = [x1, lerp(val1, val2, y0, y1)];
+            const c = [lerp(val3, val2, x0, x1), y1];
+            const d = [x0, lerp(val0, val3, y0, y1)];
+
+            // Draw lines
+            switch (code) {
+              case 1: ctx.moveTo(d[0], d[1]); ctx.lineTo(c[0], c[1]); break; // BL
+              case 2: ctx.moveTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); break; // BR
+              case 3: ctx.moveTo(d[0], d[1]); ctx.lineTo(b[0], b[1]); break; // BL-BR
+              case 4: ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); break; // TR
+              case 5: ctx.moveTo(a[0], a[1]); ctx.lineTo(d[0], d[1]);      // TR-BL saddle
+                ctx.moveTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); break;
+              case 6: ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); break; // TR-BR
+              case 7: ctx.moveTo(a[0], a[1]); ctx.lineTo(d[0], d[1]); break; // TR-BR-BL
+              case 8: ctx.moveTo(a[0], a[1]); ctx.lineTo(d[0], d[1]); break; // TL
+              case 9: ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); break; // TL-BL
+              case 10: ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);      // TL-BR saddle
+                ctx.moveTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); break;
+              case 11: ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); break; // TL-BR-BL
+              case 12: ctx.moveTo(d[0], d[1]); ctx.lineTo(b[0], b[1]); break; // TL-TR
+              case 13: ctx.moveTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); break; // TL-TR-BL
+              case 14: ctx.moveTo(d[0], d[1]); ctx.lineTo(c[0], c[1]); break; // TL-TR-BR
+            }
+          }
+
+          // Swap rows for next iteration
+          currentRow.set(nextRow);
+        }
+      }
+    };
+
+    // --- State & Animation ---
+
+    // Physical circles (floater positions)
+    const circles = Array.from({ length: NUM_CIRCLES }, () => ({
+      x: Math.random() * CANVAS_SIZE,
+      y: Math.random() * CANVAS_SIZE,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: (Math.random() - 0.5) * 1.5,
+      r: 8 + Math.random() * 10,
+      baseR: 8 + Math.random() * 10
+    }));
+
+    // Treatments
+    // shapes: 'euclidean' (circles), 'superellipse' (squares)
+    const treatments = [
+      // ROW 1: Basic Circles (0-3)
+      { name: '01. 1px stroke', shape: 'euclidean', render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } },
+      { name: '02. 3px stroke', shape: 'euclidean', render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 3; ctx.stroke(); } },
+      { name: '03. fill white', shape: 'euclidean', type: 'pixel', color: COLORS.white, gridSize: 2 },
+      { name: '04. accent lime', shape: 'euclidean', render: (ctx) => { ctx.strokeStyle = COLORS.lime; ctx.lineWidth = 2; ctx.stroke(); } },
+
+      // ROW 2: Effects (4-7)
+      { name: '05. blur 4px', shape: 'euclidean', render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 2; ctx.filter = 'blur(4px)'; ctx.stroke(); ctx.filter = 'none'; } },
+      { name: '06. glow', shape: 'euclidean', render: (ctx) => { ctx.shadowBlur = 10; ctx.shadowColor = COLORS.white; ctx.strokeStyle = COLORS.white; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0; } },
+      { name: '07. dashed', shape: 'euclidean', render: (ctx) => { ctx.setLineDash([5, 5]); ctx.strokeStyle = COLORS.white; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]); } },
+      { name: '08. double', shape: 'euclidean', double: true, render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } },
+
+      // ROW 3: Squares (8-11)
+      { name: '09. sq line', shape: 'superellipse', render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } },
+      { name: '10. sq fill', shape: 'superellipse', type: 'pixel', color: COLORS.white },
+      { name: '11. sq grid', shape: 'superellipse', preRender: (ctx) => drawGrid(ctx), render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 2; ctx.stroke(); } },
+      { name: '12. sq ghost', shape: 'superellipse', type: 'pixel', color: 'rgba(255,255,255,0.2)', postRender: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } },
+
+      // ROW 4: Experimental Squares (12-15)
+      { name: '13. sq dotted', shape: 'superellipse', render: (ctx) => { ctx.setLineDash([2, 4]); ctx.strokeStyle = COLORS.white; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]); } },
+      { name: '14. sq pixel', shape: 'superellipse', type: 'pixel', color: COLORS.white },
+      { name: '15. sq inverted', shape: 'superellipse', type: 'pixel-inverted' },
+      { name: '16. sq bloom', shape: 'superellipse', render: (ctx) => { ctx.strokeStyle = COLORS.blue; ctx.lineWidth = 2; ctx.shadowBlur = 15; ctx.shadowColor = COLORS.blue; ctx.stroke(); ctx.shadowBlur = 0; } },
+
+      // ROW 5: Noise & Distortion (16-19)
+      { name: '17. noise stroke', shape: 'euclidean', distortion: 20, render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } },
+      { name: '18. noise fill', shape: 'euclidean', type: 'pixel', distortion: 30, color: COLORS.white, gridSize: 6 }, // Optimized gridSize
+      { name: '19. glitch noise', shape: 'euclidean', distortion: 50, render: (ctx) => { ctx.strokeStyle = COLORS.lime; ctx.lineWidth = 2; ctx.setLineDash([2, 10]); ctx.stroke(); ctx.setLineDash([]); } },
+      { name: '20. pixel warp', shape: 'euclidean', type: 'pixel', distortion: 15, gridSize: 8, color: '#aaa' },
+
+      // ROW 6: Texture & Pattern (20-23)
+      { name: '21. hatch diag', shape: 'euclidean', type: 'pixel', pattern: 'hatch-diag', gridSize: 4 },
+      { name: '22. hatch cross', shape: 'euclidean', type: 'pixel', pattern: 'hatch-cross', gridSize: 4 },
+      { name: '23. ascii', shape: 'euclidean', type: 'ascii', gridSize: 10 },
+      { name: '24. dot mask', shape: 'euclidean', type: 'pixel', pattern: 'dot', gridSize: 4 },
+
+      // ROW 7: Color & Light (24-27)
+      { name: '25. gradient', shape: 'euclidean', type: 'pixel', color: COLORS.white, gridSize: 3, postRender: (ctx) => { ctx.globalCompositeOperation = 'source-in'; ctx.fillStyle = createGradient(ctx); ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE); ctx.globalCompositeOperation = 'source-over'; } },
+      {
+        name: '26. chromatic', shape: 'euclidean', render: (ctx) => {
+          ctx.lineWidth = 2;
+          ctx.globalCompositeOperation = 'screen';
+          ctx.strokeStyle = '#f00'; ctx.save(); ctx.translate(-2, -1); ctx.stroke(); ctx.restore();
+          ctx.strokeStyle = '#0f0'; ctx.stroke();
+          ctx.strokeStyle = '#00f'; ctx.save(); ctx.translate(2, 1); ctx.stroke(); ctx.restore();
+          ctx.globalCompositeOperation = 'source-over';
+        }
+      },
+      { name: '27. heat map', shape: 'euclidean', type: 'pixel', color: COLORS.blue },
+      { name: '28. neon scan', shape: 'euclidean', render: (ctx) => { ctx.strokeStyle = COLORS.lime; ctx.lineWidth = 2; ctx.stroke(); drawScanline(ctx); } },
+
+      // ROW 8: Time & Physics (28-31)
+      { name: '29. trails', shape: 'euclidean', trail: true, render: (ctx) => { ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1; ctx.stroke(); } },
+      { name: '30. feedback', shape: 'euclidean', trail: true, type: 'pixel', color: 'rgba(255,255,255,0.1)', gridSize: 2 },
+      { name: '31. sticky', shape: 'euclidean', exponent: 8, render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } },
+      { name: '32. soft merge', shape: 'euclidean', exponent: 1.5, render: (ctx) => { ctx.strokeStyle = COLORS.white; ctx.lineWidth = 1; ctx.stroke(); } }
+    ];
+
+    function drawGrid(ctx) {
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < CANVAS_SIZE; i += 20) {
+        ctx.moveTo(i, 0); ctx.lineTo(i, CANVAS_SIZE);
+        ctx.moveTo(0, i); ctx.lineTo(CANVAS_SIZE, i);
+      }
+      ctx.stroke();
+    }
+
+    function drawHatch(ctx, spacing) {
+      ctx.strokeStyle = COLORS.white;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = -CANVAS_SIZE; i < CANVAS_SIZE * 2; i += spacing) {
+        ctx.moveTo(i, 0); ctx.lineTo(i - CANVAS_SIZE, CANVAS_SIZE);
+      }
+      ctx.stroke();
+    }
+
+    function drawDots(ctx, spacing) {
+      ctx.fillStyle = COLORS.white;
+      for (let y = 0; y < CANVAS_SIZE; y += spacing) {
+        for (let x = 0; x < CANVAS_SIZE; x += spacing) {
+          ctx.fillRect(x, y, 2, 2);
+        }
+      }
+    }
+
+    function createGradient(ctx) {
+      const g = ctx.createLinearGradient(0, 0, 0, CANVAS_SIZE);
+      g.addColorStop(0, COLORS.lime);
+      g.addColorStop(0.5, COLORS.white);
+      g.addColorStop(1, COLORS.blue);
+      return g;
+    }
+
+    function drawScanline(ctx) {
+      const y = (performance.now() / 10) % CANVAS_SIZE;
+      ctx.fillStyle = COLORS.lime + '80'; // 50% opacity
+      ctx.fillRect(0, y, CANVAS_SIZE, 2);
+    }
+
+
+    // Initialize
+    const gridEl = document.getElementById('grid');
+    const ctxs = [];
+
+    treatments.forEach((t, i) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'sketch-wrapper';
+      wrapper.id = 'sketch-' + i;
+      if (t.name === 'sq bloom') wrapper.className += ' scanlines'; // Just for fun on the last one
+
+      const canvas = document.createElement('canvas');
+      canvas.width = CANVAS_SIZE;
+      canvas.height = CANVAS_SIZE;
+      wrapper.appendChild(canvas);
+
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.innerText = t.name;
+      wrapper.appendChild(label);
+
+      gridEl.appendChild(wrapper);
+      ctxs.push({ ctx: canvas.getContext('2d'), config: t, index: i });
+    });
+
+    // Pagination Logic
+    function updatePagination() {
+      // 1. Update Buttons
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+      document.getElementById('nextBtn').disabled = currentPage === TOTAL_PAGES;
+      document.getElementById('pageIndicator').innerText = currentPage + " / " + TOTAL_PAGES;
+
+      // 2. Show/Hide items
+      const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIdx = startIdx + ITEMS_PER_PAGE;
+
+      for (let i = 0; i < COUNT; i++) {
+        const el = document.getElementById('sketch-' + i);
+        if (i >= startIdx && i < endIdx) {
+          el.classList.add('visible');
+        } else {
+          el.classList.remove('visible');
+        }
+      }
+    }
+
+    function changePage(dir) {
+      const newPage = currentPage + dir;
+      if (newPage >= 1 && newPage <= TOTAL_PAGES) {
+        currentPage = newPage;
+        updatePagination();
+      }
+    }
+
+    updatePagination(); // Initial call
+
+    // Main Loop
+    function loop() {
+      // 1. Update Physics
+      circles.forEach(c => {
+        c.x += c.vx;
+        c.y += c.vy;
+
+        // Bounce
+        if (c.x < 0 || c.x > CANVAS_SIZE) c.vx *= -1;
+        if (c.y < 0 || c.y > CANVAS_SIZE) c.vy *= -1;
+      });
+
+      // Calculate visible range to optimize loop
+      const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIdx = startIdx + ITEMS_PER_PAGE;
+
+      // 2. Render Only Visible
+      for (let i = startIdx; i < endIdx; i++) {
+        if (i >= ctxs.length) break;
+        const { ctx, config } = ctxs[i];
+
+        // Clear logic: dependent on trail config
+        if (config.trail) {
+          // Fade out slightly
+          ctx.fillStyle = 'rgba(10, 10, 10, 0.2)'; // semi-transparent black
+          ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        } else {
+          // Standard clear
+          ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        }
+
+        // Pre-render (e.g. static grid background)
+        if (config.preRender) config.preRender(ctx);
+
+        ctx.save(); // Save state (for clips etc)
+
+        if (config.double) {
+          // Inner ring
+          Engine.march(ctx, circles, { ...config, threshold: 1.2 });
+          config.render(ctx);
+          // Outer ring
+          Engine.march(ctx, circles, { ...config, threshold: 0.8 });
+          config.render(ctx);
+        } else {
+          Engine.march(ctx, circles, config);
+
+          if (!config.type) {
+            if (config.render) config.render(ctx);
+          }
+
+          if (config.postRender) config.postRender(ctx);
+        }
+
+        ctx.restore(); // Restore state (undo clips)
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+
+  </script>
+</body>
+
+</html>

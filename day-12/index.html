@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wind</title>
+  <style>
+    html, body { height:100%; margin:0; background:#0f0f12; }
+    body { display:grid; place-items:center; }
+    #wrap{ position:relative; width: min(92vw, 92vh); height: min(92vw, 92vh); }
+    canvas{ width:100%; height:100%; display:block; image-rendering: pixelated; }
+    /* Minimal slider */
+    .ui { position:absolute; inset:auto 8px 8px 8px; display:flex; justify-content:center; gap:8px; }
+    .ui input[type="range"]{ flex:1; min-width:0; }
+    .ui label{ color:#7a7a84; font:12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .pill{ background:#0f0f12cc; border:1px solid #1a1a1f; border-radius:10px; padding:6px 10px; display:flex; align-items:center; gap:8px; width:20%; }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="stage"></canvas>
+    <div class="ui">
+      <div class="pill"><label for="wind">wind</label><input id="wind" type="range" min="3" max="10" step="0.5" /></div>
+    </div>
+  </div>
+
+<script>
+// ——— Config ———
+const CFG = {
+  grid: 8,
+  size: 2,
+  amplitude: 20,       // will be driven by wind
+  frequency: 0.009,    // will be driven by wind
+  speed: 0.012,        // will be driven by wind
+  octaves: 3,
+  persistence: 0.5,
+  lacunarity: 1.5,
+  mode: 2, // 1=line, 2=ocean, 3=radial
+  showGrid: true,
+  pause: false,
+  text: 'fin',
+  textScale: 0.15,
+  dotColor: '#e6e6e6',
+  textColor: '#0000FF',
+  wind: 6,            // 0..10
+};
+
+const WIND_TARGETS = { ampMax: 22, freqMax: 0.01, speedMax: 0.012 };
+
+// ——— Canvas setup ———
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+let W, H, cols, rows; 
+let textMask = new Set();
+resize();
+window.addEventListener('resize', resize);
+
+function resize(){
+  const wrap = document.getElementById('wrap');
+  const r = wrap.getBoundingClientRect();
+  canvas.width = Math.floor(r.width);
+  canvas.height = Math.floor(r.height);
+  W = canvas.width; H = canvas.height;
+  cols = Math.floor(W / CFG.grid);
+  rows = Math.floor(H / CFG.grid);
+  buildTextMask();
+}
+
+// ——— Build a per-cell mask from the word (centered) ———
+function buildTextMask(){
+  textMask = new Set();
+  const off = document.createElement('canvas');
+  off.width = cols; off.height = rows;
+  const octx = off.getContext('2d');
+  octx.clearRect(0,0,cols,rows);
+  const fs = Math.max(6, Math.floor(rows * CFG.textScale));
+  octx.fillStyle = '#ffffff';
+  octx.font = `bold ${fs}px monospace`;
+  octx.textBaseline = 'middle';
+  const metrics = octx.measureText(CFG.text);
+  const textW = metrics.width;
+  const x = Math.floor((cols - textW)/2);
+  const y = Math.floor(rows/2);
+  octx.fillText(CFG.text, x, y);
+  const img = octx.getImageData(0,0,cols,rows).data;
+  for(let r=0; r<rows; r++){
+    for(let c=0; c<cols; c++){
+      const i = (r*cols + c)*4 + 3;
+      if (img[i] > 128){ textMask.add(`${c},${r}`); }
+    }
+  }
+}
+
+// ——— Grid helper ———
+function drawGrid(){
+  ctx.save();
+  ctx.strokeStyle = '#1a1a1f';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  const s = CFG.grid;
+  for(let x=0; x<=W; x+=s){ ctx.moveTo(x+.5, 0); ctx.lineTo(x+.5, H); }
+  for(let y=0; y<=H; y+=s){ ctx.moveTo(0, y+.5); ctx.lineTo(W, y+.5); }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ——— Perlin Noise (improved) ———
+const PERM = new Uint8Array(512);
+(function initPerm(){
+  const p = new Uint8Array(256);
+  for (let i=0; i<256; i++) p[i]=i;
+  for (let i=255; i>0; i--) { const j = (Math.random()*(i+1))|0; const t=p[i]; p[i]=p[j]; p[j]=t; }
+  for (let i=0; i<512; i++) PERM[i]=p[i&255];
+})();
+function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+function lerp(a,b,t){ return a + t*(b-a); }
+function grad(h, x, y){
+  switch(h & 3){
+    case 0: return  x + y;
+    case 1: return -x + y;
+    case 2: return  x - y;
+    default:return -x - y;
+  }
+}
+function perlin2(x, y){
+  const X = Math.floor(x) & 255;
+  const Y = Math.floor(y) & 255;
+  x -= Math.floor(x); y -= Math.floor(y);
+  const u = fade(x), v = fade(y);
+  const A  = PERM[X] + Y;
+  const B  = PERM[X+1] + Y;
+  const g00 = grad(PERM[A],   x,   y);
+  const g10 = grad(PERM[B],   x-1, y);
+  const g01 = grad(PERM[A+1], x,   y-1);
+  const g11 = grad(PERM[B+1], x-1, y-1);
+  return lerp( lerp(g00, g10, u), lerp(g01, g11, u), v );
+}
+function fbm2(x, y, octaves=3, persistence=.5, lacunarity=2.0){
+  let amp = 1, freq = 1, sum = 0, max = 0;
+  for(let i=0; i<octaves; i++){
+    sum += perlin2(x*freq, y*freq) * amp;
+    max += amp; amp *= persistence; freq *= lacunarity;
+  }
+  return sum / max;
+}
+
+// ——— Wind mapping ———
+function applyWind(){
+  const k = CFG.wind / 10; // 0..1
+  CFG.amplitude = WIND_TARGETS.ampMax * k;
+  CFG.frequency = WIND_TARGETS.freqMax * k;
+  CFG.speed     = WIND_TARGETS.speedMax * k;
+}
+
+// ——— Animation ———
+let t = 0;
+function tick(){
+  if (!CFG.pause) t += CFG.speed;
+  ctx.clearRect(0,0,W,H);
+  if (CFG.showGrid) drawGrid();
+
+  const g = CFG.grid;
+  const half = CFG.size/2;
+  ctx.shadowColor = '#e6e6e6';
+  ctx.shadowBlur = 0;
+
+  for(let r=0; r<rows; r++){
+    for(let c=0; c<cols; c++){
+      const x0 = c*g + g/2;
+      const y0 = r*g + g/2;
+
+      let x = x0, y = y0;
+      const amp = CFG.amplitude;
+      const f = CFG.frequency;
+
+      if (CFG.mode === 1){
+        const n = fbm2(x0*f, t, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        y = y0 + n * amp;
+      } else if (CFG.mode === 2){
+        const nx = fbm2(x0*f + 13.37, y0*f + t, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        const ny = fbm2(x0*f + t,      y0*f + 42.42, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        x = x0 + nx * amp;
+        y = y0 + ny * amp;
+      } else if (CFG.mode === 3){
+        const cx = W/2, cy = H/2;
+        const dx = x0 - cx, dy = y0 - cy;
+        const dist = Math.hypot(dx, dy);
+        const n = fbm2(dist*f, t, CFG.octaves, CFG.persistence, CFG.lacunarity);
+        const dir = Math.atan2(dy, dx);
+        const off = n * amp;
+        x = x0 + Math.cos(dir) * off*0.3;
+        y = y0 + Math.sin(dir) * off;
+      }
+
+      const key = `${c},${r}`;
+      ctx.fillStyle = textMask.has(key) ? CFG.textColor : CFG.dotColor;
+      ctx.fillRect(Math.round(x - half), Math.round(y - half), CFG.size, CFG.size);
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// ——— UI wiring ———
+const windInput = document.getElementById('wind');
+windInput.value = CFG.wind;
+applyWind();
+windInput.addEventListener('input', (e)=>{
+  CFG.wind = +e.target.value;
+  applyWind();
+});
+
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

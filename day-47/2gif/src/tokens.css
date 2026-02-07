@@ -1,0 +1,43 @@
+/* 2GIF Design Tokens */
+:root {
+  /* Surfaces */
+  --surface-0: #0a0a0a;
+  --surface-1: #141414;
+  --surface-2: #1a1a1a;
+  --surface-hover: #242424;
+
+  /* Borders */
+  --border-subtle: #2a2a2a;
+  --border-emphasis: #404040;
+
+  /* Text */
+  --text-primary: #f5f5f5;
+  --text-secondary: #a0a0a0;
+  --text-disabled: #606060;
+
+  /* Accents */
+  --accent: #00a8ff;
+  --destructive: #ff006e;
+  --success: #00ff88;
+  --warning: #ffaa00;
+
+  /* Spacing */
+  --unit: 8px;
+  --padding-component: 16px;
+  --margin-panel: 24px;
+  --gap-section: 32px;
+
+  /* Borders & Radius */
+  --radius: 4px;
+  --border-width: 1px;
+
+  /* Timing */
+  --timing-instant: 0ms;
+  --timing-fast: 100ms;
+  --timing-medium: 200ms;
+  --timing-slow: 300ms;
+
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  --font-system: -apple-system, 'Segoe UI', system-ui, sans-serif;
+}

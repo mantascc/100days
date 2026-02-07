@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Audio Agents</title>
+<link rel="icon" type="image/png" href="favicon.png" />
+<style>
+  :root { color-scheme: dark; }
+  html, body { height:100%; margin:0; background:#0b0b0d; }
+  body { display:grid; place-items:center; font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color:#e6e6e6; }
+  #wrap { display:grid; gap:12px; }
+  #stage { position:relative; width:80vmin; height:80vmin; max-width:640px; max-height:640px; min-width:320px; min-height:320px;
+           border-radius:12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); overflow:hidden; }
+  canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; }
+  #ui { display:flex; gap:8px; align-items:center; justify-content:center; }
+  button{ background:#1b1b22; color:#e6e6e6; border:1px solid #2a2a33; border-radius:10px; padding:8px 12px; cursor:pointer; }
+  button:hover{ border-color:#3b3b46; }
+  small{ opacity:.5; text-align:center; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage"><canvas id="c"></canvas></div>
+  <small>Enable your microphone to move the agents around.</small>
+  <div id="ui">
+    <button id="start">Start Mic</button>
+    <button id="stop" disabled>Stop</button>
+  </div>
+  
+</div>
+
+<script>
+(() => {
+  // ---------- Device detection & responsive params ----------
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                   || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
+                   || window.innerWidth <= 768;
+
+  // Responsive parameters
+  const DESKTOP_AGENTS = 200;
+  const MOBILE_AGENTS = 100;
+  const DESKTOP_CONNECTION_DISTANCE = 30;
+  const MOBILE_CONNECTION_DISTANCE = 25;
+
+  // Log device detection
+  console.log(`Device detected as: ${isMobile ? 'Mobile' : 'Desktop'}`);
+  console.log(`Using ${isMobile ? MOBILE_AGENTS : DESKTOP_AGENTS} agents, connection distance: ${isMobile ? MOBILE_CONNECTION_DISTANCE : DESKTOP_CONNECTION_DISTANCE}px`);
+
+  // ---------- Canvas & grid ----------
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha:false });
+  let W=0,H=0, DPR = Math.max(1, Math.min(2, devicePixelRatio || 1)); // cap for crisp pixels
+  const GRID = 8;                       // grid spacing (CSS px)
+  const AGENT_SIZE = 2;                 // 2×2 px agents (CSS px)
+  const N = isMobile ? MOBILE_AGENTS : DESKTOP_AGENTS; // responsive agent count
+
+  function resize(){
+    const r = canvas.getBoundingClientRect();
+    W = Math.floor(r.width);
+    H = Math.floor(r.height);
+    canvas.width  = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+
+  function drawGrid(){
+    ctx.fillStyle = '#0b0b0d';
+    ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = 'rgba(255,255,255,.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for(let x=0; x<=W; x+=GRID){ ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,H); }
+    for(let y=0; y<=H; y+=GRID){ ctx.moveTo(0,y+0.5); ctx.lineTo(W,y+0.5); }
+    ctx.stroke();
+  }
+
+  // ---------- Agents ----------
+  const agents = [];
+  function rand(a,b){ return a + Math.random()*(b-a); }
+
+  function initAgents(){
+    agents.length = 0;
+    for(let i=0;i<N;i++){
+      agents.push({
+        x: rand(AGENT_SIZE, W-AGENT_SIZE),
+        y: rand(AGENT_SIZE, H-AGENT_SIZE),
+        vx: rand(-0.2, 0.2),
+        vy: rand(-0.2, 0.2),
+        seed: Math.random()*1e6
+      });
+    }
+  }
+  initAgents();
+
+  // ---------- Audio (mic) ----------
+  let ac, analyser, timeData, mediaNode, micStream;
+  const FFT = 1024;
+
+  async function startMic(){
+    if(!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true }});
+    mediaNode = ac.createMediaStreamSource(micStream);
+    analyser = ac.createAnalyser();
+    analyser.fftSize = FFT;
+    analyser.smoothingTimeConstant = 0.85;
+    timeData = new Float32Array(analyser.fftSize);
+    mediaNode.connect(analyser);
+    running = true;
+  }
+
+  function stopMic(){
+    if(micStream){
+      micStream.getTracks().forEach(t=>t.stop());
+      micStream = null;
+    }
+    if(mediaNode) { try{ mediaNode.disconnect(); }catch{} mediaNode = null; }
+    running = false;
+  }
+
+  // ---------- Audio features ----------
+  let logCounter = 0; // For periodic logging
+  function getFeatures(){
+    if(!analyser) return { rms:0 };
+    analyser.getFloatTimeDomainData(timeData);
+    // RMS loudness
+    let sum = 0;
+    for(let i=0;i<timeData.length;i++){ const v=timeData[i]; sum += v*v; }
+    const rms = Math.sqrt(sum / timeData.length); // ~0..0.5 typical
+
+    // Log every 60 frames (~1 second at 60fps) for debugging
+    logCounter++;
+    if(logCounter % 60 === 0) {
+      console.log(`Audio Analysis:
+        RMS: ${rms.toFixed(4)} (range: ~0-0.5)
+        Sample rate: ~${ac ? ac.sampleRate : 'unknown'}Hz`);
+    }
+
+    return { rms };
+  }
+
+  // ---------- Simulation params (audio-mapped) ----------
+  const BASE_SPEED = 0.05;      // baseline drift (px/frame)
+  const RMS_TO_SPEED = 50.0;     // scale loudness → speed
+  const BASE_NOISE = 0.05;      // baseline jitter
+  const RMS_TO_NOISE = 100.0;    // scale loudness → jitter
+  const EDGE_BOUNCE = 0.98;     // damp velocity on wall hit
+  const CONNECTION_DISTANCE = isMobile ? MOBILE_CONNECTION_DISTANCE : DESKTOP_CONNECTION_DISTANCE; // responsive connection distance
+
+  // ---------- Loop ----------
+  let running = false;
+  function step(){
+    requestAnimationFrame(step);
+    drawGrid();
+
+    const { rms } = getFeatures();
+    const speed = BASE_SPEED + RMS_TO_SPEED * rms;         // louder → faster
+    const noiseAmp = BASE_NOISE + RMS_TO_NOISE * rms;      // louder → more jittery
+    
+    // Log simulation values periodically
+    if(logCounter % 60 === 1) { // offset by 1 frame from audio logging
+      console.log(`Simulation Values:
+        Speed: ${speed.toFixed(4)} (base: ${BASE_SPEED} + rms*${RMS_TO_SPEED})
+        Noise Amplitude: ${noiseAmp.toFixed(4)} (base: ${BASE_NOISE} + rms*${RMS_TO_NOISE})`);
+    }
+
+    // update
+    for(const a of agents){
+      // small random jitter as “noise”
+      a.vx += (Math.random()*2-1) * noiseAmp * 0.2;
+      a.vy += (Math.random()*2-1) * noiseAmp * 0.2;
+
+      // limit velocity magnitude to target speed
+      const mag = Math.hypot(a.vx, a.vy) || 1e-6;
+      const k = speed / mag;
+      a.vx *= k; a.vy *= k;
+
+      a.x += a.vx;
+      a.y += a.vy;
+
+      // contain & bounce softly
+      if(a.x < 0){ a.x = 0; a.vx = Math.abs(a.vx)*EDGE_BOUNCE; }
+      if(a.y < 0){ a.y = 0; a.vy = Math.abs(a.vy)*EDGE_BOUNCE; }
+      if(a.x > W-AGENT_SIZE){ a.x = W-AGENT_SIZE; a.vx = -Math.abs(a.vx)*EDGE_BOUNCE; }
+      if(a.y > H-AGENT_SIZE){ a.y = H-AGENT_SIZE; a.vy = -Math.abs(a.vy)*EDGE_BOUNCE; }
+    }
+
+    // draw connections between nearby agents
+    ctx.strokeStyle = 'rgba(128, 128, 128, 0.3)'; // grey with transparency
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for(let i = 0; i < agents.length; i++) {
+      const a1 = agents[i];
+      for(let j = i + 1; j < agents.length; j++) {
+        const a2 = agents[j];
+        const dx = a2.x - a1.x;
+        const dy = a2.y - a1.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if(distance <= CONNECTION_DISTANCE) {
+          // Draw line from center of agent 1 to center of agent 2
+          ctx.moveTo(a1.x + AGENT_SIZE/2, a1.y + AGENT_SIZE/2);
+          ctx.lineTo(a2.x + AGENT_SIZE/2, a2.y + AGENT_SIZE/2);
+        }
+      }
+    }
+    ctx.stroke();
+
+    // draw agents (snap to integer for crisp 2×2 "pixels")
+    ctx.fillStyle = '#ffffff';
+    for(const a of agents){
+      const x = Math.round(a.x); const y = Math.round(a.y);
+      ctx.fillRect(x, y, AGENT_SIZE, AGENT_SIZE);
+    }
+  }
+  step();
+
+
+  // ---------- UI ----------
+  const startBtn = document.getElementById('start');
+  const stopBtn  = document.getElementById('stop');
+
+  startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    try{
+      await startMic();
+      if(ac.state === 'suspended') await ac.resume();
+      stopBtn.disabled = false;
+    }catch(err){
+      console.error(err);
+      alert('Microphone access failed. Check browser permissions.');
+      startBtn.disabled = false;
+    }
+  });
+
+  stopBtn.addEventListener('click', () => {
+    stopMic();
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[
+  { "month": "Jan", "score": 45 },
+  { "month": "Feb", "score": 52 },
+  { "month": "Mar", "score": 48 },
+  { "month": "Apr", "score": 61 },
+  { "month": "May", "score": 55 },
+  { "month": "Jun", "score": 67 },
+  { "month": "Jul", "score": 73 },
+  { "month": "Aug", "score": 69 },
+  { "month": "Sep", "score": 78 },
+  { "month": "Oct", "score": 82 }
+]

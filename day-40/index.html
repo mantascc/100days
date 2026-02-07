@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cube Grid Rules Engine</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            overflow: hidden;
+            font-family: monospace;
+            color: #e0e0e0;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 1.2rem;
+            pointer-events: none;
+            opacity: 0.7;
+            transition: opacity 0.5s ease;
+            z-index: 100;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+            opacity: 0.8;
+            font-size: 0.8rem;
+        }
+
+        .hidden {
+            opacity: 0 !important;
+        }
+
+        /* Parameters Button */
+        #fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background: #222;
+            border: 1px solid #444;
+            color: #aaa;
+            font-size: 12px;
+            font-family: monospace;
+            cursor: pointer;
+            z-index: 200;
+            transition: background 0.2s, color 0.2s;
+            display: none;
+        }
+
+        #fab.visible {
+            display: block;
+        }
+
+        #fab:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        /* Parameter Panel */
+        #paramPanel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            z-index: 199;
+            display: none;
+        }
+
+        #paramPanel.open {
+            display: block;
+        }
+
+        #paramPanel h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #fff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        #paramPanel label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        #paramPanel input[type="range"] {
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        #paramPanel .coming-soon {
+            color: #666;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        #paramPanel .param-value {
+            float: right;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="overlay">Click to Start | Arrows/0-5: Levels | r: Randomize | Space: Pause</div>
+    <div id="info">Level 0: Direct Threshold</div>
+    <canvas id="gridCanvas"></canvas>
+
+    <button id="fab">[Parameters]</button>
+
+    <div id="paramPanel">
+        <h3>Level 5: Expression Grammar</h3>
+        <label>
+            Loud Threshold <span class="param-value" id="loudVal">0.7</span>
+            <input type="range" id="loudThreshold" min="0" max="1" step="0.01" value="0.7">
+        </label>
+        <label>
+            Quiet Threshold <span class="param-value" id="quietVal">0.01</span>
+            <input type="range" id="quietThreshold" min="0" max="1" step="0.01" value="0.01">
+        </label>
+        <label>
+            Flip Min <span class="param-value" id="flipMinVal">0.4</span>
+            <input type="range" id="flipMin" min="0" max="1" step="0.01" value="0.4">
+        </label>
+        <label>
+            Flip Max <span class="param-value" id="flipMaxVal">0.6</span>
+            <input type="range" id="flipMax" min="0" max="1" step="0.01" value="0.6">
+        </label>
+        <label>
+            Flip Chance <span class="param-value" id="flipChanceVal">0.9</span>
+            <input type="range" id="flipChance" min="0" max="1" step="0.01" value="0.9">
+        </label>
+        <label>
+            Ripple Speed <span class="param-value" id="rippleSpeedVal">1</span>
+            <input type="range" id="rippleSpeed" min="0" max="20" step="1" value="1">
+        </label>
+        <hr style="border-color: #333; margin: 16px 0;">
+        <p class="coming-soon">Other level parameters coming soon...</p>
+    </div>
+
+    <script src="script-4.js"></script>
+    <script>
+        // FAB toggle
+        const fab = document.getElementById('fab');
+        const paramPanel = document.getElementById('paramPanel');
+        fab.addEventListener('click', () => {
+            paramPanel.classList.toggle('open');
+        });
+
+        // Show/hide FAB based on current level
+        function updateFabVisibility() {
+            if (currentLevel === 5) {
+                fab.classList.add('visible');
+            } else {
+                fab.classList.remove('visible');
+                paramPanel.classList.remove('open');
+            }
+        }
+
+        // Override keydown to also update FAB visibility
+        const originalKeyHandler = window.onkeydown;
+        document.addEventListener('keydown', () => {
+            setTimeout(updateFabVisibility, 10);
+        });
+
+        // Sync sliders with PARAMS (still uses level6 key in PARAMS object)
+        function setupSlider(id, valId, paramPath) {
+            const slider = document.getElementById(id);
+            const valSpan = document.getElementById(valId);
+            slider.value = PARAMS.level6[paramPath];
+            valSpan.textContent = slider.value;
+            slider.addEventListener('input', () => {
+                PARAMS.level6[paramPath] = parseFloat(slider.value);
+                valSpan.textContent = slider.value;
+            });
+        }
+        setupSlider('loudThreshold', 'loudVal', 'loudThreshold');
+        setupSlider('quietThreshold', 'quietVal', 'quietThreshold');
+        setupSlider('flipMin', 'flipMinVal', 'flipMin');
+        setupSlider('flipMax', 'flipMaxVal', 'flipMax');
+        setupSlider('flipChance', 'flipChanceVal', 'flipChance');
+        setupSlider('rippleSpeed', 'rippleSpeedVal', 'rippleSpeed');
+
+        // Initial check
+        updateFabVisibility();
+    </script>
+</body>
+
+</html>

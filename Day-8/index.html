@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title></title>
+<style>
+  :root{
+    --bg: #0f0f12;
+    --grid: rgba(255,255,255,.08);
+    --grid-bold: rgba(255,255,255,.12);
+    --ink: #e6e6e6;
+  }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--ink); }
+  body { display: grid; place-items: center; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+
+  /* Stage: mobile-optimized vertical 9:16 */
+  #stage {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    width: min(94vw, 420px);
+    max-height: 86vh;
+    border-radius: 16px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 8px 30px rgba(0,0,0,.35);
+    overflow: hidden;
+  }
+  canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; }
+  .hint { margin-top: 12px; opacity:.7; font-size:12px; }
+</style>
+</head>
+<body>
+  <div id="stage"><canvas id="c"></canvas></div>
+
+<script>
+(() => {
+  'use strict';
+  const params = {
+    gridStep: 12,
+    speed: 0.5,
+    turnJitter: 0.2,
+    steerBack: 0.5,
+    margin: 8,
+    dot: 2,
+    linkMax: 50,
+    linkK: 0.2,
+    clusterSize: 20,       // min enforced to 4 at runtime
+    clusterCount: 5,      // 1..10
+    clusterRadius: 40,
+    clusterRepelK: 0.25,
+    connectRatio: 0.5,    // when degreeMode==='min'
+    minDegree: 1,         // minimum degree when degreeMode==='min'
+    degreeMode: 'exact',    // 'min' | 'exact'
+    degreeTarget: 5       // exact target degree when degreeMode==='exact'
+  };
+
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha: false });
+
+  let DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    const cssW = Math.floor(rect.width);
+    const cssH = Math.floor(rect.height);
+    DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+    canvas.width  = cssW * DPR;
+    canvas.height = cssH * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function drawGrid() {
+    const { gridStep } = params;
+    const rect = stage.getBoundingClientRect();
+    const w = Math.floor(rect.width);
+    const h = Math.floor(rect.height);
+
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.beginPath();
+    for (let x = 0; x <= w; x += gridStep) { ctx.moveTo(x + 0.5, 0); ctx.lineTo(x + 0.5, h); }
+    for (let y = 0; y <= h; y += gridStep) { ctx.moveTo(0, y + 0.5); ctx.lineTo(w, y + 0.5); }
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    for (let x = 0; x <= w; x += gridStep*5) { ctx.moveTo(x + 0.5, 0); ctx.lineTo(x + 0.5, h); }
+    for (let y = 0; y <= h; y += gridStep*5) { ctx.moveTo(0, y + 0.5); ctx.lineTo(w, y + 0.5); }
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.stroke();
+  }
+
+  function steerWithinBounds(agent) {
+    const rect = stage.getBoundingClientRect();
+    const w = Math.floor(rect.width);
+    const h = Math.floor(rect.height);
+    const m = params.margin;
+
+    const cx = w/2, cy = h/2;
+    const dx = cx - agent.x;
+    const dy = cy - agent.y;
+    const desired = Math.atan2(dy, dx);
+
+    const nearLeft   = agent.x < m;
+    const nearRight  = agent.x > w - m;
+    const nearTop    = agent.y < m;
+    const nearBottom = agent.y > h - m;
+
+    if (nearLeft || nearRight || nearTop || nearBottom) {
+      const da = ((desired - agent.a + Math.PI*3) % (Math.PI*2)) - Math.PI; // shortest angle
+      agent.a += da * params.steerBack;
+    }
+
+    agent.x = clamp(agent.x, 1, w - 1);
+    agent.y = clamp(agent.y, 1, h - 1);
+  }
+
+  // ---------- Cluster data ----------
+  /** @type {{agents:{x:number,y:number,a:number,_px?:number,_py?:number}[], cx:number, cy:number, edges:number[][]}[]} */
+  let clusters = [];
+  let lastConnectRatio = params.connectRatio;
+  let lastMinDegree = params.minDegree;
+  let lastDegreeMode = params.degreeMode;
+  let lastDegreeTarget = params.degreeTarget;
+
+  function computeClusterCenter(cluster){
+    let sx = 0, sy = 0; const n = cluster.agents.length;
+    for (const a of cluster.agents){ sx += a.x; sy += a.y; }
+    cluster.cx = sx / n; cluster.cy = sy / n;
+  }
+
+  // ---------- Graph builders ----------
+  function targetDegreeMin(n){
+    const minK = Math.max(0, Math.min(params.minDegree|0, n-1));
+    let k = Math.round(params.connectRatio * (n - 1)) | 0;
+    k = clamp(k, minK, n-1);
+    return k;
+  }
+
+  function buildEdgesMin(n){
+    const k = targetDegreeMin(n);
+    const adj = Array.from({length:n}, () => new Set());
+    const deg = i => adj[i].size;
+    const add = (u,v)=>{ if (u===v || adj[u].has(v)) return false; adj[u].add(v); adj[v].add(u); return true; };
+
+    // Seed a ring for baseline connectivity
+    for (let i=0;i<n;i++){ add(i, (i+1)%n); }
+    if (k>=2 && n>3){ for (let i=0;i<n;i++){ add(i, (i+2)%n); } }
+
+    // Greedy top-up until degree >= k
+    let guard = n*n*4;
+    while (guard-- > 0){
+      let u = 0, du = deg(0);
+      for (let i=1;i<n;i++){ const di = deg(i); if (di < du){ du = di; u = i; } }
+      if (du >= k) break;
+      let best = -1, bestd = 1e9;
+      for (let v=0; v<n; v++){
+        if (v!==u && !adj[u].has(v)){
+          const dv = deg(v);
+          if (dv < bestd || (dv===bestd && Math.random()<0.5)){ best = v; bestd = dv; }
+        }
+      }
+      if (best === -1) break;
+      add(u, best);
+    }
+
+    const edges = [];
+    for (let i=0;i<n;i++) for (const j of adj[i]) if (i<j) edges.push([i,j]);
+    return edges;
+  }
+
+  function buildEdgesExact(n, k){
+    // Feasibility: 0<=k<n and (n*k) even for simple k-regular existence.
+    k = clamp(k|0, 0, n-1);
+    if ((n*k) % 2 !== 0) return null;
+
+    // Havel–Hakimi style construction with random tie-breaking.
+    for (let attempt=0; attempt<50; attempt++){
+      const adj = Array.from({length:n}, () => new Set());
+      const rem = new Array(n).fill(k);
+      const verts = Array.from({length:n}, (_,i)=>i);
+
+      let ok = true;
+      while (true){
+        // pick a vertex u with max remaining degree
+        verts.sort((a,b)=> rem[b]-rem[a] || (Math.random()-0.5));
+        const u = verts.find(i => rem[i] > 0);
+        if (u === undefined) break; // done
+        const d = rem[u];
+        // candidates: vertices with highest remaining degree not equal u and not already connected
+        const cand = verts.filter(v => v!==u && rem[v]>0 && !adj[u].has(v));
+        if (cand.length < d){ ok=false; break; }
+        // connect to first d candidates
+        for (let i=0;i<d;i++){
+          const v = cand[i];
+          adj[u].add(v); adj[v].add(u);
+          rem[v]--;
+          if (rem[v] < 0){ ok=false; break; }
+        }
+        rem[u] = 0;
+        if (!ok) break;
+      }
+      if (!ok) continue;
+      // Build edges
+      const edges = [];
+      for (let i=0;i<n;i++) for (const j of adj[i]) if (i<j) edges.push([i,j]);
+      // quick degree check
+      const deg = new Array(n).fill(0); for (const [u,v] of edges){ deg[u]++; deg[v]++; }
+      if (deg.every(d => d===k)) return edges;
+    }
+    return null; // failed after attempts
+  }
+
+  function buildEdges(n){
+    if (params.degreeMode === 'exact'){
+      const k = clamp(params.degreeTarget|0, 0, n-1);
+      const edges = buildEdgesExact(n, k);
+      if (edges) return edges;
+      console.warn(`[DEGREE] exact(${k}) not feasible for n=${n} or construction failed; falling back to min mode.`);
+    }
+    return buildEdgesMin(n);
+  }
+
+  function rebuildAllEdges(){
+    for (const cl of clusters){ cl.edges = buildEdges(cl.agents.length); }
+    sanityCheck();
+  }
+
+  // ---------- Simulation step ----------
+  function step() {
+    // Hot-rebuild if clusterCount/clusterSize changed at runtime
+    {
+      const desiredCount = Math.max(1, Math.min(10, (params.clusterCount|0)));
+      const desiredSize  = Math.max(4, (params.clusterSize|0));
+      if (clusters.length !== desiredCount || ((clusters[0]?.agents?.length|0) !== desiredSize)) {
+        buildClusters();
+      }
+    }
+
+    if (
+      params.connectRatio !== lastConnectRatio ||
+      params.minDegree !== lastMinDegree ||
+      params.degreeMode !== lastDegreeMode ||
+      params.degreeTarget !== lastDegreeTarget
+    ) {
+      rebuildAllEdges();
+      lastConnectRatio = params.connectRatio;
+      lastMinDegree = params.minDegree;
+      lastDegreeMode = params.degreeMode;
+      lastDegreeTarget = params.degreeTarget;
+    }
+
+    // wander headings
+    for (const cl of clusters) {
+      for (const ag of cl.agents) {
+        ag.a += (Math.random() - 0.5) * (params.turnJitter * 2);
+      }
+    }
+
+    // intra-cluster springs
+    for (const cl of clusters) {
+      const aList = cl.agents;
+      const edges = cl.edges || [];
+      for (let e=0; e<edges.length; e++) {
+        const i = edges[e][0], j = edges[e][1];
+        const a = aList[i], b = aList[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 0.0001;
+        const over = Math.max(0, dist - params.linkMax);
+        if (over > 0) {
+          const s = params.linkK * over;
+          const nx = dx / dist, ny = dy / dist;
+          a._px = (a._px || 0) + nx * s; a._py = (a._py || 0) + ny * s;
+          b._px = (b._px || 0) - nx * s; b._py = (b._py || 0) - ny * s;
+        }
+      }
+    }
+
+    // compute centers
+    for (const cl of clusters) computeClusterCenter(cl);
+
+    // inter‑cluster repel (soft discs)
+    for (let i=0; i<clusters.length; i++) {
+      for (let j=i+1; j<clusters.length; j++) {
+        const A = clusters[i], B = clusters[j];
+        const dx = B.cx - A.cx, dy = B.cy - A.cy;
+        const dist = Math.hypot(dx, dy) || 0.0001;
+        const minD = params.clusterRadius * 2;
+        const overlap = minD - dist;
+        if (overlap > 0) {
+          const nx = dx / dist, ny = dy / dist;
+          const push = params.clusterRepelK * overlap;
+          for (const a of A.agents) { a._px = (a._px || 0) - nx * push; a._py = (a._py || 0) - ny * push; }
+          for (const b of B.agents) { b._px = (b._px || 0) + nx * push; b._py = (b._py || 0) + ny * push; }
+        }
+      }
+    }
+
+    // integrate
+    for (const cl of clusters) {
+      for (const ag of cl.agents) {
+        const vx = Math.cos(ag.a) * params.speed + (ag._px || 0);
+        const vy = Math.sin(ag.a) * params.speed + (ag._py || 0);
+        ag.x += vx; ag.y += vy;
+        ag._px = ag._py = 0;
+        steerWithinBounds(ag);
+      }
+    }
+  }
+
+  // ---------- Render ----------
+  function draw() {
+    const s = params.dot;
+    // draw edges
+    for (const cl of clusters) {
+      const aList = cl.agents;
+      const edges = cl.edges || [];
+      for (let e=0; e<edges.length; e++) {
+        const i = edges[e][0], j = edges[e][1];
+        const a = aList[i], b = aList[j];
+        const d = Math.hypot(b.x - a.x, b.y - a.y);
+        const t = Math.min(1, Math.max(0, (d - params.linkMax*0.5) / (params.linkMax*0.8)));
+        ctx.beginPath();
+        ctx.moveTo(a.x + 0.5, a.y + 0.5);
+        ctx.lineTo(b.x + 0.5, b.y + 0.5);
+        ctx.strokeStyle = `rgba(255,255,255,${0.15 + t*0.5})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    // draw agents (2×2 px, crisp)
+    ctx.fillStyle = '#fff';
+    for (const cl of clusters) {
+      for (const ag of cl.agents) {
+        const x = Math.round(ag.x - s/2), y = Math.round(ag.y - s/2);
+        ctx.fillRect(x, y, s, s);
+      }
+    }
+  }
+
+  function loop(){
+    drawGrid();
+    step();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // ---------- Init & utils ----------
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+
+  function seedPositions(){
+    const rect = stage.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+    const R = params.clusterRadius;
+    const spots = [];
+    const triesPerCluster = 200;
+    for (let c=0; c<clusters.length; c++) {
+      let placed = false;
+      for (let t=0; t<triesPerCluster && !placed; t++) {
+        const x = R + Math.random() * (w - 2*R);
+        const y = R + Math.random() * (h - 2*R);
+        let ok = true;
+        for (const s of spots) {
+          if (Math.hypot(x - s.x, y - s.y) < 2*R + 6) { ok = false; break; }
+        }
+        if (ok) {
+          spots.push({x,y});
+          const cl = clusters[c];
+          for (const ag of cl.agents) {
+            const rr = Math.random() * (R*0.4);
+            const th = Math.random() * Math.PI * 2;
+            ag.x = x + Math.cos(th) * rr;
+            ag.y = y + Math.sin(th) * rr;
+          }
+          placed = true;
+        }
+      }
+      if (!placed) {
+        const cols = Math.ceil(Math.sqrt(clusters.length));
+        const rows = Math.ceil(clusters.length / cols);
+        const col = c % cols; const row = (c / cols) | 0;
+        const gx = (col + 0.5) * (w / cols);
+        const gy = (row + 0.5) * (h / rows);
+        for (const ag of clusters[c].agents) {
+          const rr = Math.random() * (R*0.4);
+          const th = Math.random() * Math.PI * 2;
+          ag.x = gx + Math.cos(th) * rr;
+          ag.y = gy + Math.sin(th) * rr;
+        }
+      }
+    }
+  }
+
+  function buildClusters(){
+    const desiredCount = Math.max(1, Math.min(10, (params.clusterCount|0)));
+    const desiredSize  = Math.max(4, (params.clusterSize|0));
+    clusters = Array.from({ length: desiredCount }, () => ({
+      agents: Array.from({ length: desiredSize }, () => ({ x: 0, y: 0, a: Math.random()*Math.PI*2 })),
+      cx: 0, cy: 0,
+      edges: []
+    }));
+    rebuildAllEdges();
+    seedPositions();
+  }
+
+  // ---------- Sanity checks ("test cases") ----------
+  function sanityCheck(){
+    for (let idx=0; idx<clusters.length; idx++){
+      const cl = clusters[idx];
+      const n = cl.agents.length; const edges = cl.edges;
+      const deg = new Array(n).fill(0);
+      for (const [u,v] of edges){ deg[u]++; deg[v]++; }
+
+      if (params.degreeMode === 'exact'){
+        const k = clamp(params.degreeTarget|0, 0, n-1);
+        const ok = deg.every(d => d === k);
+        if (!ok) console.warn(`[SANITY] Cluster ${idx} not exact-regular`, {deg, k, n});
+      } else {
+        const minK = Math.max(0, Math.min(params.minDegree|0, n-1));
+        const ok = deg.every(d => d >= Math.min(minK, n-1));
+        if (!ok) console.warn(`[SANITY] Cluster ${idx} violates minDegree`, {deg, minK, n});
+      }
+
+      // no self-loops / duplicates
+      const seen = new Set(); let bad=false;
+      for (const [u,v] of edges){
+        if (u===v) { bad=true; break; }
+        const a=u<v?`${u},${v}`:`${v},${u}`;
+        if (seen.has(a)) { bad=true; break; }
+        seen.add(a);
+      }
+      if (bad) console.error(`[SANITY] Duplicate/self edges in cluster ${idx}`);
+    }
+  }
+
+  buildClusters();
+  window.addEventListener('keydown', (e) => { if ((e.key||'').toLowerCase() === 'r') seedPositions(); });
+
+  loop();
+})();
+</script>
+</body>
+</html>

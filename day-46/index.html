@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OKLCH vs HSL Gradient Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #f5f5f5;
+      font-family: 'Space Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #333;
+      padding: 40px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .title {
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid #f5f5f5;
+      color: #f5f5f5;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #f5f5f5;
+      color: #0a0a0a;
+    }
+
+    .gradient-section {
+      margin-bottom: 40px;
+    }
+
+    .gradient-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+
+    .gradient-bar {
+      width: 100%;
+      height: 80px;
+      border: 1px solid #333;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 48px;
+    }
+
+    .warning {
+      background: #1a1a1a;
+      border: 1px solid #ff6b6b;
+      padding: 24px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .warning h2 {
+      color: #ff6b6b;
+      font-size: 14px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .warning p {
+      font-size: 12px;
+      line-height: 1.6;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // Check OKLCH support
+    function supportsOKLCH() {
+      const test = document.createElement('div');
+      test.style.color = 'oklch(0.5 0.1 180)';
+      return test.style.color !== '';
+    }
+
+    if (!supportsOKLCH()) {
+      document.getElementById('app').innerHTML = `
+        <div class="warning">
+          <h2>Browser Not Supported</h2>
+          <p>Your browser doesn't support OKLCH color space. Please use a modern browser like Chrome 111+, Safari 15.4+, or Firefox 113+.</p>
+        </div>
+      `;
+    } else {
+      // Initialize app
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="container">
+          <div class="header">
+            <div class="title">OKLCH vs HSL</div>
+            <button id="randomize">randomize</button>
+          </div>
+
+          <div class="gradient-section">
+            <div class="gradient-label">HSL</div>
+            <div class="gradient-bar" id="hsl-gradient"></div>
+          </div>
+
+          <div class="gradient-section">
+            <div class="gradient-label">OKLCH</div>
+            <div class="gradient-bar" id="oklch-gradient"></div>
+          </div>
+
+          <div class="controls">
+            <button id="toggle-animation">play</button>
+          </div>
+        </div>
+      `;
+
+      // State
+      let colors = [];
+      let isAnimating = false;
+      let animationFrame;
+      let startTime;
+
+      // Color palettes
+      const palettes = [
+        { name: 'cream/salmon', hueRange: [20, 50] },
+        { name: 'forest/lime', hueRange: [100, 150] },
+        { name: 'blue/purple', hueRange: [240, 300] }
+      ];
+
+      // OKLCH to RGB conversion (using OKLab color space)
+      function oklchToRGB(l, c, h) {
+        // Convert OKLCH to OKLab
+        const a = c * Math.cos(h * Math.PI / 180);
+        const b = c * Math.sin(h * Math.PI / 180);
+
+        // OKLab to linear RGB
+        const l_ = l + 0.3963377774 * a + 0.2158037573 * b;
+        const m_ = l - 0.1055613458 * a - 0.0638541728 * b;
+        const s_ = l - 0.0894841775 * a - 1.2914855480 * b;
+
+        const l3 = l_ * l_ * l_;
+        const m3 = m_ * m_ * m_;
+        const s3 = s_ * s_ * s_;
+
+        let r = +4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3;
+        let g = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3;
+        let bl = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3;
+
+        // Gamma correction (linear RGB to sRGB)
+        r = r > 0.0031308 ? 1.055 * Math.pow(r, 1 / 2.4) - 0.055 : 12.92 * r;
+        g = g > 0.0031308 ? 1.055 * Math.pow(g, 1 / 2.4) - 0.055 : 12.92 * g;
+        bl = bl > 0.0031308 ? 1.055 * Math.pow(bl, 1 / 2.4) - 0.055 : 12.92 * bl;
+
+        r = Math.max(0, Math.min(1, r));
+        g = Math.max(0, Math.min(1, g));
+        bl = Math.max(0, Math.min(1, bl));
+
+        return [r * 255, g * 255, bl * 255];
+      }
+
+      // RGB to HSL conversion
+      function rgbToHSL(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+          h = s = 0;
+        } else {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+          switch (max) {
+            case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+            case g: h = ((b - r) / d + 2) / 6; break;
+            case b: h = ((r - g) / d + 4) / 6; break;
+          }
+        }
+
+        return [h * 360, s * 100, l * 100];
+      }
+
+      // Generate random colors
+      function generateRandomColors() {
+        // Pick one palette
+        const palette = palettes[Math.floor(Math.random() * palettes.length)];
+
+        // Generate 3 colors within that palette
+        return [0, 1, 2].map(() => {
+          const hue = palette.hueRange[0] + Math.random() * (palette.hueRange[1] - palette.hueRange[0]);
+          const lightness = 0.5 + Math.random() * 0.3; // 0.5 to 0.8
+          const chroma = 0.1 + Math.random() * 0.1; // 0.1 to 0.2
+          return { l: lightness, c: chroma, h: hue };
+        });
+      }
+
+      // Create gradient
+      function createGradient(colors, space) {
+        const steps = 50;
+        const stops = [];
+
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          let color;
+
+          if (t < 0.5) {
+            // Interpolate between color 0 and color 1
+            const localT = t * 2;
+            color = interpolateColors(colors[0], colors[1], localT, space);
+          } else {
+            // Interpolate between color 1 and color 2
+            const localT = (t - 0.5) * 2;
+            color = interpolateColors(colors[1], colors[2], localT, space);
+          }
+
+          const percent = (i / steps * 100).toFixed(2);
+          stops.push(`${color} ${percent}%`);
+        }
+
+        return `linear-gradient(to right, ${stops.join(', ')})`;
+      }
+
+      // Interpolate between two colors
+      function interpolateColors(c1, c2, t, space) {
+        if (space === 'oklch') {
+          const l = c1.l + (c2.l - c1.l) * t;
+          const c = c1.c + (c2.c - c1.c) * t;
+          let h = c1.h + (c2.h - c1.h) * t;
+
+          // Handle hue wrapping
+          if (Math.abs(c2.h - c1.h) > 180) {
+            if (c2.h > c1.h) {
+              h = c1.h + ((c2.h - 360) - c1.h) * t;
+            } else {
+              h = c1.h + ((c2.h + 360) - c1.h) * t;
+            }
+          }
+
+          if (h < 0) h += 360;
+          if (h > 360) h -= 360;
+
+          return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${h.toFixed(1)})`;
+        } else {
+          // Convert OKLCH to HSL for comparison
+          const rgb1 = oklchToRGB(c1.l, c1.c, c1.h);
+          const rgb2 = oklchToRGB(c2.l, c2.c, c2.h);
+          const hsl1 = rgbToHSL(...rgb1);
+          const hsl2 = rgbToHSL(...rgb2);
+
+          const h = hsl1[0] + (hsl2[0] - hsl1[0]) * t;
+          const s = hsl1[1] + (hsl2[1] - hsl1[1]) * t;
+          const l = hsl1[2] + (hsl2[2] - hsl1[2]) * t;
+
+          return `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`;
+        }
+      }
+
+      // Update gradients
+      function updateGradients(animatedColors = null) {
+        const displayColors = animatedColors || colors;
+
+        const hslGradient = createGradient(displayColors, 'hsl');
+        const oklchGradient = createGradient(displayColors, 'oklch');
+
+        document.getElementById('hsl-gradient').style.background = hslGradient;
+        document.getElementById('oklch-gradient').style.background = oklchGradient;
+      }
+
+      // Animation
+      function animate(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const duration = 3000;
+        const progress = (elapsed % duration) / duration;
+
+        // Ease in-out
+        const t = progress < 0.5
+          ? 2 * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        // Create shifted colors
+        const animatedColors = colors.map(color => ({
+          l: color.l,
+          c: color.c,
+          h: color.h + (t * 60 - 30) // Shift ±30 degrees
+        }));
+
+        updateGradients(animatedColors);
+
+        if (isAnimating) {
+          animationFrame = requestAnimationFrame(animate);
+        }
+      }
+
+      // Event listeners
+      document.getElementById('randomize').addEventListener('click', () => {
+        colors = generateRandomColors();
+        updateGradients();
+        if (isAnimating) {
+          startTime = null;
+        }
+      });
+
+      document.getElementById('toggle-animation').addEventListener('click', (e) => {
+        isAnimating = !isAnimating;
+        e.target.textContent = isAnimating ? 'pause' : 'play';
+
+        if (isAnimating) {
+          startTime = null;
+          animationFrame = requestAnimationFrame(animate);
+        } else {
+          cancelAnimationFrame(animationFrame);
+          updateGradients();
+        }
+      });
+
+      // Initialize
+      colors = generateRandomColors();
+      updateGradients();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "type": "form",
+  "formId": "product-feedback",
+  "title": "Product Feedback",
+  "description": "Help us improve by sharing your thoughts",
+  "fields": [
+    {
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "placeholder": "your@email.com"
+    },
+    {
+      "name": "category",
+      "label": "Feedback Type",
+      "type": "select",
+      "required": true,
+      "options": ["Bug Report", "Feature Request", "General Feedback", "Praise"]
+    },
+    {
+      "name": "rating",
+      "label": "Overall Rating (1-5)",
+      "type": "number",
+      "min": 1,
+      "max": 5,
+      "required": true,
+      "placeholder": "5"
+    },
+    {
+      "name": "message",
+      "label": "Your Feedback",
+      "type": "textarea",
+      "required": true,
+      "rows": 6,
+      "placeholder": "Tell us what you think..."
+    },
+    {
+      "name": "wouldRecommend",
+      "label": "Would you recommend our product?",
+      "type": "select",
+      "required": true,
+      "options": ["Yes", "No", "Maybe"]
+    }
+  ],
+  "submitUrl": "http://localhost:8081/submit",
+  "outputFile": "data/feedback-log.json"
+}

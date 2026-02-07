@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Trace</title>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Geist Pixel Square';
+            src: url('./GeistPixel-Square.woff2') format('woff2');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #text-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            font-family: 'Geist Pixel Square', monospace;
+            font-size: 24px;
+            color: #ffffff;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="text-container">
+        <span id="typed-text"></span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let spacing = 15;
+        let dots = [];
+        let activePaths = [];
+        let lastPathTime = 0;
+        const pathSpawnInterval = 200;
+        const maxPaths = 5;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            generateGrid();
+        }
+
+        function generateGrid() {
+            dots = [];
+            const cols = Math.ceil(canvas.width / spacing);
+            const rows = Math.ceil(canvas.height / spacing);
+
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    dots.push({
+                        x: x * spacing + spacing / 2,
+                        y: y * spacing + spacing / 2,
+                        gridX: x,
+                        gridY: y,
+                        glow: 0
+                    });
+                }
+            }
+        }
+
+        function getNeighbors(dot) {
+            return dots.filter(d => {
+                const dx = Math.abs(d.gridX - dot.gridX);
+                const dy = Math.abs(d.gridY - dot.gridY);
+                return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
+            });
+        }
+
+        function getOccupiedDots() {
+            const occupied = new Set();
+            activePaths.forEach(path => {
+                path.dots.forEach(dot => occupied.add(dot));
+            });
+            return occupied;
+        }
+
+        function generatePath() {
+            const occupied = getOccupiedDots();
+            const availableDots = dots.filter(d => !occupied.has(d));
+
+            if (availableDots.length === 0) return null;
+
+            const pathDots = [];
+            const length = 12 + Math.floor(Math.random() * 14);
+            let current = availableDots[Math.floor(Math.random() * availableDots.length)];
+            pathDots.push(current);
+
+            for (let i = 0; i < length; i++) {
+                const neighbors = getNeighbors(current).filter(n =>
+                    !pathDots.includes(n) && !occupied.has(n)
+                );
+                if (neighbors.length === 0) break;
+                current = neighbors[Math.floor(Math.random() * neighbors.length)];
+                pathDots.push(current);
+            }
+
+            return {
+                dots: pathDots,
+                progress: 0
+            };
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid dots
+            dots.forEach(dot => {
+                const baseAlpha = 0.08;
+                const glowAlpha = Math.min(dot.glow, 1);
+
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${baseAlpha + glowAlpha * 0.9})`;
+                ctx.fill();
+
+                if (dot.glow > 0) {
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, 8 * dot.glow, 0, Math.PI * 2);
+                    const gradient = ctx.createRadialGradient(dot.x, dot.y, 0, dot.x, dot.y, 8 * dot.glow);
+                    gradient.addColorStop(0, `rgba(200, 235, 255, ${0.3 * dot.glow})`);
+                    gradient.addColorStop(1, 'rgba(200, 235, 255, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            });
+
+            // Draw connecting lines for all active paths
+            activePaths.forEach(path => {
+                const fadeLength = 8; // Number of segments that show the fade
+                const headPosition = path.progress;
+
+                for (let i = 0; i < path.dots.length - 1; i++) {
+                    const segmentProgress = Math.max(0, Math.min(1, (path.progress - i) / 2));
+                    if (segmentProgress <= 0) continue;
+
+                    // Calculate fade based on distance from head
+                    const distanceFromHead = headPosition - i;
+                    const fadeFactor = Math.max(0, Math.min(1, distanceFromHead / fadeLength));
+
+                    const from = path.dots[i];
+                    const to = path.dots[i + 1];
+
+                    ctx.beginPath();
+                    ctx.moveTo(from.x, from.y);
+                    ctx.lineTo(to.x, to.y);
+
+                    // Apply both segment progress and fade
+                    const opacity = 0.7 * segmentProgress * fadeFactor;
+                    ctx.strokeStyle = `rgba(200, 235, 255, ${opacity})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+
+        }
+
+        function update() {
+            const now = Date.now();
+
+            // Decay all glows gently
+            dots.forEach(dot => {
+                dot.glow *= 0.95;
+            });
+
+            // Try to spawn new path
+            if (now - lastPathTime > pathSpawnInterval && activePaths.length < maxPaths) {
+                const newPath = generatePath();
+                if (newPath) {
+                    activePaths.push(newPath);
+                    lastPathTime = now;
+                }
+            }
+
+            // Update all active paths
+            activePaths.forEach(path => {
+                path.progress += 0.25;
+                const fadeLength = 8;
+
+                // Update glow for all dots in path with fading tail
+                for (let i = 0; i < path.dots.length; i++) {
+                    const distanceFromHead = path.progress - i;
+
+                    if (distanceFromHead > 0 && distanceFromHead < fadeLength) {
+                        // Fade from 1 to 0 based on distance from head
+                        const fadeFactor = 1 - (distanceFromHead / fadeLength);
+                        path.dots[i].glow = Math.max(path.dots[i].glow, fadeFactor);
+                    } else if (Math.floor(path.progress) === i) {
+                        // Current head is full brightness
+                        path.dots[i].glow = 1;
+                    }
+                }
+            });
+
+            // Remove completed paths
+            activePaths = activePaths.filter(path =>
+                path.progress <= path.dots.length + 8
+            );
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        loop();
+
+        // Initialize Typed.js
+        const typed = new Typed('#typed-text', {
+            strings: ['hello w0rld'],
+            typeSpeed: 50,
+            showCursor: true,
+            cursorChar: '|',
+            autoInsertCss: true,
+        });
+    </script>
+</body>
+
+</html>

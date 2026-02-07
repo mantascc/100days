@@ -1,0 +1,158 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 4rem 2rem;
+}
+
+.container {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 3rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 48px);
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  body {
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 2rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(5, 48px);
+    gap: 10px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  body {
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4, 40px);
+    gap: 8px;
+  }
+
+  .loader-cell {
+    width: 40px;
+    height: 40px;
+  }
+
+  .loader-cell canvas {
+    width: 20px;
+    height: 20px;
+  }
+
+  .group-title {
+    font-size: 12px;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .hover-info {
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 11px;
+    padding: 0.75rem;
+  }
+}
+
+.group-title {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.group-title:first-child {
+  margin-top: 0;
+}
+
+.loader-cell {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.loader-cell:hover {
+  border-color: #666;
+}
+
+.loader-cell canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 24px;
+  height: 24px;
+}
+
+.hover-info {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  padding: 1rem;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.hover-info.visible {
+  opacity: 1;
+}
+
+.hover-info .group {
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+
+.hover-info .index {
+  color: #666;
+}

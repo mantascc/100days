@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entropy Patterns</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="site-header">
+      <h1 class="site-title">Entropy</h1>
+      <p class="site-description">A visual taxonomy mapping the oscillation patterns of creative work over time, showing how different rhythms of cognitive load (from recovery to danger zones) interact with the quality of thinking (divergence, exploration, abstraction) to reveal sustainable versus pathological modes of making.</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="curves">Entropy curves</button>
+      <button class="tab-btn" data-tab="scale">Entropy scale</button>
+    </nav>
+
+    <div id="curves-content" class="tab-content active"></div>
+    <div id="scale-content" class="tab-content"></div>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="data.js"></script>
+  <script src="visualization.js"></script>
+  <script src="tabs.js"></script>
+</body>
+</html>

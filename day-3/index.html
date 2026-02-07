@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clusters and a chaos agent</title>
+  <!-- SEO -->
+  <meta name="description" content="A simulation exploring chaos agent interactions with cohesive clusters" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Clusters and a chaos agent" />
+  <meta property="og:description" content="A simulation exploring chaos agent interactions with cohesive clusters" />
+  <meta property="og:image" content="1.png" />
+  <meta property="og:image:alt" content="Grid-backed canvas with clustered agents and a red chaos agent." />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Clusters and a chaos agent" />
+  <meta name="twitter:description" content="A simulation exploring chaos agent interactions with cohesive clusters" />
+  <meta name="twitter:image" content="1.png" />
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; margin: 0; background:#0f0f12; }
+    body { display:grid; place-items:center; font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color:#e6e6e6; }
+    #stage { position:relative; width:80vmin; height:80vmin; border-radius:12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); overflow:hidden; }
+    canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+    .badge { position:absolute; right:.75rem; bottom:.5rem; opacity:.6; font-size:.75rem; letter-spacing:.02em; user-select:none; }
+    .chaos { color:#ff4d4f; }
+  </style>
+</head>
+<body>
+  <div id="stage" aria-label="Simulation stage">
+    <canvas id="field" aria-hidden="true"></canvas>
+    <div class="badge">clusters and a <span class="chaos">chaos agent</span> </div>
+  </div>
+
+  <script>
+    // Configuration — boids-ish clustering + harmful agent increases cluster noise
+    const AGENT_COUNT = 100;
+    const AGENT_SIZE  = 2;          // 2×2 px squares
+
+    const SENSE       = 15;         // neighborhood radius (px)
+    const ALIGN_GAIN  = 0.5;        // match neighbors' velocity
+    const COH_GAIN    = 0.010;      // move toward neighbor centroid
+    const SEP_GAIN    = 0.2;       // push away up-close neighbors
+
+    const NOISE_BASE  = 0.20;       // baseline random jitter per agent
+    const HARM_NOISE  = 10;       // EXTRA noise factor when in harmful cluster (e.g., 1.2 -> +120%)
+    const DAMPING     = 0.995;      // slight friction
+    const MAX_SPEED   = 1.5;          // cap speed
+
+    const HARM_MIN_CLUSTER = 6;     // minimum size that counts as a "cluster"
+
+    const stage  = document.getElementById('stage');
+    const canvas = document.getElementById('field');
+    const ctx    = canvas.getContext('2d', { alpha:false });
+
+    // Hi‑DPI canvas sizing
+    function resizeCanvas(){
+      const w = stage.clientWidth, h = stage.clientHeight;
+      const dpr = Math.max(1, Math.floor(devicePixelRatio || 1));
+      canvas.width  = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeCanvas();
+    addEventListener('resize', resizeCanvas);
+
+    class Agent {
+      constructor(x, y, harmful=false) {
+        this.x = x; this.y = y;
+        const a = Math.random() * Math.PI * 2;
+        const s = 0.6 + Math.random() * 0.8;
+        this.vx = Math.cos(a) * s;
+        this.vy = Math.sin(a) * s;
+        this.harmful = harmful;
+      }
+      step(agents, w, h, jitter) {
+        let sumX = 0, sumY = 0, sumVX = 0, sumVY = 0, n = 0;
+        let sepX = 0, sepY = 0;
+
+        for (const b of agents) {
+          if (b === this) continue;
+          const dx = b.x - this.x;
+          const dy = b.y - this.y;
+          const d2 = dx*dx + dy*dy;
+          if (d2 <= SENSE*SENSE) {
+            n++;
+            sumX  += b.x; sumY  += b.y;
+            sumVX += b.vx; sumVY += b.vy;
+            // Separation — stronger when very close
+            const d = Math.sqrt(d2) || 0.0001;
+            const inv = 1 / d; // inverse distance
+            sepX -= dx * inv * inv; // ~1/d^2 falloff
+            sepY -= dy * inv * inv;
+          }
+        }
+
+        // Alignment & Cohesion & Separation
+        if (n > 0) {
+          const cx = sumX / n, cy = sumY / n;         // neighbor centroid
+          const mvx = sumVX / n, mvy = sumVY / n;     // mean velocity
+          this.vx += (mvx - this.vx) * ALIGN_GAIN;
+          this.vy += (mvy - this.vy) * ALIGN_GAIN;
+          this.vx += (cx - this.x) * COH_GAIN;
+          this.vy += (cy - this.y) * COH_GAIN;
+          this.vx += sepX * SEP_GAIN;
+          this.vy += sepY * SEP_GAIN;
+        }
+
+        // Random jitter (noise) + damping
+        this.vx += (Math.random() - 0.5) * jitter;
+        this.vy += (Math.random() - 0.5) * jitter;
+        this.vx *= DAMPING; this.vy *= DAMPING;
+
+        // Limit speed
+        const sp = Math.hypot(this.vx, this.vy);
+        if (sp > MAX_SPEED) { const s = MAX_SPEED / sp; this.vx *= s; this.vy *= s; }
+
+        // Integrate
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Wrap around edges so clusters can travel across the canvas
+        if (this.x < 0) this.x += w; else if (this.x >= w) this.x -= w;
+        if (this.y < 0) this.y += h; else if (this.y >= h) this.y -= h;
+      }
+      draw(ctx) {
+        ctx.fillStyle = this.harmful ? '#ff4d4f' : '#d7d7db';
+        ctx.fillRect((this.x + 0.5) | 0, (this.y + 0.5) | 0, AGENT_SIZE, AGENT_SIZE);
+      }
+    }
+
+    function makeAgents(){
+      const w = stage.clientWidth, h = stage.clientHeight;
+      const list = [];
+      for (let i = 0; i < AGENT_COUNT; i++) {
+        list.push(new Agent(Math.random()*w, Math.random()*h));
+      }
+      // Mark one harmful agent at random
+      const idx = (Math.random() * list.length) | 0;
+      list[idx].harmful = true;
+      return list;
+    }
+
+    // --- Cluster utilities ---
+    function neighborsWithin(agents, i, radius){
+      const res = [];
+      const a = agents[i];
+      const r2 = radius*radius;
+      for (let j=0;j<agents.length;j++) if (j!==i){
+        const b = agents[j];
+        const dx=b.x-a.x, dy=b.y-a.y;
+        if (dx*dx+dy*dy <= r2) res.push(j);
+      }
+      return res;
+    }
+
+    function componentContaining(agents, start, radius){
+      const seen=new Set([start]);
+      const q=[start];
+      while(q.length){
+        const i=q.pop();
+        for (const j of neighborsWithin(agents, i, radius)){
+          if (!seen.has(j)) { seen.add(j); q.push(j); }
+        }
+      }
+      return [...seen];
+    }
+
+    function harmfulClusterSet(agents){
+      const harmIdx = agents.findIndex(a=>a.harmful);
+      if (harmIdx < 0) return null;
+      const comp = componentContaining(agents, harmIdx, SENSE);
+      if (comp.length >= HARM_MIN_CLUSTER) return new Set(comp);
+      return null;
+    }
+
+    let agents = makeAgents();
+
+    function drawBackdrop(ctx, w, h) {
+      ctx.fillStyle = '#0b0b0e';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      const s = 16;
+      for (let x = 0; x < w; x += s) ctx.fillRect(x, 0, 1, h);
+      for (let y = 0; y < h; y += s) ctx.fillRect(0, 0 + y, w, 1);
+    }
+
+    function frame(){
+      const w = stage.clientWidth, h = stage.clientHeight;
+      const harmSet = harmfulClusterSet(agents); // Set of indices in the harmful cluster (or null)
+
+      drawBackdrop(ctx, w, h);
+
+      // physics
+      for (let i=0; i<agents.length; i++) {
+        const a = agents[i];
+        const jitter = NOISE_BASE * (harmSet && harmSet.has(i) ? (1 + HARM_NOISE) : 1);
+        a.step(agents, w, h, jitter);
+      }
+
+      // draw
+      for (const a of agents) { a.draw(ctx); }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // Click to reseed positions & velocities
+    stage.addEventListener('click', () => { agents = makeAgents(); });
+  </script>
+</body>
+</html>

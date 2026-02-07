@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Path Experiment [ipad]</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Turf.js for great circle calculations -->
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
+    <!-- Font Awesome for airplane icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="ipad-frame">
+        <div class="sidebar"></div>
+        <div class="main-content">
+            <div class="content-area">
+                <div class="info-panel">
+                    <button id="toggleInfoPanel" class="toggle-btn">−</button>
+                    <div class="info-content">
+                        <div class="flight-header">
+                            <div class="flight-number">SK 1789</div>
+                            <div class="flight-status">En Route</div>
+                        </div>
+
+                        <div class="route-info">
+                            <div class="city-info">
+                                <div class="city-code">CPH</div>
+                                <div class="city-name">Copenhagen</div>
+                            </div>
+                            <div class="route-arrow">→</div>
+                            <div class="city-info">
+                                <div class="city-code">BCN</div>
+                                <div class="city-name">Barcelona</div>
+                            </div>
+                        </div>
+
+                        <div class="flight-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+
+                        <div class="flight-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Departure</span>
+                                <span class="detail-value">14:30 CET</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Arrival</span>
+                                <span class="detail-value">17:15 CET</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Duration</span>
+                                <span class="detail-value">2h 45m</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Distance</span>
+                                <span class="detail-value">1,546 km</span>
+                            </div>
+                        </div>
+
+                        <div class="aircraft-info">
+                            <div class="detail-row">
+                                <span class="detail-label">Aircraft</span>
+                                <span class="detail-value">Airbus A320</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Speed</span>
+                                <span class="detail-value">850 km/h</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Altitude</span>
+                                <span class="detail-value">11,000 m</span>
+                            </div>
+                        </div>
+
+                        <div class="notifications-section">
+                            <div class="section-header">Route Optimizations</div>
+
+                            <div class="notification-card" data-waypoint="1">
+                                <div class="notification-indicator">
+                                    <div class="pulse-dot"></div>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">Waypoint Alpha</div>
+                                    <div class="notification-details">
+                                        <span class="detail-badge">+12% fuel saving</span>
+                                        <span class="detail-badge">+2 min</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="notification-card" data-waypoint="2">
+                                <div class="notification-indicator">
+                                    <div class="pulse-dot"></div>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">Waypoint Bravo</div>
+                                    <div class="notification-details">
+                                        <span class="detail-badge">+8% fuel saving</span>
+                                        <span class="detail-badge">+1 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+            <div class="bottom-panel collapsed">
+                <button id="toggleBottomPanel" class="toggle-btn bottom">+</button>
+            </div>
+        </div>
+        <button id="playPauseBtn" class="play-pause-btn">
+            <svg class="pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="6" y="4" width="4" height="16" fill="currentColor"/>
+                <rect x="14" y="4" width="4" height="16" fill="currentColor"/>
+            </svg>
+            <svg class="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+        </button>
+
+        <!-- Waypoint Popover -->
+        <div id="waypointPopover" class="waypoint-popover" style="display: none;">
+            <div class="popover-header">
+                <h3 class="popover-title">Route Optimization</h3>
+                <button class="popover-close" id="closePopover">×</button>
+            </div>
+            <div class="popover-content">
+                <div class="optimization-suggestion">
+                    <div class="suggestion-label">Suggested Changes</div>
+                    <div class="parameter-changes">
+                        <div class="parameter-row">
+                            <span class="param-name">Altitude</span>
+                            <span class="param-change">+500 m</span>
+                        </div>
+                        <div class="parameter-row">
+                            <span class="param-name">Speed</span>
+                            <span class="param-change">-30 km/h</span>
+                        </div>
+                        <div class="parameter-row">
+                            <span class="param-name">Heading</span>
+                            <span class="param-change">+2.5°</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="optimization-benefits">
+                    <div class="benefit-row">
+                        <span class="benefit-label">Fuel Saving</span>
+                        <span class="benefit-value">12%</span>
+                    </div>
+                    <div class="benefit-row">
+                        <span class="benefit-label">Time Impact</span>
+                        <span class="benefit-value">+2 min</span>
+                    </div>
+                </div>
+                <div class="popover-actions">
+                    <button class="action-btn reject-btn" id="rejectBtn">Reject</button>
+                    <button class="action-btn accept-btn" id="acceptBtn">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

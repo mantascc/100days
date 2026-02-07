@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Orbital</title>
+<style>
+  html, body { height:100%; margin:0; background:#0f0f12; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+  body { color:#e6e6e6; font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+  #stage { position:relative; width:400px; height:400px; border-radius:12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); overflow:hidden; }
+  canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; } /* CSS size only */
+  button { padding:6px 12px; border:none; border-radius:6px; background:#222; color:#eee; cursor:pointer; }
+  button:hover { background:#333; }
+  .title { font-size:12px; font-weight:300; color:#e6e6e6; opacity:0.6; }
+</style>
+</head>
+<body>
+  <h1 class="title"><span id="typed-text"></span></h1>
+  <!-- Title fixed: single element -->
+  <div id="stage"><canvas id="c"></canvas></div>
+  <button id="resetBtn">Reset</button>
+
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script>
+(() => {
+  const CANVAS_SIZE = 400; // CSS px
+  const GRID = 4;
+  const CELL = CANVAS_SIZE / GRID;
+
+  const CENTER_SIZE = 3;
+  const ORBITER_SIZE = 2;
+  const ORBITERS_DEFAULT = 3;
+  const SPEED_MIN = 0.003;
+  const SPEED_MAX = 0.06;
+  const RX_MIN_RATIO = 0.18, RX_MAX_RATIO = 0.45;
+  const RY_MIN_RATIO = 0.12, RY_MAX_RATIO = 0.45;
+  const REVERSE_CHANCE = 0.5;
+
+  const GRID_LINE_COLOR  = 'rgba(230,230,230,0.10)';
+  const STAR_COLOR       = '#ffffff';
+  const ORBITER_COLOR    = '#dadada';
+  const ORBIT_LINE_COLOR = 'rgba(255,255,255,0.1)';
+  const ORBIT_LINE_WIDTH = 1;
+
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const bg = document.createElement('canvas');
+  const g  = bg.getContext('2d');
+
+  function setupCanvases(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = CANVAS_SIZE * dpr;
+    canvas.height = CANVAS_SIZE * dpr;
+    bg.width = CANVAS_SIZE * dpr;
+    bg.height = CANVAS_SIZE * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    g.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  let sims = [];
+
+  function makeCellSim(cellX, cellY){
+    const cx = Math.floor(cellX*CELL + CELL/2);
+    const cy = Math.floor(cellY*CELL + CELL/2);
+    const half = CELL/2;
+    const orbiters = [];
+    for (let i=0; i<ORBITERS_DEFAULT; i++){
+      const rx  = rand(half*RX_MIN_RATIO, half*RX_MAX_RATIO);
+      const ry  = rand(half*RY_MIN_RATIO, half*RY_MAX_RATIO);
+      const rot = rand(0, Math.PI*2);
+      const ang = rand(0, Math.PI*2);
+      const sgn = Math.random() < REVERSE_CHANCE ? -1 : 1;
+      const spd = sgn * rand(SPEED_MIN, SPEED_MAX);
+      orbiters.push({ rx, ry, rot, ang, spd });
+    }
+    return { cx, cy, orbiters };
+  }
+
+  function buildSims(){
+    const arr = [];
+    for (let y=0; y<GRID; y++) for (let x=0; x<GRID; x++) arr.push(makeCellSim(x,y));
+    return arr;
+  }
+
+  function drawBackground(){
+    g.save();
+    g.setTransform(1,0,0,1,0,0);
+    g.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+    g.fillStyle = '#111216';
+    g.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+
+    g.strokeStyle = GRID_LINE_COLOR;
+    g.lineWidth = 1;
+    g.beginPath();
+    for (let i=1; i<GRID; i++){
+      g.moveTo(Math.floor(i*CELL)+0.5, 0);
+      g.lineTo(Math.floor(i*CELL)+0.5, CANVAS_SIZE);
+      g.moveTo(0, Math.floor(i*CELL)+0.5);
+      g.lineTo(CANVAS_SIZE, Math.floor(i*CELL)+0.5);
+    }
+    g.stroke();
+
+    g.strokeStyle = ORBIT_LINE_COLOR;
+    g.lineWidth = ORBIT_LINE_WIDTH;
+    for (const sim of sims){
+      for (const o of sim.orbiters){
+        g.beginPath();
+        if (g.ellipse) g.ellipse(sim.cx, sim.cy, o.rx, o.ry, o.rot, 0, Math.PI*2);
+        else { g.save(); g.translate(sim.cx, sim.cy); g.rotate(o.rot); g.scale(o.rx, o.ry); g.arc(0,0,1,0,Math.PI*2); g.restore(); }
+        g.stroke();
+      }
+    }
+    g.restore();
+  }
+
+  function reset(){ sims = buildSims(); drawBackground(); }
+
+  function frame(){
+    ctx.drawImage(bg, 0, 0);
+    for (const sim of sims){
+      drawCore(sim.cx, sim.cy, CENTER_SIZE, STAR_COLOR);
+      for (const o of sim.orbiters){
+        o.ang += o.spd;
+        const cosT = Math.cos(o.ang), sinT = Math.sin(o.ang);
+        const cosR = Math.cos(o.rot), sinR = Math.sin(o.rot);
+        const ex = cosT * o.rx, ey = sinT * o.ry;
+        const px = Math.round(sim.cx + ex*cosR - ey*sinR);
+        const py = Math.round(sim.cy + ex*sinR + ey*cosR);
+        drawSquare(px, py, ORBITER_SIZE, ORBITER_COLOR);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function drawCore(cx, cy, size, color){
+    const x = Math.round(cx - Math.floor(size/2));
+    const y = Math.round(cy - Math.floor(size/2));
+    ctx.fillStyle = color; ctx.fillRect(x, y, size, size);
+  }
+  function drawSquare(cx, cy, size, color){
+    const x = Math.round(cx - Math.floor(size/2));
+    const y = Math.round(cy - Math.floor(size/2));
+    ctx.fillStyle = color; ctx.fillRect(x, y, size, size);
+  }
+  function rand(a,b){ return a + Math.random()*(b-a); }
+
+  // Boot
+  setupCanvases();
+  reset();
+  requestAnimationFrame(frame);
+
+  // Reset button
+  document.getElementById('resetBtn').addEventListener('click', reset);
+
+  // Typed title
+  new Typed('#typed-text', {
+    strings: ['Hello, world','Day 6','Orbital - Halcyon.mp3'],
+    typeSpeed: 75, backSpeed: 75, backDelay: 5000, loop: true
+  });
+})();
+</script>
+</body>
+</html>

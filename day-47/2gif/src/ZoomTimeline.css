@@ -1,0 +1,131 @@
+.zoom-timeline-wrapper {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.zoom-timeline-control {
+    position: relative;
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.zoom-timeline-track {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background-color: var(--surface-1);
+    border-radius: 3px;
+    overflow: visible;
+    border: 1px solid var(--border-subtle);
+}
+
+.zoom-trim-reference {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+}
+
+.zoom-region {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: rgba(0, 255, 136, 0.15);
+    border-left: 2px solid var(--success);
+    border-right: 2px solid #e67e22;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.zoom-marker {
+    position: absolute;
+    top: -20px;
+    bottom: 0;
+    width: 32px; /* Larger hit area */
+    transform: translateX(-50%);
+    z-index: 15;
+    cursor: ew-resize;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.15s;
+    pointer-events: auto; /* Ensure markers are interactive */
+}
+
+.zoom-marker:hover {
+    transform: translateX(-50%) scale(1.05);
+}
+
+.zoom-marker:active {
+    transform: translateX(-50%) scale(0.95);
+}
+
+.zoom-marker.marker-in .marker-icon {
+    background-color: var(--success);
+}
+
+.zoom-marker.marker-in .marker-line {
+    background-color: var(--success);
+}
+
+.zoom-marker.marker-out .marker-icon {
+    background-color: #e67e22;
+}
+
+.zoom-marker.marker-out .marker-line {
+    background-color: #e67e22;
+}
+
+.marker-icon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+    flex-shrink: 0;
+}
+
+.marker-line {
+    width: 2px;
+    height: 100%;
+    margin-top: 2px;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.zoom-playhead {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background-color: var(--accent);
+    z-index: 20;
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(0, 168, 255, 0.5);
+    opacity: 0.6;
+}
+
+.zoom-timeline-disabled {
+    padding: 16px;
+    background-color: var(--surface-1);
+    border: 1px dashed var(--border-subtle);
+    border-radius: 3px;
+    text-align: center;
+}
+
+.zoom-timeline-disabled p {
+    font-size: 12px;
+    color: var(--text-disabled);
+    font-family: var(--font-mono);
+    margin: 0;
+}

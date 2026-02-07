@@ -1,0 +1,179 @@
+/* Base Styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+    margin: 0;
+    position: relative;
+}
+
+/* Grid Layout */
+.grid {
+    position: absolute;
+    inset: 5%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.dot {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out;
+    transform: translate(-50%, -50%);
+}
+
+.dot.active {
+    background-color: hsl(var(--dot-hue, 0), 100%, 49%);
+    box-shadow: 0 0 10px rgb(255, 255, 255);
+}
+
+.trail-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+/* Content Area */
+.content {
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    position: relative;
+    z-index: 10;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+    border-radius: 6px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background: teal;
+    color: white;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* Top Bar */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s ease;
+}
+
+/* Control Bar */
+.control-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s ease;
+}
+
+.control-bar .slider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+    min-width: 200px;
+}
+
+.control-bar .slider:hover {
+    opacity: 1;
+}
+
+.control-bar label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    min-width: 50px;
+}
+
+/* Slider Input Styles */
+.slider-input {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+}
+
+#hue.slider-input {
+    background: linear-gradient(to right,
+        hsl(0, 100%, 49%),
+        hsl(60, 100%, 49%),
+        hsl(120, 100%, 49%),
+        hsl(180, 100%, 49%),
+        hsl(240, 100%, 49%),
+        hsl(300, 100%, 49%),
+        hsl(360, 100%, 49%)
+    );
+}
+
+.slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: rgb(184, 184, 184);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.slider-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.slider-input::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: rgb(184, 184, 184);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease;
+}
+
+.slider-input::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}

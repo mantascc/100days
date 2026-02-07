@@ -1,0 +1,2 @@
+- Only use typography from global styles.css if you want to add a new one, ask
+- Only use colors from global styles.css if you want to add a new one, ask

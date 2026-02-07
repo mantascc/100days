@@ -1,0 +1,131 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border_box;
+}
+
+body {
+    background-color: #000;
+    overflow: hidden;
+    font-family: monospace;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    width: 100vw;
+    height: 100vh;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 1.2rem;
+    pointer-events: none;
+    opacity: 0.7;
+    transition: opacity 0.5s ease;
+    z-index: 100;
+}
+
+#overlay.hidden {
+    opacity: 0;
+}
+
+/* Documentation Layout (2.html) */
+.doc-layout {
+    overflow-y: auto;
+    /* Allow scrolling */
+    padding: 2rem;
+}
+
+.stack-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    padding-bottom: 4rem;
+}
+
+.prose {
+    color: #e0e0e0;
+    line-height: 1.6;
+}
+
+.prose h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: normal;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+}
+
+.prose h2 {
+    font-size: 1.2rem;
+    font-weight: normal;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.prose p {
+    margin-bottom: 1rem;
+    color: #aaa;
+}
+
+.prose hr {
+    border: 0;
+    border-top: 1px solid #333;
+    margin: 1rem 0;
+}
+
+.sketch-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.canvas-wrapper {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #333;
+    background: #000;
+}
+
+/* Grid Layout (3.html) */
+.grid-layout-3 {
+    display: flex;
+    /* Center vertical/horizontal if needed, but spec says 75% width */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.grid-container-3 {
+    width: 75vw;
+    /* margin: 0 auto; - handled by flex justify-center on body */
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 20px;
+    /* Space between cubes? User didn't specify, but cubes imply separation usually. */
+}
+
+.cube {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #000;
+    border: 1px solid #333;
+    position: relative;
+}

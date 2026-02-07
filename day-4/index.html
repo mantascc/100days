@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Random Walk</title>
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --fg: #e6e6e6;
+      --grid: rgba(255,255,255,.06);
+    }
+    html, body { height: 100%; margin: 0; background: var(--bg); }
+    body { display: grid; place-items: center; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: var(--fg); }
+
+    #stage { position: relative; width: 80vmin; height: 80vmin; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--grid); overflow: hidden; }
+    canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; image-rendering: crisp-edges; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="c" width="600" height="600"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Grid settings
+    const grid = 10;
+
+    // Agent settings
+    const step = 2;                 // agent moves on a 2px lattice
+    const AGENT_SIZE = 2;           // 2×2 px white agents
+    const AGENT_COUNT = 400;         // <<< change this number to spawn more/fewer agents
+
+    // Lifetime from URL param (?life=seconds) or default 10
+    const params = new URLSearchParams(window.location.search);
+    const lifetime = Math.max(0.5, parseFloat(params.get('life')) || 10);
+
+    // Create agents
+    const agents = Array.from({ length: AGENT_COUNT }, () => ({
+      x: Math.floor(Math.random() * (W / step)) * step,
+      y: Math.floor(Math.random() * (H / step)) * step,
+    }));
+
+    // Trail: shared array of {x,y,t} for all agents
+    const trail = [];
+
+    // Fixed-timestep walker
+    let stepAccumulator = 0;
+    const stepInterval = 70; // ms
+
+    function randomWalkStep() {
+      for (let i = 0; i < agents.length; i++) {
+        const a = agents[i];
+        const r = Math.floor(Math.random() * 4);
+        if (r === 0) a.x += step;      // right
+        else if (r === 1) a.x -= step; // left
+        else if (r === 2) a.y += step; // down
+        else a.y -= step;              // up
+
+        // Wrap
+        if (a.x < 0) a.x = W - step;
+        if (a.y < 0) a.y = H - step;
+        if (a.x >= W) a.x = 0;
+        if (a.y >= H) a.y = 0;
+
+        // Leave a breadcrumb
+        trail.push({ x: a.x, y: a.y, t: performance.now() });
+      }
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += grid) {
+        ctx.moveTo(x + 0.5, 0);
+        ctx.lineTo(x + 0.5, H);
+      }
+      for (let y = 0; y <= H; y += grid) {
+        ctx.moveTo(0, y + 0.5);
+        ctx.lineTo(W, y + 0.5);
+      }
+      ctx.stroke();
+    }
+
+    function render(now) {
+      // Clear background
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#0f0f12';
+      ctx.fillRect(0, 0, W, H);
+
+      // Grid
+      drawGrid();
+
+      // Step logic
+      stepAccumulator += (render.lastNow ? (now - render.lastNow) : 0);
+      while (stepAccumulator >= stepInterval) {
+        randomWalkStep();
+        stepAccumulator -= stepInterval;
+      }
+      render.lastNow = now;
+
+      // Draw fading trail (light grey)
+      const cutoff = now - lifetime * 1000;
+      while (trail.length && trail[0].t < cutoff - 1000) trail.shift();
+
+      for (let i = 0; i < trail.length; i++) {
+        const p = trail[i];
+        const age = (now - p.t) / 1000;
+        if (age > lifetime) continue;
+        const a = Math.max(0, 1 - age / lifetime);
+        ctx.fillStyle = `rgba(220,220,220,${(0.75 * a).toFixed(3)})`;
+        ctx.fillRect(p.x, p.y, AGENT_SIZE, AGENT_SIZE);
+      }
+
+      // Draw agents (white)
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < agents.length; i++) {
+        const a = agents[i];
+        ctx.fillRect(a.x, a.y, AGENT_SIZE, AGENT_SIZE);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // Seed initial breadcrumbs so something is visible immediately
+    const now0 = performance.now();
+    for (let i = 0; i < agents.length; i++) {
+      trail.push({ x: agents[i].x, y: agents[i].y, t: now0 });
+    }
+
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

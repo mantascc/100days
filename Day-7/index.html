@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apophenia — Proximity Links on Grid</title>
+  <style>
+    html, body { height:100%; margin:0; background:#0f0f12; }
+    body { display:grid; place-items:center; color:#e6e6e6; font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+
+    /* Title wrapper */
+    #wrap{ display:grid; place-items:center; gap:12px; }
+    #title{ margin:0; font-weight:300; letter-spacing:.02em; color:#808080; font-size:clamp(12px, 2.6vw, 18px); }
+
+    /* Responsive square stage: 80vw on mobile, 60vw on >=768px */
+    #stage { position:relative; width:min(80vw, 80vh); aspect-ratio:1 / 1; border-radius:12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); overflow:hidden; }
+    @media (min-width:768px){ #stage { width:min(60vw, 80vh); } } }
+
+    canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering: pixelated; }
+
+    /* Tune button */
+    #tuneBtn{ position:fixed; right:16px; bottom:16px; display:inline-flex; align-items:center; gap:8px; padding:10px 12px; background:#1a1a20; color:#e6e6e6; border:1px solid rgba(255,255,255,.12); border-radius:10px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.35); }
+    #tuneBtn svg{ width:16px; height:16px; }
+    #tuneBtn:hover{ background:#22222a; }
+
+    /* Modal dialog */
+    dialog#paramsDialog { border:none; border-radius:12px; padding:0; background:#141418; color:#e6e6e6; box-shadow:0 24px 60px rgba(0,0,0,.5); width:min(480px, 90vw); }
+    .dlg-header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08); }
+    .dlg-title{ font-weight:600; font-size:14px; color:#cfcfcf; }
+    .dlg-body{ padding:14px 16px; display:grid; gap:14px; }
+    .row{ display:grid; gap:6px; }
+    .row label{ font-size:12px; color:#a8a8a8; }
+    .row .control{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .seg{ display:inline-flex; border:1px solid rgba(255,255,255,.12); border-radius:10px; overflow:hidden; }
+    .seg button{ background:#1a1a20; color:#e6e6e6; padding:6px 10px; border:none; cursor:pointer; font:inherit; }
+    .seg button[aria-pressed="true"]{ background:#2a2a30; }
+    input[type="range"]{ width:100%; }
+    .hint{ font-size:11px; color:#8a8a8a; }
+    .dlg-footer{ display:flex; justify-content:flex-end; gap:8px; padding:14px 16px; border-top:1px solid rgba(255,255,255,.08); }
+    .btn{ padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#1a1a20; color:#e6e6e6; cursor:pointer; }
+    .btn.primary{ background:#2c2c35; border-color:rgba(255,255,255,.18); }
+    .btn:hover{ filter:brightness(1.05); }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+</head>
+<body>
+  <div id="wrap">
+    <h1 id="title"><span id="typed-text"></span></h1>
+    <div id="stage"><canvas id="c"></canvas></div>
+  </div>
+
+  <!-- Tune button -->
+  <button id="tuneBtn" title="Tune parameters" aria-haspopup="dialog" aria-controls="paramsDialog">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h10"/><path d="M4 6h2"/><path d="M10 12h10"/><path d="M4 12h6"/><path d="M10 18h10"/><path d="M4 18h8"/><circle cx="8" cy="6" r="2"/><circle cx="14" cy="12" r="2"/><circle cx="12" cy="18" r="2"/></svg>
+    Tune
+  </button>
+
+  <!-- Modal -->
+  <dialog id="paramsDialog">
+    <form method="dialog">
+      <div class="dlg-header">
+        <div class="dlg-title">Parameters</div>
+        <button id="closeDlg" class="btn" value="cancel" type="submit">Close</button>
+      </div>
+      <div class="dlg-body">
+        <div class="row">
+          <label for="nodesSlider">Node count</label>
+          <div class="control">
+            <input id="nodesSlider" type="range" min="0" max="5" step="1" value="4" />
+            <div id="nodesValue" class="hint">400</div>
+          </div>
+          <div class="hint">Options: 50, 100, 150, 250, 400, 600</div>
+        </div>
+
+        <div class="row">
+          <label for="speedSlider">Speed</label>
+          <div class="control">
+            <input id="speedSlider" type="range" min="0" max="1" step="0.01" value="0.6" />
+            <div id="speedValue" class="hint">0.60</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Link strength</label>
+          <div id="linkSeg" class="control seg" role="group" aria-label="Link strength">
+            <button type="button" data-val="30" aria-pressed="true">30</button>
+            <button type="button" data-val="60" aria-pressed="false">60</button>
+            <button type="button" data-val="90" aria-pressed="false">90</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Noise</label>
+          <div id="noiseSeg" class="control seg" role="group" aria-label="Noise">
+            <button type="button" data-val="0" aria-pressed="false">0</button>
+            <button type="button" data-val="5" aria-pressed="false">5</button>
+            <button type="button" data-val="10" aria-pressed="true">10</button>
+          </div>
+        </div>
+      </div>
+      <div class="dlg-footer">
+        <button class="btn" value="cancel" type="submit">Cancel</button>
+        <button id="applyBtn" class="btn primary" value="default" type="submit">Apply</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+  (() => {
+    'use strict';
+
+    // Run after DOM is ready to ensure #stage has a layout size
+    function onReady(fn){
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once:true });
+      else fn();
+    }
+
+    onReady(() => {
+      // Typed title — single initialization
+      const typedTitle = new Typed('#typed-text', {
+        strings: ['Apophenia'],
+        typeSpeed: 75,
+        backSpeed: 75,
+        backDelay: 3000,
+        loop: true
+      });
+
+      // —— Config (mutable to support UI) —————————————————————
+      let SIZE;                  // dynamic, set from stage width
+      const GRID = 20;           // grid spacing
+      const NODE_SIZE = 2;       // 2×2 px nodes
+
+      const NODE_OPTIONS = [50,100,150,250,400,600];
+      let NODE_COUNT = 400;      // default
+      let SPEED = 0.6;           // 0–1
+      let LINK_DIST = 30;        // 30/60/90
+      let NOISE = 10;            // 0/5/10
+
+      // Visual
+      const BG = '#0f0f12';
+      const GRID_STROKE = 'rgba(255,255,255,0.10)';
+      const NODE_GREY = 'rgba(230,230,230,0.70)';
+      const LINK_WHITE = 'rgba(255,255,255,1)';
+
+      // DOM
+      const stage = document.getElementById('stage');
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d');
+      const dlg = document.getElementById('paramsDialog');
+      const tuneBtn = document.getElementById('tuneBtn');
+      const nodesSlider = document.getElementById('nodesSlider');
+      const nodesValue = document.getElementById('nodesValue');
+      const speedSlider = document.getElementById('speedSlider');
+      const speedValue = document.getElementById('speedValue');
+      const linkSeg = document.getElementById('linkSeg');
+      const noiseSeg = document.getElementById('noiseSeg');
+      const applyBtn = document.getElementById('applyBtn');
+
+      let nodes = [];
+
+      function setupCanvas() {
+        if (!stage) return; // safety
+        const cw = stage.clientWidth || stage.offsetWidth || 0;
+        if (!cw) return;    // not laid out yet — caller will retry
+
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const newSize = Math.floor(cw);
+        const prevSize = SIZE || newSize;
+        SIZE = newSize;
+
+        if (nodes && nodes.length && prevSize && SIZE && prevSize !== SIZE) {
+          const s = SIZE / prevSize;
+          for (const n of nodes) { n.x *= s; n.y *= s; }
+        }
+
+        canvas.width = Math.floor(SIZE * dpr);
+        canvas.height = Math.floor(SIZE * dpr);
+        canvas.style.width = SIZE + 'px';
+        canvas.style.height = SIZE + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function drawGrid() {
+        ctx.fillStyle = BG;
+        ctx.fillRect(0, 0, SIZE, SIZE);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = GRID_STROKE;
+        ctx.beginPath();
+        for (let x = 0; x <= SIZE; x += GRID) {
+          const px = Math.round(x) + 0.5;
+          ctx.moveTo(px, 0); ctx.lineTo(px, SIZE);
+        }
+        for (let y = 0; y <= SIZE; y += GRID) {
+          const py = Math.round(y) + 0.5;
+          ctx.moveTo(0, py); ctx.lineTo(SIZE, py);
+        }
+        ctx.stroke();
+      }
+
+      class Node {
+        constructor() {
+          const margin = 40;
+          this.x = SIZE/2 + (Math.random()*2-1) * (SIZE/2 - margin);
+          this.y = SIZE/2 + (Math.random()*2-1) * (SIZE/2 - margin);
+          const a = Math.random() * Math.PI * 2;
+          this.vx = Math.cos(a) * SPEED;
+          this.vy = Math.sin(a) * SPEED;
+        }
+        step() {
+          const jitter = (NOISE/10) * 0.3; // 0–10 → ~0–0.3 rad
+          const a = Math.atan2(this.vy, this.vx) + (Math.random()*2-1)*jitter;
+          const s = SPEED; // live speed (UI updates apply instantly)
+          this.vx = Math.cos(a) * s;
+          this.vy = Math.sin(a) * s;
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < -10) this.x = SIZE+10;
+          if (this.x > SIZE+10) this.x = -10;
+          if (this.y < -10) this.y = SIZE+10;
+          if (this.y > SIZE+10) this.y = -10;
+        }
+        draw() {
+          ctx.fillStyle = NODE_GREY;
+          const half = NODE_SIZE/2;
+          ctx.fillRect(Math.round(this.x - half), Math.round(this.y - half), NODE_SIZE, NODE_SIZE);
+        }
+      }
+
+      function resetNodes() { nodes = Array.from({length:NODE_COUNT}, () => new Node()); }
+
+      function drawLinks() {
+        for (let i = 0; i < nodes.length; i++) {
+          const a = nodes[i];
+          for (let j = i+1; j < nodes.length; j++) {
+            const b = nodes[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d2 = dx*dx + dy*dy;
+            if (d2 <= LINK_DIST*LINK_DIST) {
+              const d = Math.sqrt(d2);
+              const t = 1 - (d / LINK_DIST);
+              ctx.globalAlpha = 0.15 + 0.85 * t;
+              ctx.lineWidth = 1;
+              ctx.strokeStyle = LINK_WHITE;
+              ctx.beginPath();
+              ctx.moveTo(Math.round(a.x)+0.5, Math.round(a.y)+0.5);
+              ctx.lineTo(Math.round(b.x)+0.5, Math.round(b.y)+0.5);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
+          }
+        }
+      }
+
+      function frame() {
+        drawGrid();
+        drawLinks();
+        for (const n of nodes) n.draw();
+        for (const n of nodes) n.step();
+        requestAnimationFrame(frame);
+      }
+
+      function syncDialogFromState(){
+        // Node count
+        let idx = NODE_OPTIONS.indexOf(NODE_COUNT);
+        if (idx < 0) idx = 3; // fallback to 250 tick if mismatch
+        nodesSlider.value = String(idx);
+        nodesValue.textContent = String(NODE_OPTIONS[idx]);
+
+        // Speed
+        speedSlider.value = String(Number(SPEED).toFixed(2));
+        speedValue.textContent = Number(SPEED).toFixed(2);
+
+        // Link strength
+        [...linkSeg.querySelectorAll('button')].forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.val) === LINK_DIST)));
+
+        // Noise
+        [...noiseSeg.querySelectorAll('button')].forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.val) === NOISE)));
+      }
+
+      function applyDialogToState(){
+        // Node count
+        const newCount = NODE_OPTIONS[Number(nodesSlider.value)];
+        const countChanged = newCount !== NODE_COUNT;
+        NODE_COUNT = newCount;
+
+        // Speed
+        SPEED = Math.min(1, Math.max(0, Number(speedSlider.value)));
+
+        // Link strength
+        const lsBtn = linkSeg.querySelector('button[aria-pressed="true"]');
+        LINK_DIST = lsBtn ? Number(lsBtn.dataset.val) : LINK_DIST;
+
+        // Noise
+        const nzBtn = noiseSeg.querySelector('button[aria-pressed="true"]');
+        NOISE = nzBtn ? Number(nzBtn.dataset.val) : NOISE;
+
+        if (countChanged) resetNodes();
+      }
+
+      // UI wiring
+      tuneBtn.addEventListener('click', () => { syncDialogFromState(); dlg.showModal(); });
+      nodesSlider.addEventListener('input', () => { nodesValue.textContent = String(NODE_OPTIONS[Number(nodesSlider.value)]); });
+      speedSlider.addEventListener('input', () => { speedValue.textContent = Number(speedSlider.value).toFixed(2); });
+      linkSeg.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-val]');
+        if (!b) return;
+        linkSeg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', 'true');
+      });
+      noiseSeg.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-val]');
+        if (!b) return;
+        noiseSeg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', 'true');
+      });
+      applyBtn.addEventListener('click', (e) => { e.preventDefault(); applyDialogToState(); dlg.close(); });
+
+      // Initialize after layout is stable
+      function init() {
+        const attempt = () => {
+          setupCanvas();
+          if (!SIZE || SIZE <= 0) { requestAnimationFrame(attempt); return; }
+          resetNodes();
+          frame();
+          setTimeout(runTests, 0);
+        };
+        attempt();
+      }
+
+      // Guarded resize handler (only if stage is still in DOM)
+      window.addEventListener('resize', () => {
+        if (!document.body.contains(stage)) return;
+        setupCanvas();
+      });
+
+      // —— Simple console tests ————————————————————————
+      function runTests(){
+        const R = [];
+        const ok = (name, pass, info='') => R.push({name, pass, info});
+        try {
+          ok('Stage exists', !!stage);
+          ok('Typed instance created', !!typedTitle && typeof typedTitle.start === 'function');
+          ok('SIZE computed (>0)', typeof SIZE === 'number' && SIZE > 0, `SIZE=${SIZE}`);
+
+          const dpr = Math.max(1, window.devicePixelRatio || 1);
+          ok('Canvas size ≈ SIZE×dpr',
+             Math.abs(canvas.width  - Math.floor(SIZE * dpr)) <= 1 &&
+             Math.abs(canvas.height - Math.floor(SIZE * dpr)) <= 1,
+             `canvas=(${canvas.width},${canvas.height}), SIZE=${SIZE}, dpr=${dpr}`);
+
+          ok('Node count in allowed set', [50,100,150,250,400,600].includes(nodes.length), `nodes=${nodes.length}`);
+          ok('Link distance in {30,60,90}', [30,60,90].includes(LINK_DIST), `linkDist=${LINK_DIST}`);
+          ok('Noise in {0,5,10}', [0,5,10].includes(NOISE), `noise=${NOISE}`);
+          ok('Speed within 0..1', SPEED >= 0 && SPEED <= 1, `speed=${SPEED}`);
+
+          // Speed effect sample
+          const tmp = new Node();
+          const { x: x0, y: y0 } = tmp;
+          tmp.step();
+          const d1 = Math.hypot(tmp.x - x0, tmp.y - y0);
+          const prevS = SPEED; SPEED = 1; tmp.step(); const d2 = Math.hypot(tmp.x - x0, tmp.y - y0); SPEED = prevS;
+          ok('Higher speed → larger step', d2 > d1, `d1=${d1.toFixed(3)}, d2@S=1=${d2.toFixed(3)}`);
+        } catch (e) {
+          console.error('[Apophenia Tests] error', e);
+        }
+        const summary = R.map(r => `${r.pass ? 'PASS' : 'FAIL'} — ${r.name}${r.info ? ' — ' + r.info : ''}`).join('\n');
+        console.log('%c[Apophenia Tests]\n' + summary, 'color:#9fe6a0');
+      }
+
+      init();
+    });
+  })();
+  </script>
+</body>
+</html>

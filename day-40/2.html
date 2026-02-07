@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio-Reactive Sketches</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="doc-layout">
+
+    <div id="overlay">Click to Start</div>
+
+    <main class="stack-container">
+
+        <header class="prose">
+            <h1>Audio Sketches</h1>
+            <p>A series of explorations into mapping sound to visual properties.</p>
+        </header>
+
+        <!-- 0 Direct -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>0 — Direct</h2>
+                <hr>
+                <p><strong>One value → one property.</strong></p>
+                <p>Amplitude directly maps to circle radius. No filtering, no transformation. The raw signal drives the
+                    visual state 1:1.</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s0"></canvas>
+            </div>
+        </section>
+
+        <!-- 1 Scaled -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>1 — Scaled</h2>
+                <hr>
+                <p><strong>One value → one property, with range mapping.</strong></p>
+                <p>Amplitude (0–255) is remapped to Opacity (0.1–1.0). The visual output is constrained to a useful
+                    aesthetic range.</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s1"></canvas>
+            </div>
+        </section>
+
+        <!-- 2 Threshold -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>2 — Threshold</h2>
+                <hr>
+                <p><strong>Value triggers state change.</strong></p>
+                <p>If amplitude > 180, the state is "Flash". Below, it is "Dark". A binary reaction to an analog signal.
+                </p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s2"></canvas>
+            </div>
+        </section>
+
+        <!-- 3 Smoothed -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>3 — Smoothed</h2>
+                <hr>
+                <p><strong>Value filtered over time.</strong></p>
+                <p>We linear interpolate (Lerp) toward the current amplitude. The circle "breathes" rather than
+                    twitches. It has momentum.</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s3"></canvas>
+            </div>
+        </section>
+
+        <!-- 4 Derived -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>4 — Derived</h2>
+                <hr>
+                <p><strong>Computed property from raw data.</strong></p>
+                <p>We calculate the <em>rate of change</em> (current - previous). Visuals react to the derivative—the
+                    "impulse"—rather than the volume.</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s4"></canvas>
+            </div>
+        </section>
+
+        <!-- 5 Cross-mapped -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>5 — Cross-mapped</h2>
+                <hr>
+                <p><strong>Multiple inputs → multiple outputs.</strong></p>
+                <p>Amplitude → size. Rate of change → rotation speed. A system of relationships creates a more complex
+                    behavior.</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s5"></canvas>
+            </div>
+        </section>
+
+        <!-- 6 Emergent -->
+        <section class="sketch-section">
+            <div class="prose">
+                <h2>6 — Emergent</h2>
+                <hr>
+                <p><strong>Sound feeds rules, not properties.</strong></p>
+                <p>Amplitude spawns particles. Silence applies gravity. The sound shapes a system that runs on its own
+                    internal logic.</p>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="s6"></canvas>
+            </div>
+        </section>
+
+        <footer class="prose">
+            <hr>
+            <p>End of Sketches.</p>
+        </footer>
+
+    </main>
+
+    <script src="script-2.js"></script>
+</body>
+
+</html>

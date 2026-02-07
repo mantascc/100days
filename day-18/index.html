@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cellular Automaton</title>
+<style>
+  html,body{height:100%;margin:0;background:#0f0f12;color:#bbb;font:14px/1.4 system-ui}
+  .wrap{height:100%;display:grid;place-items:center;gap:12px}
+  canvas{image-rendering:pixelated;box-shadow:0 0 0 1px #222, 0 4px 30px rgba(0,0,0,.35)}
+  .hint{opacity:.8}
+  
+  /* Mobile buttons */
+  .mobile-controls{display:none;gap:12px;margin-top:12px}
+  .mobile-btn{
+    padding:12px 24px;background:#333;border:1px solid #555;border-radius:6px;
+    color:#bbb;font:14px/1.4 system-ui;cursor:pointer;user-select:none;
+    transition:background 0.2s, border-color 0.2s
+  }
+  .mobile-btn:hover{background:#444;border-color:#666}
+  .mobile-btn:active{background:#222;border-color:#444}
+  
+  /* Show buttons on mobile */
+  @media (max-width: 768px) {
+    .mobile-controls{display:flex;justify-content:center}
+    .hint{display:none}
+    
+    /* Make canvas fit screen width with 5% padding */
+    .wrap{padding:5%;gap:16px}
+    canvas{
+      width:90vw !important;
+      height:90vw !important;
+      max-width:90vw;
+      max-height:90vw;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <canvas id="c" width="240" height="240"></canvas>
+  <div class="hint">Press SPACE to step, R to reset.</div>
+  <div class="mobile-controls">
+    <button class="mobile-btn" id="stepBtn">Step</button>
+    <button class="mobile-btn" id="resetBtn">Reset</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  // Scale up visually without changing logical resolution
+  const scale = Math.floor(Math.min(innerWidth, innerHeight) / 260);
+  canvas.style.width  = (canvas.width  * scale) + 'px';
+  canvas.style.height = (canvas.height * scale) + 'px';
+
+  const W = canvas.width, H = canvas.height;
+
+  // State arrays (0 = white, 1 = black)
+  const state  = Array.from({length: W}, () => new Uint8Array(H));
+  const memory = Array.from({length: W}, () => new Uint8Array(H));
+
+  // Seed with random black/white pixels, but keep 1px border white
+  for (let x = 0; x < W; x++)
+    for (let y = 0; y < H; y++)
+      state[x][y] = (x === 0 || x === W-1 || y === 0 || y === H-1) ? 0 : (Math.random() < 0.45 ? 1 : 0);
+
+  // Render current state to canvas
+  function render() {
+    const img = ctx.createImageData(W, H);
+    const d = img.data;
+    let i = 0;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const v = state[x][y] ? 0 : 255; // black if 1, white if 0
+        d[i++] = v; d[i++] = v; d[i++] = v; d[i++] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  // One generation step (run on key press)
+  function step() {
+    // exclude a 1px border
+    for (let x = 1; x < W - 1; x++) {
+      for (let y = 1; y < H - 1; y++) {
+        let k = 0; // count black neighbors
+        for (let i = -1; i <= 1; i++) {
+          for (let j = -1; j <= 1; j++) {
+            if (i === 0 && j === 0) continue;
+            if (state[x + i][y + j] === 1) k++;
+          }
+        }
+        if (k === 3)       memory[x][y] = 1;   // become black
+        else if (k >= 5)   memory[x][y] = 0;   // become white
+        else               memory[x][y] = state[x][y]; // unchanged
+      }
+    }
+
+    // copy border unchanged + inner updated
+    for (let x = 0; x < W; x++) {
+      for (let y = 0; y < H; y++) {
+        state[x][y] = (x>=1 && x<W-1 && y>=1 && y<H-1) ? memory[x][y] : state[x][y];
+      }
+    }
+    render();
+  }
+
+  // Initial paint
+  render();
+
+  // Reset function to regenerate random initial state
+  function reset() {
+    for (let x = 0; x < W; x++)
+      for (let y = 0; y < H; y++)
+        state[x][y] = (x === 0 || x === W-1 || y === 0 || y === H-1) ? 0 : (Math.random() < 0.45 ? 1 : 0);
+    render();
+  }
+
+  // Handle key presses
+  addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'r') {
+      reset();
+    } else if (e.code === 'Space') {
+      e.preventDefault(); // Prevent page scroll
+      step();
+    }
+  });
+
+  // Handle mobile button clicks
+  document.getElementById('stepBtn').addEventListener('click', step);
+  document.getElementById('resetBtn').addEventListener('click', reset);
+})();
+</script>
+</body>
+</html>
