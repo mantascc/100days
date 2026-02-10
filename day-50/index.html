@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Execution Trace Graph</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0c;
+    color: #c8c8d0;
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+  }
+
+  /* LEFT PANEL */
+  .panel {
+    background: #0e0e12;
+    border-right: 1px solid #1a1a22;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .panel-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555566;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1a1a22;
+  }
+
+  .prompt-box {
+    background: #12121a;
+    border: 1px solid #1e1e2a;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #9090a0;
+    font-style: italic;
+  }
+
+  .prompt-box span {
+    color: #7b8cff;
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+  }
+
+  .step-item:hover {
+    background: #16161e;
+  }
+
+  .step-item.active {
+    background: #1a1a28;
+  }
+
+  .step-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #444455;
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .step-skill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: #444455;
+    transition: background 0.15s ease;
+  }
+
+  .step-item.active .step-skill-dot {
+    background: #7b8cff;
+  }
+
+  .step-name {
+    color: #a0a0b0;
+    font-weight: 400;
+  }
+
+  .step-item.active .step-name {
+    color: #e0e0f0;
+  }
+
+  /* DETAIL PANEL */
+  .detail-box {
+    background: #12121a;
+    border: 1px solid #1e1e2a;
+    border-radius: 8px;
+    padding: 16px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .detail-box.visible {
+    display: flex;
+  }
+
+  .detail-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #444455;
+  }
+
+  .detail-value {
+    font-size: 13px;
+    color: #b0b0c0;
+    line-height: 1.5;
+  }
+
+  .detail-value.mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #7b8cff;
+  }
+
+  .detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #1a1a22;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #666677;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #444455;
+  }
+
+  /* CANVAS AREA */
+  .canvas-area {
+    position: relative;
+    overflow: hidden;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* SVG STYLES */
+  .edge-line {
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+  }
+
+  .edge-line.highlighted {
+    opacity: 0.9;
+    stroke-width: 2;
+  }
+
+  .edge-line.dimmed {
+    opacity: 0.08;
+  }
+
+  .edge-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #444455;
+    text-anchor: middle;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .edge-label.visible {
+    opacity: 1;
+  }
+
+  .node-group {
+    cursor: pointer;
+  }
+
+  .node-circle {
+    transition: all 0.3s ease;
+  }
+
+  .node-circle.dimmed {
+    opacity: 0.15;
+  }
+
+  .node-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: #888899;
+    text-anchor: middle;
+    pointer-events: none;
+    transition: fill 0.3s ease;
+  }
+
+  .node-label.highlighted {
+    fill: #e0e0f0;
+  }
+
+  .node-label.dimmed {
+    opacity: 0.15;
+  }
+
+  .node-sublabel {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    fill: #555566;
+    text-anchor: middle;
+    pointer-events: none;
+  }
+
+  .node-sublabel.dimmed {
+    opacity: 0.15;
+  }
+
+  .node-ring {
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .node-ring.active {
+    opacity: 0.6;
+  }
+
+  /* ARROW MARKERS */
+  .arrow-marker {
+    fill: #555566;
+  }
+
+  /* STEP SEQUENCE NUMBERS ON GRAPH */
+  .seq-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: #0a0a0c;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+    font-weight: 600;
+  }
+
+  /* FLOATING JSON TOGGLE */
+  .json-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #12121a;
+    border: 1px solid #1e1e2a;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #666677;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .json-toggle:hover {
+    background: #1a1a28;
+    color: #9090a0;
+  }
+
+  /* JSON OVERLAY */
+  .json-overlay {
+    position: absolute;
+    top: 52px;
+    right: 16px;
+    width: 480px;
+    max-height: calc(100vh - 80px);
+    background: #0e0e12;
+    border: 1px solid #1e1e2a;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 10;
+    display: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #8888aa;
+  }
+
+  .json-overlay.visible {
+    display: block;
+  }
+
+  .json-key { color: #7b8cff; }
+  .json-string { color: #6bcea0; }
+  .json-number { color: #e0a06b; }
+  .json-null { color: #555566; }
+  .json-bracket { color: #444455; }
+
+  /* PULSE ANIMATION */
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  .data-flow-particle {
+    fill: #444455;
+    opacity: 0;
+  }
+
+  .data-flow-particle.animate {
+    animation: flowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes flowPulse {
+    0% { opacity: 0; }
+    30% { opacity: 0.8; }
+    100% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="panel">
+    <div class="panel-header">Execution Trace</div>
+
+    <div class="prompt-box">
+      <span>"</span>Find EuroLeague standings and create a visualization comparing team budgets vs. win rates<span>"</span>
+    </div>
+
+    <div class="step-list" id="stepList"></div>
+
+    <div class="detail-box" id="detailBox">
+      <div class="detail-row">
+        <span class="detail-label">Skill</span>
+        <span class="detail-value mono" id="detailSkill"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Action</span>
+        <span class="detail-value" id="detailAction"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Input</span>
+        <span class="detail-value mono" id="detailInput"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Output</span>
+        <span class="detail-value mono" id="detailOutput"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Duration</span>
+        <span class="detail-value mono" id="detailDuration"></span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="panel-header">Skills</div>
+      <div class="legend-item"><div class="legend-dot"></div> reasoning</div>
+      <div class="legend-item"><div class="legend-dot"></div> web_search</div>
+      <div class="legend-item"><div class="legend-dot"></div> web_fetch</div>
+      <div class="legend-item"><div class="legend-dot"></div> code_execution</div>
+      <div class="legend-item"><div class="legend-dot"></div> file_creation</div>
+    </div>
+  </div>
+
+  <div class="canvas-area">
+    <button class="json-toggle" id="jsonToggle">{ } schema</button>
+    <div class="json-overlay" id="jsonOverlay"></div>
+    <svg id="graph"></svg>
+  </div>
+</div>
+
+<script>
+// ─── EXECUTION DATASET (JSON SCHEMA) ───
+const executionData = {
+  meta: {
+    id: "exec_001",
+    prompt: "Find EuroLeague standings and create a visualization comparing team budgets vs. win rates",
+    timestamp: "2026-02-10T14:32:00Z",
+    total_duration_ms: 12400,
+    skills_used: ["reasoning", "web_search", "web_fetch", "code_execution", "file_creation"],
+    status: "completed"
+  },
+  skill_graph: {
+    nodes: [
+      { id: "reasoning", type: "skill", label: "Reasoning" },
+      { id: "web_search", type: "skill", label: "Web Search" },
+      { id: "web_fetch", type: "skill", label: "Web Fetch" },
+      { id: "code_execution", type: "skill", label: "Code Execution" },
+      { id: "file_creation", type: "skill", label: "File Creation" }
+    ],
+    edges: [
+      { source: "reasoning", target: "web_search", type: "delegates_to" },
+      { source: "web_search", target: "web_fetch", type: "chains_into" },
+      { source: "web_search", target: "code_execution", type: "feeds_data_to" },
+      { source: "web_fetch", target: "code_execution", type: "feeds_data_to" },
+      { source: "code_execution", target: "file_creation", type: "produces" },
+      { source: "code_execution", target: "web_search", type: "validates_via" }
+    ]
+  },
+  execution_trace: [
+    {
+      step: 1,
+      id: "parse",
+      skill: "reasoning",
+      action: "decompose_prompt",
+      input: { type: "prompt", value: "user prompt" },
+      output: { type: "task_list", value: ["find_standings", "find_budgets", "merge", "visualize"] },
+      duration_ms: 800,
+      triggered_by: null
+    },
+    {
+      step: 2,
+      id: "search_standings",
+      skill: "web_search",
+      action: "search",
+      input: { type: "query", value: "EuroLeague 2025-26 standings" },
+      output: { type: "search_results", value: "raw_results_standings" },
+      duration_ms: 2100,
+      triggered_by: "parse"
+    },
+    {
+      step: 3,
+      id: "search_budgets",
+      skill: "web_search",
+      action: "search",
+      input: { type: "query", value: "EuroLeague team budgets 2025-26" },
+      output: { type: "search_results", value: "raw_results_budgets" },
+      duration_ms: 1900,
+      triggered_by: "parse"
+    },
+    {
+      step: 4,
+      id: "fetch_standings",
+      skill: "web_fetch",
+      action: "fetch_page",
+      input: { type: "url", value: "euroleague.net/standings" },
+      output: { type: "structured_data", value: "standings_table" },
+      duration_ms: 1400,
+      triggered_by: "search_standings",
+      reason: "search snippets insufficient — need full table"
+    },
+    {
+      step: 5,
+      id: "merge_data",
+      skill: "code_execution",
+      action: "transform",
+      input: { type: "datasets", value: ["standings_table", "raw_results_budgets"] },
+      output: { type: "dataset", value: "merged_budget_winrate" },
+      duration_ms: 2200,
+      triggered_by: ["fetch_standings", "search_budgets"]
+    },
+    {
+      step: 6,
+      id: "visualize",
+      skill: "code_execution",
+      action: "generate_chart",
+      input: { type: "dataset", value: "merged_budget_winrate" },
+      output: { type: "file", value: "scatter_plot.html" },
+      duration_ms: 2800,
+      triggered_by: "merge_data"
+    },
+    {
+      step: 7,
+      id: "deliver",
+      skill: "file_creation",
+      action: "present_file",
+      input: { type: "file", value: "scatter_plot.html" },
+      output: { type: "user_facing", value: "presented_artifact" },
+      duration_ms: 400,
+      triggered_by: "visualize"
+    }
+  ],
+  data_flow: [
+    { from: "parse", to: "search_standings", payload: "task: find_standings" },
+    { from: "parse", to: "search_budgets", payload: "task: find_budgets" },
+    { from: "search_standings", to: "fetch_standings", payload: "url + context" },
+    { from: "search_budgets", to: "merge_data", payload: "raw_results_budgets" },
+    { from: "fetch_standings", to: "merge_data", payload: "standings_table" },
+    { from: "merge_data", to: "visualize", payload: "merged_budget_winrate" },
+    { from: "visualize", to: "deliver", payload: "scatter_plot.html" }
+  ]
+};
+
+// ─── LAYOUT POSITIONS ───
+const positions = {
+  parse:             { x: 400, y: 80 },
+  search_standings:  { x: 240, y: 220 },
+  search_budgets:    { x: 560, y: 220 },
+  fetch_standings:   { x: 160, y: 370 },
+  merge_data:        { x: 400, y: 420 },
+  visualize:         { x: 400, y: 560 },
+  deliver:           { x: 400, y: 680 }
+};
+
+const ACCENT = "#7b8cff";
+const NODE_DEFAULT = "#444455";
+
+const skillColors = {
+  reasoning: NODE_DEFAULT,
+  web_search: NODE_DEFAULT,
+  web_fetch: NODE_DEFAULT,
+  code_execution: NODE_DEFAULT,
+  file_creation: NODE_DEFAULT
+};
+
+const nodeRadius = 24;
+
+// ─── RENDER STEP LIST ───
+const stepList = document.getElementById('stepList');
+const detailBox = document.getElementById('detailBox');
+
+executionData.execution_trace.forEach(step => {
+  const item = document.createElement('div');
+  item.className = 'step-item';
+  item.dataset.stepId = step.id;
+  item.innerHTML = `
+    <span class="step-number">${step.step}</span>
+    <div class="step-skill-dot"></div>
+    <span class="step-name">${step.id}</span>
+  `;
+  item.addEventListener('click', () => selectStep(step.id));
+  item.addEventListener('mouseenter', () => highlightNode(step.id));
+  item.addEventListener('mouseleave', () => clearHighlight());
+  stepList.appendChild(item);
+});
+
+// ─── RENDER SVG GRAPH ───
+const svg = document.getElementById('graph');
+const svgNS = "http://www.w3.org/2000/svg";
+
+// Create defs for arrow markers
+const defs = document.createElementNS(svgNS, "defs");
+
+// Single arrow marker
+["default", "accent"].forEach((key) => {
+  const color = key === "accent" ? ACCENT : NODE_DEFAULT;
+  const marker = document.createElementNS(svgNS, "marker");
+  marker.setAttribute("id", `arrow-${key}`);
+  marker.setAttribute("viewBox", "0 0 10 6");
+  marker.setAttribute("refX", "10");
+  marker.setAttribute("refY", "3");
+  marker.setAttribute("markerWidth", "10");
+  marker.setAttribute("markerHeight", "6");
+  marker.setAttribute("orient", "auto-start-reverse");
+  const path = document.createElementNS(svgNS, "path");
+  path.setAttribute("d", "M 0 0 L 10 3 L 0 6 z");
+  path.setAttribute("fill", color);
+  path.setAttribute("opacity", "0.5");
+  marker.appendChild(path);
+  defs.appendChild(marker);
+});
+
+svg.appendChild(defs);
+
+// Draw edges
+const edgeGroup = document.createElementNS(svgNS, "g");
+edgeGroup.setAttribute("class", "edges");
+
+executionData.data_flow.forEach((flow, i) => {
+  const from = positions[flow.from];
+  const to = positions[flow.to];
+
+  // Calculate angle for offset
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const offsetX = (dx / dist) * (nodeRadius + 8);
+  const offsetY = (dy / dist) * (nodeRadius + 8);
+
+  // Curved path
+  const midX = (from.x + to.x) / 2;
+  const midY = (from.y + to.y) / 2;
+  const perpX = -(to.y - from.y) * 0.08;
+  const perpY = (to.x - from.x) * 0.08;
+
+  const path = document.createElementNS(svgNS, "path");
+  const d = `M ${from.x + offsetX} ${from.y + offsetY} Q ${midX + perpX} ${midY + perpY} ${to.x - offsetX} ${to.y - offsetY}`;
+  path.setAttribute("d", d);
+  path.setAttribute("class", "edge-line");
+  path.setAttribute("stroke", NODE_DEFAULT);
+  path.setAttribute("marker-end", `url(#arrow-default)`);
+  path.dataset.from = flow.from;
+  path.dataset.to = flow.to;
+  edgeGroup.appendChild(path);
+
+  // Edge label
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", midX + perpX);
+  label.setAttribute("y", midY + perpY - 6);
+  label.setAttribute("class", "edge-label");
+  label.dataset.from = flow.from;
+  label.dataset.to = flow.to;
+  label.textContent = flow.payload;
+  edgeGroup.appendChild(label);
+});
+
+svg.appendChild(edgeGroup);
+
+// Draw nodes
+const nodeGroup = document.createElementNS(svgNS, "g");
+nodeGroup.setAttribute("class", "nodes");
+
+executionData.execution_trace.forEach(step => {
+  const pos = positions[step.id];
+  const g = document.createElementNS(svgNS, "g");
+  g.setAttribute("class", "node-group");
+  g.dataset.stepId = step.id;
+
+  // Outer ring (highlight)
+  const ring = document.createElementNS(svgNS, "circle");
+  ring.setAttribute("cx", pos.x);
+  ring.setAttribute("cy", pos.y);
+  ring.setAttribute("r", nodeRadius + 6);
+  ring.setAttribute("class", "node-ring");
+  ring.setAttribute("stroke", ACCENT);
+  ring.dataset.stepId = step.id;
+  g.appendChild(ring);
+
+  // Glow
+  const glow = document.createElementNS(svgNS, "circle");
+  glow.setAttribute("cx", pos.x);
+  glow.setAttribute("cy", pos.y);
+  glow.setAttribute("r", nodeRadius + 2);
+  glow.setAttribute("fill", ACCENT);
+  glow.setAttribute("opacity", "0");
+  glow.dataset.stepId = step.id;
+  glow.setAttribute("class", "node-glow");
+  g.appendChild(glow);
+
+  // Main circle
+  const circle = document.createElementNS(svgNS, "circle");
+  circle.setAttribute("cx", pos.x);
+  circle.setAttribute("cy", pos.y);
+  circle.setAttribute("r", nodeRadius);
+  circle.setAttribute("class", "node-circle");
+  circle.setAttribute("fill", "#12121a");
+  circle.setAttribute("stroke", NODE_DEFAULT);
+  circle.setAttribute("stroke-width", "1.5");
+  circle.dataset.stepId = step.id;
+  g.appendChild(circle);
+
+  // Step number inside circle
+  const num = document.createElementNS(svgNS, "text");
+  num.setAttribute("x", pos.x);
+  num.setAttribute("y", pos.y + 1);
+  num.setAttribute("class", "seq-number");
+  num.setAttribute("fill", NODE_DEFAULT);
+  num.textContent = step.step;
+  g.appendChild(num);
+
+  // Label below
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", pos.x);
+  label.setAttribute("y", pos.y + nodeRadius + 18);
+  label.setAttribute("class", "node-label");
+  label.dataset.stepId = step.id;
+  label.textContent = step.id;
+  g.appendChild(label);
+
+  // Skill sublabel
+  const sublabel = document.createElementNS(svgNS, "text");
+  sublabel.setAttribute("x", pos.x);
+  sublabel.setAttribute("y", pos.y + nodeRadius + 30);
+  sublabel.setAttribute("class", "node-sublabel");
+  sublabel.dataset.stepId = step.id;
+  sublabel.textContent = step.skill;
+  g.appendChild(sublabel);
+
+  // Duration indicator (tiny bar)
+  const maxDur = 3000;
+  const barW = Math.min((step.duration_ms / maxDur) * 40, 40);
+  const bar = document.createElementNS(svgNS, "rect");
+  bar.setAttribute("x", pos.x - barW / 2);
+  bar.setAttribute("y", pos.y + nodeRadius + 35);
+  bar.setAttribute("width", barW);
+  bar.setAttribute("height", 2);
+  bar.setAttribute("rx", 1);
+  bar.setAttribute("fill", NODE_DEFAULT);
+  bar.setAttribute("opacity", "0.4");
+  g.appendChild(bar);
+
+  g.addEventListener('click', () => selectStep(step.id));
+  g.addEventListener('mouseenter', () => highlightNode(step.id));
+  g.addEventListener('mouseleave', () => clearHighlight());
+  nodeGroup.appendChild(g);
+});
+
+svg.appendChild(nodeGroup);
+
+// ─── INTERACTIONS ───
+let selectedStep = null;
+
+function selectStep(stepId) {
+  selectedStep = stepId;
+  const step = executionData.execution_trace.find(s => s.id === stepId);
+
+  // Update step list
+  document.querySelectorAll('.step-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.stepId === stepId);
+  });
+
+  // Show detail
+  detailBox.classList.add('visible');
+  document.getElementById('detailSkill').textContent = step.skill;
+  document.getElementById('detailAction').textContent = step.action;
+  document.getElementById('detailInput').textContent = typeof step.input.value === 'object' ? JSON.stringify(step.input.value) : step.input.value;
+  document.getElementById('detailOutput').textContent = typeof step.output.value === 'object' ? JSON.stringify(step.output.value) : step.output.value;
+  document.getElementById('detailDuration').textContent = step.duration_ms + 'ms';
+
+  highlightNode(stepId);
+}
+
+function highlightNode(stepId) {
+  // Find connected edges
+  const connectedNodes = new Set([stepId]);
+  executionData.data_flow.forEach(flow => {
+    if (flow.from === stepId) connectedNodes.add(flow.to);
+    if (flow.to === stepId) connectedNodes.add(flow.from);
+  });
+
+  // Dim unconnected nodes, accent active
+  document.querySelectorAll('.node-circle').forEach(el => {
+    el.classList.toggle('dimmed', !connectedNodes.has(el.dataset.stepId));
+    el.setAttribute('stroke', el.dataset.stepId === stepId ? ACCENT : NODE_DEFAULT);
+  });
+  document.querySelectorAll('.node-glow').forEach(el => {
+    el.setAttribute('opacity', el.dataset.stepId === stepId ? '0.08' : '0');
+  });
+  document.querySelectorAll('.node-label').forEach(el => {
+    el.classList.toggle('highlighted', el.dataset.stepId === stepId);
+    el.classList.toggle('dimmed', !connectedNodes.has(el.dataset.stepId));
+  });
+  document.querySelectorAll('.node-sublabel').forEach(el => {
+    el.classList.toggle('dimmed', !connectedNodes.has(el.dataset.stepId));
+  });
+  document.querySelectorAll('.node-ring').forEach(el => {
+    el.classList.toggle('active', el.dataset.stepId === stepId);
+  });
+
+  // Highlight connected edges with accent
+  document.querySelectorAll('.edge-line').forEach(el => {
+    const isConnected = (el.dataset.from === stepId || el.dataset.to === stepId);
+    el.classList.toggle('highlighted', isConnected);
+    el.classList.toggle('dimmed', !isConnected);
+    el.setAttribute('stroke', isConnected ? ACCENT : NODE_DEFAULT);
+    el.setAttribute('marker-end', `url(#arrow-${isConnected ? 'accent' : 'default'})`);
+  });
+  document.querySelectorAll('.edge-label').forEach(el => {
+    const isConnected = (el.dataset.from === stepId || el.dataset.to === stepId);
+    el.classList.toggle('visible', isConnected);
+  });
+}
+
+function clearHighlight() {
+  if (selectedStep) {
+    highlightNode(selectedStep);
+    return;
+  }
+
+  document.querySelectorAll('.node-circle').forEach(el => {
+    el.classList.remove('dimmed');
+    el.setAttribute('stroke', NODE_DEFAULT);
+  });
+  document.querySelectorAll('.node-glow').forEach(el => el.setAttribute('opacity', '0'));
+  document.querySelectorAll('.node-label').forEach(el => { el.classList.remove('highlighted', 'dimmed'); });
+  document.querySelectorAll('.node-sublabel').forEach(el => el.classList.remove('dimmed'));
+  document.querySelectorAll('.node-ring').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.edge-line').forEach(el => {
+    el.classList.remove('highlighted', 'dimmed');
+    el.setAttribute('stroke', NODE_DEFAULT);
+    el.setAttribute('marker-end', 'url(#arrow-default)');
+  });
+  document.querySelectorAll('.edge-label').forEach(el => el.classList.remove('visible'));
+}
+
+// Click on background to deselect
+document.getElementById('graph').addEventListener('click', (e) => {
+  if (e.target === svg || e.target.tagName === 'svg') {
+    selectedStep = null;
+    detailBox.classList.remove('visible');
+    document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+    clearHighlight();
+  }
+});
+
+// ─── JSON OVERLAY ───
+const jsonToggle = document.getElementById('jsonToggle');
+const jsonOverlay = document.getElementById('jsonOverlay');
+
+function syntaxHighlight(json) {
+  return json
+    .replace(/("[\w_]+")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*"([^"]*)"(,?)/g, ': <span class="json-string">"$1"</span>$2')
+    .replace(/:\s*(\d+\.?\d*)(,?)/g, ': <span class="json-number">$1</span>$2')
+    .replace(/:\s*(null)(,?)/g, ': <span class="json-null">$1</span>$2')
+    .replace(/[{}\[\]]/g, '<span class="json-bracket">$&</span>');
+}
+
+jsonOverlay.innerHTML = `<pre style="white-space:pre-wrap;word-break:break-word;">${syntaxHighlight(JSON.stringify(executionData, null, 2))}</pre>`;
+
+jsonToggle.addEventListener('click', () => {
+  jsonOverlay.classList.toggle('visible');
+  jsonToggle.textContent = jsonOverlay.classList.contains('visible') ? '✕ close' : '{ } schema';
+});
+</script>
+
+</body>
+</html>
