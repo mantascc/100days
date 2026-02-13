@@ -433,5 +433,10 @@
     "id": "day-50",
     "path": "100days/day-50",
     "description": "Execution Trace Graph - AI response visualized as a traversal through a skill graph"
+  },
+  {
+    "id": "day-51",
+    "path": "100days/day-51",
+    "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes"
   }
 ]
