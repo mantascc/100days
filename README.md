@@ -55,3 +55,5 @@ This collection explores the intersection of human creativity and artificial int
 | [day-46](day-46) | day-46 | OKLCH vs HSL gradient comparison |
 | [day-47](day-47) | day-47 | Sketch project |
 | [day-49](day-49) | day-49 | Grid Trace - Interactive grid path visualization with Geist Pixel font |
+| [day-50](day-50) | day-50 | Execution Trace Graph - AI response visualized as a traversal through a skill graph |
+| [day-51](day-51) | day-51 | Resonant Lattice - Interactive physics grid with mass-spring damper nodes |
