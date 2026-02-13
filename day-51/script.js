@@ -27,7 +27,8 @@ const CONFIG = {
 
 let width, height;
 let nodes = [];
-let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, prevX: -1000, prevY: -1000, down: false };
+// Initialize active flag to false to prevent initial bounce
+let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, prevX: -1000, prevY: -1000, down: false, active: false };
 
 class Node {
     constructor(x, y) {
@@ -49,23 +50,27 @@ class Node {
         this.ay += dy * CONFIG.stiffness;
 
         // 2. Mouse Interaction (Repulsion/Attraction)
-        // Only if mouse is moving enough or pressed
-        const dmx = mouse.x - this.x;
-        const dmy = mouse.y - this.y;
-        const distSq = dmx * dmx + dmy * dmy;
+        // Only if mouse is active (has entered)
+        if (mouse.active) {
+            const dmx = mouse.x - this.x;
+            const dmy = mouse.y - this.y;
+            const distSq = dmx * dmx + dmy * dmy;
 
-        if (distSq < CONFIG.cursorRadius * CONFIG.cursorRadius) {
-            const dist = Math.sqrt(distSq);
-            const force = (1 - dist / CONFIG.cursorRadius) * CONFIG.cursorForce;
+            if (distSq < CONFIG.cursorRadius * CONFIG.cursorRadius) {
+                const dist = Math.sqrt(distSq);
 
-            // Push away
-            this.ax -= (dmx / dist) * force;
-            this.ay -= (dmy / dist) * force;
+                // Ease in force? No, just linear dropoff
+                const force = (1 - dist / CONFIG.cursorRadius) * CONFIG.cursorForce;
 
-            // Add mouse velocity influence (drag)
-            if (mouse.vx !== 0 || mouse.vy !== 0) {
-                this.ax += mouse.vx * 0.1;
-                this.ay += mouse.vy * 0.1;
+                // Push away
+                this.ax -= (dmx / dist) * force;
+                this.ay -= (dmy / dist) * force;
+
+                // Add mouse velocity influence (drag)
+                if (mouse.vx !== 0 || mouse.vy !== 0) {
+                    this.ax += mouse.vx * 0.1;
+                    this.ay += mouse.vy * 0.1;
+                }
             }
         }
 
@@ -236,6 +241,16 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('mousemove', (e) => {
+    // If not active, activate it but don't apply velocity yet
+    if (!mouse.active) {
+        mouse.active = true;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.prevX = e.clientX;
+        mouse.prevY = e.clientY;
+        return;
+    }
+
     mouse.prevX = mouse.x;
     mouse.prevY = mouse.y;
 
@@ -246,9 +261,18 @@ window.addEventListener('mousemove', (e) => {
     mouse.vy = mouse.y - mouse.prevY;
 });
 
+
 // Mobile Interaction
 canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
+    if (!mouse.active) {
+        mouse.active = true;
+        mouse.prevX = mouse.x = e.touches[0].clientX;
+        mouse.prevY = mouse.y = e.touches[0].clientY;
+        mouse.down = true;
+        return;
+    }
+
     mouse.prevX = mouse.x = e.touches[0].clientX;
     mouse.prevY = mouse.y = e.touches[0].clientY;
     mouse.down = true;
@@ -271,6 +295,10 @@ canvas.addEventListener('touchend', () => {
     // Reset velocity so it doesn't keep dragging
     mouse.vx = 0;
     mouse.vy = 0;
+    // Do not turn off active, otherwise it resets next time. 
+    // Actually, maybe we SHOULD turn off active if we want to reset the entry animation?
+    // No, once active, stay active until reload.
+
     // Move off screen
     mouse.x = -1000;
     mouse.y = -1000;
