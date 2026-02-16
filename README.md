@@ -57,3 +57,5 @@ This collection explores the intersection of human creativity and artificial int
 | [day-49](day-49) | day-49 | Grid Trace - Interactive grid path visualization with Geist Pixel font |
 | [day-50](day-50) | day-50 | Execution Trace Graph - AI response visualized as a traversal through a skill graph |
 | [day-51](day-51) | day-51 | Resonant Lattice - Interactive physics grid with mass-spring damper nodes |
+| [day-52](day-52) | day-52 | Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls |
+| [day-53](day-53) | day-53 | ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes |

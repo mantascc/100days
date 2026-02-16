@@ -438,5 +438,15 @@
     "id": "day-51",
     "path": "100days/day-51",
     "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes"
+  },
+  {
+    "id": "day-52",
+    "path": "100days/day-52",
+    "description": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls"
+  },
+  {
+    "id": "day-53",
+    "path": "100days/day-53",
+    "description": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes"
   }
 ]

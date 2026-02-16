@@ -1,0 +1,89 @@
+:root {
+    --bg-color: #0a0a0a;
+    --text-color: #e0e0e0;
+    --accent-color: #ffffff;
+    --dim-color: #444444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+#grid {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    line-height: 1;
+    white-space: pre;
+    text-align: center;
+    /* Responsive sizing logic: 
+       100 chars wide. 100vw / 100 = 1vw per char (roughly).
+       But we need margins. Let's try 0.55vw to be safe and account for line-height interaction.
+       Adjusted for mobile vs desktop aspect ratios. 
+    */
+    font-size: 0.8vh;
+    /* Fits height better usually for square grid */
+
+    /* Disabling selection for cleaner interactive feel */
+    user-select: none;
+    cursor: crosshair;
+}
+
+@media (min-aspect-ratio: 1/1) {
+    #grid {
+        font-size: 0.8vh;
+    }
+}
+
+@media (max-aspect-ratio: 1/1) {
+    #grid {
+        font-size: 0.9vw;
+        /* On portrait, width is the constraint */
+    }
+}
+
+#ui {
+    position: absolute;
+    bottom: 20px;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--dim-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 10;
+}
+
+.mode {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.mode:hover {
+    color: var(--text-color);
+}
+
+.mode.active {
+    color: var(--accent-color);
+    font-weight: bold;
+}

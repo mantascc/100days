@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 52: Reaction-Diffusion</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="title">reaction-diffusion / gray-scott<br>drag to seed</div>
+  <div id="hint">simulating...</div>
+
+  <canvas id="canvas" width="400" height="400"></canvas>
+
+  <div id="panel">
+    <div class="control-row">
+      <div class="slider-group">
+        <div class="label">feed <em id="f-val">0.0550</em></div>
+        <input type="range" id="f-slider" min="0.01" max="0.1" step="0.0001" value="0.055">
+      </div>
+      <div class="slider-group">
+        <div class="label">kill <em id="k-val">0.0620</em></div>
+        <input type="range" id="k-slider" min="0.04" max="0.07" step="0.0001" value="0.062">
+      </div>
+      <div class="presets">
+        <button class="preset-btn" data-f="0.0545" data-k="0.062">coral</button>
+        <button class="preset-btn" data-f="0.029" data-k="0.057">maze</button>
+        <button class="preset-btn" data-f="0.025" data-k="0.06">spots</button>
+        <button class="preset-btn" data-f="0.01" data-k="0.047">dendrite</button>
+      </div>
+      <button id="reset-btn">seed</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

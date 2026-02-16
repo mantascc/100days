@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #000000;
+  --cyan: #ffffff;
+  --gold: #ffffff;
+  --dim: #333333;
+  --mid: #666666;
+  --bright: #aaaaaa;
+  --panel-h: 72px;
+  --font: 'Space Mono', monospace;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  cursor: crosshair;
+}
+
+/* ── Title ─────────────────────────────────────────── */
+
+#title {
+  position: fixed;
+  top: 14px;
+  left: 18px;
+  font-family: var(--font);
+  font-size: 10px;
+  color: var(--mid);
+  letter-spacing: 0.14em;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+}
+
+#hint {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  font-family: var(--font);
+  font-size: 9px;
+  color: var(--mid);
+  letter-spacing: 0.18em;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  animation: fadeHint 6s ease forwards;
+}
+
+@keyframes fadeHint {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── Canvas ─────────────────────────────────────────── */
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: calc(100vh - var(--panel-h));
+  flex-shrink: 0;
+  /* smooth bilinear upscaling — gives organic look */
+}
+
+/* ── Panel ──────────────────────────────────────────── */
+
+#panel {
+  flex-shrink: 0;
+  height: var(--panel-h);
+  background: #000000;
+  border-top: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 920px;
+}
+
+/* ── Sliders ────────────────────────────────────────── */
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 150px;
+}
+
+.label {
+  font-family: var(--font);
+  font-size: 9px;
+  color: var(--mid);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.label em {
+  font-style: normal;
+  color: var(--bright);
+  margin-left: 8px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 1px;
+  background: #333;
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ── Presets ────────────────────────────────────────── */
+
+.presets {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  font-family: var(--font);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--mid);
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 0;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.preset-btn:hover {
+  color: #fff;
+  border-color: #666;
+  box-shadow: none;
+}
+
+.preset-btn.active {
+  color: #fff;
+  border-color: #fff;
+}
+
+/* ── Reset ──────────────────────────────────────────── */
+
+#reset-btn {
+  font-family: var(--font);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--mid);
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 0;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  text-transform: lowercase;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+#reset-btn:hover {
+  color: #fff;
+  border-color: #fff;
+  box-shadow: none;
+}
