@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Days Concept Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            font-size: 12px;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        #stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #666;
+            font-size: 11px;
+            text-align: right;
+            pointer-events: none;
+            line-height: 1.6;
+        }
+
+        #stats .stat {
+            color: #999;
+        }
+
+        #tooltip {
+            position: absolute;
+            background: rgba(20, 20, 20, 0.95);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            border: 1px solid #333;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        #tooltip .title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        #tooltip .idea {
+            color: #aaa;
+            font-size: 11px;
+            font-style: italic;
+        }
+
+        #legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            color: #f5f5f7;
+            font-size: 11px;
+            line-height: 1.5;
+            max-width: 280px;
+        }
+
+        #legend-toggle {
+            padding: 8px 12px;
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #a8aab8;
+            transition: color 100ms linear;
+        }
+
+        #legend-toggle:hover {
+            color: #f5f5f7;
+        }
+
+        #legend-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid #1a1a1a;
+        }
+
+        #legend.expanded #legend-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #legend-content-inner {
+            padding: 12px;
+        }
+
+        .legend-section {
+            margin-bottom: 12px;
+        }
+
+        .legend-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-label {
+            color: #a8aab8;
+            font-size: 11px;
+        }
+
+        .legend-count {
+            color: #666;
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="info">100 Days Concept Graph</div>
+    <div id="stats">
+        <div>Projects: <span class="stat" id="projectCount">0</span></div>
+        <div>Concepts: <span class="stat" id="conceptCount">8</span></div>
+        <div>Connections: <span class="stat" id="connectionCount">0</span></div>
+    </div>
+    <div id="tooltip"></div>
+
+    <div id="legend">
+        <div id="legend-toggle">legend</div>
+        <div id="legend-content">
+            <div id="legend-content-inner">
+                <!-- Will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const legend = document.getElementById('legend');
+        const legendToggle = document.getElementById('legend-toggle');
+
+        // Setup
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Legend toggle
+        legendToggle.addEventListener('click', () => {
+            legend.classList.toggle('expanded');
+        });
+
+        // Load data and initialize
+        let data = null;
+        let nodes = [];
+        let edges = [];
+
+        fetch('concept-graph-data.json')
+            .then(res => res.json())
+            .then(dataset => {
+                data = dataset;
+                initializeGraph();
+                populateLegend();
+                updateStats();
+
+                // Pre-simulate for smoother start
+                document.getElementById('info').textContent = 'Settling layout...';
+                for (let i = 0; i < 120; i++) {
+                    simulate();
+                }
+                document.getElementById('info').textContent = '100 Days Concept Graph';
+
+                animate();
+            })
+            .catch(err => {
+                console.error('Error loading data:', err);
+                document.getElementById('info').textContent = 'Error loading data';
+            });
+
+        function initializeGraph() {
+            // Create concept nodes (larger, in center region)
+            const conceptPositions = {};
+            data.concepts.forEach((c, i) => {
+                const angle = (i / data.concepts.length) * Math.PI * 2;
+                const radius = 250;
+                const x = canvas.width / 2 + Math.cos(angle) * radius;
+                const y = canvas.height / 2 + Math.sin(angle) * radius;
+
+                conceptPositions[c.id] = { x, y };
+
+                nodes.push({
+                    id: `concept-${c.id}`,
+                    label: c.label,
+                    x: x,
+                    y: y,
+                    vx: 0,
+                    vy: 0,
+                    type: 'concept',
+                    color: c.color,
+                    radius: 10,
+                    data: c
+                });
+            });
+
+            // Create project nodes - position near primary concept
+            data.projects.forEach(p => {
+                // Find primary concept position
+                const primaryConceptId = p.concepts[0];
+                const conceptPos = conceptPositions[primaryConceptId];
+
+                // Position near concept with some randomness
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 80 + Math.random() * 60;
+                const x = conceptPos.x + Math.cos(angle) * distance;
+                const y = conceptPos.y + Math.sin(angle) * distance;
+
+                nodes.push({
+                    id: `project-${p.day}`,
+                    label: `Day ${p.day}`,
+                    title: p.title,
+                    idea: p.idea,
+                    x: x,
+                    y: y,
+                    vx: 0,
+                    vy: 0,
+                    type: 'project',
+                    concepts: p.concepts,
+                    radius: 3,
+                    data: p
+                });
+            });
+
+            // Create edges (project → concept connections)
+            data.projects.forEach(p => {
+                p.concepts.forEach(conceptId => {
+                    edges.push({
+                        source: `project-${p.day}`,
+                        target: `concept-${conceptId}`
+                    });
+                });
+            });
+        }
+
+        function populateLegend() {
+            const inner = document.getElementById('legend-content-inner');
+
+            let html = '<div class="legend-section">';
+            data.concepts.forEach(c => {
+                const count = data.groups[c.id].projects.length;
+                html += `
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: ${c.color};"></div>
+                        <div class="legend-label">${c.label}</div>
+                        <div class="legend-count">${count}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            inner.innerHTML = html;
+        }
+
+        function updateStats() {
+            document.getElementById('projectCount').textContent = data.projects.length;
+            document.getElementById('connectionCount').textContent = edges.length;
+        }
+
+        // Physics parameters
+        const SPRING_LENGTH = 120;
+        const SPRING_STRENGTH = 0.008;
+        const REPULSION = 4000;
+        const CENTER_STRENGTH = 0.0008;
+
+        // Cooling schedule - high damping at start, reduces over time
+        let simulationStep = 0;
+        const COOLING_STEPS = 200;
+        function getDamping() {
+            if (simulationStep < COOLING_STEPS) {
+                // Start at 0.70 (very damped), move to 0.92
+                const progress = simulationStep / COOLING_STEPS;
+                return 0.70 + (0.92 - 0.70) * progress;
+            }
+            return 0.92;
+        }
+
+        // Mouse interaction
+        let hoveredNode = null;
+        let draggedNode = null;
+        const mouse = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            // Check hover
+            hoveredNode = null;
+            for (const node of nodes) {
+                const dx = mouse.x - node.x;
+                const dy = mouse.y - node.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < node.radius * 4) {
+                    hoveredNode = node;
+                    break;
+                }
+            }
+
+            // Update tooltip
+            if (hoveredNode) {
+                tooltip.style.opacity = '1';
+                tooltip.style.left = mouse.x + 15 + 'px';
+                tooltip.style.top = mouse.y + 15 + 'px';
+
+                if (hoveredNode.type === 'concept') {
+                    const count = data.groups[hoveredNode.data.id].projects.length;
+                    tooltip.innerHTML = `
+                        <div class="title">${hoveredNode.label}</div>
+                        <div class="idea">${count} projects</div>
+                    `;
+                } else {
+                    tooltip.innerHTML = `
+                        <div class="title">Day ${hoveredNode.data.day}: ${hoveredNode.title}</div>
+                        <div class="idea">${hoveredNode.idea}</div>
+                        <div class="idea" style="margin-top: 6px; color: #666;">Click to open →</div>
+                    `;
+                }
+            } else {
+                tooltip.style.opacity = '0';
+            }
+
+            // Drag
+            if (draggedNode) {
+                draggedNode.x = mouse.x;
+                draggedNode.y = mouse.y;
+                draggedNode.vx = 0;
+                draggedNode.vy = 0;
+            }
+        });
+
+        canvas.addEventListener('mousedown', () => {
+            if (hoveredNode) {
+                draggedNode = hoveredNode;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            draggedNode = null;
+        });
+
+        // Click to navigate to project
+        canvas.addEventListener('click', () => {
+            if (hoveredNode && hoveredNode.type === 'project') {
+                const day = hoveredNode.data.day;
+                const folderName = getDayFolder(day);
+                if (folderName) {
+                    window.location.href = `../${folderName}/index.html`;
+                }
+            }
+        });
+
+        // Map day number to folder name
+        function getDayFolder(day) {
+            const map = {
+                1: '01-entropy', 2: '02-vicsek-model', 3: '03-chaos-agent',
+                4: '04-random-walk', 5: '05-fall', 6: '06-orbital',
+                7: '07-apophenia', 8: '08-graph-clusters', 9: '09-planar-graph',
+                10: '10-audio-reactive-agents', 11: '11-brownian-tree', 12: '12-wind-field',
+                13: '13-image-flow-field', 14: '14-dna-mutations', 15: '15-binary-camera-grid',
+                16: '16-hub-spoke-network', 17: '17-audio-reactive-network', 18: '18-cellular-automaton',
+                19: '19-coworker-network', 20: '20-schelling-model', 21: '21-interaction-heatmap',
+                22: '22-directed-network', 23: '23-interactive-typography', 24: '24-rock-paper-scissors',
+                25: '25-spotlight-grid', 26: '26-widget-dashboard', 27: '27-muse',
+                28: '28-liquid-glass', 29: '29-progress-indicators', 30: '30-thinking-states',
+                31: '31-cli-material-palette', 32: '32-genart-cards', 33: '33-three-body-problem',
+                34: '34-particle-text-morph', 35: '35-flight-path-viz', 36: '36-spinning-globe',
+                37: '37-sentiment-analyzer', 38: '38-baltic-pattern', 39: '39-wave-morph',
+                40: '40-cube-grid-rules', 41: '41-metaball', 42: '42-metaball-grid',
+                43: '43-style-seed', 44: '44-whiff', 45: '45-gravity-pills',
+                46: '46-oklch-vs-hsl', 47: '47-2gif', 49: '49-grid-trace',
+                50: '50-execution-trace-graph', 51: '51-resonant-lattice', 52: '52-reaction-diffusion',
+                53: '53-ascii-grid', 54: '54-concept-graph'
+            };
+            return map[day];
+        }
+
+        // Update cursor style on hover
+        canvas.style.cursor = 'default';
+        canvas.addEventListener('mousemove', () => {
+            if (hoveredNode && hoveredNode.type === 'project') {
+                canvas.style.cursor = 'pointer';
+            } else if (hoveredNode && hoveredNode.type === 'concept') {
+                canvas.style.cursor = 'grab';
+            } else {
+                canvas.style.cursor = 'default';
+            }
+        });
+
+        // Physics simulation
+        function simulate() {
+            simulationStep++;
+            const damping = getDamping();
+
+            // Spring forces between connected nodes
+            edges.forEach(edge => {
+                const source = nodes.find(n => n.id === edge.source);
+                const target = nodes.find(n => n.id === edge.target);
+
+                const dx = target.x - source.x;
+                const dy = target.y - source.y;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const force = (dist - SPRING_LENGTH) * SPRING_STRENGTH;
+
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+
+                source.vx += fx;
+                source.vy += fy;
+                target.vx -= fx;
+                target.vy -= fy;
+            });
+
+            // Repulsion between all nodes (reduced for projects to reduce jumpiness)
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const n1 = nodes[i];
+                    const n2 = nodes[j];
+
+                    const dx = n2.x - n1.x;
+                    const dy = n2.y - n1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+                    // Reduce repulsion between project nodes
+                    const repulsionMultiplier =
+                        (n1.type === 'project' && n2.type === 'project') ? 0.3 : 1.0;
+                    const force = (REPULSION * repulsionMultiplier) / (dist * dist);
+
+                    const fx = (dx / dist) * force;
+                    const fy = (dy / dist) * force;
+
+                    n1.vx -= fx;
+                    n1.vy -= fy;
+                    n2.vx += fx;
+                    n2.vy += fy;
+                }
+            }
+
+            // Center gravity for concepts
+            nodes.forEach(node => {
+                if (node.type === 'concept') {
+                    const dx = canvas.width / 2 - node.x;
+                    const dy = canvas.height / 2 - node.y;
+                    node.vx += dx * CENTER_STRENGTH * 3;
+                    node.vy += dy * CENTER_STRENGTH * 3;
+                }
+            });
+
+            // Update positions with cooling schedule
+            nodes.forEach(node => {
+                if (node !== draggedNode) {
+                    node.vx *= damping;
+                    node.vy *= damping;
+                    node.x += node.vx;
+                    node.y += node.vy;
+
+                    // Boundary
+                    const margin = 50;
+                    if (node.x < margin) node.x = margin;
+                    if (node.x > canvas.width - margin) node.x = canvas.width - margin;
+                    if (node.y < margin) node.y = margin;
+                    if (node.y > canvas.height - margin) node.y = canvas.height - margin;
+                }
+            });
+        }
+
+        // Render
+        function render() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw edges
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1;
+            edges.forEach(edge => {
+                const source = nodes.find(n => n.id === edge.source);
+                const target = nodes.find(n => n.id === edge.target);
+
+                ctx.beginPath();
+                ctx.moveTo(source.x, source.y);
+                ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+            });
+
+            // Highlight hovered connections
+            if (hoveredNode) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+
+                if (hoveredNode.type === 'project') {
+                    hoveredNode.concepts.forEach(conceptId => {
+                        const target = nodes.find(n => n.id === `concept-${conceptId}`);
+                        if (target) {
+                            ctx.beginPath();
+                            ctx.moveTo(hoveredNode.x, hoveredNode.y);
+                            ctx.lineTo(target.x, target.y);
+                            ctx.stroke();
+                        }
+                    });
+                } else {
+                    edges.forEach(edge => {
+                        if (edge.target === hoveredNode.id) {
+                            const source = nodes.find(n => n.id === edge.source);
+                            ctx.beginPath();
+                            ctx.moveTo(source.x, source.y);
+                            ctx.lineTo(hoveredNode.x, hoveredNode.y);
+                            ctx.stroke();
+                        }
+                    });
+                }
+            }
+
+            // Draw nodes
+            nodes.forEach(node => {
+                const isHovered = node === hoveredNode;
+
+                if (node.type === 'concept') {
+                    // Concept nodes
+                    ctx.fillStyle = node.color;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, isHovered ? node.radius * 1.5 : node.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Label
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(node.label, node.x, node.y - 18);
+                } else {
+                    // Project nodes
+                    const isConnected = hoveredNode && hoveredNode.type === 'concept' &&
+                        node.concepts.includes(hoveredNode.data.id);
+
+                    ctx.fillStyle = isHovered || isConnected ? '#fff' : '#555';
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, isHovered ? node.radius * 2.5 : node.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (isHovered || isConnected) {
+                        ctx.fillStyle = '#999';
+                        ctx.font = '9px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(node.label, node.x, node.y + 18);
+                    }
+                }
+            });
+        }
+
+        // Animation loop
+        function animate() {
+            if (data) {
+                simulate();
+                render();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+
+</html>

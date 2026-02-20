@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Days Concept Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            font-size: 12px;
+            pointer-events: none;
+        }
+        #tooltip {
+            position: absolute;
+            background: rgba(20, 20, 20, 0.95);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border: 1px solid #333;
+        }
+        #legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            color: #f5f5f7;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        #legend-toggle {
+            padding: 8px 12px;
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #a8aab8;
+            transition: color 100ms linear;
+        }
+        #legend-toggle:hover {
+            color: #f5f5f7;
+        }
+        #legend-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid #1a1a1a;
+        }
+        #legend.expanded #legend-content {
+            max-height: 400px;
+        }
+        #legend-content-inner {
+            padding: 12px;
+        }
+        .legend-section {
+            margin-bottom: 16px;
+        }
+        .legend-section:last-child {
+            margin-bottom: 0;
+        }
+        .legend-title {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .legend-label {
+            color: #a8aab8;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="info">100 Days Concept Graph • Drag to explore</div>
+    <div id="tooltip"></div>
+
+    <div id="legend">
+        <div id="legend-toggle">legend</div>
+        <div id="legend-content">
+            <div id="legend-content-inner">
+                <div class="legend-section">
+                    <div class="legend-title">concepts</div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #ff6b6b;"></div>
+                        <div class="legend-label">network & graph</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #4ecdc4;"></div>
+                        <div class="legend-label">temporal data</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #45b7d1;"></div>
+                        <div class="legend-label">spatial & geo</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #f9ca24;"></div>
+                        <div class="legend-label">clustering</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #a29bfe;"></div>
+                        <div class="legend-label">statistical</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #fd79a8;"></div>
+                        <div class="legend-label">audio & signal</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #00b894;"></div>
+                        <div class="legend-label">image & visual</div>
+                    </div>
+                </div>
+                <div class="legend-section">
+                    <div class="legend-title">nodes</div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #fff;"></div>
+                        <div class="legend-label">project days</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const legend = document.getElementById('legend');
+        const legendToggle = document.getElementById('legend-toggle');
+
+        // Setup
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Legend toggle
+        legendToggle.addEventListener('click', () => {
+            legend.classList.toggle('expanded');
+        });
+
+        // Data structure
+        const concepts = [
+            { id: 'network', label: 'Network & Graph', color: '#ff6b6b' },
+            { id: 'temporal', label: 'Temporal Data', color: '#4ecdc4' },
+            { id: 'spatial', label: 'Spatial & Geo', color: '#45b7d1' },
+            { id: 'clustering', label: 'Clustering', color: '#f9ca24' },
+            { id: 'statistical', label: 'Statistical', color: '#a29bfe' },
+            { id: 'audio', label: 'Audio & Signal', color: '#fd79a8' },
+            { id: 'visual', label: 'Image & Visual', color: '#00b894' }
+        ];
+
+        const projects = [
+            { id: 'd1', label: 'Day 1', concepts: ['statistical'], desc: 'Entropy visualization' },
+            { id: 'd3', label: 'Day 3', concepts: ['clustering'], desc: 'Particle clustering' },
+            { id: 'd4', label: 'Day 4', concepts: ['statistical'], desc: 'Stochastic random walk' },
+            { id: 'd7', label: 'Day 7', concepts: ['clustering'], desc: 'Apophenia proximity' },
+            { id: 'd8', label: 'Day 8', concepts: ['clustering'], desc: 'Cluster detection' },
+            { id: 'd9', label: 'Day 9', concepts: ['network'], desc: 'Linked agents network' },
+            { id: 'd10', label: 'Day 10', concepts: ['audio'], desc: 'Audio-reactive agents' },
+            { id: 'd14', label: 'Day 14', concepts: ['clustering'], desc: 'Dynamic clusters' },
+            { id: 'd16', label: 'Day 16', concepts: ['network'], desc: 'Force graph' },
+            { id: 'd19', label: 'Day 19', concepts: ['network'], desc: 'Coworker interactions' },
+            { id: 'd20', label: 'Day 20', concepts: ['statistical'], desc: 'Schelling model' },
+            { id: 'd21', label: 'Day 21', concepts: ['temporal', 'network'], desc: 'Interaction heatmap' },
+            { id: 'd22', label: 'Day 22', concepts: ['network'], desc: 'Graph network' },
+            { id: 'd25', label: 'Day 25', concepts: ['clustering'], desc: 'Density particles' },
+            { id: 'd32', label: 'Day 32', concepts: ['statistical'], desc: 'Chaotic entropy' },
+            { id: 'd33', label: 'Day 33', concepts: ['temporal'], desc: 'Temporal slitscan' },
+            { id: 'd35', label: 'Day 35', concepts: ['spatial'], desc: 'Flight paths' },
+            { id: 'd50', label: 'Day 50', concepts: ['network'], desc: 'Execution trace' }
+        ];
+
+        // Create nodes
+        const nodes = [];
+
+        // Concept nodes (larger, in center)
+        concepts.forEach((c, i) => {
+            const angle = (i / concepts.length) * Math.PI * 2;
+            const radius = 200;
+            nodes.push({
+                id: c.id,
+                label: c.label,
+                x: canvas.width / 2 + Math.cos(angle) * radius,
+                y: canvas.height / 2 + Math.sin(angle) * radius,
+                vx: 0,
+                vy: 0,
+                type: 'concept',
+                color: c.color,
+                radius: 8
+            });
+        });
+
+        // Project nodes (smaller, scattered)
+        projects.forEach(p => {
+            nodes.push({
+                id: p.id,
+                label: p.label,
+                desc: p.desc,
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: 0,
+                vy: 0,
+                type: 'project',
+                concepts: p.concepts,
+                radius: 4
+            });
+        });
+
+        // Create edges
+        const edges = [];
+        projects.forEach(p => {
+            p.concepts.forEach(c => {
+                edges.push({
+                    source: p.id,
+                    target: c
+                });
+            });
+        });
+
+        // Physics parameters
+        const SPRING_LENGTH = 100;
+        const SPRING_STRENGTH = 0.01;
+        const REPULSION = 3000;
+        const DAMPING = 0.9;
+        const CENTER_STRENGTH = 0.001;
+
+        // Mouse interaction
+        let hoveredNode = null;
+        let draggedNode = null;
+        const mouse = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            // Check hover
+            hoveredNode = null;
+            for (const node of nodes) {
+                const dx = mouse.x - node.x;
+                const dy = mouse.y - node.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < node.radius * 3) {
+                    hoveredNode = node;
+                    break;
+                }
+            }
+
+            // Update tooltip
+            if (hoveredNode) {
+                tooltip.style.opacity = '1';
+                tooltip.style.left = mouse.x + 15 + 'px';
+                tooltip.style.top = mouse.y + 15 + 'px';
+                tooltip.textContent = hoveredNode.desc || hoveredNode.label;
+            } else {
+                tooltip.style.opacity = '0';
+            }
+
+            // Drag
+            if (draggedNode) {
+                draggedNode.x = mouse.x;
+                draggedNode.y = mouse.y;
+                draggedNode.vx = 0;
+                draggedNode.vy = 0;
+            }
+        });
+
+        canvas.addEventListener('mousedown', () => {
+            if (hoveredNode) {
+                draggedNode = hoveredNode;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            draggedNode = null;
+        });
+
+        // Physics simulation
+        function simulate() {
+            // Apply forces between connected nodes (spring)
+            edges.forEach(edge => {
+                const source = nodes.find(n => n.id === edge.source);
+                const target = nodes.find(n => n.id === edge.target);
+
+                const dx = target.x - source.x;
+                const dy = target.y - source.y;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const force = (dist - SPRING_LENGTH) * SPRING_STRENGTH;
+
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+
+                source.vx += fx;
+                source.vy += fy;
+                target.vx -= fx;
+                target.vy -= fy;
+            });
+
+            // Repulsion between all nodes
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const n1 = nodes[i];
+                    const n2 = nodes[j];
+
+                    const dx = n2.x - n1.x;
+                    const dy = n2.y - n1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const force = REPULSION / (dist * dist);
+
+                    const fx = (dx / dist) * force;
+                    const fy = (dy / dist) * force;
+
+                    n1.vx -= fx;
+                    n1.vy -= fy;
+                    n2.vx += fx;
+                    n2.vy += fy;
+                }
+            }
+
+            // Center gravity for concepts
+            nodes.forEach(node => {
+                if (node.type === 'concept') {
+                    const dx = canvas.width / 2 - node.x;
+                    const dy = canvas.height / 2 - node.y;
+                    node.vx += dx * CENTER_STRENGTH * 2;
+                    node.vy += dy * CENTER_STRENGTH * 2;
+                }
+            });
+
+            // Update positions
+            nodes.forEach(node => {
+                if (node !== draggedNode) {
+                    node.vx *= DAMPING;
+                    node.vy *= DAMPING;
+                    node.x += node.vx;
+                    node.y += node.vy;
+
+                    // Boundary
+                    const margin = 50;
+                    if (node.x < margin) node.x = margin;
+                    if (node.x > canvas.width - margin) node.x = canvas.width - margin;
+                    if (node.y < margin) node.y = margin;
+                    if (node.y > canvas.height - margin) node.y = canvas.height - margin;
+                }
+            });
+        }
+
+        // Render
+        function render() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw edges
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1;
+            edges.forEach(edge => {
+                const source = nodes.find(n => n.id === edge.source);
+                const target = nodes.find(n => n.id === edge.target);
+
+                ctx.beginPath();
+                ctx.moveTo(source.x, source.y);
+                ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+            });
+
+            // Highlight hovered connections
+            if (hoveredNode) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 2;
+
+                if (hoveredNode.type === 'project') {
+                    hoveredNode.concepts.forEach(c => {
+                        const target = nodes.find(n => n.id === c);
+                        ctx.beginPath();
+                        ctx.moveTo(hoveredNode.x, hoveredNode.y);
+                        ctx.lineTo(target.x, target.y);
+                        ctx.stroke();
+                    });
+                } else {
+                    edges.forEach(edge => {
+                        if (edge.target === hoveredNode.id) {
+                            const source = nodes.find(n => n.id === edge.source);
+                            ctx.beginPath();
+                            ctx.moveTo(source.x, source.y);
+                            ctx.lineTo(hoveredNode.x, hoveredNode.y);
+                            ctx.stroke();
+                        }
+                    });
+                }
+            }
+
+            // Draw nodes
+            nodes.forEach(node => {
+                const isHovered = node === hoveredNode;
+
+                if (node.type === 'concept') {
+                    // Concept nodes
+                    ctx.fillStyle = node.color;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, isHovered ? node.radius * 1.5 : node.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Label
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '11px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(node.label, node.x, node.y - 15);
+                } else {
+                    // Project nodes
+                    const isConnected = hoveredNode && hoveredNode.type === 'concept' &&
+                                       node.concepts.includes(hoveredNode.id);
+
+                    ctx.fillStyle = isHovered || isConnected ? '#fff' : '#444';
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, isHovered ? node.radius * 2 : node.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (isHovered || isConnected) {
+                        ctx.fillStyle = '#999';
+                        ctx.font = '10px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(node.label, node.x, node.y + 15);
+                    }
+                }
+            });
+        }
+
+        // Animation loop
+        function animate() {
+            simulate();
+            render();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

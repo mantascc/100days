@@ -1,452 +1,272 @@
 [
   {
-    "id": "day-1",
-    "path": "100days/day-1",
+    "id": "01-entropy",
+    "path": "100days/01-entropy",
     "description": "Interactive entropy visualization with animated particles"
   },
   {
-    "id": "day-2",
-    "path": "100days/day-2",
+    "id": "02-vicsek-model",
+    "path": "100days/02-vicsek-model",
     "description": "Vicsek model flocking behavior simulation"
   },
   {
-    "id": "day-3",
-    "path": "100days/day-3",
+    "id": "03-chaos-agent",
+    "path": "100days/03-chaos-agent",
     "description": "Particle clustering with chaotic agents"
   },
   {
-    "id": "day-4",
-    "path": "100days/day-4",
+    "id": "04-random-walk",
+    "path": "100days/04-random-walk",
     "description": "Stochastic random walk patterns on canvas"
   },
   {
-    "id": "day-5",
-    "path": "100days/day-5",
+    "id": "05-fall",
+    "path": "100days/05-fall",
     "description": "Gravity and particle physics with falling objects"
   },
   {
-    "id": "day-6",
-    "path": "100days/day-6",
+    "id": "06-orbital",
+    "path": "100days/06-orbital",
     "description": "Celestial mechanics with orbital planets"
   },
   {
-    "id": "Day-7",
-    "path": "100days/Day-7",
+    "id": "07-apophenia",
+    "path": "100days/07-apophenia",
     "description": "Apophenia proximity links on grid"
   },
   {
-    "id": "Day-8",
-    "path": "100days/Day-8",
+    "id": "08-graph-clusters",
+    "path": "100days/08-graph-clusters",
     "description": "Cluster detection with parameter tuning"
   },
   {
-    "id": "day-9",
-    "path": "100days/day-9",
+    "id": "09-planar-graph",
+    "path": "100days/09-planar-graph",
     "description": "Linked agents network visualization"
   },
   {
-    "id": "day-10",
-    "path": "100days/day-10",
+    "id": "10-audio-reactive-agents",
+    "path": "100days/10-audio-reactive-agents",
     "description": "Audio-reactive agents with spatial positioning"
   },
   {
-    "id": "day-11",
-    "path": "100days/day-11",
+    "id": "11-brownian-tree",
+    "path": "100days/11-brownian-tree",
     "description": "Interactive message storage system (Node.js/Express)"
   },
   {
-    "id": "day-12",
-    "path": "100days/day-12",
+    "id": "12-wind-field",
+    "path": "100days/12-wind-field",
     "description": "Perlin noise wind simulation"
   },
   {
-    "id": "day-13",
-    "path": "100days/day-13",
+    "id": "13-image-flow-field",
+    "path": "100days/13-image-flow-field",
     "description": "Wave pattern generation with ripple effects"
   },
   {
-    "id": "day-14",
-    "path": "100days/day-14",
+    "id": "14-dna-mutations",
+    "path": "100days/14-dna-mutations",
     "description": "Dynamic cluster visualization with signals"
   },
   {
-    "id": "day-15",
-    "path": "100days/day-15",
+    "id": "15-binary-camera-grid",
+    "path": "100days/15-binary-camera-grid",
     "description": "Interactive 2D grid navigation with zoom"
   },
   {
-    "id": "day-15-2",
-    "path": "100days/day-15-2",
+    "id": "15b-binary-camera-grid-v2",
+    "path": "100days/15b-binary-camera-grid-v2",
     "description": "Grid camera variant"
   },
   {
-    "id": "day-16",
-    "path": "100days/day-16",
+    "id": "16-hub-spoke-network",
+    "path": "100days/16-hub-spoke-network",
     "description": "Force graph visualization"
   },
   {
-    "id": "day-17",
-    "path": "100days/day-17",
+    "id": "17-audio-reactive-network",
+    "path": "100days/17-audio-reactive-network",
     "description": "Text-to-speech with animated typography"
   },
   {
-    "id": "day-18",
-    "path": "100days/day-18",
+    "id": "18-cellular-automaton",
+    "path": "100days/18-cellular-automaton",
     "description": "Conway's Game of Life variant"
   },
   {
-    "id": "day-19",
-    "path": "100days/day-19",
+    "id": "19-coworker-network",
+    "path": "100days/19-coworker-network",
     "description": "Force-directed graph of coworker interactions (React/D3)"
   },
   {
-    "id": "day-20",
-    "path": "100days/day-20",
+    "id": "20-schelling-model",
+    "path": "100days/20-schelling-model",
     "description": "Schelling model of segregation simulation"
   },
   {
-    "id": "day-21",
-    "path": "100days/day-21",
+    "id": "21-interaction-heatmap",
+    "path": "100days/21-interaction-heatmap",
     "description": "30-day agent interaction heatmap"
   },
   {
-    "id": "day-22",
-    "path": "100days/day-22",
+    "id": "22-directed-network",
+    "path": "100days/22-directed-network",
     "description": "Graph network visualization"
   },
   {
-    "id": "day-23",
-    "path": "100days/day-23",
+    "id": "23-interactive-typography",
+    "path": "100days/23-interactive-typography",
     "description": "Touch/mouse event handler demo"
   },
   {
-    "id": "day-24",
-    "path": "100days/day-24",
+    "id": "24-rock-paper-scissors",
+    "path": "100days/24-rock-paper-scissors",
     "description": "Rock paper scissors game"
   },
   {
-    "id": "day-25",
-    "path": "100days/day-25",
+    "id": "25-spotlight-grid",
+    "path": "100days/25-spotlight-grid",
     "description": "Density and color-controlled particle effect"
   },
   {
-    "id": "day-26",
-    "path": "100days/day-26",
+    "id": "26-widget-dashboard",
+    "path": "100days/26-widget-dashboard",
     "description": "Dynamic widget dashboard layout"
   },
   {
-    "id": "day-27",
-    "path": "100days/day-27",
+    "id": "27-muse",
+    "path": "100days/27-muse",
     "description": "Muse v0 - music/creative tool prototype"
   },
   {
-    "id": "day-28",
-    "path": "100days/day-28",
+    "id": "28-liquid-glass",
+    "path": "100days/28-liquid-glass",
     "description": "Liquid glass morphism effect"
   },
   {
-    "id": "day-29",
-    "path": "100days/day-29",
+    "id": "29-progress-indicators",
+    "path": "100days/29-progress-indicators",
     "description": "Text generation UI showing thinking states"
   },
   {
-    "id": "day-31",
-    "path": "100days/day-31",
+    "id": "30-thinking-states",
+    "path": "100days/30-thinking-states",
+    "description": "Experimental loading indicators exploring thinking metaphors"
+  },
+  {
+    "id": "31-cli-material-palette",
+    "path": "100days/31-cli-material-palette",
     "description": "CLI material color palette"
   },
   {
-    "id": "day-32",
-    "path": "100days/day-32",
+    "id": "32-genart-cards",
+    "path": "100days/32-genart-cards",
     "description": "Chaotic entropy pattern generation"
   },
   {
-    "id": "day-33",
-    "path": "100days/day-33",
+    "id": "33-three-body-problem",
+    "path": "100days/33-three-body-problem",
     "description": "Temporal slitscan imaging effect"
   },
   {
-    "id": "day-34",
-    "path": "100days/day-34",
+    "id": "34-particle-text-morph",
+    "path": "100days/34-particle-text-morph",
     "description": "Text morphing with particle transitions"
   },
   {
-    "id": "day-35 (flights)",
-    "path": "100days/day-35 (flights)",
+    "id": "35-flight-path-viz",
+    "path": "100days/35-flight-path-viz",
     "description": "Great circle flight path animation (Leaflet/Turf.js)"
   },
   {
-    "id": "day-36",
-    "path": "100days/day-36",
+    "id": "36-spinning-globe",
+    "path": "100days/36-spinning-globe",
     "description": "Vite React TypeScript project"
   },
   {
-    "id": "day-38",
-    "path": "100days/day-38",
+    "id": "37-sentiment-analyzer",
+    "path": "100days/37-sentiment-analyzer",
+    "description": "Real-time text sentiment analysis with industrial visualization (React/TypeScript)"
+  },
+  {
+    "id": "38-baltic-pattern",
+    "path": "100days/38-baltic-pattern",
     "description": "Generative Baltic pattern"
   },
   {
-    "id": "day-39",
-    "path": "100days/day-39",
+    "id": "39-wave-morph",
+    "path": "100days/39-wave-morph",
     "description": "Morphing wave patterns"
   },
   {
-    "id": "day-40",
-    "path": "100days/day-40",
+    "id": "40-cube-grid-rules",
+    "path": "100days/40-cube-grid-rules",
     "description": "Cube grid rules engine"
   },
   {
-    "id": "day-41",
-    "path": "100days/day-41",
+    "id": "41-metaball",
+    "path": "100days/41-metaball",
     "description": "Metaball physics and animation"
   },
   {
-    "id": "day-42",
-    "path": "100days/day-42",
+    "id": "42-metaball-grid",
+    "path": "100days/42-metaball-grid",
     "description": "Grid-based metaball effects"
   },
   {
-    "id": "day-43",
-    "path": "100days/day-43",
+    "id": "43-style-seed",
+    "path": "100days/43-style-seed",
     "description": "Sketch project"
   },
   {
-    "id": "day-44",
-    "path": "100days/day-44",
+    "id": "44-whiff",
+    "path": "100days/44-whiff",
     "description": "Whiff project"
   },
   {
-    "id": "day-45",
-    "path": "100days/day-45",
+    "id": "45-gravity-pills",
+    "path": "100days/45-gravity-pills",
     "description": "Gravity pills particle simulation"
   },
   {
-    "id": "day-46",
-    "path": "100days/day-46",
+    "id": "46-oklch-vs-hsl",
+    "path": "100days/46-oklch-vs-hsl",
     "description": "OKLCH vs HSL gradient comparison"
   },
   {
-    "id": "day-47",
-    "path": "100days/day-47",
+    "id": "47-2gif",
+    "path": "100days/47-2gif",
     "description": "Sketch project"
   },
   {
-    "id": "aflow",
-    "path": "aflow",
-    "description": "Agentic data experience framework with deck/widget UI"
-  },
-  {
-    "id": "agents",
-    "path": "agents",
-    "description": "Entropy simulator with 10 interactive agents"
-  },
-  {
-    "id": "apophenia",
-    "path": "apophenia",
-    "description": "Force-directed graph visualization (D3.js)"
-  },
-  {
-    "id": "baime",
-    "path": "baime",
-    "description": "Retro CRT-style particle trail drawing (p5.js)"
-  },
-  {
-    "id": "campaign-creation",
-    "path": "campaign-creation",
-    "description": "Campaign manager with product selection workflow"
-  },
-  {
-    "id": "cc",
-    "path": "cc",
-    "description": "Relationship advice UI for humans and machines"
-  },
-  {
-    "id": "chaos",
-    "path": "chaos",
-    "description": "Dense visual taxonomy of computational thinking patterns"
-  },
-  {
-    "id": "creative-feed",
-    "path": "creative-feed",
-    "description": "Creative content feed (Next.js)"
-  },
-  {
-    "id": "dictate",
-    "path": "dictate",
-    "description": "Browser-native voice-to-text interface"
-  },
-  {
-    "id": "eixample",
-    "path": "eixample",
-    "description": "16x16 grid visual project"
-  },
-  {
-    "id": "emergence",
-    "path": "emergence",
-    "description": "5-day generative design framework with scrollable cards"
-  },
-  {
-    "id": "hello",
-    "path": "hello",
-    "description": "Liquid blob v2 animation"
-  },
-  {
-    "id": "images",
-    "path": "images",
-    "description": "Asset storage"
-  },
-  {
-    "id": "json-render-1",
-    "path": "json-render-1",
-    "description": "Observability UI using JSON-render core library"
-  },
-  {
-    "id": "letters-1",
-    "path": "letters-1",
-    "description": "CSS grid of animated squares"
-  },
-  {
-    "id": "letters-2",
-    "path": "letters-2",
-    "description": "Text to grid-based stylized patterns library"
-  },
-  {
-    "id": "mcc1",
-    "path": "mcc1",
-    "description": "\"Approaching uncertainty with curiosity\" interface"
-  },
-  {
-    "id": "Memory1",
-    "path": "Memory1",
-    "description": "Three-column layout template"
-  },
-  {
-    "id": "milda",
-    "path": "milda",
-    "description": "Marketing portfolio website"
-  },
-  {
-    "id": "mintis",
-    "path": "mintis",
-    "description": "Days widget system with card-based content"
-  },
-  {
-    "id": "mirc",
-    "path": "mirc",
-    "description": "Classic mIRC chat client UI recreation"
-  },
-  {
-    "id": "notebook",
-    "path": "notebook",
-    "description": "Markdown note-taking system"
-  },
-  {
-    "id": "nyc",
-    "path": "nyc",
-    "description": "Empty placeholder"
-  },
-  {
-    "id": "ost",
-    "path": "ost",
-    "description": "Street view multi-panel layout"
-  },
-  {
-    "id": "point-map",
-    "path": "point-map",
-    "description": "Image to point cloud conversion"
-  },
-  {
-    "id": "react-graph",
-    "path": "react-graph",
-    "description": "Vite React graph prototype"
-  },
-  {
-    "id": "receptukai",
-    "path": "receptukai",
-    "description": "Recipe scraper web app (Next.js)"
-  },
-  {
-    "id": "rutuliukas",
-    "path": "rutuliukas",
-    "description": "Isometric ball game prototype"
-  },
-  {
-    "id": "semantic-1",
-    "path": "semantic-1",
-    "description": "Knowledge/concept exploration with seed documents"
-  },
-  {
-    "id": "skanaus",
-    "path": "skanaus",
-    "description": "Recipe extraction agent (Python/OpenAI)"
-  },
-  {
-    "id": "snapshots",
-    "path": "snapshots",
-    "description": "Image geocoding and map visualization"
-  },
-  {
-    "id": "spotlight",
-    "path": "spotlight",
-    "description": "Adjustable density spotlight effect"
-  },
-  {
-    "id": "squared-py",
-    "path": "squared-py",
-    "description": "Image segmentation script"
-  },
-  {
-    "id": "tonejs-helloworld",
-    "path": "tonejs-helloworld",
-    "description": "Interactive music visualization (Tone.js)"
-  },
-  {
-    "id": "txt",
-    "path": "txt",
-    "description": "Writing/journal notes collection"
-  },
-  {
-    "id": "uiui",
-    "path": "uiui",
-    "description": "React TypeScript UI component framework"
-  },
-  {
-    "id": "uiiuii",
-    "path": "uiiuii",
-    "description": "React TypeScript prototype"
-  },
-  {
-    "id": "uiuiuiui",
-    "path": "uiuiuiui",
-    "description": "Sidebar layout template"
-  },
-  {
-    "id": "video-hover",
-    "path": "video-hover",
-    "description": "Interactive media hover effects"
-  },
-  {
-    "id": "day-49",
-    "path": "100days/day-49",
+    "id": "49-grid-trace",
+    "path": "100days/49-grid-trace",
     "description": "Grid Trace - Interactive grid path visualization with Geist Pixel font"
   },
   {
-    "id": "day-50",
-    "path": "100days/day-50",
+    "id": "50-execution-trace-graph",
+    "path": "100days/50-execution-trace-graph",
     "description": "Execution Trace Graph - AI response visualized as a traversal through a skill graph"
   },
   {
-    "id": "day-51",
-    "path": "100days/day-51",
+    "id": "51-resonant-lattice",
+    "path": "100days/51-resonant-lattice",
     "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes"
   },
   {
-    "id": "day-52",
-    "path": "100days/day-52",
+    "id": "52-reaction-diffusion",
+    "path": "100days/52-reaction-diffusion",
     "description": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls"
   },
   {
-    "id": "day-53",
-    "path": "100days/day-53",
+    "id": "53-ascii-grid",
+    "path": "100days/53-ascii-grid",
     "description": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes"
+  },
+  {
+    "id": "54-concept-graph",
+    "path": "100days/54-concept-graph",
+    "description": "Interactive force-directed graph visualizing relationships between projects and data concepts"
   }
 ]

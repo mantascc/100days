@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+    --color-lime-primary: #B4E03C;
+    --color-lime-hover: #A0CC35;
+    --color-lime-active: #8CB82E;
+
+    --font-inter: 'Inter', sans-serif;
+}
+
+@theme {
+    --color-lime-primary: var(--color-lime-primary);
+    --color-lime-hover: var(--color-lime-hover);
+    --color-lime-active: var(--color-lime-active);
+}
+
+body {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: var(--font-inter);
+}
+
+@keyframes gradient-slide {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+.listening-gradient {
+    background: linear-gradient(90deg, #ffffff, #f7fee7, #ffffff);
+    /* white -> lime-50 -> white */
+    background-size: 200% 100%;
+    animation: gradient-slide 3s linear infinite;
+}

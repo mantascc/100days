@@ -1,0 +1,980 @@
+{
+  "generated": "2026-02-20T05:22:06.995Z",
+  "totalProjects": 52,
+  "concepts": [
+    {
+      "id": "network",
+      "label": "Network & Graph",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": "clustering",
+      "label": "Clustering",
+      "color": "#f9ca24"
+    },
+    {
+      "id": "statistical",
+      "label": "Statistical",
+      "color": "#a29bfe"
+    },
+    {
+      "id": "temporal",
+      "label": "Temporal",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": "spatial",
+      "label": "Spatial & Geo",
+      "color": "#45b7d1"
+    },
+    {
+      "id": "audio",
+      "label": "Audio & Signal",
+      "color": "#fd79a8"
+    },
+    {
+      "id": "visual",
+      "label": "Image & Visual",
+      "color": "#00b894"
+    },
+    {
+      "id": "emergence",
+      "label": "Emergence",
+      "color": "#feca57"
+    }
+  ],
+  "groups": {
+    "network": {
+      "concept": {
+        "id": "network",
+        "label": "Network & Graph",
+        "color": "#ff6b6b"
+      },
+      "projects": [
+        {
+          "day": 2,
+          "title": "Vicsek Model",
+          "idea": "Collective flocking behavior emerges from simple local alignment rules"
+        },
+        {
+          "day": 8,
+          "title": "Graph Clusters",
+          "idea": "Multiple wandering graph clusters with exact or minimum degree constraints and soft-body repulsion"
+        },
+        {
+          "day": 9,
+          "title": "Planar Graph Network",
+          "idea": "Wandering agents connected by a dynamically-computed planar graph structure with MST backbone and non-crossing extra edges"
+        },
+        {
+          "day": 16,
+          "title": "Hub-Spoke Force Network",
+          "idea": "Force-directed graph with designated hub nodes, shared vs exclusive agent connections, and draggable hub repositioning"
+        },
+        {
+          "day": 17,
+          "title": "Audio-Reactive Force Network",
+          "idea": "Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength"
+        },
+        {
+          "day": 19,
+          "title": "Coworker Network (React)",
+          "idea": "Force-directed graph visualization of coworker relationships built with React and TypeScript"
+        },
+        {
+          "day": 21,
+          "title": "Agent Interaction Heatmap",
+          "idea": "Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns"
+        },
+        {
+          "day": 22,
+          "title": "Directed Network Graph",
+          "idea": "SVG-based force-directed graph with directional edges, rectangular nodes, and drag interaction"
+        },
+        {
+          "day": 26,
+          "title": "Dynamic Widget Dashboard",
+          "idea": "Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays"
+        },
+        {
+          "day": 50,
+          "title": "Execution Trace Graph",
+          "idea": "Visualization of code execution flow as interactive node graph with left panel showing execution context"
+        },
+        {
+          "day": 54,
+          "title": "Concept Graph Visualization",
+          "idea": "Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts"
+        }
+      ]
+    },
+    "clustering": {
+      "concept": {
+        "id": "clustering",
+        "label": "Clustering",
+        "color": "#f9ca24"
+      },
+      "projects": [
+        {
+          "day": 3,
+          "title": "Clusters and a Chaos Agent",
+          "idea": "How a single disruptive agent affects collective clustering behavior"
+        },
+        {
+          "day": 7,
+          "title": "Apophenia",
+          "idea": "Perceiving patterns in random motion—proximity links emerge and dissolve"
+        }
+      ]
+    },
+    "statistical": {
+      "concept": {
+        "id": "statistical",
+        "label": "Statistical",
+        "color": "#a29bfe"
+      },
+      "projects": [
+        {
+          "day": 1,
+          "title": "Entropy",
+          "idea": "Interactive visualization of entropy as a gradient from perfect order to total chaos"
+        },
+        {
+          "day": 2,
+          "title": "Vicsek Model",
+          "idea": "Collective flocking behavior emerges from simple local alignment rules"
+        },
+        {
+          "day": 4,
+          "title": "Random Walk",
+          "idea": "Stochastic patterns emerge from purely random individual motion"
+        },
+        {
+          "day": 5,
+          "title": "Fall",
+          "idea": "Biased random walk where gravity interrupts pure randomness"
+        },
+        {
+          "day": 37,
+          "title": "Sentiment Analyzer",
+          "idea": "Real-time text sentiment analysis with industrial-themed visualization interface"
+        },
+        {
+          "day": 51,
+          "title": "Resonant Lattice",
+          "idea": "Interactive spring-mass lattice showing energy propagation, resonance, and damping effects"
+        },
+        {
+          "day": 54,
+          "title": "Concept Graph Visualization",
+          "idea": "Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts"
+        }
+      ]
+    },
+    "temporal": {
+      "concept": {
+        "id": "temporal",
+        "label": "Temporal",
+        "color": "#4ecdc4"
+      },
+      "projects": [
+        {
+          "day": 11,
+          "title": "Ambient Clock",
+          "idea": "Fullscreen clock with typing animation overlaid on particle network background"
+        },
+        {
+          "day": 14,
+          "title": "Synchronizing Fireflies",
+          "idea": "Proximity-based phase synchronization where clustered agents pulse together and drift upward, isolated agents remain dim and sink"
+        },
+        {
+          "day": 20,
+          "title": "Schelling Segregation Model",
+          "idea": "Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns"
+        },
+        {
+          "day": 21,
+          "title": "Agent Interaction Heatmap",
+          "idea": "Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns"
+        },
+        {
+          "day": 24,
+          "title": "Rock Paper Scissors Simulation",
+          "idea": "Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates"
+        },
+        {
+          "day": 32,
+          "title": "Entropy Patterns",
+          "idea": "Visual taxonomy of creative work rhythms mapping cognitive load oscillations and thinking quality across different production modes"
+        },
+        {
+          "day": 33,
+          "title": "Slit-Scan Camera",
+          "idea": "Webcam-based slit-scan photography tool that captures 30-second temporal slices with programmatic color effects and cinematic post-processing"
+        },
+        {
+          "day": 40,
+          "title": "Cube Grid Rules Engine",
+          "idea": "3D cube grid governed by customizable cellular automaton-like rules with parameter controls"
+        },
+        {
+          "day": 44,
+          "title": "Whiff",
+          "idea": "Command-line tool that instantly visualizes JSON data as tables, line graphs, or bar charts in the browser"
+        },
+        {
+          "day": 50,
+          "title": "Execution Trace Graph",
+          "idea": "Visualization of code execution flow as interactive node graph with left panel showing execution context"
+        },
+        {
+          "day": 52,
+          "title": "Reaction-Diffusion (Gray-Scott)",
+          "idea": "Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions"
+        }
+      ]
+    },
+    "spatial": {
+      "concept": {
+        "id": "spatial",
+        "label": "Spatial & Geo",
+        "color": "#45b7d1"
+      },
+      "projects": [
+        {
+          "day": 6,
+          "title": "Orbital",
+          "idea": "Miniature solar systems in a grid—16 unique orbital configurations"
+        },
+        {
+          "day": 7,
+          "title": "Apophenia",
+          "idea": "Perceiving patterns in random motion—proximity links emerge and dissolve"
+        },
+        {
+          "day": 12,
+          "title": "Wind Field",
+          "idea": "Grid of particles displaced by multi-octave Perlin noise forming animated wind-like flows with embedded text"
+        },
+        {
+          "day": 18,
+          "title": "Custom Cellular Automaton",
+          "idea": "Step-by-step cellular automaton with custom rules: birth on 3 neighbors, death on 5+ neighbors"
+        },
+        {
+          "day": 20,
+          "title": "Schelling Segregation Model",
+          "idea": "Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns"
+        },
+        {
+          "day": 24,
+          "title": "Rock Paper Scissors Simulation",
+          "idea": "Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates"
+        },
+        {
+          "day": 25,
+          "title": "Spotlight Grid",
+          "idea": "Interactive dot grid where dots near mouse cursor illuminate with adjustable density and color"
+        },
+        {
+          "day": 27,
+          "title": "Muse (Desktop Only)",
+          "idea": "Desktop-only interactive creative tool or playground with fly element"
+        },
+        {
+          "day": 35,
+          "title": "Flight Path Visualization",
+          "idea": "iPad-optimized flight tracking interface showing real-time route optimization with great circle paths and waypoint notifications"
+        },
+        {
+          "day": 40,
+          "title": "Cube Grid Rules Engine",
+          "idea": "3D cube grid governed by customizable cellular automaton-like rules with parameter controls"
+        },
+        {
+          "day": 45,
+          "title": "Gravity Pills",
+          "idea": "Physics simulation of pill-shaped objects with gravity, drag interaction, and collision dynamics"
+        },
+        {
+          "day": 49,
+          "title": "Grid Trace",
+          "idea": "Animated grid with path-tracing effects and typewriter text using Geist Pixel Square font"
+        },
+        {
+          "day": 51,
+          "title": "Resonant Lattice",
+          "idea": "Interactive spring-mass lattice showing energy propagation, resonance, and damping effects"
+        },
+        {
+          "day": 52,
+          "title": "Reaction-Diffusion (Gray-Scott)",
+          "idea": "Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions"
+        }
+      ]
+    },
+    "audio": {
+      "concept": {
+        "id": "audio",
+        "label": "Audio & Signal",
+        "color": "#fd79a8"
+      },
+      "projects": [
+        {
+          "day": 10,
+          "title": "Audio-Reactive Agents",
+          "idea": "Microphone-driven particle swarm where loudness controls movement speed and chaos"
+        },
+        {
+          "day": 17,
+          "title": "Audio-Reactive Force Network",
+          "idea": "Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength"
+        },
+        {
+          "day": 39,
+          "title": "Wave Morph",
+          "idea": "Audio waveform morphing between different wave types (sine, triangle, square, sawtooth) with interactive slider"
+        }
+      ]
+    },
+    "visual": {
+      "concept": {
+        "id": "visual",
+        "label": "Image & Visual",
+        "color": "#00b894"
+      },
+      "projects": [
+        {
+          "day": 13,
+          "title": "Image Flow Field",
+          "idea": "Upload images transformed into flowing particle fields using Perlin noise displacement"
+        },
+        {
+          "day": 15,
+          "title": "Binary Camera Grid",
+          "idea": "Real-time webcam feed converted to binary grid visualization with adjustable threshold and cell size"
+        },
+        {
+          "day": 23,
+          "title": "Interactive Typography",
+          "idea": "\"Hello World\" text where each letter cycles through different fonts on hover and randomizes on click"
+        },
+        {
+          "day": 26,
+          "title": "Dynamic Widget Dashboard",
+          "idea": "Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays"
+        },
+        {
+          "day": 28,
+          "title": "Liquid Glass Effect",
+          "idea": "Draggable frosted glass pane with liquid distortion filter and customizable backdrop effects"
+        },
+        {
+          "day": 29,
+          "title": "100 Progress Indicators",
+          "idea": "Comprehensive collection of 100 unique loading/progress indicator animations organized by style categories"
+        },
+        {
+          "day": 30,
+          "title": "Thinking States",
+          "idea": "Experimental iteration exploring \"thinking\" metaphor through animated loading indicators"
+        },
+        {
+          "day": 31,
+          "title": "CLI Material Palette",
+          "idea": "Comprehensive design reference documenting the fundamental visual and interactive materials of command-line interfaces"
+        },
+        {
+          "day": 34,
+          "title": "Particle Text Morph",
+          "idea": "Canvas particle system where text decomposes into particles controlled by stability slider (desktop only)"
+        },
+        {
+          "day": 38,
+          "title": "Generative Baltic Pattern",
+          "idea": "Generative pattern generator creating Baltic folk art inspired geometric designs"
+        },
+        {
+          "day": 41,
+          "title": "Metaball",
+          "idea": "Interactive metaball physics simulation with mouse-driven particle attraction"
+        },
+        {
+          "day": 42,
+          "title": "Metaball Grid",
+          "idea": "Grid of multiple metaball sketches with responsive 4-column (desktop) / 2-column (mobile) layout"
+        },
+        {
+          "day": 43,
+          "title": "Computational Minimalism Style Seed",
+          "idea": "Design system document defining visual language for creative coding sketches"
+        },
+        {
+          "day": 46,
+          "title": "OKLCH vs HSL Gradient Comparison",
+          "idea": "Side-by-side comparison of color gradients using OKLCH and HSL color spaces"
+        },
+        {
+          "day": 47,
+          "title": "2GIF",
+          "idea": "Browser-based tool for converting screen recordings into polished, shareable gifs with styled backgrounds"
+        },
+        {
+          "day": 53,
+          "title": "ASCII Animated Grid (Refined UI)",
+          "idea": "Character-based animation grid with five distinct modes: ripple, wave, rain, breath, and worm"
+        }
+      ]
+    },
+    "emergence": {
+      "concept": {
+        "id": "emergence",
+        "label": "Emergence",
+        "color": "#feca57"
+      },
+      "projects": [
+        {
+          "day": 2,
+          "title": "Vicsek Model",
+          "idea": "Collective flocking behavior emerges from simple local alignment rules"
+        }
+      ]
+    }
+  },
+  "projects": [
+    {
+      "day": 1,
+      "title": "Entropy",
+      "idea": "Interactive visualization of entropy as a gradient from perfect order to total chaos",
+      "primaryConcept": "Statistical / Entropy",
+      "secondaryConcept": "Temporal (motion over time)",
+      "concepts": [
+        "statistical"
+      ]
+    },
+    {
+      "day": 2,
+      "title": "Vicsek Model",
+      "idea": "Collective flocking behavior emerges from simple local alignment rules",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Statistical (noise as stochasticity), Emergence",
+      "concepts": [
+        "network",
+        "statistical",
+        "emergence"
+      ]
+    },
+    {
+      "day": 3,
+      "title": "Clusters and a Chaos Agent",
+      "idea": "How a single disruptive agent affects collective clustering behavior",
+      "primaryConcept": "Clustering",
+      "secondaryConcept": "Network (connected components), Statistical (noise injection)",
+      "concepts": [
+        "clustering"
+      ]
+    },
+    {
+      "day": 4,
+      "title": "Random Walk",
+      "idea": "Stochastic patterns emerge from purely random individual motion",
+      "primaryConcept": "Statistical",
+      "secondaryConcept": "Temporal (trails show motion history), Spatial (diffusion patterns)",
+      "concepts": [
+        "statistical"
+      ]
+    },
+    {
+      "day": 5,
+      "title": "Fall",
+      "idea": "Biased random walk where gravity interrupts pure randomness",
+      "primaryConcept": "Statistical",
+      "secondaryConcept": "Temporal (periodic forcing), Spatial (directional flow)",
+      "concepts": [
+        "statistical"
+      ]
+    },
+    {
+      "day": 6,
+      "title": "Orbital",
+      "idea": "Miniature solar systems in a grid—16 unique orbital configurations",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (periodic motion, phase relationships)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 7,
+      "title": "Apophenia",
+      "idea": "Perceiving patterns in random motion—proximity links emerge and dissolve",
+      "primaryConcept": "Clustering",
+      "secondaryConcept": "Network (dynamic edges), Spatial (distance-based relationships)",
+      "concepts": [
+        "clustering",
+        "spatial"
+      ]
+    },
+    {
+      "day": 8,
+      "title": "Graph Clusters",
+      "idea": "Multiple wandering graph clusters with exact or minimum degree constraints and soft-body repulsion",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Clustering (spatial grouping, soft-body repulsion), Spatial (bounded wandering, position-based forces)",
+      "concepts": [
+        "network"
+      ]
+    },
+    {
+      "day": 9,
+      "title": "Planar Graph Network",
+      "idea": "Wandering agents connected by a dynamically-computed planar graph structure with MST backbone and non-crossing extra edges",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Spatial (geometric constraints, intersection testing), Statistical (random walk, Brownian motion)",
+      "concepts": [
+        "network"
+      ]
+    },
+    {
+      "day": 10,
+      "title": "Audio-Reactive Agents",
+      "idea": "Microphone-driven particle swarm where loudness controls movement speed and chaos",
+      "primaryConcept": "Audio",
+      "secondaryConcept": "Network (proximity connections, dynamic topology), Spatial (particle positions, boundary constraints)",
+      "concepts": [
+        "audio"
+      ]
+    },
+    {
+      "day": 11,
+      "title": "Ambient Clock",
+      "idea": "Fullscreen clock with typing animation overlaid on particle network background",
+      "primaryConcept": "Temporal",
+      "secondaryConcept": "Network (particle proximity connections), Spatial (particle positions and movement)",
+      "concepts": [
+        "temporal"
+      ]
+    },
+    {
+      "day": 12,
+      "title": "Wind Field",
+      "idea": "Grid of particles displaced by multi-octave Perlin noise forming animated wind-like flows with embedded text",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Statistical (Perlin noise, fractal processes), Visual (text masking, particle rendering)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 13,
+      "title": "Image Flow Field",
+      "idea": "Upload images transformed into flowing particle fields using Perlin noise displacement",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (vector field displacement, grid-based layout), Statistical (Perlin noise, fractal processes)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 14,
+      "title": "Synchronizing Fireflies",
+      "idea": "Proximity-based phase synchronization where clustered agents pulse together and drift upward, isolated agents remain dim and sink",
+      "primaryConcept": "Temporal",
+      "secondaryConcept": "Clustering (proximity detection, emergent grouping), Spatial (drift forces, velocity-based motion)",
+      "concepts": [
+        "temporal"
+      ]
+    },
+    {
+      "day": 15,
+      "title": "Binary Camera Grid",
+      "idea": "Real-time webcam feed converted to binary grid visualization with adjustable threshold and cell size",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (grid-based sampling, resolution control)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 16,
+      "title": "Hub-Spoke Force Network",
+      "idea": "Force-directed graph with designated hub nodes, shared vs exclusive agent connections, and draggable hub repositioning",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Spatial (force-directed layout, collision physics)",
+      "concepts": [
+        "network"
+      ]
+    },
+    {
+      "day": 17,
+      "title": "Audio-Reactive Force Network",
+      "idea": "Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength",
+      "primaryConcept": "Audio",
+      "secondaryConcept": "Network (graph topology, force-directed layout), Temporal (smooth transitions, EMA filtering)",
+      "concepts": [
+        "audio",
+        "network"
+      ]
+    },
+    {
+      "day": 18,
+      "title": "Custom Cellular Automaton",
+      "idea": "Step-by-step cellular automaton with custom rules: birth on 3 neighbors, death on 5+ neighbors",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (discrete generations, state evolution)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 19,
+      "title": "Coworker Network (React)",
+      "idea": "Force-directed graph visualization of coworker relationships built with React and TypeScript",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Spatial (force-directed layout)",
+      "concepts": [
+        "network"
+      ]
+    },
+    {
+      "day": 20,
+      "title": "Schelling Segregation Model",
+      "idea": "Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Statistical (threshold-based decisions, emergent patterns), Temporal (iterative evolution)",
+      "concepts": [
+        "spatial",
+        "temporal"
+      ]
+    },
+    {
+      "day": 21,
+      "title": "Agent Interaction Heatmap",
+      "idea": "Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns",
+      "primaryConcept": "Temporal",
+      "secondaryConcept": "Statistical (success rates, aggregate metrics), Network (agent-user relationships)",
+      "concepts": [
+        "temporal",
+        "network"
+      ]
+    },
+    {
+      "day": 22,
+      "title": "Directed Network Graph",
+      "idea": "SVG-based force-directed graph with directional edges, rectangular nodes, and drag interaction",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Spatial (force-directed layout, geometric calculations)",
+      "concepts": [
+        "network"
+      ]
+    },
+    {
+      "day": 23,
+      "title": "Interactive Typography",
+      "idea": "\"Hello World\" text where each letter cycles through different fonts on hover and randomizes on click",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (state cycling, interaction response)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 24,
+      "title": "Rock Paper Scissors Simulation",
+      "idea": "Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Statistical (population dynamics, competitive exclusion), Temporal (simulation evolution)",
+      "concepts": [
+        "spatial",
+        "temporal"
+      ]
+    },
+    {
+      "day": 25,
+      "title": "Spotlight Grid",
+      "idea": "Interactive dot grid where dots near mouse cursor illuminate with adjustable density and color",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Visual (color variation, dynamic styling)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 26,
+      "title": "Dynamic Widget Dashboard",
+      "idea": "Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (moon phase cycles, agent usage over time), Network (agent interaction data)",
+      "concepts": [
+        "visual",
+        "network"
+      ]
+    },
+    {
+      "day": 27,
+      "title": "Muse (Desktop Only)",
+      "idea": "Desktop-only interactive creative tool or playground with fly element",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (animation, responsive behavior)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 28,
+      "title": "Liquid Glass Effect",
+      "idea": "Draggable frosted glass pane with liquid distortion filter and customizable backdrop effects",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (drag interaction, element positioning)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 29,
+      "title": "100 Progress Indicators",
+      "idea": "Comprehensive collection of 100 unique loading/progress indicator animations organized by style categories",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (looping animations, timing variations)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 30,
+      "title": "Thinking States",
+      "idea": "Experimental iteration exploring \"thinking\" metaphor through animated loading indicators",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (processing states, cognitive timing)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 31,
+      "title": "CLI Material Palette",
+      "idea": "Comprehensive design reference documenting the fundamental visual and interactive materials of command-line interfaces",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (animation patterns, progress indicators), Interactive (UI patterns, state feedback)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 32,
+      "title": "Entropy Patterns",
+      "idea": "Visual taxonomy of creative work rhythms mapping cognitive load oscillations and thinking quality across different production modes",
+      "primaryConcept": "Temporal",
+      "secondaryConcept": "Statistical (pattern classification, mode taxonomy), Visual (curve representation, spatial mapping)",
+      "concepts": [
+        "temporal"
+      ]
+    },
+    {
+      "day": 33,
+      "title": "Slit-Scan Camera",
+      "idea": "Webcam-based slit-scan photography tool that captures 30-second temporal slices with programmatic color effects and cinematic post-processing",
+      "primaryConcept": "Temporal",
+      "secondaryConcept": "Visual (image processing, color effects, slit-scan aesthetic), Spatial (column-based composition, vertical slicing)",
+      "concepts": [
+        "temporal"
+      ]
+    },
+    {
+      "day": 34,
+      "title": "Particle Text Morph",
+      "idea": "Canvas particle system where text decomposes into particles controlled by stability slider (desktop only)",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (particle positions, text formation), Temporal (animation, transition states)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 35,
+      "title": "Flight Path Visualization",
+      "idea": "iPad-optimized flight tracking interface showing real-time route optimization with great circle paths and waypoint notifications",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (flight progress, estimated times, duration), Network (waypoint connections, route optimization)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 37,
+      "title": "Sentiment Analyzer",
+      "idea": "Real-time text sentiment analysis with industrial-themed visualization interface",
+      "primaryConcept": "Statistical",
+      "secondaryConcept": "Temporal (debounced input, real-time updates)",
+      "concepts": [
+        "statistical"
+      ]
+    },
+    {
+      "day": 38,
+      "title": "Generative Baltic Pattern",
+      "idea": "Generative pattern generator creating Baltic folk art inspired geometric designs",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (pattern tiling, symmetry)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 39,
+      "title": "Wave Morph",
+      "idea": "Audio waveform morphing between different wave types (sine, triangle, square, sawtooth) with interactive slider",
+      "primaryConcept": "Audio",
+      "secondaryConcept": "Temporal (animation cycles, morphing transitions), Visual (waveform rendering)",
+      "concepts": [
+        "audio"
+      ]
+    },
+    {
+      "day": 40,
+      "title": "Cube Grid Rules Engine",
+      "idea": "3D cube grid governed by customizable cellular automaton-like rules with parameter controls",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (evolution steps, update cycles), Statistical (rule application, state transitions)",
+      "concepts": [
+        "spatial",
+        "temporal"
+      ]
+    },
+    {
+      "day": 41,
+      "title": "Metaball",
+      "idea": "Interactive metaball physics simulation with mouse-driven particle attraction",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (particle positions, distance fields, surface computation)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 42,
+      "title": "Metaball Grid",
+      "idea": "Grid of multiple metaball sketches with responsive 4-column (desktop) / 2-column (mobile) layout",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Spatial (grid layout, responsive design)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 43,
+      "title": "Computational Minimalism Style Seed",
+      "idea": "Design system document defining visual language for creative coding sketches",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Conceptual (design philosophy, anti-patterns)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 44,
+      "title": "Whiff",
+      "idea": "Command-line tool that instantly visualizes JSON data as tables, line graphs, or bar charts in the browser",
+      "primaryConcept": "Temporal",
+      "secondaryConcept": "Network (WebSocket communication), Visual (data rendering)",
+      "concepts": [
+        "temporal"
+      ]
+    },
+    {
+      "day": 45,
+      "title": "Gravity Pills",
+      "idea": "Physics simulation of pill-shaped objects with gravity, drag interaction, and collision dynamics",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (continuous physics updates, drag interactions)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 46,
+      "title": "OKLCH vs HSL Gradient Comparison",
+      "idea": "Side-by-side comparison of color gradients using OKLCH and HSL color spaces",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Statistical (perceptual uniformity, color metrics)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 47,
+      "title": "2GIF",
+      "idea": "Browser-based tool for converting screen recordings into polished, shareable gifs with styled backgrounds",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (timeline editing, trimming)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 49,
+      "title": "Grid Trace",
+      "idea": "Animated grid with path-tracing effects and typewriter text using Geist Pixel Square font",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (animation paths, typewriter timing), Visual (dot patterns, line drawing)",
+      "concepts": [
+        "spatial"
+      ]
+    },
+    {
+      "day": 50,
+      "title": "Execution Trace Graph",
+      "idea": "Visualization of code execution flow as interactive node graph with left panel showing execution context",
+      "primaryConcept": "Network",
+      "secondaryConcept": "Temporal (execution sequence, timing), Visual (code highlighting, graph layout)",
+      "concepts": [
+        "network",
+        "temporal"
+      ]
+    },
+    {
+      "day": 51,
+      "title": "Resonant Lattice",
+      "idea": "Interactive spring-mass lattice showing energy propagation, resonance, and damping effects",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (wave propagation, oscillation), Statistical (energy distribution, damping)",
+      "concepts": [
+        "spatial",
+        "statistical"
+      ]
+    },
+    {
+      "day": 52,
+      "title": "Reaction-Diffusion (Gray-Scott)",
+      "idea": "Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions",
+      "primaryConcept": "Spatial",
+      "secondaryConcept": "Temporal (pattern evolution, reaction dynamics), Statistical (concentration gradients, equilibrium states)",
+      "concepts": [
+        "spatial",
+        "temporal"
+      ]
+    },
+    {
+      "day": 53,
+      "title": "ASCII Animated Grid (Refined UI)",
+      "idea": "Character-based animation grid with five distinct modes: ripple, wave, rain, breath, and worm",
+      "primaryConcept": "Visual",
+      "secondaryConcept": "Temporal (animation loops, character cycling), Spatial (grid layout, pattern movement)",
+      "concepts": [
+        "visual"
+      ]
+    },
+    {
+      "day": 54,
+      "title": "Concept Graph Visualization",
+      "idea": "Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts",
+      "primaryConcept": "Network & Graph",
+      "secondaryConcept": "Statistical (concept distribution analysis)",
+      "concepts": [
+        "network",
+        "statistical"
+      ]
+    }
+  ]
+}
