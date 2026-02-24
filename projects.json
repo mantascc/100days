@@ -268,5 +268,10 @@
     "id": "54-concept-graph",
     "path": "100days/54-concept-graph",
     "description": "Interactive force-directed graph visualizing relationships between projects and data concepts"
+  },
+  {
+    "id": "55-ascii-loading",
+    "path": "100days/55-ascii-loading",
+    "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar"
   }
 ]

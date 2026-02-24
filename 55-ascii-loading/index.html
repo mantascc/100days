@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>55 — ascii loading</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --border-default: #2a2a2a;
+      --accent: #00ffaa;
+      --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--ground-void);
+      font-family: var(--font-mono);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .cursor { animation: blink 1s steps(1) infinite; }
+
+    .grids {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    pre.grid {
+      font-size: 11px;
+      line-height: 1.45;
+      letter-spacing: 0.14em;
+      white-space: pre;
+      display: block;
+    }
+
+    .progress-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bar-track {
+      height: 2px;
+      background: var(--border-default);
+      position: relative;
+    }
+
+    #bar-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 2px;
+      background: var(--accent);
+      width: 0%;
+    }
+
+    #bar-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0;
+      width: 3px;
+      height: 2px;
+      background: #ffffff;
+      opacity: 0.9;
+      animation: head-pulse 0.6s steps(1) infinite;
+    }
+
+    @keyframes head-pulse {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.3; }
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    #pct   { color: var(--text-secondary); }
+    #timer { color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="label" id="status-label">initializing system<span class="cursor">_</span></div>
+    <div class="grids" id="grids">
+      <pre class="grid" id="grid"></pre>
+      <pre class="grid" id="grid-face"></pre>
+    </div>
+    <div class="progress-section" id="progress-section">
+      <div class="bar-track"><div id="bar-fill"></div></div>
+      <div class="bar-meta">
+        <span id="pct">000 / 100</span>
+        <span id="timer">0:15</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const COLS = 32, ROWS = 16;
+    const DURATION = 15000;
+    const GRID_INTERVAL = 1000 / 12;
+
+    const CHAOS    = '!@#$%^&*+=-~<>|/?\\;:';
+    const SETTLING = '░▒▓▪▫';
+    const LOCKED   = '·';
+
+    const barFill  = document.getElementById('bar-fill');
+    const pctEl    = document.getElementById('pct');
+    const timerEl  = document.getElementById('timer');
+    const progSect = document.getElementById('progress-section');
+    const statusEl = document.getElementById('status-label');
+    const gridsEl  = document.getElementById('grids');
+
+    // --- helpers ---
+
+    function createCells(pre) {
+      const cells = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const s = document.createElement('span');
+          cells.push(s);
+          pre.appendChild(s);
+        }
+        if (r < ROWS - 1) pre.appendChild(document.createTextNode('\n'));
+      }
+      return cells;
+    }
+
+    // --- grid 1: radial crystallization from center ---
+
+    const cells1 = createCells(document.getElementById('grid'));
+
+    const thresh1 = (() => {
+      const t = [], cx = (COLS-1)/2, cy = (ROWS-1)/2;
+      const max = Math.sqrt(cx*cx + cy*cy);
+      for (let r = 0; r < ROWS; r++)
+        for (let c = 0; c < COLS; c++) {
+          const d = Math.sqrt((c-cx)**2 + (r-cy)**2) / max;
+          t.push(d * 0.5 + Math.random() * 0.5);
+        }
+      return t;
+    })();
+
+    function updateGrid1(progress) {
+      for (let i = 0; i < cells1.length; i++) {
+        const s = cells1[i];
+        if (progress >= thresh1[i]) {
+          s.textContent = LOCKED; s.style.color = '#a8aab8';
+        } else {
+          const local = progress / thresh1[i];
+          if (local > 0.72) {
+            s.textContent = SETTLING[Math.floor(Math.random() * SETTLING.length)];
+            s.style.color = '#686868';
+          } else {
+            s.textContent = CHAOS[Math.floor(Math.random() * CHAOS.length)];
+            s.style.color = '#3a3a3a';
+          }
+        }
+      }
+    }
+
+    // --- grid 2: face emergence ---
+
+    const cells2 = createCells(document.getElementById('grid-face'));
+
+    // Face template: █=border, ▒=fill, ' '=hole, ░=background
+    const FACE_ROWS = [
+      '░░██░░░░░░░░░░░░░░░░░░░░░░░░██░░',
+      '░█▒▒█░░░░░░░░░░░░░░░░░░░░░░█▒▒█░',
+      '░█▒▒▒█░░░░░░░░░░░░░░░░░░░░█▒▒▒█░',
+      '░█▒▒▒▒████████████████████▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒  ▒  ▒▒▒▒▒▒▒▒▒▒  ▒  ▒▒▒▒█░',
+      '░█▒▒▒▒▒   ▒▒▒▒▒▒▒▒▒▒▒▒   ▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒▒▒▒      ▒▒▒▒▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒  ▒▒▒    ▒▒▒  ▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒  ▒▒▒  ▒▒▒  ▒▒▒▒▒▒▒▒█░',
+      '░█▒▒▒▒▒▒▒▒▒    ▒▒    ▒▒▒▒▒▒▒▒▒█░',
+      '░░█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█░░',
+      '░░░██████████████████████████░░░',
+    ];
+
+    // Cell types: 0=empty, 1=fill(▒), 2=border(█), 3=hole-edge(space adj to fill/border)
+    const faceType = new Uint8Array(ROWS * COLS);
+
+    // Pass 1: parse face characters by codepoint
+    for (let r = 0; r < ROWS; r++) {
+      const row = FACE_ROWS[r] || '';
+      for (let c = 0; c < COLS; c++) {
+        const cp = row.codePointAt(c);
+        const i  = r * COLS + c;
+        if      (cp === 0x2588) faceType[i] = 2; // █ border
+        else if (cp === 0x2592) faceType[i] = 1; // ▒ fill
+        // else 0 (░ background or space hole)
+      }
+    }
+
+    // Pass 2: space cells (actual ' ') adjacent to fill/border → hole-edge
+    for (let r = 0; r < ROWS; r++) {
+      const row = FACE_ROWS[r] || '';
+      for (let c = 0; c < COLS; c++) {
+        if (row[c] !== ' ') continue;
+        const i = r * COLS + c;
+        const up    = r > 0      ? faceType[(r-1)*COLS+c] : 0;
+        const down  = r < ROWS-1 ? faceType[(r+1)*COLS+c] : 0;
+        const left  = c > 0      ? faceType[i-1]           : 0;
+        const right = c < COLS-1 ? faceType[i+1]           : 0;
+        if (up || down || left || right) faceType[i] = 3;
+      }
+    }
+
+    // Thresholds: face cells lock first, background last
+    const thresh2 = (() => {
+      const t = new Float32Array(ROWS * COLS);
+      for (let i = 0; i < t.length; i++) {
+        const tp = faceType[i];
+        if      (tp === 2) t[i] = 0.03 + Math.random() * 0.42; // border: 3-45%
+        else if (tp === 1) t[i] = 0.08 + Math.random() * 0.52; // fill: 8-60%
+        else if (tp === 3) t[i] = 0.12 + Math.random() * 0.53; // hole-edge: 12-65%
+        else               t[i] = 0.55 + Math.random() * 0.45; // empty: 55-100%
+      }
+      return t;
+    })();
+
+    function updateGrid2(progress) {
+      for (let i = 0; i < cells2.length; i++) {
+        const s  = cells2[i];
+        const tp = faceType[i];
+        if (progress >= thresh2[i]) {
+          if      (tp === 2) { s.textContent = '█'; s.style.color = '#dcdce8'; }
+          else if (tp === 1) { s.textContent = '▒'; s.style.color = '#787888'; }
+          else if (tp === 3) { s.textContent = '█'; s.style.color = '#dcdce8'; }
+          else               { s.textContent = ' '; s.style.color = ''; }
+        } else {
+          const local   = progress / thresh2[i];
+          const isFace  = tp > 0;
+          if (local > 0.72) {
+            s.textContent = SETTLING[Math.floor(Math.random() * SETTLING.length)];
+            s.style.color = isFace ? '#606060' : '#222222';
+          } else {
+            s.textContent = CHAOS[Math.floor(Math.random() * CHAOS.length)];
+            s.style.color = isFace ? '#383838' : '#1e1e1e';
+          }
+        }
+      }
+    }
+
+    // Match bar width to combined grids width
+    requestAnimationFrame(() => {
+      progSect.style.width = gridsEl.offsetWidth + 'px';
+    });
+
+    function formatCountdown(elapsed) {
+      const s = Math.ceil((DURATION - elapsed) / 1000);
+      if (s <= 0) return '0:00';
+      return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    }
+
+    let startTime = null, lastGridUpdate = 0;
+
+    function animate(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed  = Math.min(ts - startTime, DURATION);
+      const progress = elapsed / DURATION;
+
+      barFill.style.width = (progress * 100).toFixed(3) + '%';
+      pctEl.textContent   = String(Math.floor(progress * 100)).padStart(3, '0') + ' / 100';
+      timerEl.textContent = formatCountdown(elapsed);
+
+      if (ts - lastGridUpdate >= GRID_INTERVAL) {
+        lastGridUpdate = ts;
+        updateGrid1(progress);
+        updateGrid2(progress);
+      }
+
+      if (elapsed < DURATION) {
+        requestAnimationFrame(animate);
+      } else {
+        updateGrid1(1);
+        updateGrid2(1);
+        timerEl.textContent = '0:00';
+        statusEl.innerHTML  = '<span style="color: var(--accent)">system ready</span>';
+      }
+    }
+
+    requestAnimationFrame(animate);
+
+    window.addEventListener('resize', () => {
+      progSect.style.width = gridsEl.offsetWidth + 'px';
+    });
+  </script>
+</body>
+</html>
