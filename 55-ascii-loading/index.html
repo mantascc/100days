@@ -62,6 +62,13 @@
       display: block;
     }
 
+    @media (max-width: 700px) {
+      .grids {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+
     .progress-section {
       display: flex;
       flex-direction: column;
@@ -278,10 +285,11 @@
       }
     }
 
-    // Match bar width to combined grids width
-    requestAnimationFrame(() => {
+    // Match bar width to grids container
+    function syncBarWidth() {
       progSect.style.width = gridsEl.offsetWidth + 'px';
-    });
+    }
+    requestAnimationFrame(syncBarWidth);
 
     function formatCountdown(elapsed) {
       const s = Math.ceil((DURATION - elapsed) / 1000);
@@ -318,9 +326,7 @@
 
     requestAnimationFrame(animate);
 
-    window.addEventListener('resize', () => {
-      progSect.style.width = gridsEl.offsetWidth + 'px';
-    });
+    window.addEventListener('resize', syncBarWidth);
   </script>
 </body>
 </html>
