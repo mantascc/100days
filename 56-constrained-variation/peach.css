@@ -187,6 +187,11 @@ header {
 
 .guide-popover[hidden] { display: none; }
 
+.guide-steps a {
+    color: inherit;
+    text-decoration: underline;
+}
+
 .guide-steps {
     list-style: none;
     display: flex;
