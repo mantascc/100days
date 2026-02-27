@@ -273,5 +273,10 @@
     "id": "55-ascii-loading",
     "path": "100days/55-ascii-loading",
     "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar"
+  },
+  {
+    "id": "56-constrained-variation",
+    "path": "100days/56-constrained-variation",
+    "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously"
   }
 ]
