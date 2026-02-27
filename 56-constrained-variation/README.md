@@ -20,8 +20,8 @@ Canvas animation viewer built around the constrained variation method — hold a
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/your-username/peach
-cd peach
+git clone https://github.com/mantascc/100days
+cd 100days/56-constrained-variation
 python3 -m http.server 8000
 ```
 
