@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peach</title>
+    <link rel="stylesheet" href="peach.css">
+</head>
+
+<body>
+    <header>peach</header>
+
+    <nav class="toolbar">
+        <button class="toolbar-btn disabled" id="btn-prev">←</button>
+        <div class="toolbar-sep"></div>
+        <span class="toolbar-label" id="chapter-counter">01 / 04</span>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" id="btn-next">→</button>
+    </nav>
+
+    <button id="btn-clone">CLONE</button>
+
+    <div class="guide-popover" id="guide-popover" hidden>
+        <ul class="guide-steps">
+            <li>
+                <span class="guide-step-n">1</span>
+                <span>Clone the repo and run a local server</span>
+            </li>
+            <li>
+                <span class="guide-step-n">2</span>
+                <span>Open with any coding assistant — invoke <code class="guide-code-inline">skill.md</code>. Claude
+                    Code works automatically</span>
+            </li>
+            <li>
+                <span class="guide-step-n">3</span>
+                <span>Tell it what you want to explore. Your chapter appears as 05</span>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        const btnClone = document.getElementById('btn-clone');
+        const popover = document.getElementById('guide-popover');
+        btnClone.addEventListener('click', (e) => {
+            e.stopPropagation();
+            popover.hidden = !popover.hidden;
+            btnClone.classList.toggle('active', !popover.hidden);
+        });
+        document.addEventListener('click', () => {
+            popover.hidden = true;
+            btnClone.classList.remove('active');
+        });
+        popover.addEventListener('click', (e) => e.stopPropagation());
+    </script>
+
+    <div class="grid" id="grid"></div>
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
