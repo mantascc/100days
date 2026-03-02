@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <header>peach</header>
+    <header>peach<span id="chapter-name"></span></header>
 
     <nav class="toolbar">
         <button class="toolbar-btn disabled" id="btn-prev">←</button>
@@ -21,20 +21,22 @@
 
     <button id="btn-clone">CLONE</button>
 
-    <div class="guide-popover" id="guide-popover" hidden>
+    <div class="guide-popover" id="guide-popover">
+        <p class="guide-title">You reached a blank chapter. What's next?</p>
         <ul class="guide-steps">
             <li>
                 <span class="guide-step-n">1</span>
-                <span>Clone the repo and run a local server<br><a href="https://github.com/mantascc/100days" target="_blank">github.com/mantascc/100days</a></span>
+                <span>Clone the repo:<br><a href="https://github.com/mantascc/100days"
+                        target="_blank">github.com/mantascc/100days</a></span>
             </li>
             <li>
                 <span class="guide-step-n">2</span>
-                <span>Open with any coding assistant — invoke <code class="guide-code-inline">skill.md</code>. Claude
-                    Code works automatically</span>
+                <span>Open with any coding assistant — invoke <code class="guide-code-inline">skill.md</code> and get
+                    started</span>
             </li>
             <li>
                 <span class="guide-step-n">3</span>
-                <span>Tell it what you want to explore. Your chapter appears as 05</span>
+                <span>Follow the guidance and create new chapters of Peach</span>
             </li>
         </ul>
     </div>
@@ -44,11 +46,11 @@
         const popover = document.getElementById('guide-popover');
         btnClone.addEventListener('click', (e) => {
             e.stopPropagation();
-            popover.hidden = !popover.hidden;
-            btnClone.classList.toggle('active', !popover.hidden);
+            const open = popover.classList.toggle('is-open');
+            btnClone.classList.toggle('active', open);
         });
         document.addEventListener('click', () => {
-            popover.hidden = true;
+            popover.classList.remove('is-open');
             btnClone.classList.remove('active');
         });
         popover.addEventListener('click', (e) => e.stopPropagation());

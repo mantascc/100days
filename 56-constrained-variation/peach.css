@@ -30,6 +30,14 @@ header {
     opacity: 0.85;
     z-index: 100;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#chapter-name {
+    opacity: 0.4;
+    letter-spacing: 0.15em;
 }
 
 .toolbar {
@@ -183,9 +191,23 @@ header {
     font-size: 12px;
     color: var(--peach);
     line-height: 1.6;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
 }
 
-.guide-popover[hidden] { display: none; }
+.guide-popover.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.guide-title {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    opacity: 0.5;
+}
 
 .guide-steps a {
     color: inherit;
