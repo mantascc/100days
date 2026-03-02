@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            background: #0E0E0E;
+            font-family: 'DM Mono', monospace;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stage {
+            display: flex;
+            align-items: flex-end;
+            gap: 28px;
+        }
+
+        .tile {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .tile-canvas-wrap {
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 3px;
+            overflow: hidden;
+            transition: border-color 0.25s ease, transform 0.25s ease;
+            width: 200px;
+            height: 260px;
+        }
+
+        .tile:hover .tile-canvas-wrap {
+            border-color: rgba(255, 255, 255, 0.22);
+            transform: translateY(-6px);
+        }
+
+        .tile canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        .tile-name {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            transition: opacity 0.25s ease;
+            padding-left: 1px;
+        }
+
+        .tile:hover .tile-name {
+            opacity: 1;
+        }
+
+        #tile-peach .tile-name { color: #F4BFA0; }
+        #tile-mesa  .tile-name { color: #D18A6A; }
+        #tile-sprig .tile-name { color: #9B8CC8; }
+    </style>
+</head>
+<body>
+
+<div class="stage">
+    <a class="tile" id="tile-peach" href="/56-constrained-variation/">
+        <div class="tile-canvas-wrap">
+            <canvas id="c-peach"></canvas>
+        </div>
+        <span class="tile-name">peach</span>
+    </a>
+    <a class="tile" id="tile-mesa" href="/daily-sketch/sketch-mesa/">
+        <div class="tile-canvas-wrap">
+            <canvas id="c-mesa"></canvas>
+        </div>
+        <span class="tile-name">mesa</span>
+    </a>
+    <a class="tile" id="tile-sprig" href="/daily-sketch/sketch-sprig/">
+        <div class="tile-canvas-wrap">
+            <canvas id="c-sprig"></canvas>
+        </div>
+        <span class="tile-name">sprig</span>
+    </a>
+</div>
+
+<script>
+    const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+
+    function lerp(a, b, t) {
+        return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+    }
+    function clamp(v) { return Math.max(0, Math.min(255, v)); }
+
+    function drawDither(canvas, PINK, YELLOW) {
+        const wrap = canvas.parentElement;
+        canvas.width  = wrap.offsetWidth;
+        canvas.height = wrap.offsetHeight;
+        const W = canvas.width, H = canvas.height;
+        const ctx = canvas.getContext('2d');
+        const img = ctx.createImageData(W, H);
+        for (let y = 0; y < H; y++) {
+            for (let x = 0; x < W; x++) {
+                const col = lerp(PINK, YELLOW, x / W);
+                const threshold = (BAYER[y % 4][x % 4] / 16) * 60 - 30;
+                const i = (y * W + x) * 4;
+                img.data[i]   = clamp(col[0] + threshold);
+                img.data[i+1] = clamp(col[1] + threshold);
+                img.data[i+2] = clamp(col[2] + threshold);
+                img.data[i+3] = 255;
+            }
+        }
+        ctx.putImageData(img, 0, 0);
+    }
+
+    const themes = [
+        { id: 'c-peach', pink: [244, 160, 160], yellow: [244, 216, 122] },
+        { id: 'c-mesa',  pink: [209, 138, 106], yellow: [183, 165, 138] },
+        { id: 'c-sprig', pink: [155, 140, 200], yellow: [126, 200, 168] },
+    ];
+
+    for (const { id, pink, yellow } of themes) {
+        drawDither(document.getElementById(id), pink, yellow);
+    }
+</script>
+
+</body>
+</html>
