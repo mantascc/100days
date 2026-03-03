@@ -5,7 +5,6 @@ import { createChapter as createInterferenceChapter } from './chapters/interfere
 import { createChapter as createScanlinesChapter } from './chapters/scanlines.js';
 import { createChapter as createCorruptChapter } from './chapters/corrupt.js';
 import { createChapter as createAnnaChapter } from './chapters/anna.js';
-import { createChapter as createEntropyChapter } from './chapters/entropy.js';
 
 const CHAPTER_FACTORIES = [
     { id: 'static', create: createStaticChapter },
@@ -13,7 +12,6 @@ const CHAPTER_FACTORIES = [
     { id: 'scanlines', create: createScanlinesChapter },
     { id: 'corrupt', create: createCorruptChapter },
     { id: 'anna', create: createAnnaChapter },
-    { id: 'entropy', create: createEntropyChapter },
 ];
 
 const N = CHAPTER_FACTORIES.length;
