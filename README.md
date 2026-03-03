@@ -62,3 +62,4 @@ This collection explores the intersection of human creativity and artificial int
 | [52-reaction-diffusion](52-reaction-diffusion) | 52-reaction-diffusion | Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls |
 | [54-concept-graph](54-concept-graph) | 54-concept-graph | Interactive force-directed graph visualizing relationships between projects and data concepts |
 | [53-ascii-grid](53-ascii-grid) | 53-ascii-grid | ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes |
+| [57-color-themes](57-color-themes) | 57-color-themes | Theme-switchable constrained-variation viewer exploring palette identity across shared sketches |

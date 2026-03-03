@@ -71,36 +71,17 @@
             opacity: 1;
         }
 
-        #tile-peach .tile-name { color: #F4BFA0; }
-        #tile-mesa  .tile-name { color: #D18A6A; }
-        #tile-sprig .tile-name { color: #9B8CC8; }
     </style>
 </head>
 <body>
 
-<div class="stage">
-    <a class="tile" id="tile-peach" href="/56-constrained-variation/">
-        <div class="tile-canvas-wrap">
-            <canvas id="c-peach"></canvas>
-        </div>
-        <span class="tile-name">peach</span>
-    </a>
-    <a class="tile" id="tile-mesa" href="/daily-sketch/sketch-mesa/">
-        <div class="tile-canvas-wrap">
-            <canvas id="c-mesa"></canvas>
-        </div>
-        <span class="tile-name">mesa</span>
-    </a>
-    <a class="tile" id="tile-sprig" href="/daily-sketch/sketch-sprig/">
-        <div class="tile-canvas-wrap">
-            <canvas id="c-sprig"></canvas>
-        </div>
-        <span class="tile-name">sprig</span>
-    </a>
-</div>
+<div class="stage" id="stage"></div>
 
-<script>
+<script type="module">
+    import { THEMES } from './themes.js';
+
     const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+    const stage = document.getElementById('stage');
 
     function lerp(a, b, t) {
         return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
@@ -128,14 +109,17 @@
         ctx.putImageData(img, 0, 0);
     }
 
-    const themes = [
-        { id: 'c-peach', pink: [244, 160, 160], yellow: [244, 216, 122] },
-        { id: 'c-mesa',  pink: [209, 138, 106], yellow: [183, 165, 138] },
-        { id: 'c-sprig', pink: [155, 140, 200], yellow: [126, 200, 168] },
-    ];
+    stage.innerHTML = THEMES.map((theme) => `
+        <a class="tile" href="./sketch-theme/?theme=${theme.slug}">
+            <div class="tile-canvas-wrap">
+                <canvas id="c-${theme.slug}"></canvas>
+            </div>
+            <span class="tile-name" style="color: ${theme.accent}">${theme.slug}</span>
+        </a>
+    `).join('');
 
-    for (const { id, pink, yellow } of themes) {
-        drawDither(document.getElementById(id), pink, yellow);
+    for (const theme of THEMES) {
+        drawDither(document.getElementById(`c-${theme.slug}`), theme.pink, theme.yellow);
     }
 </script>
 
