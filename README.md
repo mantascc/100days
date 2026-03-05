@@ -63,3 +63,4 @@ This collection explores the intersection of human creativity and artificial int
 | [54-concept-graph](54-concept-graph) | 54-concept-graph | Interactive force-directed graph visualizing relationships between projects and data concepts |
 | [53-ascii-grid](53-ascii-grid) | 53-ascii-grid | ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes |
 | [57-color-themes](57-color-themes) | 57-color-themes | Theme-switchable constrained-variation viewer exploring palette identity across shared sketches |
+| [58-shapes](58-shapes) | 58-shapes | Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking |

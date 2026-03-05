@@ -283,5 +283,10 @@
     "id": "57-color-themes",
     "path": "100days/57-color-themes",
     "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities"
+  },
+  {
+    "id": "58-shapes",
+    "path": "100days/58-shapes",
+    "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking"
   }
 ]
