@@ -288,5 +288,10 @@
     "id": "58-shapes",
     "path": "100days/58-shapes",
     "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking"
+  },
+  {
+    "id": "59-font-explorer",
+    "path": "100days/59-font-explorer",
+    "description": "IBM Plex Mono specimen — weights, scale, tracking, glyphs, and live compose with three color themes"
   }
 ]

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JetBrains Mono</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void:    #0a0a0a;
+      --ground-base:    #0f0f0f;
+      --ground-raised:  #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary:   #ffffff;
+      --text-default:   #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary:  #666666;
+      --text-ghost:     #333333;
+      --border-default: #2a2a2a;
+      --accent:         #00a8ff;
+      --mono: 'JetBrains Mono', monospace;
+      --edge: clamp(24px, 5vw, 72px);
+      --label-h: 56px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { background: var(--ground-void); }
+
+    body {
+      font-family: var(--mono);
+      color: var(--text-default);
+      background: var(--ground-void);
+    }
+
+    /* ── Scroller ── */
+    .scroller {
+      height: 100dvh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    /* ── Section base ── */
+    section {
+      height: 100dvh;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Section label — in flow ── */
+    .sec-label {
+      flex-shrink: 0;
+      height: var(--label-h);
+      display: flex;
+      align-items: flex-end;
+      padding: 0 var(--edge) 12px;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .sec-label em {
+      font-style: normal;
+      color: var(--accent);
+      margin-right: 0.4em;
+    }
+
+    /* ── Content wrapper ── */
+    .sec-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Side nav ── */
+    .sidenav {
+      position: fixed;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 14px;
+      z-index: 200;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 3px 0;
+    }
+
+    .nav-name {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .nav-item.active .nav-name { opacity: 1; }
+
+    .nav-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--text-ghost);
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .nav-item.active .nav-dot  { background: var(--accent); transform: scale(1.5); }
+    .nav-item:hover  .nav-dot  { background: var(--text-secondary); }
+
+    /* ════════════════════════════════
+       01 / SPECIMEN
+    ════════════════════════════════ */
+    #specimen .sec-body {
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 var(--edge) 56px;
+    }
+
+    .spec-word {
+      font-size: clamp(72px, 18vw, 240px);
+      line-height: 0.88;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      user-select: none;
+    }
+    .spec-word:nth-child(1) { font-weight: 300; }
+    .spec-word:nth-child(2) { font-weight: 400; }
+    .spec-word:nth-child(3) { font-weight: 500; }
+
+    .cursor {
+      display: inline-block;
+      width: 0.07em;
+      height: 0.82em;
+      background: var(--accent);
+      vertical-align: middle;
+      margin-left: 0.06em;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .spec-meta {
+      position: absolute;
+      bottom: 28px;
+      left: var(--edge);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    /* ════════════════════════════════
+       02 / WEIGHTS
+    ════════════════════════════════ */
+    .weights-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .weight-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-right: 1px solid var(--border-default);
+      padding: 32px;
+      cursor: default;
+      transition: background 0.15s;
+    }
+    .weight-col:last-child { border-right: none; }
+    .weight-col:hover { background: var(--ground-raised); }
+
+    .w-aa {
+      font-size: clamp(80px, 12vw, 180px);
+      line-height: 1;
+      color: var(--text-primary);
+      margin-bottom: 28px;
+    }
+    .weight-col:nth-child(1) .w-aa { font-weight: 300; }
+    .weight-col:nth-child(2) .w-aa { font-weight: 400; }
+    .weight-col:nth-child(3) .w-aa { font-weight: 500; }
+
+    .w-name {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .w-num {
+      font-size: 32px;
+      font-weight: 300;
+      color: var(--text-ghost);
+      transition: color 0.15s;
+    }
+    .weight-col:hover .w-num { color: var(--accent); }
+
+    .w-sample {
+      margin-top: 24px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 240px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .weight-col:hover .w-sample { opacity: 1; }
+    .weight-col:nth-child(1) .w-sample { font-weight: 300; }
+    .weight-col:nth-child(2) .w-sample { font-weight: 400; }
+    .weight-col:nth-child(3) .w-sample { font-weight: 500; }
+
+    /* ════════════════════════════════
+       03 / SCALE
+    ════════════════════════════════ */
+    #scale .sec-body {
+      justify-content: center;
+      padding: 16px 0 24px var(--edge);
+      overflow: hidden;
+    }
+
+    .scale-row {
+      white-space: nowrap;
+      overflow: hidden;
+      color: var(--text-default);
+      font-weight: 400;
+      line-height: 1.1;
+    }
+
+    /* ════════════════════════════════
+       04 / MONOSPACE
+    ════════════════════════════════ */
+    #mono .sec-body {
+      justify-content: center;
+      padding: 0 var(--edge) 56px;
+      gap: 8px;
+    }
+
+    .mono-row {
+      display: flex;
+      align-items: baseline;
+      font-size: clamp(28px, 4.5vw, 64px);
+      font-weight: 400;
+      line-height: 1.3;
+    }
+    .mono-a   { color: var(--text-default); }
+    .mono-sep { color: var(--border-default); padding: 0 1ch; }
+    .mono-b   { color: var(--text-ghost); }
+
+    .mono-foot {
+      position: absolute;
+      bottom: 28px;
+      left: var(--edge);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    /* ════════════════════════════════
+       05 / TRACKING
+    ════════════════════════════════ */
+    #tracking .sec-body {
+      justify-content: center;
+      padding: 0 var(--edge);
+    }
+
+    .track-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--ground-surface);
+      padding: 13px 0;
+    }
+    .track-row:first-child { border-top: 1px solid var(--ground-surface); }
+
+    .track-text {
+      font-size: clamp(14px, 2.5vw, 32px);
+      font-weight: 400;
+      color: var(--text-default);
+      white-space: nowrap;
+    }
+    .track-val {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-left: 24px;
+    }
+
+    /* ════════════════════════════════
+       06 / GLYPHS
+    ════════════════════════════════ */
+    #glyphs .sec-body {
+      justify-content: center;
+      padding: 16px var(--edge) 24px;
+    }
+
+    .glyph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+      gap: 1px;
+      background: var(--border-default);
+      border: 1px solid var(--border-default);
+    }
+
+    .g-cell {
+      background: var(--ground-void);
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--text-default);
+      cursor: default;
+      position: relative;
+      transition: background 0.1s, color 0.1s;
+    }
+    .g-cell:hover {
+      background: var(--ground-surface);
+      color: var(--accent);
+    }
+    .g-cell:hover::after {
+      content: attr(data-cp);
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 6px;
+      letter-spacing: 0;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    /* ════════════════════════════════
+       07 / COMPOSE
+    ════════════════════════════════ */
+    #compose .sec-body {
+      justify-content: center;
+      padding: 0 var(--edge) 24px;
+    }
+
+    .compose-area {
+      font-family: var(--mono);
+      font-size: 48px;
+      font-weight: 400;
+      color: var(--text-primary);
+      background: none;
+      outline: none;
+      width: 100%;
+      line-height: 1.2;
+      caret-color: var(--accent);
+      min-height: 1.2em;
+      max-height: 40dvh;
+      overflow-y: auto;
+      word-break: break-word;
+    }
+    .compose-area:empty::before {
+      content: 'type here_';
+      color: var(--text-ghost);
+    }
+
+    .compose-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-top: 32px;
+      align-items: flex-end;
+      border-top: 1px solid var(--border-default);
+      padding-top: 24px;
+    }
+
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ctrl-label {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .ctrl-buttons { display: flex; gap: 6px; }
+
+    .ctrl-btn {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 5px 14px;
+      background: none;
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: border-color 0.1s, color 0.1s;
+    }
+    .ctrl-btn:hover  { border-color: var(--text-secondary); color: var(--text-default); }
+    .ctrl-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    .ctrl-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ctrl-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border-default);
+      height: 1px;
+      width: 160px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .ctrl-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .ctrl-slider::-moz-range-thumb {
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+
+    .ctrl-val {
+      font-size: 10px;
+      color: var(--text-secondary);
+      min-width: 40px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .sidenav { display: none; }
+      .w-sample { display: none; }
+      .weights-grid { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); }
+      .weight-col { border-right: none; border-bottom: 1px solid var(--border-default); padding: 16px 24px; }
+      .weight-col:last-child { border-bottom: none; }
+      .compose-area { font-size: 28px; }
+      .ctrl-slider { width: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="sidenav" id="sidenav"></nav>
+
+<div class="scroller" id="scroller">
+
+  <!-- 01 / SPECIMEN -->
+  <section id="specimen">
+    <div class="sec-label"><em>01</em> / specimen</div>
+    <div class="sec-body">
+      <div class="spec-word">JET</div>
+      <div class="spec-word">BRAINS</div>
+      <div class="spec-word">MONO<span class="cursor"></span></div>
+    </div>
+    <div class="spec-meta">designed by philipp nurullin&nbsp;&nbsp;·&nbsp;&nbsp;jetbrains&nbsp;&nbsp;·&nbsp;&nbsp;2020&nbsp;&nbsp;·&nbsp;&nbsp;open source</div>
+  </section>
+
+  <!-- 02 / WEIGHTS -->
+  <section id="weights">
+    <div class="sec-label"><em>02</em> / weights</div>
+    <div class="weights-grid">
+      <div class="weight-col">
+        <div class="w-aa">Aa</div>
+        <span class="w-name">Light</span>
+        <div class="w-num">300</div>
+        <p class="w-sample">The quick brown fox jumps over the lazy dog.</p>
+      </div>
+      <div class="weight-col">
+        <div class="w-aa">Aa</div>
+        <span class="w-name">Regular</span>
+        <div class="w-num">400</div>
+        <p class="w-sample">The quick brown fox jumps over the lazy dog.</p>
+      </div>
+      <div class="weight-col">
+        <div class="w-aa">Aa</div>
+        <span class="w-name">Medium</span>
+        <div class="w-num">500</div>
+        <p class="w-sample">The quick brown fox jumps over the lazy dog.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 / SCALE -->
+  <section id="scale">
+    <div class="sec-label"><em>03</em> / scale</div>
+    <div class="sec-body" id="scale-body"></div>
+  </section>
+
+  <!-- 04 / MONOSPACE -->
+  <section id="mono">
+    <div class="sec-label"><em>04</em> / monospace</div>
+    <div class="sec-body" id="mono-body"></div>
+    <div class="mono-foot">every character&nbsp;&nbsp;·&nbsp;&nbsp;equal advance width</div>
+  </section>
+
+  <!-- 05 / TRACKING -->
+  <section id="tracking">
+    <div class="sec-label"><em>05</em> / tracking</div>
+    <div class="sec-body" id="track-body"></div>
+  </section>
+
+  <!-- 06 / GLYPHS -->
+  <section id="glyphs">
+    <div class="sec-label"><em>06</em> / glyphs</div>
+    <div class="sec-body">
+      <div class="glyph-grid" id="glyph-grid"></div>
+    </div>
+  </section>
+
+  <!-- 07 / COMPOSE -->
+  <section id="compose">
+    <div class="sec-label"><em>07</em> / compose</div>
+    <div class="sec-body">
+      <div class="compose-area" id="compose-area" contenteditable="true" spellcheck="false" autocorrect="off" autocapitalize="off"></div>
+      <div class="compose-controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Weight</span>
+          <div class="ctrl-buttons" id="weight-btns">
+            <button class="ctrl-btn" data-w="300">light</button>
+            <button class="ctrl-btn active" data-w="400">regular</button>
+            <button class="ctrl-btn" data-w="500">medium</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Size</span>
+          <div class="ctrl-slider-row">
+            <input class="ctrl-slider" type="range" id="size-slider" min="16" max="120" value="48">
+            <span class="ctrl-val" id="size-val">48px</span>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Tracking</span>
+          <div class="ctrl-slider-row">
+            <input class="ctrl-slider" type="range" id="track-slider" min="-5" max="30" value="0">
+            <span class="ctrl-val" id="track-val">0.00em</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const SECTIONS = [
+    { id: 'specimen', name: 'specimen' },
+    { id: 'weights',  name: 'weights'  },
+    { id: 'scale',    name: 'scale'    },
+    { id: 'mono',     name: 'mono'     },
+    { id: 'tracking', name: 'tracking' },
+    { id: 'glyphs',   name: 'glyphs'  },
+    { id: 'compose',  name: 'compose'  },
+  ];
+
+  /* ── Side nav ── */
+  const sidenav = document.getElementById('sidenav');
+  sidenav.innerHTML = SECTIONS.map((s, i) =>
+    `<div class="nav-item" data-i="${i}">
+       <span class="nav-name">${s.name}</span>
+       <div class="nav-dot"></div>
+     </div>`
+  ).join('');
+
+  const navItems = sidenav.querySelectorAll('.nav-item');
+  navItems.forEach(el => {
+    el.addEventListener('click', () => {
+      document.getElementById(SECTIONS[+el.dataset.i].id)
+        .scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  function setActive(i) {
+    navItems.forEach((el, j) => el.classList.toggle('active', i === j));
+  }
+
+  const scroller = document.getElementById('scroller');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const i = SECTIONS.findIndex(s => s.id === e.target.id);
+        if (i >= 0) setActive(i);
+      }
+    });
+  }, { root: scroller, threshold: 0.5 });
+
+  SECTIONS.forEach(s => observer.observe(document.getElementById(s.id)));
+  setActive(0);
+
+  /* ── 03 SCALE ── */
+  const SIZES   = [180, 100, 60, 42, 28, 20, 15, 11];
+  const PANGRAM = 'THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG';
+  const scaleBody = document.getElementById('scale-body');
+  SIZES.forEach(px => {
+    const d = document.createElement('div');
+    d.className = 'scale-row';
+    d.style.fontSize = px + 'px';
+    d.textContent = PANGRAM;
+    scaleBody.appendChild(d);
+  });
+
+  /* ── 04 MONOSPACE ── */
+  const PAIRS = [
+    ['MMMMMMMM', 'iiiiiiii'],
+    ['WWWWWWWW', 'llllllll'],
+    ['@@@@@@@@', '........'],
+    ['00000000', '11111111'],
+    ['########', '--------'],
+  ];
+  const monoBody = document.getElementById('mono-body');
+  PAIRS.forEach(([a, b]) => {
+    const row = document.createElement('div');
+    row.className = 'mono-row';
+    row.innerHTML =
+      `<span class="mono-a">${a}</span>` +
+      `<span class="mono-sep">·</span>` +
+      `<span class="mono-b">${b}</span>`;
+    monoBody.appendChild(row);
+  });
+
+  /* ── 05 TRACKING ── */
+  const TRACKS = [
+    { val: '-0.05em', label: '−0.05em' },
+    { val: '0em',     label: '0em'     },
+    { val: '0.08em',  label: '+0.08em' },
+    { val: '0.15em',  label: '+0.15em' },
+    { val: '0.25em',  label: '+0.25em' },
+    { val: '0.40em',  label: '+0.40em' },
+    { val: '0.60em',  label: '+0.60em' },
+  ];
+  const trackBody = document.getElementById('track-body');
+  TRACKS.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'track-row';
+    row.innerHTML =
+      `<span class="track-text" style="letter-spacing:${t.val}">JETBRAINS</span>` +
+      `<span class="track-val">${t.label}</span>`;
+    trackBody.appendChild(row);
+  });
+
+  /* ── 06 GLYPHS ── */
+  const CHARS = [
+    ...'0123456789',
+    ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    ...'abcdefghijklmnopqrstuvwxyz',
+    ...'!@#$%^&*()_+-=[]{}|;:\'",.<>/?`~\\',
+  ];
+  const glyphGrid = document.getElementById('glyph-grid');
+  CHARS.forEach(ch => {
+    const cell = document.createElement('div');
+    cell.className = 'g-cell';
+    cell.textContent = ch;
+    const cp = ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+    cell.dataset.cp = `U+${cp}`;
+    glyphGrid.appendChild(cell);
+  });
+
+  /* ── 07 COMPOSE ── */
+  const area        = document.getElementById('compose-area');
+  const sizeSlider  = document.getElementById('size-slider');
+  const trackSlider = document.getElementById('track-slider');
+  const sizeVal     = document.getElementById('size-val');
+  const trackVal    = document.getElementById('track-val');
+
+  document.getElementById('weight-btns').addEventListener('click', e => {
+    const btn = e.target.closest('.ctrl-btn');
+    if (!btn) return;
+    document.querySelectorAll('#weight-btns .ctrl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    area.style.fontWeight = btn.dataset.w;
+  });
+
+  sizeSlider.addEventListener('input', () => {
+    area.style.fontSize = sizeSlider.value + 'px';
+    sizeVal.textContent = sizeSlider.value + 'px';
+  });
+
+  trackSlider.addEventListener('input', () => {
+    const em = (trackSlider.value / 100).toFixed(2);
+    area.style.letterSpacing = em + 'em';
+    trackVal.textContent = em + 'em';
+  });
+</script>
+</body>
+</html>
