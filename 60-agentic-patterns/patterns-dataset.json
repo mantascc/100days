@@ -1,0 +1,341 @@
+[
+  {
+    "group": "Reasoning & Planning",
+    "id": "prompt-chaining",
+    "name": "Prompt Chaining",
+    "type": "workflow",
+    "expression": "Linear node chain",
+    "expression_detail": "A horizontal sequence of rounded nodes connected by arrows. Each node shows a transformation label (extract → classify → respond). The active node pulses; completed nodes fill solid. Clicking a node shows its input/output.",
+    "status": "new"
+  },
+  {
+    "group": "Reasoning & Planning",
+    "id": "react",
+    "name": "ReAct",
+    "type": "pattern",
+    "expression": "Ping-pong trace",
+    "expression_detail": "Two alternating columns — Thought and Action — with entries appearing as if typed in real time. An Observation row appears after each Action, indented and muted. The loop tightens visually as steps accumulate.",
+    "status": "existing"
+  },
+  {
+    "group": "Reasoning & Planning",
+    "id": "plan-and-execute",
+    "name": "Plan-and-Execute",
+    "type": "workflow",
+    "expression": "Checklist with inner loop",
+    "expression_detail": "A vertical numbered plan. Each step has a status pill (pending / running / done / replanned). When a step runs it expands to reveal a mini ReAct trace inside. A replanned step shows a strikethrough and a replacement.",
+    "status": "existing"
+  },
+  {
+    "group": "Reasoning & Planning",
+    "id": "tree-of-thoughts",
+    "name": "Tree of Thoughts",
+    "type": "pattern",
+    "expression": "Branching tree with scoring",
+    "expression_detail": "A top-down tree that grows as the agent explores. Each branch shows a reasoning snippet and a score badge. Dead-end branches fade and collapse with a strikethrough. The winning path highlights in a distinct color.",
+    "status": "new"
+  },
+  {
+    "group": "Reasoning & Planning",
+    "id": "state-machine",
+    "name": "State Machine",
+    "type": "architecture",
+    "expression": "Phase diagram with active state",
+    "expression_detail": "Rounded rectangles for states, labeled arrows for transitions. The current state glows. Hovering a transition shows its trigger condition. Invalid transitions from the current state are dimmed.",
+    "status": "new"
+  },
+
+  {
+    "group": "Grounding & Action",
+    "id": "tool-use",
+    "name": "Tool Use / Function Calling",
+    "type": "pattern",
+    "expression": "Typed function card",
+    "expression_detail": "A card showing a function signature: name, parameter schema (type + description per param), and return type. Below it, a filled-in call card with actual values shows one invocation. A result chip appears after execution.",
+    "status": "existing"
+  },
+  {
+    "group": "Grounding & Action",
+    "id": "sandboxed-execution",
+    "name": "Sandboxed Execution",
+    "type": "technique",
+    "expression": "Container with walls",
+    "expression_detail": "A bordered box styled like a terminal window. Inside: code in, stdout/stderr out, exit code badge. Outside the box: explicit 'no filesystem', 'no network' denial labels. Box dissolves after run to show teardown.",
+    "status": "existing"
+  },
+  {
+    "group": "Grounding & Action",
+    "id": "agentic-rag",
+    "name": "Agentic RAG",
+    "type": "pattern",
+    "expression": "Iterative retrieval loop",
+    "expression_detail": "A cycle: Query → Retrieve → Evaluate → Refine or Accept. Each iteration the query label mutates. Retrieved chunks appear as cards that are scored; low-score cards are discarded. Loop terminates when the agent marks the result grounded.",
+    "status": "new"
+  },
+  {
+    "group": "Grounding & Action",
+    "id": "citation-attribution",
+    "name": "Citation / Attribution",
+    "type": "pattern",
+    "expression": "Inline source badges",
+    "expression_detail": "A paragraph of agent output where factual phrases have superscript [1], [2] badges. Hovering a badge reveals the source snippet in a popover. Unverified claims are underlined in orange with a 'low confidence' label.",
+    "status": "existing"
+  },
+
+  {
+    "group": "Memory & Knowledge",
+    "id": "in-context-memory",
+    "name": "In-Context Memory",
+    "type": "technique",
+    "expression": "Sliding context window",
+    "expression_detail": "A horizontal tape of message blocks. A visible window frame shows what's in active context. Blocks outside the window are faded. As new tokens arrive, old ones scroll left and dim. A token counter sits at the edge of the frame.",
+    "status": "existing"
+  },
+  {
+    "group": "Memory & Knowledge",
+    "id": "context-distillation",
+    "name": "Context Distillation",
+    "type": "technique",
+    "expression": "Compression funnel",
+    "expression_detail": "Many message blocks flow into a funnel graphic. Out the other end comes a single dense 'summary' block. An arrow continues from there with the conversation resuming. Before/after token count shows the reduction ratio.",
+    "status": "new"
+  },
+  {
+    "group": "Memory & Knowledge",
+    "id": "semantic-memory",
+    "name": "Semantic Memory",
+    "type": "pattern",
+    "expression": "Living JSON card",
+    "expression_detail": "A profile card rendered as formatted JSON. Fields update in place with a brief flash animation when the agent writes a new fact. A toggle switches between profile model (one card) and collection model (many narrow cards).",
+    "status": "new"
+  },
+  {
+    "group": "Memory & Knowledge",
+    "id": "episodic-memory",
+    "name": "Episodic Memory",
+    "type": "pattern",
+    "expression": "Event log timeline",
+    "expression_detail": "A vertical timeline of past run entries — timestamp, task summary, outcome badge (success / failed / revised). The agent retrieves relevant episodes before acting; retrieved entries highlight. Decayed entries fade at the bottom.",
+    "status": "existing"
+  },
+  {
+    "group": "Memory & Knowledge",
+    "id": "procedural-memory",
+    "name": "Procedural Memory",
+    "type": "pattern",
+    "expression": "Self-editing instruction card",
+    "expression_detail": "A system prompt displayed as an editable card. When the agent learns a better procedure, a diff view shows the old line struck through and the new line in green. Version history is accessible via a stepper at the top.",
+    "status": "new"
+  },
+  {
+    "group": "Memory & Knowledge",
+    "id": "external-memory-rag",
+    "name": "External Memory (RAG)",
+    "type": "pattern",
+    "expression": "Static retrieve-then-generate pipeline",
+    "expression_detail": "Three fixed stages in sequence: Query → Vector Store (nearest-neighbor result list) → Generate. Chunk cards show similarity scores. No loop — one retrieval pass, then generation. Contrasts with Agentic RAG by being deliberately static.",
+    "status": "existing"
+  },
+  {
+    "group": "Memory & Knowledge",
+    "id": "memory-write-strategies",
+    "name": "Memory Write Strategies",
+    "type": "technique",
+    "expression": "Hot path vs background fork",
+    "expression_detail": "A single flow that forks at a 'write memory' decision node. The hot path branch continues inline (synchronous, labeled with +latency). The background branch shows a deferred task icon and a dashed arrow indicating async completion.",
+    "status": "new"
+  },
+
+  {
+    "group": "Quality & Verification",
+    "id": "reflection-self-critique",
+    "name": "Reflection / Self-Critique",
+    "type": "pattern",
+    "expression": "Mirror loop",
+    "expression_detail": "Output feeds back into a 'Critic' prompt that returns a score and a list of issues. If score < threshold, a revised output card appears below the original, connected by a curved arrow. Iteration count badge. Hard cap shown as a stop sign.",
+    "status": "existing"
+  },
+  {
+    "group": "Quality & Verification",
+    "id": "evaluator-optimizer",
+    "name": "Evaluator-Optimizer",
+    "type": "pattern",
+    "expression": "Two-agent exchange",
+    "expression_detail": "Generator and Evaluator appear as two distinct agent cards in a dialogue layout. Generator outputs first; Evaluator responds with structured feedback (score + bullet points). Generator's next output shows tracked changes. Roles are visually separate — not self-loop.",
+    "status": "new"
+  },
+  {
+    "group": "Quality & Verification",
+    "id": "debate-critique",
+    "name": "Debate / Critique",
+    "type": "architecture",
+    "expression": "Adversarial split-screen",
+    "expression_detail": "Two agent columns — Proponent and Critic — exchanging labeled rounds. A Judge panel sits below, reading both columns. The judge's verdict card appears after a set number of rounds, quoting from each side.",
+    "status": "existing"
+  },
+  {
+    "group": "Quality & Verification",
+    "id": "guardrails",
+    "name": "Guardrails",
+    "type": "pattern",
+    "expression": "Guard rail overlay",
+    "expression_detail": "Agent output passes through a validation layer shown as a translucent barrier. Passive mode: rule-check badges appear (pass / warn / block) inline with the output. Active mode: a blocked item triggers a human escalation card with a reason label.",
+    "status": "new"
+  },
+
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "pipeline",
+    "name": "Pipeline",
+    "type": "architecture",
+    "expression": "Assembly line stages",
+    "expression_detail": "Horizontal stages connected by a conveyor arrow: spec → code → tests → review → docs. Each stage is a labeled agent card with an input and output slot. A failed stage turns red and the arrow past it goes dark — pipeline halts.",
+    "status": "existing"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "fan-out-parallel",
+    "name": "Fan-out / Parallel",
+    "type": "architecture",
+    "expression": "Broadcast and merge",
+    "expression_detail": "One orchestrator node fans out to N worker nodes via simultaneous arrows. Workers run in parallel — a progress bar on each. A reduce node waits at the bottom. Result cards arrive and stack; conflicts are flagged with a merge indicator.",
+    "status": "existing"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "routing-triage",
+    "name": "Routing / Triage",
+    "type": "pattern",
+    "expression": "Switchboard classifier",
+    "expression_detail": "An input enters a classifier node that emits a category label. Labeled branches extend from the classifier to specialist agents. Only the matching branch activates — others dim. No coordinator logic, just dispatch.",
+    "status": "new"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "orchestrator-subagents",
+    "name": "Orchestrator + Subagents",
+    "type": "architecture",
+    "expression": "Hub and spoke",
+    "expression_detail": "Central orchestrator node with spokes to specialist nodes (researcher, coder, tester). Each spoke shows the context slice the orchestrator passed. Results flow back to the hub, which synthesizes them into a final output card.",
+    "status": "existing"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "hierarchical",
+    "name": "Hierarchical Agent",
+    "type": "architecture",
+    "expression": "Multi-level org chart",
+    "expression_detail": "A tree with 3 tiers: Manager → Supervisors → Workers. Each tier's nodes are color-coded. Context scope badges show how much context each tier holds. Delegation arrows go down; result arrows go up. Summarization loss is shown at each tier boundary.",
+    "status": "new"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "handoff",
+    "name": "Handoff",
+    "type": "pattern",
+    "expression": "Relay baton pass",
+    "expression_detail": "A horizontal sequence of specialist agents (Triage → Billing → Tech Support). Between each, a baton graphic carries a 'state packet' label listing what context was transferred. The receiving agent activates; the prior agent dims.",
+    "status": "new"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "swarm-decentralized",
+    "name": "Swarm / Decentralized",
+    "type": "architecture",
+    "expression": "Peer mesh with emergent paths",
+    "expression_detail": "Many equal-weight agent nodes in a loose cluster. Edges appear and disappear dynamically as agents communicate peer-to-peer. No node is larger or centered. Task completion emerges from the cluster — no single coordinator is highlighted.",
+    "status": "new"
+  },
+  {
+    "group": "Multi-Agent Coordination",
+    "id": "event-driven-actor",
+    "name": "Event-Driven / Actor Model",
+    "type": "architecture",
+    "expression": "Mailbox message flow",
+    "expression_detail": "Each agent has an inbox queue rendered as a stack of envelope icons. Agents emit events that route to other inboxes — shown as animated envelopes in flight. No blocking; agents process independently. Queue depth and processing rate are visible.",
+    "status": "new"
+  },
+
+  {
+    "group": "Control Flow & Reliability",
+    "id": "retry-with-fallback",
+    "name": "Retry with Fallback",
+    "type": "pattern",
+    "expression": "Error classification fork",
+    "expression_detail": "A failed tool call enters an error classifier. Transient branch: retry arc with exponential backoff timer badges (1s, 2s, 4s). Structural branch: a fallback strategy card replaces the original call. Dead end is marked if both exhaust.",
+    "status": "existing"
+  },
+  {
+    "group": "Control Flow & Reliability",
+    "id": "checkpoint-approval-gate",
+    "name": "Checkpoint / Approval Gate",
+    "type": "pattern",
+    "expression": "Toll booth pause",
+    "expression_detail": "Agent execution timeline flows right until it hits a gate graphic (barrier + human icon). Agent state and reasoning surface in a review panel. Approve: barrier lifts, execution resumes with a green stamp. Deny: arrow curves back to a replan node.",
+    "status": "existing"
+  },
+  {
+    "group": "Control Flow & Reliability",
+    "id": "confidence-gated-autonomy",
+    "name": "Confidence-Gated Autonomy",
+    "type": "pattern",
+    "expression": "Confidence dial with threshold line",
+    "expression_detail": "A semicircular gauge showing agent confidence score (0–1). A threshold marker is shown per action type (higher for destructive, lower for reads). Score above threshold: proceed autonomously (green zone). Below: escalate to human (orange zone).",
+    "status": "existing"
+  },
+  {
+    "group": "Control Flow & Reliability",
+    "id": "speculative-execution",
+    "name": "Speculative Execution",
+    "type": "pattern",
+    "expression": "Racing parallel lanes",
+    "expression_detail": "N parallel agent lanes start simultaneously with different strategy labels. Each has a progress indicator. The first to complete triggers a 'winner' banner; remaining lanes are visibly cancelled with a strikethrough. A merge variant shows all lanes contributing to a final node.",
+    "status": "existing"
+  },
+  {
+    "group": "Control Flow & Reliability",
+    "id": "prompt-caching",
+    "name": "Prompt Caching",
+    "type": "technique",
+    "expression": "Hot/cold prefix indicator",
+    "expression_detail": "A prompt broken into labelled segments: system (cached, shown in warm amber), tools definition (cached), user message (uncached, shown cool). Cache hit badges appear on the warm segments. Token cost counter shows reduction from cache hits.",
+    "status": "new"
+  },
+
+  {
+    "group": "Coding Agent Patterns",
+    "id": "code-test-fix",
+    "name": "Code → Test → Fix Loop",
+    "type": "pattern",
+    "expression": "Red-green feedback wheel",
+    "expression_detail": "A circular loop: Write → Run Tests → Parse Failures → Patch → Write. Test results appear as a suite grid: red cells for failures with parsed error snippets below. After patch, cells flip to green. Iteration counter at hub. Hard stop shown as a brake.",
+    "status": "existing"
+  },
+  {
+    "group": "Coding Agent Patterns",
+    "id": "linter-in-the-loop",
+    "name": "Linter-in-the-Loop",
+    "type": "pattern",
+    "expression": "Inline error annotation",
+    "expression_detail": "Generated code with squiggly underlines on problem lines. A parsed error card per issue shows: file, line, rule ID, message. An arrow from each card points to the next code block showing the targeted fix. Execution stage is gated until lint passes.",
+    "status": "existing"
+  },
+  {
+    "group": "Coding Agent Patterns",
+    "id": "scaffolded-execution",
+    "name": "Scaffolded Execution",
+    "type": "technique",
+    "expression": "Isolated runtime container",
+    "expression_detail": "A bordered execution box (container metaphor) surrounds code + runtime. Explicit 'no network', 'no host fs' labels on walls. Stdout/stderr captured and returned as structured observation cards. The box dissolves at run end — teardown is visible.",
+    "status": "existing"
+  },
+  {
+    "group": "Coding Agent Patterns",
+    "id": "git-aware-agent",
+    "name": "Git-Aware Agent",
+    "type": "pattern",
+    "expression": "Commit timeline as context",
+    "expression_detail": "A git log strip showing the last N commits as context cards: hash, message, author, files changed. The agent's current diff appears as an uncommitted card at the head. Branch indicator and blame attribution visible. Risk level badge derived from recent change velocity.",
+    "status": "existing"
+  }
+]

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic Patterns</title>
+  <meta property="og:title" content="Agentic Patterns">
+  <meta property="og:description" content="A design reference for agentic AI system patterns">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Agentic Patterns</h1>
+    <div class="intro">
+      <p>How agents reason, act, remember, and collaborate — 37 patterns across 7 dimensions.</p>
+    </div>
+  </header>
+
+  <nav>
+    <a href="#reasoning">Reasoning</a>
+    <a href="#grounding">Action</a>
+    <a href="#memory">Memory</a>
+    <a href="#quality">Quality</a>
+    <a href="#coordination">Multi-Agent</a>
+    <a href="#control">Control Flow</a>
+    <a href="#coding">Coding</a>
+  </nav>
+
+  <main>
+
+    <!-- ── 1. Reasoning & Planning ──────────────────────── -->
+    <section id="reasoning">
+      <h2>Reasoning &amp; Planning</h2>
+
+      <div class="ph"><span class="pt">workflow</span><h3>Prompt Chaining</h3></div>
+      <p>A sequence of LLM calls where each pass narrows, transforms, or verifies the output of the previous. One model, one thread — no coordination overhead.</p>
+      <ul>
+        <li>Each step has a single well-defined transformation (extract → classify → respond)</li>
+        <li>Simpler than multi-agent: no state synchronisation, no handoffs</li>
+        <li>Fail fast: if step N produces bad output, the chain halts before wasting downstream calls</li>
+        <li>Natural fit for structured extraction, multi-step reasoning, and document pipelines</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">request pipeline</span>
+          <button class="play-btn" data-target="prompt-chaining">play</button>
+        </div>
+        <div class="expr-body" id="expr-prompt-chaining"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>ReAct — Reason + Act</h3></div>
+      <p>The backbone of most agents. Interleaves reasoning traces with tool calls: think, call a tool, observe the result, think again.</p>
+      <ul>
+        <li>Thought — internal reasoning about what to do next</li>
+        <li>Action — call a tool or produce output</li>
+        <li>Observation — result returned from the tool, injected into context</li>
+        <li>Repeat until task complete or max steps reached</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">assistant / tool_call</span>
+          <button class="play-btn" data-target="react">play</button>
+        </div>
+        <div class="expr-body" id="expr-react"></div>
+      </div>
+
+      <div class="ph"><span class="pt">workflow</span><h3>Plan-and-Execute</h3></div>
+      <p>Separates planning from execution. A planner decomposes the goal upfront; an executor works through steps, optionally with its own ReAct loop.</p>
+      <ul>
+        <li>Planner — decomposes the goal into an ordered list of steps</li>
+        <li>Executor — runs each step; may have an inner ReAct loop per step</li>
+        <li>Replanner — optional: revises the plan when a step fails or context changes</li>
+        <li>More predictable than pure ReAct; less adaptive to mid-run surprises</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">task planner</span>
+          <button class="play-btn" data-target="plan-execute">play</button>
+        </div>
+        <div class="expr-body" id="expr-plan-execute"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Tree of Thoughts</h3></div>
+      <p>Branching + backtracking reasoning. Agent explores multiple candidate paths simultaneously, scores each branch, and prunes dead ends.</p>
+      <ul>
+        <li>Branch — from each state, generate N candidate next thoughts</li>
+        <li>Score — evaluate each branch with a critic or heuristic</li>
+        <li>Prune — discard low-scoring branches early to focus compute</li>
+        <li>Backtrack — if a branch dead-ends, return to the last branch point</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">reasoning tree</span>
+          <button class="play-btn" data-target="tree-of-thoughts">play</button>
+        </div>
+        <div class="expr-body" id="expr-tree-of-thoughts"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>State Machine</h3></div>
+      <p>Agent operates through explicit states and labeled transitions. Current state determines which actions are available — more structured than free-form ReAct.</p>
+      <ul>
+        <li>States — discrete phases with defined entry and exit conditions</li>
+        <li>Transitions — labeled edges triggered by conditions or tool results</li>
+        <li>Guard clauses — prevent invalid transitions from the current state</li>
+        <li>Useful when business logic has defined phases (draft → review → deploy)</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">workflow state</span>
+          <button class="play-btn" data-target="state-machine">play</button>
+        </div>
+        <div class="expr-body" id="expr-state-machine"></div>
+      </div>
+    </section>
+
+    <!-- ── 2. Grounding & Action ─────────────────────────── -->
+    <section id="grounding">
+      <h2>Grounding &amp; Action</h2>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Tool Use / Function Calling</h3></div>
+      <p>Agent operates on a typed schema of tools. The model selects a tool and fills in parameters; parameters are validated before execution; results are injected back as observations.</p>
+      <ul>
+        <li>Schema — each tool has a name, description, and typed parameter list</li>
+        <li>Selection — model chooses based on current reasoning state</li>
+        <li>Validation — parameters checked against schema before execution</li>
+        <li>Injection — result returned to context as a structured observation</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">tool explorer</span>
+          <button class="play-btn" data-target="tool-use">play</button>
+        </div>
+        <div class="expr-body" id="expr-tool-use"></div>
+      </div>
+
+      <div class="ph"><span class="pt">technique</span><h3>Sandboxed Execution</h3></div>
+      <p>Code runs in an isolated environment with no access to host filesystem, network, or env vars. Output is safely captured and returned as an observation.</p>
+      <ul>
+        <li>Isolation — separate container, subprocess, or WASM runtime</li>
+        <li>Resource limits — CPU, memory, and time caps prevent runaway processes</li>
+        <li>Capture — stdout, stderr, exit code returned as structured output</li>
+        <li>Teardown — environment destroyed after each execution</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">runtime / sandbox</span>
+          <button class="play-btn" data-target="sandboxed">play</button>
+        </div>
+        <div class="expr-body" id="expr-sandboxed"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Agentic RAG</h3></div>
+      <p>Agent steers retrieval — decides what to fetch, evaluates chunk relevance, refines its query, and iterates until the retrieved context is sufficient to generate a grounded answer.</p>
+      <ul>
+        <li>Query — agent generates a targeted query, not just the raw user message</li>
+        <li>Evaluate — agent scores chunk relevance; low scores trigger re-query</li>
+        <li>Refine — query is reformulated based on what was missing</li>
+        <li>Iterate — repeats until context is sufficient; distinct from static RAG</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">retrieval agent</span>
+          <button class="play-btn" data-target="agentic-rag">play</button>
+        </div>
+        <div class="expr-body" id="expr-agentic-rag"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Citation / Attribution</h3></div>
+      <p>Every claim the agent makes is linked to a retrieved source. A verification pass checks citations are accurate. Ungrounded claims are flagged as uncertain.</p>
+      <ul>
+        <li>Source IDs — retrieved chunks tagged with origin (doc, url, chunk index)</li>
+        <li>Inline citations — agent required to cite [n] after each factual statement</li>
+        <li>Verification — second pass checks citations against the source material</li>
+        <li>Essential for research agents where hallucination cost is high</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">research output</span>
+          <button class="play-btn" data-target="citation">play</button>
+        </div>
+        <div class="expr-body" id="expr-citation"></div>
+      </div>
+    </section>
+
+    <!-- ── 3. Memory & Knowledge ─────────────────────────── -->
+    <section id="memory">
+      <h2>Memory &amp; Knowledge</h2>
+
+      <div class="ph"><span class="pt">technique</span><h3>In-Context Memory</h3></div>
+      <p>The active prompt window — conversation history, chain-of-thought traces, and working state. Zero latency, bounded by context length, lost when the session ends.</p>
+      <ul>
+        <li>Conversation history — all prior turns visible in the current window</li>
+        <li>Working set — current task state, intermediate values, scratch reasoning</li>
+        <li>Bounded — attention degrades for tokens far from the present</li>
+        <li>Ephemeral — lost on session end; must be persisted externally to survive</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">context window</span>
+          <button class="play-btn" data-target="in-context">play</button>
+        </div>
+        <div class="expr-body" id="expr-in-context"></div>
+      </div>
+
+      <div class="ph"><span class="pt">technique</span><h3>Context Distillation</h3></div>
+      <p>When the context window fills up, the agent compresses older history into a dense summary block and continues from there — without losing the thread.</p>
+      <ul>
+        <li>Trigger — token count approaching the model's context limit</li>
+        <li>Summarize — agent compresses older messages into a denser summary block</li>
+        <li>Replace — original messages removed; summary takes their place</li>
+        <li>Different from RAG — this manages growing in-context state, not external retrieval</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">context manager</span>
+          <button class="play-btn" data-target="ctx-distill">play</button>
+        </div>
+        <div class="expr-body" id="expr-ctx-distill"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Semantic Memory</h3></div>
+      <p>Agent-curated, structured fact storage. Not passive retrieval — the agent writes and updates entries. Two models: a single profile JSON or a collection of narrow documents.</p>
+      <ul>
+        <li>Profile model — single JSON document updated in place (well-scoped facts)</li>
+        <li>Collection model — many narrow documents, each representing one entity or fact</li>
+        <li>Agent-curated — the agent decides what to store and when to update</li>
+        <li>Queryable — retrieved by semantic search or exact key lookup</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">memory store / profile</span>
+          <button class="play-btn" data-target="semantic-mem">play</button>
+        </div>
+        <div class="expr-body" id="expr-semantic-mem"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Episodic Memory</h3></div>
+      <p>A persistent log of past runs and their outcomes. Before acting, the agent retrieves relevant episodes to avoid known failure modes and reuse successful strategies.</p>
+      <ul>
+        <li>Write — after each run, record what happened and what worked</li>
+        <li>Read — at task start, retrieve relevant past episodes by similarity</li>
+        <li>Decay — old or low-relevance memories pruned over time</li>
+        <li>Update — memories revised when new evidence contradicts them</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">episode log</span>
+          <button class="play-btn" data-target="episodic-mem">play</button>
+        </div>
+        <div class="expr-body" id="expr-episodic-mem"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Procedural Memory</h3></div>
+      <p>The agent's operating instructions stored as updateable text. After a run, the agent evaluates its own process and proposes rule changes — writing better procedures over time.</p>
+      <ul>
+        <li>Instructions — operating procedures stored as editable rules or system prompt</li>
+        <li>Learn — agent evaluates its own process and proposes improvements</li>
+        <li>Write back — approved rules update the instruction store</li>
+        <li>Version — previous procedures retained for rollback</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">agent rules / procedures</span>
+          <button class="play-btn" data-target="procedural-mem">play</button>
+        </div>
+        <div class="expr-body" id="expr-procedural-mem"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>External Memory (RAG)</h3></div>
+      <p>Documents chunked, embedded, and retrieved by nearest-neighbor search. Static retrieval: one pass, then generate. Decouples knowledge from context length.</p>
+      <ul>
+        <li>Embed — documents chunked and embedded into a vector store offline</li>
+        <li>Query — agent generates a retrieval query from current context</li>
+        <li>Retrieve — top-k nearest chunks fetched by cosine similarity</li>
+        <li>Augment — chunks injected into prompt before generation (no iteration)</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">knowledge base</span>
+          <button class="play-btn" data-target="external-rag">play</button>
+        </div>
+        <div class="expr-body" id="expr-external-rag"></div>
+      </div>
+
+      <div class="ph"><span class="pt">technique</span><h3>Memory Write Strategies</h3></div>
+      <p>A meta-pattern: when and how memories are committed. Hot path writes inline during execution; background defers to an async task. The choice trades latency for consistency.</p>
+      <ul>
+        <li>Hot path — write inline during the run; immediate availability, adds latency</li>
+        <li>Background — defer write to an async task; no latency, eventual consistency</li>
+        <li>Choose hot path when — the agent needs to read its own writes in the same session</li>
+        <li>Choose background when — memory is for future sessions, throughput matters more</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">write strategy</span>
+          <button class="play-btn" data-target="mem-write">play</button>
+        </div>
+        <div class="expr-body" id="expr-mem-write"></div>
+      </div>
+    </section>
+
+    <!-- ── 4. Quality & Verification ────────────────────── -->
+    <section id="quality">
+      <h2>Quality &amp; Verification</h2>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Reflection / Self-Critique</h3></div>
+      <p>Agent evaluates its own output against a set of criteria and retries if the score falls below a threshold. The same model generates and critiques.</p>
+      <ul>
+        <li>Generate — produce an initial output</li>
+        <li>Critique — score output against criteria (correctness, completeness, safety)</li>
+        <li>Refine — revise based on critique, repeat until threshold met</li>
+        <li>Max iterations — hard cap prevents infinite loops</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">review / iterate</span>
+          <button class="play-btn" data-target="reflection">play</button>
+        </div>
+        <div class="expr-body" id="expr-reflection"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Evaluator-Optimizer</h3></div>
+      <p>Two separate LLMs: one generates, one evaluates. The evaluator returns structured feedback; the generator revises. Not self-loop — separate roles, separate prompts.</p>
+      <ul>
+        <li>Generator — produces a candidate output</li>
+        <li>Evaluator — separate model scores it and returns structured critique</li>
+        <li>Optimizer — generator revises using evaluator's specific feedback</li>
+        <li>Key distinction from Reflection — evaluator is a separate LLM, not self-critique</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">generator / evaluator</span>
+          <button class="play-btn" data-target="evaluator-opt">play</button>
+        </div>
+        <div class="expr-body" id="expr-evaluator-opt"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Debate / Critique</h3></div>
+      <p>Two agents argue opposing positions; a judge evaluates the exchange and synthesises a resolution. Surfaces assumptions a single agent misses.</p>
+      <ul>
+        <li>Proposer — generates a solution or claim</li>
+        <li>Critic — argues against it, finds flaws and edge cases</li>
+        <li>Judge — evaluates the exchange, picks winner or synthesises</li>
+        <li>Useful for verification, adversarial testing, and high-stakes decisions</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">debate / verdict</span>
+          <button class="play-btn" data-target="debate">play</button>
+        </div>
+        <div class="expr-body" id="expr-debate"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Guardrails</h3></div>
+      <p>Validation layer on every input and output. Passive mode checks rules and flags; active mode blocks and escalates to human or replanning. Always on — not event-driven.</p>
+      <ul>
+        <li>Passive — regex, schema, or classifier checks on every pass; flag violations</li>
+        <li>Active — violations trigger human escalation or agent replanning</li>
+        <li>Layered — input guardrails before the model, output guardrails after</li>
+        <li>Distinct from Approval Gate — always running, not triggered by action type</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">content / safety layer</span>
+          <button class="play-btn" data-target="guardrails">play</button>
+        </div>
+        <div class="expr-body" id="expr-guardrails"></div>
+      </div>
+    </section>
+
+    <!-- ── 5. Multi-Agent Coordination ──────────────────── -->
+    <section id="coordination">
+      <h2>Multi-Agent Coordination</h2>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Pipeline</h3></div>
+      <p>Output of one agent becomes input to the next. Each stage has a single well-defined transformation. Simple, auditable — a failed stage halts the pipeline.</p>
+      <ul>
+        <li>Each agent has one transformation: spec → code → tests → review → docs</li>
+        <li>No agent needs awareness of stages before or after it</li>
+        <li>Simple and auditable — clear data lineage through each stage</li>
+        <li>Failed stage halts the pipeline; the artifact doesn't advance</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">ci / pipeline</span>
+          <button class="play-btn" data-target="pipeline">play</button>
+        </div>
+        <div class="expr-body" id="expr-pipeline"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Fan-out / Parallel</h3></div>
+      <p>Orchestrator decomposes a task into N independent chunks and dispatches them simultaneously. Collects results when all complete, then reduces.</p>
+      <ul>
+        <li>Decompose — identify chunks that can run independently</li>
+        <li>Dispatch — all chunks sent simultaneously to N agents</li>
+        <li>Wait — collect when all complete (or a quorum)</li>
+        <li>Reduce — merge results, resolve conflicts, synthesise final output</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">parallel tasks</span>
+          <button class="play-btn" data-target="fanout">play</button>
+        </div>
+        <div class="expr-body" id="expr-fanout"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Routing / Triage</h3></div>
+      <p>Classify the incoming request and dispatch to the right specialist or workflow branch. Pure dispatch logic — once routed, the classifier is done.</p>
+      <ul>
+        <li>Classify — identify the intent, domain, or urgency of the request</li>
+        <li>Route — select the appropriate specialist agent or workflow branch</li>
+        <li>Stateless — each request classified and routed independently</li>
+        <li>No coordination — distinct from orchestration; the router doesn't synthesise</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">support / inbox</span>
+          <button class="play-btn" data-target="routing">play</button>
+        </div>
+        <div class="expr-body" id="expr-routing"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Orchestrator + Subagents</h3></div>
+      <p>One coordinator agent holds overall context and delegates focused subtasks to specialist subagents. Orchestrator synthesises outputs into a final result.</p>
+      <ul>
+        <li>Orchestrator — plans, delegates, holds context, aggregates</li>
+        <li>Subagents — specialist roles: coder, researcher, reviewer, tester</li>
+        <li>Context passing — orchestrator decides what each subagent needs</li>
+        <li>Result synthesis — orchestrator merges outputs into final answer</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">team board</span>
+          <button class="play-btn" data-target="orchestrator">play</button>
+        </div>
+        <div class="expr-body" id="expr-orchestrator"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Hierarchical Agent</h3></div>
+      <p>Multi-level delegation tree: manager → supervisors → workers. Each tier receives only the context it needs. Scales to problems that exceed a single context window.</p>
+      <ul>
+        <li>Manager — holds top-level goal and overall context</li>
+        <li>Supervisors — hold team-level context, break goal into subtasks</li>
+        <li>Workers — receive focused subtask input only; no awareness of broader goal</li>
+        <li>Context scoping — prevents pollution; each tier gets exactly what it needs</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">org / hierarchy</span>
+          <button class="play-btn" data-target="hierarchical">play</button>
+        </div>
+        <div class="expr-body" id="expr-hierarchical"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Handoff</h3></div>
+      <p>Explicit transfer of control and conversation state from one specialist to the next. State packet travels with the handoff — each agent is fully active one at a time.</p>
+      <ul>
+        <li>State packet — context, history, and intent transferred explicitly</li>
+        <li>Specialist — receiving agent activates with full context; prior agent deactivates</li>
+        <li>Chain — can handoff multiple times (triage → billing → senior support)</li>
+        <li>Unlike orchestration — agents are sequential, not concurrent</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">support ticket</span>
+          <button class="play-btn" data-target="handoff">play</button>
+        </div>
+        <div class="expr-body" id="expr-handoff"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Swarm / Decentralised</h3></div>
+      <p>Agents communicate peer-to-peer with no central coordinator. Self-select tasks based on availability and signals. Resilient — no single point of failure.</p>
+      <ul>
+        <li>Peer-to-peer — agents communicate directly, no orchestrator</li>
+        <li>Self-selection — agents pick up tasks based on local signals</li>
+        <li>Emergent — overall behaviour arises from local decisions</li>
+        <li>Resilient — any node can drop without halting the system</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">peer network</span>
+          <button class="play-btn" data-target="swarm">play</button>
+        </div>
+        <div class="expr-body" id="expr-swarm"></div>
+      </div>
+
+      <div class="ph"><span class="pt">architecture</span><h3>Event-Driven / Actor Model</h3></div>
+      <p>Each agent has an inbox queue and processes messages independently. Agents emit events and continue without waiting. No blocking — fully async.</p>
+      <ul>
+        <li>Actors — each agent has an inbox and processes messages independently</li>
+        <li>Async — agents emit events and continue without waiting for replies</li>
+        <li>Decoupled — agents don't know who consumes their output events</li>
+        <li>Inbox depth — a backpressure signal; deep queues indicate overload</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">message queues</span>
+          <button class="play-btn" data-target="event-driven">play</button>
+        </div>
+        <div class="expr-body" id="expr-event-driven"></div>
+      </div>
+    </section>
+
+    <!-- ── 6. Control Flow & Reliability ────────────────── -->
+    <section id="control">
+      <h2>Control Flow &amp; Reliability</h2>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Retry with Fallback</h3></div>
+      <p>On tool failure, classify the error: transient errors get retried with backoff; structural errors trigger a fallback strategy. Avoids hitting the same wall repeatedly.</p>
+      <ul>
+        <li>Classify — transient (network, rate limit) vs structural (wrong key, unsupported op)</li>
+        <li>Backoff — exponential: 1s, 2s, 4s for transient errors only</li>
+        <li>Fallback chain — ordered list of alternative strategies</li>
+        <li>Dead letter — if all fallbacks fail, surface to human or dead-letter queue</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">error / recovery</span>
+          <button class="play-btn" data-target="retry-fallback">play</button>
+        </div>
+        <div class="expr-body" id="expr-retry-fallback"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Checkpoint / Approval Gate</h3></div>
+      <p>Agent runs autonomously until it reaches an irreversible or high-blast-radius action. At the gate it surfaces its plan to a human and waits for approval.</p>
+      <ul>
+        <li>Classify — reversible vs irreversible, local vs shared system</li>
+        <li>Gate triggers — file deletion, push to remote, external API side effects</li>
+        <li>Present context — show plan and reasoning before asking</li>
+        <li>Resume or replan — on approval continue; on denial replan or stop</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">approval required</span>
+          <button class="play-btn" data-target="checkpoint">play</button>
+        </div>
+        <div class="expr-body" id="expr-checkpoint"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Confidence-Gated Autonomy</h3></div>
+      <p>Agent scores its own confidence before acting. Above threshold: proceed autonomously. Below threshold: escalate to human. Thresholds vary by action type.</p>
+      <ul>
+        <li>Score — agent rates confidence 0–1 before each action</li>
+        <li>Threshold — tuned per action type (0.95 for destructive, 0.60 for safe reads)</li>
+        <li>Escalate — below threshold → ask human; above → proceed</li>
+        <li>Calibrate — track actual accuracy vs confidence over time</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">confidence / autonomy</span>
+          <button class="play-btn" data-target="confidence">play</button>
+        </div>
+        <div class="expr-body" id="expr-confidence"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Speculative Execution</h3></div>
+      <p>Spawn N agents with different strategies in parallel. The first to succeed wins; remaining branches are cancelled. Trades compute for latency.</p>
+      <ul>
+        <li>Branch — spawn N agents with different strategies simultaneously</li>
+        <li>Race — first successful result wins; remaining branches cancelled</li>
+        <li>Merge — alternative: collect all results and combine instead of racing</li>
+        <li>Useful when the correct approach is uncertain upfront</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">parallel strategies</span>
+          <button class="play-btn" data-target="speculative">play</button>
+        </div>
+        <div class="expr-body" id="expr-speculative"></div>
+      </div>
+
+      <div class="ph"><span class="pt">technique</span><h3>Prompt Caching</h3></div>
+      <p>Cache repeated long prefixes (system prompt, tool definitions, document context) across calls. The provider skips re-encoding the prefix — significant latency and cost reduction.</p>
+      <ul>
+        <li>Identify — system prompt, tool schemas, and document context are cacheable</li>
+        <li>Cache — provider stores the prefix KV state after first call</li>
+        <li>Reuse — subsequent calls skip re-encoding the cached prefix</li>
+        <li>Impact — meaningful latency and token cost reduction for long-context agents</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">request / cache</span>
+          <button class="play-btn" data-target="prompt-cache">play</button>
+        </div>
+        <div class="expr-body" id="expr-prompt-cache"></div>
+      </div>
+    </section>
+
+    <!-- ── 7. Coding Agent Patterns ──────────────────────── -->
+    <section id="coding">
+      <h2>Coding Agent Patterns</h2>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Code → Test → Fix Loop</h3></div>
+      <p>The tightest feedback loop in coding agents. Write code, run the test suite in a sandbox, parse failure messages, apply targeted patches, repeat.</p>
+      <ul>
+        <li>Write — generate implementation from spec</li>
+        <li>Execute — run test suite in sandbox; parse stderr, assertions, stack traces</li>
+        <li>Patch — targeted edits based on failure messages; not full rewrites</li>
+        <li>Repeat — until all tests pass or max iterations hit</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">test runner</span>
+          <button class="play-btn" data-target="code-test-fix">play</button>
+        </div>
+        <div class="expr-body" id="expr-code-test-fix"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Linter-in-the-Loop</h3></div>
+      <p>Static analysis runs after code generation and before execution. Lint errors are parsed — file, line, rule, message — and fed back as observations for targeted fixes.</p>
+      <ul>
+        <li>Write — generate code</li>
+        <li>Lint — run static analyzer (ESLint, mypy, clippy) before execution</li>
+        <li>Parse — extract file, line, rule, message from lint output</li>
+        <li>Fix — targeted edits per error; re-lint to verify fixes are clean</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">editor / lint</span>
+          <button class="play-btn" data-target="linter">play</button>
+        </div>
+        <div class="expr-body" id="expr-linter"></div>
+      </div>
+
+      <div class="ph"><span class="pt">technique</span><h3>Scaffolded Execution</h3></div>
+      <p>Agent writes code into an isolated runtime, executes it, and reads stdout/stderr/exit code as structured observations. The environment itself becomes a tool.</p>
+      <ul>
+        <li>Scaffold — set up isolated runtime (container, WASM, subprocess)</li>
+        <li>Write — agent writes code to a file in the sandbox</li>
+        <li>Execute — run the file; capture stdout, stderr, exit code</li>
+        <li>Observe — output fed back as structured tool result; sandbox torn down</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">runtime / container</span>
+          <button class="play-btn" data-target="scaffolded">play</button>
+        </div>
+        <div class="expr-body" id="expr-scaffolded"></div>
+      </div>
+
+      <div class="ph"><span class="pt">pattern</span><h3>Git-Aware Agent</h3></div>
+      <p>Agent reads git log, diff, and blame as context before acting. Understands what changed and why — not just the current state — by mining commit history and authorship.</p>
+      <ul>
+        <li>git log — understand recent trajectory and intent behind changes</li>
+        <li>git diff — see what changed since last commit; understand current state</li>
+        <li>git blame — trace a line back to its author, commit, and reason</li>
+        <li>Branch context — main vs feature vs hotfix informs risk level of proposed changes</li>
+      </ul>
+      <div class="expr">
+        <div class="expr-chrome">
+          <div class="chrome-dots"><span></span><span></span><span></span></div>
+          <span class="chrome-title">git / history</span>
+          <button class="play-btn" data-target="git-aware">play</button>
+        </div>
+        <div class="expr-body" id="expr-git-aware"></div>
+      </div>
+    </section>
+
+  </main>
+
+
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
