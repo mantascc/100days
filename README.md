@@ -64,3 +64,4 @@ This collection explores the intersection of human creativity and artificial int
 | [53-ascii-grid](53-ascii-grid) | 53-ascii-grid | ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes |
 | [57-color-themes](57-color-themes) | 57-color-themes | Theme-switchable constrained-variation viewer exploring palette identity across shared sketches |
 | [58-shapes](58-shapes) | 58-shapes | Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking |
+| [59-font-explorer](59-font-explorer) | 59-font-explorer | Font Explorer — skill to visualize any font |
