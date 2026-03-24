@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human in the Loop</title>
+  <meta property="og:title" content="Human in the Loop">
+  <meta property="og:description" content="Four patterns for placing humans in agentic systems">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Human in the Loop</h1>
+    <div class="intro">
+      <p>Four patterns ordered by autonomy — from maximum control to full agent independence.</p>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── 1. Approval Gate ──────────────────────────────────── -->
+
+    <div class="ph"><span class="pt">pattern</span><h3>Approval Gate</h3></div>
+    <p>Agent runs autonomously until it reaches an irreversible or high-stakes action — sending an email, deploying code, spending money. Execution halts. A human reviews the specific action, its context, and consequences, then approves or rejects. The bottleneck is intentional.</p>
+    <ul>
+      <li>Triggered by action type, not confidence level — the gate is deterministic, not probabilistic</li>
+      <li>Human is a decision gate: they approve or block a specific action, not the whole task</li>
+      <li>High friction by design — if it fires too often, the agent is scoped too broadly</li>
+      <li>Suitable for: financial transactions, external communications, infrastructure changes</li>
+    </ul>
+    <div class="expr">
+      <div class="expr-chrome">
+        <div class="chrome-dots"><span></span><span></span><span></span></div>
+        <span class="chrome-title">deploy pipeline</span>
+        <button class="play-btn" data-target="approval-gate">play</button>
+      </div>
+      <div class="expr-body" id="expr-approval-gate"></div>
+    </div>
+
+    <!-- ── 2. Interrupt on Uncertainty ──────────────────────── -->
+
+    <div class="ph"><span class="pt">pattern</span><h3>Interrupt on Uncertainty</h3></div>
+    <p>The agent is trusted by default and operates autonomously — but it monitors its own confidence. When it drops below a calibrated threshold, it surfaces a specific "I'm not sure" signal and pauses, waiting for human input before continuing. Requires a well-calibrated uncertainty model, which is non-trivial.</p>
+    <ul>
+      <li>Agent must distinguish what it knows from what it doesn't — calibration matters more than raw capability</li>
+      <li>The interrupt carries a specific question, not just a confidence score</li>
+      <li>Unlike an approval gate, this fires on ambiguity — it is query-driven, not action-driven</li>
+      <li>Common in medical, legal, and financial contexts where errors compound</li>
+    </ul>
+    <div class="expr">
+      <div class="expr-chrome">
+        <div class="chrome-dots"><span></span><span></span><span></span></div>
+        <span class="chrome-title">clinical assistant</span>
+        <button class="play-btn" data-target="interrupt-uncertainty">play</button>
+      </div>
+      <div class="expr-body" id="expr-interrupt-uncertainty"></div>
+    </div>
+
+    <!-- ── 3. Post-hoc Review ────────────────────────────────── -->
+
+    <div class="ph"><span class="pt">pattern</span><h3>Post-hoc Review</h3></div>
+    <p>Agent operates at full speed. Outputs are staged — written to a review buffer, not committed. The human reviews the batch, approves clean outputs, and rejects or corrects problematic ones. Faster UX than approval gates, still fully reversible.</p>
+    <ul>
+      <li>Human is a quality gate, not a decision gate — they review output, not intent</li>
+      <li>Works best for content generation, document transforms, data pipelines</li>
+      <li>Throughput scales independently of review speed — the staging buffer absorbs the difference</li>
+      <li>Rejected items can be requeued with corrective context injected for the agent</li>
+    </ul>
+    <div class="expr">
+      <div class="expr-chrome">
+        <div class="chrome-dots"><span></span><span></span><span></span></div>
+        <span class="chrome-title">document pipeline</span>
+        <button class="play-btn" data-target="posthoc-review">play</button>
+      </div>
+      <div class="expr-body" id="expr-posthoc-review"></div>
+    </div>
+
+    <!-- ── 4. Async Audit ─────────────────────────────────────── -->
+
+    <div class="ph"><span class="pt">architecture</span><h3>Async Audit</h3></div>
+    <p>The agent operates at full autonomy. All actions are logged with structured traces. The human is out of the loop until something looks wrong — they scan logs, flag anomalies, and trigger rollbacks. This is the model most production systems gravitate toward: it scales, but depends entirely on good observability and reliable rollback primitives.</p>
+    <ul>
+      <li>Human reviews traces, not actions — oversight is retrospective, not preventive</li>
+      <li>Rollback must be a first-class primitive, not an afterthought</li>
+      <li>Trust is validated by the audit trail, not by pre-approval</li>
+      <li>Scales to high throughput; the cost is that errors can propagate before detection</li>
+    </ul>
+    <div class="expr">
+      <div class="expr-chrome">
+        <div class="chrome-dots"><span></span><span></span><span></span></div>
+        <span class="chrome-title">trace log / audit</span>
+        <button class="play-btn" data-target="async-audit">play</button>
+      </div>
+      <div class="expr-body" id="expr-async-audit"></div>
+    </div>
+
+  </main>
+
+  <footer>Human in the Loop — 4 patterns across a single autonomy axis.</footer>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
