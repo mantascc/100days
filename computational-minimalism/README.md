@@ -18,6 +18,15 @@ Design system and tools for creating visually quiet, informationally dense creat
 
 ## Contents
 
+### `variation-grid.md`
+Pattern for building multi-chapter viewers where a grid displays simultaneous variations along one axis:
+- Chapter contract (`labels`, `drawFns`, `dt`, `setup`)
+- Plain object vs factory function chapter formats
+- Generic loader / RAF lifecycle
+- Form factor variations (cell count, layout)
+- Navigation patterns (hash routing, query params)
+- What makes a good axis
+
 ### `style-seed.md`
 Complete design system documentation:
 - Color tokens (ground, text, structural, accent)

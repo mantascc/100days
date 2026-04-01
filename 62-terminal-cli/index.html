@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal REPL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap">
+  <style>
+    :root {
+      --page-bg:       #F4BFA0;
+      --chrome-bg:     #f0b090;
+      --chrome-border: #e09870;
+      --term-bg:       #fff3e0;
+      --term-border:   #e8c8a8;
+      --text-primary:  #1a0f0a;
+      --text-default:  #2e1a10;
+      --text-secondary:#8a6050;
+      --text-ghost:    #c4a080;
+      --accent:        #c05020;
+      --success:       #7a5c1a;
+      --error:         #aa1a00;
+      --prompt:        #c05020;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--mono);
+      background: var(--page-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    /* ── Terminal card ── */
+    .terminal {
+      width: min(800px, 100%);
+      height: min(800px, 100dvh - 32px);
+      background: var(--page-bg);
+      border: 1px solid var(--term-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Title bar ── */
+    .titlebar {
+      flex-shrink: 0;
+      height: 40px;
+      background: var(--chrome-bg);
+      border-bottom: 1px solid var(--chrome-border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+      user-select: none;
+    }
+
+    .dots { display: flex; gap: 6px; }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid var(--chrome-border);
+    }
+
+    .titlebar-title {
+      flex: 1;
+      text-align: center;
+      font-size: clamp(10px, 1.5vw, 12px);
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+    }
+
+    /* ── Output ── */
+    .output {
+      flex: 1;
+      overflow-y: auto;
+      padding: clamp(16px, 3vw, 28px) clamp(16px, 4vw, 32px) 12px;
+      font-size: clamp(13px, 1.8vw, 15px);
+      line-height: 1.75;
+      color: var(--text-default);
+      background: var(--term-bg);
+    }
+
+    .output::-webkit-scrollbar { width: 4px; }
+    .output::-webkit-scrollbar-track { background: transparent; }
+    .output::-webkit-scrollbar-thumb { background: var(--chrome-border); border-radius: 2px; }
+
+    .line { white-space: pre-wrap; word-break: break-all; }
+
+    .line.cmd .prompt-sym { color: var(--prompt); font-weight: 600; margin-right: 0.5em; }
+    .line.cmd { color: var(--text-primary); font-weight: 500; }
+
+    .line.dim { color: var(--text-secondary); font-size: 0.87em; }
+    .line.err { color: var(--error); }
+    .line.suc { color: var(--success); font-weight: 500; }
+    .line.blank { min-height: 1.75em; }
+
+    /* help table */
+    .help-row {
+      display: flex;
+      gap: 0;
+      font-size: 0.93em;
+      line-height: 1.75;
+      flex-wrap: wrap;
+    }
+    .help-cmd  { color: var(--accent); min-width: clamp(140px, 20vw, 200px); }
+    .help-desc { color: var(--text-secondary); }
+
+    /* ── Input row ── */
+    .input-row {
+      flex-shrink: 0;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(16px, 4vw, 32px);
+      height: clamp(44px, 6vw, 56px);
+      background: var(--term-bg);
+    }
+
+    .input-prompt {
+      color: var(--prompt);
+      font-family: var(--mono);
+      font-size: clamp(13px, 1.8vw, 15px);
+      font-weight: 600;
+      margin-right: 0.5em;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .input-field {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: clamp(13px, 1.8vw, 15px);
+      color: var(--text-primary);
+      background: none;
+      border: none;
+      outline: none;
+      caret-color: var(--accent);
+      font-weight: 400;
+      min-width: 0;
+    }
+
+    .input-field::placeholder { color: var(--text-ghost); }
+
+    /* ── Status bar ── */
+    .statusbar {
+      flex-shrink: 0;
+      height: 28px;
+      background: var(--chrome-bg);
+      border-top: 1px solid var(--chrome-border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: clamp(10px, 1.4vw, 12px);
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    .status-left  { display: flex; gap: 16px; align-items: center; }
+    .status-right { margin-left: auto; }
+
+    /* hide hint on very small screens */
+    @media (max-width: 400px) { .status-right { display: none; } }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .status-accent { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="terminal">
+
+  <div class="output" id="output"></div>
+
+  <div class="input-row">
+    <span class="input-prompt">$</span>
+    <input class="input-field" id="input" type="text"
+      autocomplete="off" spellcheck="false"
+      autocorrect="off" autocapitalize="off">
+  </div>
+
+
+</div>
+
+<script>
+  const output = document.getElementById('output');
+  const input  = document.getElementById('input');
+
+  let cmdHistory = [];
+  let histIdx    = -1;
+  let busy       = false;
+
+  /* ── DOM helpers ── */
+
+  function addLine(text = '', cls = 'out') {
+    const div = document.createElement('div');
+    div.className = 'line ' + cls;
+    if (!text && cls !== 'cmd') {
+      div.classList.add('blank');
+    } else {
+      div.textContent = text;
+    }
+    output.appendChild(div);
+    scroll();
+    return div;
+  }
+
+  function addCmdLine(text) {
+    const div = document.createElement('div');
+    div.className = 'line cmd';
+    const sym = document.createElement('span');
+    sym.className = 'prompt-sym';
+    sym.textContent = '$';
+    div.appendChild(sym);
+    div.appendChild(document.createTextNode(text));
+    output.appendChild(div);
+    scroll();
+    return div;
+  }
+
+  function addHelpRow(cmd, desc) {
+    const row = document.createElement('div');
+    row.className = 'help-row';
+    row.innerHTML =
+      `<span class="help-cmd">${esc(cmd)}</span>` +
+      `<span class="help-desc">${esc(desc)}</span>`;
+    output.appendChild(row);
+    scroll();
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function scroll() {
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  /* ── Typewriter ── */
+
+  function typewriter(div, text, speed = 36, cls = 'suc') {
+    return new Promise(resolve => {
+      if (cls) div.className = 'line ' + cls;
+      div.textContent = '';
+      let i = 0;
+      const tick = () => {
+        if (i < text.length) {
+          div.textContent += text[i++];
+          scroll();
+          setTimeout(tick, speed + Math.random() * 14);
+        } else {
+          resolve();
+        }
+      };
+      tick();
+    });
+  }
+
+  /* ── Commands ── */
+
+  async function cmdHello(args) {
+    const name = args.length ? args.join(' ') : 'world';
+    addLine();
+    const d = addLine('', 'suc');
+    await typewriter(d, `Hello, ${name}!`, 38);
+    addLine();
+  }
+
+  async function cmdHelp() {
+    addLine();
+    const cmds = [
+      ['hello [name]', 'print a greeting  (default: world)'],
+      ['date',         'show current date and time'],
+      ['whoami',       'print current user'],
+      ['clear',        'clear terminal output'],
+      ['cat',          'draw an ascii cat'],
+      ['help',         'list available commands'],
+    ];
+    for (const [c, d] of cmds) {
+      const row = document.createElement('div');
+      row.className = 'help-row';
+      const cmdSpan  = document.createElement('span');
+      cmdSpan.className = 'help-cmd';
+      const descSpan = document.createElement('span');
+      descSpan.className = 'help-desc';
+      row.appendChild(cmdSpan);
+      row.appendChild(descSpan);
+      output.appendChild(row);
+      scroll();
+      await typewriter(cmdSpan,  c, 28, '');
+      await typewriter(descSpan, d, 18, '');
+    }
+    addLine();
+  }
+
+  function cmdClear() {
+    const sentinel = document.getElementById('boot-end');
+    while (output.lastChild && output.lastChild !== sentinel) {
+      output.removeChild(output.lastChild);
+    }
+  }
+
+  async function cmdDate() {
+    addLine();
+    const d = addLine('', 'out');
+    await typewriter(d, new Date().toLocaleString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long',
+      day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }), 22, 'out');
+    addLine();
+  }
+
+  async function cmdWhoami() {
+    addLine();
+    const d = addLine('', 'out');
+    await typewriter(d, 'guest@sketch', 38, 'out');
+    addLine();
+  }
+
+  async function cmdCat() {
+    const RAW_ROWS = [
+      '   /\\_____/\\  ',
+      '  /  o   o  \\ ',
+      ' ( ==  ^  == )',
+      '  )         ( ',
+      ' (           )',
+      '( (  )   (  ) )',
+      '(__(__)___(__))',
+    ];
+
+    const COLS     = Math.max(...RAW_ROWS.map(r => r.length));
+    const CAT_ROWS = RAW_ROWS.map(r => r.padEnd(COLS));
+    const ROWS     = CAT_ROWS.length;
+    const DURATION = 1300;
+    const CHAOS    = '!@#$%^&*+=~<>|/?\\;:';
+    const SETTLING = '·•∘';
+
+    // flat cell arrays
+    const catType  = new Uint8Array(ROWS * COLS);
+    const catChars = new Array(ROWS * COLS);
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const ch = CAT_ROWS[r][c];
+        const i  = r * COLS + c;
+        catChars[i] = ch;
+        catType[i]  = ch !== ' ' ? 1 : 0;
+      }
+    }
+
+    // cat cells crystallise first, background last
+    const thresh = new Float32Array(ROWS * COLS);
+    for (let i = 0; i < thresh.length; i++) {
+      thresh[i] = catType[i]
+        ? 0.08 + Math.random() * 0.52   // cat  8–60%
+        : 0.55 + Math.random() * 0.45;  // bg  55–100%
+    }
+
+    // inject <pre> into feed
+    addLine();
+    const wrapper = document.createElement('div');
+    wrapper.className = 'line';
+    const pre = document.createElement('pre');
+    pre.style.cssText =
+      'font-family:var(--mono);font-size:inherit;line-height:1.75;display:inline-block;';
+    wrapper.appendChild(pre);
+    output.appendChild(wrapper);
+    scroll();
+
+    // build one <span> per cell
+    const cells = [];
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const s = document.createElement('span');
+        cells.push(s);
+        pre.appendChild(s);
+      }
+      if (r < ROWS - 1) pre.appendChild(document.createTextNode('\n'));
+    }
+
+    // crystallisation loop (sketch-55 style)
+    const t0 = performance.now();
+    await new Promise(resolve => {
+      function frame(ts) {
+        const p = Math.min((ts - t0) / DURATION, 1);
+
+        for (let i = 0; i < cells.length; i++) {
+          const s  = cells[i];
+          const tp = catType[i];
+          if (p >= thresh[i]) {
+            s.textContent = catChars[i];
+            s.style.color = tp ? 'var(--success)' : '';
+          } else {
+            const local = p / thresh[i];
+            if (local < 0.15) {
+              s.textContent = ' '; s.style.color = '';
+            } else if (local < 0.72) {
+              s.textContent = CHAOS[Math.floor(Math.random() * CHAOS.length)];
+              s.style.color = tp ? 'var(--text-secondary)' : 'var(--text-ghost)';
+            } else {
+              s.textContent = SETTLING[Math.floor(Math.random() * SETTLING.length)];
+              s.style.color = tp ? 'var(--accent)' : 'var(--text-ghost)';
+            }
+          }
+        }
+
+        scroll();
+        p < 1 ? requestAnimationFrame(frame) : resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+
+    const meow = addLine('', 'dim');
+    await typewriter(meow, 'meow.', 72, 'dim');
+    addLine();
+  }
+
+  const COMMANDS = {
+    hello:  cmdHello,
+    help:   cmdHelp,
+    clear:  cmdClear,
+    date:   cmdDate,
+    whoami: cmdWhoami,
+    cat:    cmdCat,
+  };
+
+  /* ── Run ── */
+
+  async function run(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    cmdHistory.unshift(trimmed);
+    histIdx = -1;
+
+    const parts = trimmed.split(/\s+/);
+    const cmd   = parts[0].toLowerCase();
+    const args  = parts.slice(1);
+
+    const cmdDiv = addCmdLine(trimmed);
+
+    if (COMMANDS[cmd]) {
+      busy = true;
+      await COMMANDS[cmd](args);
+      busy = false;
+    } else {
+      await delay(60);
+      cmdDiv.style.transition = 'opacity 0.8s';
+      cmdDiv.style.opacity = '0';
+      await delay(820);
+      cmdDiv.remove();
+    }
+
+    input.focus();
+  }
+
+  /* ── Boot sequence ── */
+
+  async function boot() {
+    input.disabled = true;
+
+    await delay(120);
+    addLine('sketch-terminal  v0.1.0', 'dim');
+    await delay(80);
+    const hintLine = addLine('', 'dim');
+    hintLine.innerHTML = 'type  <span style="color:var(--accent);font-weight:600">help</span>  for available commands';
+    await delay(80);
+    addLine();
+
+    // sentinel — everything before this stays on clear
+    const sentinel = document.createElement('div');
+    sentinel.id = 'boot-end';
+    output.appendChild(sentinel);
+
+    input.disabled = false;
+    input.focus();
+  }
+
+  /* ── Keyboard ── */
+
+  input.addEventListener('keydown', async e => {
+    if (busy) return;
+
+    if (e.key === 'Enter') {
+      const val = input.value;
+      input.value = '';
+      await run(val);
+
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (histIdx < cmdHistory.length - 1) {
+        histIdx++;
+        input.value = cmdHistory[histIdx];
+        requestAnimationFrame(() =>
+          input.setSelectionRange(input.value.length, input.value.length));
+      }
+
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (histIdx > 0) {
+        histIdx--;
+        input.value = cmdHistory[histIdx];
+      } else {
+        histIdx = -1;
+        input.value = '';
+      }
+    }
+  });
+
+  boot();
+</script>
+</body>
+</html>

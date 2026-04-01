@@ -1,35 +1,47 @@
-# Peach
+# Day 56: Constrained Variation
 
-Canvas animation viewer built around the constrained variation method — hold a fixed scaffold (palette, grid, timing) stable and vary one axis at a time across 8 cells, all displayed simultaneously.
+> "Fix the scaffold. Switch the algorithm. Compare simultaneously."
+
+A canvas-based viewer for exploring one visual axis at a time across eight simultaneous cells. Six chapters, each a different draw function family running through the same 4×2 grid and Peach palette.
+
+[Live Demo](index.html)
 
 ---
+
+## Concept
+
+Constrained variation is a creative method: hold constants stable (palette, grid, timing loop, structure) and replace exactly one variable axis per chapter. Displaying all eight variants simultaneously turns iteration into taxonomy — you're mapping a possibility space, not searching for the best result.
+
+The eye needs something fixed to perceive what changed. Constants do this work silently.
 
 ## Chapters
 
-| # | theme | cells |
-|---|---|---|
-| 01 | static | dither, pixel noise, scanlines, bit crush, channel shift, low res, interference, corrupt |
-| 02 | interference | two sources, moiré lines, beat frequency, standing wave, zone plates, lissajous field… |
-| 03 | scanlines | drift, diagonal, pulse, venetian, grid, silk, stagger, frequency |
-| 04 | corrupt | chunk, dissolve, melt, warp, skip, mirror, scatter, tile |
-| 05 | **blank** | yours |
+| # | Chapter | Axis explored |
+|---|---------|---------------|
+| 01 | **static** | noise types — dither, pixel noise, scanlines, bit crush, channel shift, low res, interference, corrupt |
+| 02 | **interference** | wave interactions — two sources, moiré, beat frequency, standing wave, four sources, zone plates, lissajous field, rotating moiré |
+| 03 | **scanlines** | scan patterns — drift, diagonal, pulse, venetian, grid, silk, stagger, frequency |
+| 04 | **corrupt** | glitch modes — chunk, dissolve, melt, warp, skip, mirror, scatter, tile |
+| 05 | **anna** | custom study |
+| 06 | **blank** | output target — write new chapters here via the skill |
 
----
+## How It Works
 
-## Get started
+- Each chapter is a JS module in `chapters/` exporting `labels`, `drawFns`, `dt`, and `setup`
+- The viewer lazy-loads chapters on navigation, rebuilds the 8-cell grid, and starts a shared `requestAnimationFrame` loop
+- `dt=0` means static (no animation); any positive value drives the time accumulator
+- A CLONE popover on the blank chapter shows the module template for writing new variants
 
-**1. Clone the repo**
-```bash
-git clone https://github.com/mantascc/100days
-cd 100days/56-constrained-variation
-python3 -m http.server 8000
-```
+## Tech Stack
 
-**2. Open with any coding assistant. Run the skill.**
+- Vanilla JavaScript (ES modules)
+- HTML5 Canvas
+- CSS custom properties
+- Peach palette: pink `[244,160,160]` → yellow `[244,216,122]`, background `#1A0F0A`
 
-Paste `skill.md` into any AI assistant, or open the project in Claude Code — it loads automatically.
+## Skill
 
-**3. Describe what you want**
+This project ships a `constrained-variation-guide` skill (`skill.md`) for generating new chapters interactively. Paste `skill.md` into any AI assistant, then describe what you want:
 
 ```
 remix tile but slower
@@ -37,4 +49,6 @@ something that feels like breathing
 8 variations from still to broken
 ```
 
-Your chapter appears as 05 in the grid.
+Your chapter appears as the next slot in the grid.
+
+*Part of the 100 Days of Creative Coding challenge.*

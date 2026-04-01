@@ -293,5 +293,10 @@
     "id": "59-font-explorer",
     "path": "100days/59-font-explorer",
     "description": "Font Explorer — skill to visualize any font"
+  },
+  {
+    "id": "62-terminal-cli",
+    "path": "100days/62-terminal-cli",
+    "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat"
   }
 ]
