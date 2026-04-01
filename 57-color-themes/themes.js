@@ -29,6 +29,16 @@ export const THEMES = [
         cream: [168, 184, 176],
         deep: [26, 21, 37],
     },
+    {
+        slug: 'ube',
+        name: 'Ube',
+        accent: '#7B6FA5',
+        pink: [123, 111, 165],
+        yellow: [196, 149, 106],
+        coral: [162, 127, 135],
+        cream: [242, 237, 232],
+        deep: [28, 21, 32],
+    },
 ];
 
 export function getThemeBySlug(slug) {
