@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viz Goal Gallery</title>
+<title>Viz sheet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -38,7 +38,7 @@
     margin-bottom: 2rem;
   }
 
-  .gallery { max-width: 1100px; }
+  .gallery { max-width: 1100px; margin: 0 auto; }
 
   .goal-section { margin-bottom: 3rem; }
 
@@ -140,12 +140,48 @@
 
   .meta span:last-child { opacity: 0.5; }
 
-  .accent-compare   { border-left: 2px solid #378ADD; }
-  .accent-distribute{ border-left: 2px solid #1D9E75; }
-  .accent-trend     { border-left: 2px solid #BA7517; }
-  .accent-compose   { border-left: 2px solid #7F77DD; }
-  .accent-relate    { border-left: 2px solid #D4537E; }
-  .accent-locate    { border-left: 2px solid #888780; }
+  .accent-compare   { border-left: 2px solid #fff3e0; }
+  .accent-distribute{ border-left: 2px solid #f4d87a; }
+  .accent-trend     { border-left: 2px solid #f4bfa0; }
+  .accent-compose   { border-left: 2px solid #f4a0a0; }
+  .accent-relate    { border-left: 2px solid #f28880; }
+  .accent-locate    { border-left: 2px solid #f07060; }
+
+  .sheet-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2rem;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .sheet-nav h1 {
+    margin-bottom: 0;
+  }
+  .sheet-links {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: flex;
+    gap: 16px;
+  }
+  .sheet-links a {
+    color: var(--text-ghost);
+    text-decoration: none;
+    transition: color 0.15s;
+    padding-bottom: 4px;
+    border-bottom: 1px solid transparent;
+  }
+  .sheet-links a:hover {
+    color: var(--text-secondary);
+  }
+  .sheet-links .active {
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-hover);
+    padding-bottom: 4px;
+  }
+
 
   @media (max-width: 700px) {
     .charts-row { grid-template-columns: 1fr; }
@@ -155,7 +191,14 @@
 </head>
 <body>
 
-<h1>Visualization Goal Gallery</h1>
+<nav class="sheet-nav">
+  <h1>Viz sheet</h1>
+  <div class="sheet-links" style="display: none;">
+    <span class="active">Sheet 1: Core</span>
+    <a href="sheet2.html">Sheet 2: Semantic</a>
+  </div>
+</nav>
+
 <div class="gallery" id="app"></div>
 
 <script>
@@ -195,7 +238,7 @@ const goals = [
         name: 'Bar chart', bestFor: 'compare many, rank',
         render: canvas => new Chart(canvas, {
           type: 'bar',
-          data: { labels: ['A','B','C','D','E'], datasets: [{ data: [84,62,91,47,73], backgroundColor: '#378ADD', borderRadius: 2 }] },
+          data: { labels: ['A','B','C','D','E'], datasets: [{ data: [84,62,91,47,73], backgroundColor: '#7b6fa5', borderRadius: 2 }] },
           options: baseOpts({ scales: xyScales() })
         })
       },
@@ -206,8 +249,8 @@ const goals = [
           data: {
             labels: ['Q1','Q2','Q3','Q4'],
             datasets: [
-              { data: [65,72,81,68], backgroundColor: '#378ADD', borderRadius: 2, barPercentage: 0.4 },
-              { data: [45,58,62,79], backgroundColor: '#185FA5', borderRadius: 2, barPercentage: 0.4 }
+              { data: [65,72,81,68], backgroundColor: '#7b6fa5', borderRadius: 2, barPercentage: 0.4 },
+              { data: [45,58,62,79], backgroundColor: '#f4bfa0', borderRadius: 2, barPercentage: 0.4 }
             ]
           },
           options: baseOpts({ scales: xyScales() })
@@ -222,7 +265,7 @@ const goals = [
             type: 'bar',
             data: {
               labels: ['A','B','C','D','E','F'],
-              datasets: [{ data: vals.map(v => v - baseline), backgroundColor: vals.map(v => v >= baseline ? '#378ADD' : '#185FA5'), borderRadius: 2 }]
+              datasets: [{ data: vals.map(v => v - baseline), backgroundColor: vals.map(v => v >= baseline ? '#7b6fa5' : '#f4bfa0'), borderRadius: 2 }]
             },
             options: baseOpts({ scales: xyScales() })
           });
@@ -239,7 +282,7 @@ const goals = [
         name: 'Histogram', bestFor: 'distribution, skew',
         render: canvas => new Chart(canvas, {
           type: 'bar',
-          data: { labels: ['10','20','30','40','50','60','70','80','90'], datasets: [{ data: [3,8,15,28,22,14,7,2,1], backgroundColor: '#1D9E75', borderRadius: 2, categoryPercentage: 1, barPercentage: 0.95 }] },
+          data: { labels: ['10','20','30','40','50','60','70','80','90'], datasets: [{ data: [3,8,15,28,22,14,7,2,1], backgroundColor: '#f4d87a', borderRadius: 2, categoryPercentage: 1, barPercentage: 0.95 }] },
           options: baseOpts({ scales: xyScales() })
         })
       },
@@ -260,14 +303,14 @@ const goals = [
           // caps
           [10,92].forEach(x => { ctx.beginPath(); ctx.moveTo(sc(x),y-6); ctx.lineTo(sc(x),y+6); ctx.stroke(); });
           // box
-          ctx.fillStyle = '#1D9E75'; ctx.globalAlpha = 0.5;
+          ctx.fillStyle = '#f4d87a'; ctx.globalAlpha = 0.5;
           ctx.fillRect(sc(25), y-bh/2, sc(75)-sc(25), bh);
           ctx.globalAlpha = 1;
           ctx.strokeRect(sc(25), y-bh/2, sc(75)-sc(25), bh);
           // median
           ctx.beginPath(); ctx.moveTo(sc(55),y-bh/2); ctx.lineTo(sc(55),y+bh/2); ctx.stroke();
           // outlier
-          ctx.fillStyle = '#E24B4A'; ctx.beginPath(); ctx.arc(sc(97), y, 3, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#f07060'; ctx.beginPath(); ctx.arc(sc(97), y, 3, 0, Math.PI*2); ctx.fill();
           // labels
           ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = "9px 'IBM Plex Mono', monospace";
           [['Q1',sc(25)-4],['med',sc(51)],['Q3',sc(73)]].forEach(([label,x]) => ctx.fillText(label, x, y+bh/2+12));
@@ -281,7 +324,7 @@ const goals = [
           canvas.height = 90;
           const W = canvas.width;
           [12,18,22,25,28,31,32,34,35,36,38,39,41,42,44,48,52,55,61,68,75,82].forEach(v => {
-            ctx.fillStyle = '#1D9E75'; ctx.globalAlpha = 0.6;
+            ctx.fillStyle = '#f4d87a'; ctx.globalAlpha = 0.6;
             ctx.beginPath();
             ctx.arc((v/100)*(W-40)+20, 35 + (Math.random()*20-10), 3, 0, Math.PI*2);
             ctx.fill();
@@ -302,7 +345,7 @@ const goals = [
         name: 'Line chart', bestFor: 'trend over time',
         render: canvas => new Chart(canvas, {
           type: 'line',
-          data: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'], datasets: [{ data: [30,42,38,55,48,67,72,81], borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.1)', tension: 0.4, pointRadius: 3, fill: true }] },
+          data: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'], datasets: [{ data: [30,42,38,55,48,67,72,81], borderColor: '#f4bfa0', backgroundColor: 'rgba(244,191,160,0.1)', tension: 0.4, pointRadius: 3, fill: true }] },
           options: baseOpts({ scales: xyScales() })
         })
       },
@@ -313,8 +356,8 @@ const goals = [
           data: {
             labels: ['Jan','Mar','May','Jul','Sep','Nov'],
             datasets: [
-              { data: [30,45,52,67,58,71], borderColor: '#BA7517', tension: 0.4, pointRadius: 2, fill: false },
-              { data: [22,31,38,42,51,48], borderColor: '#FAC775', tension: 0.4, pointRadius: 2, fill: false, borderDash: [4,3] }
+              { data: [30,45,52,67,58,71], borderColor: '#f4bfa0', tension: 0.4, pointRadius: 2, fill: false },
+              { data: [22,31,38,42,51,48], borderColor: 'rgba(244,191,160,0.5)', tension: 0.4, pointRadius: 2, fill: false, borderDash: [4,3] }
             ]
           },
           options: baseOpts({ scales: xyScales() })
@@ -327,8 +370,8 @@ const goals = [
           data: {
             labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
             datasets: [
-              { data: [20,28,35,32,42,51,48], borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.25)', tension: 0.4, pointRadius: 0, fill: true },
-              { data: [10,14,18,15,22,28,24], borderColor: '#EF9F27', backgroundColor: 'rgba(239,159,39,0.15)', tension: 0.4, pointRadius: 0, fill: true }
+              { data: [20,28,35,32,42,51,48], borderColor: '#f4bfa0', backgroundColor: 'rgba(244,191,160,0.25)', tension: 0.4, pointRadius: 0, fill: true },
+              { data: [10,14,18,15,22,28,24], borderColor: 'rgba(244,191,160,0.4)', backgroundColor: 'rgba(244,191,160,0.15)', tension: 0.4, pointRadius: 0, fill: true }
             ]
           },
           options: baseOpts({ scales: xyScales() })
@@ -345,7 +388,7 @@ const goals = [
         name: 'Donut chart', bestFor: 'proportion, part-to-whole',
         render: canvas => new Chart(canvas, {
           type: 'doughnut',
-          data: { labels: ['A','B','C','D'], datasets: [{ data: [44,28,18,10], backgroundColor: ['#7F77DD','#AFA9EC','#534AB7','#3C3489'], borderWidth: 0 }] },
+          data: { labels: ['A','B','C','D'], datasets: [{ data: [44,28,18,10], backgroundColor: ['#f4a0a0','#f4bfa0','#f07060','rgba(240,112,96,0.6)'], borderWidth: 0 }] },
           options: baseOpts({ cutout: '65%' })
         })
       },
@@ -356,9 +399,9 @@ const goals = [
           data: {
             labels: ['2021','2022','2023','2024'],
             datasets: [
-              { data: [40,45,38,52], backgroundColor: '#7F77DD' },
-              { data: [30,28,35,25], backgroundColor: '#534AB7' },
-              { data: [20,18,22,15], backgroundColor: '#3C3489' }
+              { data: [40,45,38,52], backgroundColor: '#f4a0a0' },
+              { data: [30,28,35,25], backgroundColor: '#f07060' },
+              { data: [20,18,22,15], backgroundColor: 'rgba(240,112,96,0.6)' }
             ]
           },
           options: baseOpts({ scales: xyScales({ stackedX: true, stackedY: true }) })
@@ -371,7 +414,7 @@ const goals = [
           canvas.width = canvas.parentElement.offsetWidth;
           canvas.height = 90;
           const W = canvas.width - 2, H = 88;
-          const colors = ['#534AB7','#7F77DD','#AFA9EC','#3C3489','#7F77DD','#534AB7'];
+          const colors = ['#f07060','#f4a0a0','#f4bfa0','rgba(240,112,96,0.6)','#f4a0a0','#f07060'];
           [
             {x:0,   y:0,   w:0.45,h:0.6},
             {x:0.45,y:0,   w:0.3, h:0.6},
@@ -398,7 +441,7 @@ const goals = [
           const pts = Array.from({length:30}, () => { const x = Math.random()*80+10; return {x, y: x*0.6 + Math.random()*25 - 5}; });
           new Chart(canvas, {
             type: 'scatter',
-            data: { datasets: [{ data: pts, backgroundColor: 'rgba(212,83,126,0.5)', pointRadius: 4, pointBorderWidth: 0 }] },
+            data: { datasets: [{ data: pts, backgroundColor: 'rgba(242,136,128,0.5)', pointRadius: 4, pointBorderWidth: 0 }] },
             options: baseOpts({ scales: xyScales({ xGrid: true }) })
           });
         }
@@ -407,7 +450,7 @@ const goals = [
         name: 'Bubble chart', bestFor: 'correlation + size encoding',
         render: canvas => new Chart(canvas, {
           type: 'bubble',
-          data: { datasets: [{ data: [{x:20,y:30,r:8},{x:45,y:55,r:14},{x:70,y:40,r:6},{x:30,y:70,r:18},{x:60,y:80,r:10},{x:80,y:20,r:12},{x:15,y:50,r:5},{x:55,y:30,r:9}], backgroundColor: 'rgba(212,83,126,0.35)', borderColor: '#D4537E', borderWidth: 1 }] },
+          data: { datasets: [{ data: [{x:20,y:30,r:8},{x:45,y:55,r:14},{x:70,y:40,r:6},{x:30,y:70,r:18},{x:60,y:80,r:10},{x:80,y:20,r:12},{x:15,y:50,r:5},{x:55,y:30,r:9}], backgroundColor: 'rgba(242,136,128,0.35)', borderColor: '#f28880', borderWidth: 1 }] },
           options: baseOpts({ scales: { x: { min:0, max:100, ...xScale(false,true) }, y: { min:0, max:100, ...yScale() } } })
         })
       },
@@ -420,7 +463,7 @@ const goals = [
           const W = canvas.width, H = 90;
           const nodes = [{x:0.5,y:0.5,r:8},{x:0.2,y:0.25,r:5},{x:0.8,y:0.2,r:5},{x:0.15,y:0.7,r:5},{x:0.75,y:0.75,r:5},{x:0.5,y:0.15,r:4}];
           const edges = [[0,1],[0,2],[0,3],[0,4],[1,3],[2,5],[0,5]];
-          ctx.strokeStyle = 'rgba(212,83,126,0.2)'; ctx.lineWidth = 1;
+          ctx.strokeStyle = 'rgba(242,136,128,0.2)'; ctx.lineWidth = 1;
           edges.forEach(([a,b]) => {
             ctx.beginPath();
             ctx.moveTo(nodes[a].x*W, nodes[a].y*H);
@@ -428,7 +471,7 @@ const goals = [
             ctx.stroke();
           });
           nodes.forEach((n,i) => {
-            ctx.fillStyle = i === 0 ? '#D4537E' : 'rgba(212,83,126,0.45)';
+            ctx.fillStyle = i === 0 ? '#f28880' : 'rgba(242,136,128,0.45)';
             ctx.beginPath(); ctx.arc(n.x*W, n.y*H, n.r, 0, Math.PI*2); ctx.fill();
           });
         }
@@ -449,7 +492,7 @@ const goals = [
           ctx.fillStyle = 'rgba(255,255,255,0.02)'; ctx.fillRect(0,0,canvas.width,90);
           [{cx:0.3,cy:0.4,n:12},{cx:0.65,cy:0.3,n:8},{cx:0.5,cy:0.65,n:6},{cx:0.8,cy:0.6,n:4}].forEach(c => {
             for (let i = 0; i < c.n; i++) {
-              ctx.fillStyle = 'rgba(136,135,128,0.6)';
+              ctx.fillStyle = 'rgba(240,112,96,0.6)';
               ctx.beginPath();
               ctx.arc(c.cx*canvas.width + (Math.random()-0.5)*60, c.cy*90 + (Math.random()-0.5)*40, 2.5, 0, Math.PI*2);
               ctx.fill();
@@ -465,7 +508,7 @@ const goals = [
           canvas.height = 90;
           const cols = 10, rows = 5, cw = canvas.width/cols, ch = 90/rows;
           Array.from({length: rows*cols}, () => Math.random()).forEach((v, i) => {
-            ctx.fillStyle = `rgba(136,135,128,${v*0.8+0.05})`;
+            ctx.fillStyle = `rgba(240,112,96,${v*0.8+0.05})`;
             ctx.fillRect((i%cols)*cw+0.5, Math.floor(i/cols)*ch+0.5, cw-1, ch-1);
           });
         }
@@ -482,7 +525,7 @@ const goals = [
             type: 'scatter',
             data: { datasets: [0,1,2].map(cat => ({
               data: pts.filter(p => p.cat === cat).map(p => ({x:p.x*100, y:p.y*100})),
-              backgroundColor: ['rgba(136,135,128,0.7)','rgba(96,95,90,0.7)','rgba(68,68,65,0.7)'][cat],
+              backgroundColor: ['rgba(240,112,96,0.7)','rgba(242,136,128,0.7)','rgba(244,160,160,0.7)'][cat],
               pointRadius: 4, pointBorderWidth: 0
             })) },
             options: baseOpts({ scales: {

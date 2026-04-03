@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viz Goal Gallery - Sheet 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+<style>
+  :root {
+    --ground-void: #0a0a0a;
+    --ground-base: #111111;
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.45);
+    --text-ghost: rgba(255,255,255,0.25);
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --font: 'IBM Plex Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--ground-void); color: var(--text-primary); padding: 2rem; min-height: 100vh; }
+  h1 { font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 2rem; }
+  
+  .gallery { max-width: 1100px; margin: 0 auto; }
+  .goal-section { margin-bottom: 3rem; }
+  
+  .goal-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 0.5px solid var(--border); }
+  .goal-label { font-size: 10px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-ghost); min-width: 80px; }
+  .goal-title { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+  .goal-desc { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+  
+  .variants { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .variant-tag { font-size: 10px; font-family: var(--font); padding: 3px 8px; border-radius: 3px; border: 0.5px solid var(--border); color: var(--text-secondary); cursor: default; transition: border-color 0.15s, color 0.15s; }
+  .variant-tag:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  
+  .charts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .chart-card { background: var(--ground-base); border: 0.5px solid var(--border); border-radius: 4px; padding: 12px; }
+  .chart-name { font-size: 10px; color: var(--text-ghost); margin-bottom: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+  
+  .chart-canvas-wrap { position: relative; width: 100%; height: 90px; }
+  .chart-canvas-wrap canvas { display: block; }
+  
+  .best-for { font-size: 10px; color: var(--text-ghost); margin-top: 6px; }
+  .meta { margin-top: 6px; font-size: 10px; color: var(--text-ghost); display: flex; gap: 16px; }
+  .meta span:last-child { opacity: 0.5; }
+
+  .accent-judgement { border-left: 2px solid #7b6fa5; }
+  .accent-highlight { border-left: 2px solid #f4bfa0; }
+  .accent-exclusion { border-left: 2px solid #888780; }
+  .accent-annotation{ border-left: 2px solid #fff3e0; }
+
+  .sheet-nav { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; max-width: 1100px; margin-left: auto; margin-right: auto; }
+  .sheet-nav h1 { margin-bottom: 0; }
+  .sheet-links { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; display: flex; gap: 16px; }
+  .sheet-links a { color: var(--text-ghost); text-decoration: none; transition: color 0.15s; padding-bottom: 4px; border-bottom: 1px solid transparent; }
+  .sheet-links a:hover { color: var(--text-secondary); }
+  .sheet-links .active { color: var(--text-primary); border-bottom: 1px solid var(--border-hover); padding-bottom: 4px; }
+
+  @media (max-width: 700px) {
+    .charts-row { grid-template-columns: 1fr; }
+    body { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sheet-nav">
+  <h1>Visualization Goal Gallery</h1>
+  <div class="sheet-links">
+    <a href="index.html">Sheet 1: Core</a>
+    <span class="active">Sheet 2: Semantic</span>
+  </div>
+</nav>
+
+<div class="gallery" id="app"></div>
+
+<script>
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size   = 10;
+Chart.defaults.color       = 'rgba(255,255,255,0.35)';
+Chart.defaults.plugins.legend.display = false;
+
+const xScale = (stacked = false, showGrid = false) => ({
+  stacked,
+  grid: { display: showGrid, color: 'rgba(255,255,255,0.05)' }
+});
+const yScale = (stacked = false) => ({
+  stacked,
+  grid: { color: 'rgba(255,255,255,0.05)' }
+});
+const xyScales = (opts = {}) => ({
+  x: xScale(opts.stackedX, opts.xGrid),
+  y: yScale(opts.stackedY)
+});
+const baseOpts = (extra = {}) => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  ...extra
+});
+
+// Canvas pattern generator for exclusion hashes
+function getHashPattern() {
+  const c = document.createElement('canvas');
+  c.width = 8; c.height = 8;
+  const ctx = c.getContext('2d');
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0,8); ctx.lineTo(8,0);
+  ctx.stroke();
+  return c;
+}
+
+const goals = [
+  {
+    id: 'judgement', title: 'Judgement', desc: 'evaluate performance', accentClass: 'accent-judgement',
+    variants: ['goal vs actual', 'threshold passing', 'sentiment'],
+    dataContract: { required: ['value'], optional: ['target', 'sentiment'] },
+    components: [
+      {
+        name: 'Goal vs Actual', bestFor: 'target completion',
+        render: canvas => {
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ['Q1', 'Q2', 'Q3'],
+              datasets: [
+                { data: [65, 82, 45], backgroundColor: '#7b6fa5', barPercentage: 0.5, z: 2 },
+                { data: [100, 100, 100], backgroundColor: 'rgba(255,255,255,0.05)', grouped: false, barPercentage: 0.8, z: 1 }
+              ]
+            },
+            options: baseOpts({ scales: xyScales() })
+          });
+        }
+      },
+      {
+        name: 'Threshold Passing', bestFor: 'pass / fail',
+        render: canvas => new Chart(canvas, {
+          type: 'line',
+          data: { 
+            labels: ['M','T','W','T','F','S','S'], 
+            datasets: [{ 
+              data: [30,-15,40,65,-5,20,50], 
+              borderColor: '#7b6fa5',
+              segment: {
+                borderColor: ctx => ctx.p0.parsed.y >= 0 && ctx.p1.parsed.y >= 0 ? '#7b6fa5' : '#f07060', // Ube for good, Coral for bad
+              },
+              borderWidth: 2, 
+              tension: 0.1, 
+              pointRadius: 2, 
+              fill: false
+            }] 
+          },
+          options: baseOpts({ 
+            scales: xyScales(),
+            plugins: {
+              annotation: {
+                annotations: {
+                  line1: { type: 'line', yMin: 0, yMax: 0, borderColor: 'rgba(255,255,255,0.2)', borderWidth: 1, borderDash: [4,4] }
+                }
+              }
+            }
+          })
+        })
+      },
+      {
+        name: 'Sentiment Diverging', bestFor: 'positive vs negative',
+        render: canvas => {
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ['A','B','C','D','E','F'],
+              datasets: [{ 
+                data: [42, 28, -15, 34, -22, 10], 
+                backgroundColor: ctx => ctx.raw >= 0 ? '#7b6fa5' : '#f07060',
+                borderRadius: 2 
+              }]
+            },
+            options: baseOpts({ scales: xyScales() })
+          });
+        }
+      }
+    ]
+  },
+  {
+    id: 'highlight', title: 'Highlight', desc: 'direct the eye', accentClass: 'accent-highlight',
+    variants: ['hero line', 'you are here', 'selected category'],
+    dataContract: { required: ['value'], optional: ['is_focused'] },
+    components: [
+      {
+        name: 'Hero Line', bestFor: 'subject among peers',
+        render: canvas => new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: ['1','2','3','4','5','6'],
+            datasets: [
+              { data: [40,30,50,45,60,55], borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, pointRadius: 0, tension: 0.4 },
+              { data: [20,40,35,55,40,50], borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, pointRadius: 0, tension: 0.4 },
+              { data: [34,42,48,65,72,81], borderColor: '#f4bfa0', borderWidth: 2.5, pointRadius: 0, tension: 0.4, z: 10 }
+            ]
+          },
+          options: baseOpts({ scales: xyScales() })
+        })
+      },
+      {
+        name: 'You Are Here', bestFor: 'individual in distribution',
+        render: canvas => {
+          const pts = Array.from({length:40}, () => ({x: Math.random()*80+10, y: Math.random()*80+10}));
+          pts.push({x: 65, y: 75, hero: true});
+          new Chart(canvas, {
+            type: 'scatter',
+            data: { 
+              datasets: [{ 
+                data: pts, 
+                backgroundColor: ctx => ctx.raw.hero ? '#f4bfa0' : 'rgba(255,255,255,0.1)', 
+                pointRadius: ctx => ctx.raw.hero ? 6 : 3,
+                pointBorderWidth: ctx => ctx.raw.hero ? 2 : 0,
+                borderColor: '#ffffff'
+              }]
+            },
+            options: baseOpts({ scales: xyScales({ xGrid: false }) })
+          });
+        }
+      },
+      {
+        name: 'Selected Category', bestFor: 'ranking with focus',
+        render: canvas => new Chart(canvas, {
+          type: 'bar',
+          data: { 
+            labels: ['#1','#2','#3 (You)','#4','#5'], 
+            datasets: [{ 
+              data: [91,84,73,62,47], 
+              backgroundColor: ctx => ctx.dataIndex === 2 ? '#f4bfa0' : 'rgba(255,255,255,0.1)',
+              borderRadius: 2 
+            }] 
+          },
+          options: baseOpts({ scales: xyScales() })
+        })
+      }
+    ]
+  },
+  {
+    id: 'exclusion', title: 'Exclusion', desc: 'what is missing', accentClass: 'accent-exclusion',
+    variants: ['data gap', 'future projection', 'excluded segment'],
+    dataContract: { required: ['value'], optional: ['is_estimate', 'is_missing'] },
+    components: [
+      {
+        name: 'Data Gap', bestFor: 'missing periods',
+        render: canvas => new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+            datasets: [{
+              data: [30, 42, null, null, 67, 72],
+              borderColor: '#7b6fa5',
+              spanGaps: true,
+              segment: {
+                borderDash: ctx => ctx.p0.skip || ctx.p1.skip ? [4, 4] : undefined,
+                borderColor: ctx => ctx.p0.skip || ctx.p1.skip ? 'rgba(123,111,165,0.5)' : '#7b6fa5',
+              },
+              tension: 0,
+              pointRadius: 3
+            }]
+          },
+          options: baseOpts({ scales: xyScales() })
+        })
+      },
+      {
+        name: 'Future Projection', bestFor: 'estimates',
+        render: canvas => new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: ['Q1','Q2','Q3','Q4','Q1(e)','Q2(e)'],
+            datasets: [{
+              data: [45, 52, 48, 60, 68, 75],
+              borderColor: '#f4bfa0',
+              segment: {
+                borderDash: ctx => ctx.p1DataIndex >= 4 ? [4, 4] : undefined
+              },
+              tension: 0.3,
+              pointRadius: 0
+            }]
+          },
+          options: baseOpts({ scales: xyScales() })
+        })
+      },
+      {
+        name: 'Excluded Segment', bestFor: 'n/a or pending',
+        render: canvas => {
+          const pat = canvas.getContext('2d').createPattern(getHashPattern(), 'repeat');
+          new Chart(canvas, {
+            type: 'doughnut',
+            data: { 
+              labels: ['Done','Active','Pending'], 
+              datasets: [{ 
+                data: [45, 30, 25], 
+                backgroundColor: ['#7b6fa5', '#f4bfa0', pat], 
+                borderWidth: 0 
+              }] 
+            },
+            options: baseOpts({ cutout: '65%' })
+          });
+        }
+      }
+    ]
+  },
+  {
+    id: 'annotation', title: 'Annotation', desc: 'human context', accentClass: 'accent-annotation',
+    variants: ['event marker', 'range bracket', 'callout'],
+    dataContract: { required: ['value'], optional: ['event_label'] },
+    components: [
+      {
+        name: 'Event Marker', bestFor: 'external events',
+        render: canvas => new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: ['1','2','3','4','5','6','7'],
+            datasets: [{ data: [30,35,32, 65,70,72,81], borderColor: '#fff3e0', tension: 0.3, pointRadius: 2 }]
+          },
+          options: baseOpts({ 
+            scales: xyScales(),
+            plugins: {
+              annotation: {
+                annotations: {
+                  event: { type: 'line', xMin: 3.5, xMax: 3.5, borderColor: '#f07060', borderWidth: 1, borderDash: [2,2], label: { display: true, content: 'Launch', position: 'end', color: '#f07060', font: {size: 8, family: "'IBM Plex Mono'", backgroundColor: 'transparent'} } }
+                }
+              }
+            }
+          })
+        })
+      },
+      {
+        name: 'Range Bracket', bestFor: 'environmental periods',
+        render: canvas => new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: ['J','F','M','A','M','J','J'],
+            datasets: [{ data: [20,25,45,55,50,30,25], borderColor: '#7b6fa5', tension: 0.4, pointRadius: 0 }]
+          },
+          options: baseOpts({ 
+            scales: xyScales(),
+            plugins: {
+              annotation: {
+                annotations: {
+                  box: { type: 'box', xMin: 2, xMax: 4, backgroundColor: 'rgba(255,243,224,0.05)', borderWidth: 0 }
+                }
+              }
+            }
+          })
+        })
+      },
+      {
+        name: 'Callout', bestFor: 'explaining outliers',
+        render: canvas => new Chart(canvas, {
+          type: 'scatter',
+          data: {
+            datasets: [{ data: [{x:10,y:20}, {x:20,y:30}, {x:30,y:25}, {x:40,y:80}, {x:50,y:35}], backgroundColor: '#f4bfa0', pointRadius: 3 }]
+          },
+          options: baseOpts({ 
+            scales: xyScales(),
+            plugins: {
+              annotation: {
+                annotations: {
+                  outlier: {
+                    type: 'label', xValue: 40, yValue: 88,
+                    content: 'Anomaly', font: {size: 9, family: "'IBM Plex Mono'"}, color: '#000',
+                    backgroundColor: '#fff3e0', borderRadius: 2, padding: 2
+                  }
+                }
+              }
+            }
+          })
+        })
+      }
+    ]
+  }
+];
+
+function buildGallery() {
+  const app = document.getElementById('app');
+
+  goals.forEach(goal => {
+    const section = document.createElement('div');
+    section.className = 'goal-section';
+
+    const header = document.createElement('div');
+    header.className = 'goal-header';
+    header.innerHTML = `
+      <span class="goal-label">${goal.id}</span>
+      <span class="goal-title">${goal.title}</span>
+      <span class="goal-desc">${goal.desc}</span>
+    `;
+
+    const variants = document.createElement('div');
+    variants.className = 'variants';
+    variants.innerHTML = goal.variants.map(v => `<span class="variant-tag">${v}</span>`).join('');
+
+    const chartsRow = document.createElement('div');
+    chartsRow.className = 'charts-row';
+
+    goal.components.forEach(comp => {
+      const card    = document.createElement('div');
+      card.className = `chart-card ${goal.accentClass}`;
+
+      const name    = document.createElement('div');
+      name.className = 'chart-name';
+      name.textContent = comp.name;
+
+      const wrap    = document.createElement('div');
+      wrap.className = 'chart-canvas-wrap';
+      const canvas  = document.createElement('canvas');
+      wrap.appendChild(canvas);
+
+      const bestFor = document.createElement('div');
+      bestFor.className = 'best-for';
+      bestFor.textContent = comp.bestFor;
+
+      card.append(name, wrap, bestFor);
+      chartsRow.appendChild(card);
+      setTimeout(() => comp.render(canvas), 150);
+    });
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `<span>requires: ${goal.dataContract.required.join(', ')}</span><span>optional: ${goal.dataContract.optional.join(', ')}</span>`;
+
+    section.append(header, variants, chartsRow, meta);
+    app.appendChild(section);
+  });
+}
+
+buildGallery();
+</script>
+</body>
+</html>
