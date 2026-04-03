@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>color set kaizen ube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void:    #0a0a0a;
+      --ground-base:    #0f0f0f;
+      --ground-raised:  #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary:   #ffffff;
+      --text-default:   #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary:  #666666;
+      --text-ghost:     #333333;
+      --border-default: #2a2a2a;
+      --font-mono: 'JetBrains Mono', monospace;
+      --edge: clamp(24px, 5vw, 72px);
+      --label-h: 56px;
+      --c1: #7b6fa5;
+      --c2: #9d91b0;
+      --c3: #9e6240;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-snap-type: y mandatory; overflow-y: scroll; height: 100%; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body {
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    /* ── SCROLL SNAP ── */
+    section {
+      height: 100dvh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--border-default);
+      position: relative;
+    }
+
+    /* ── SECTION LABEL ── */
+    .sec-label {
+      height: var(--label-h);
+      padding: 0 var(--edge);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-default);
+      flex-shrink: 0;
+    }
+    .sec-num {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--c-accent, #7b6fa5);
+      font-weight: 500;
+    }
+    .sec-name {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .sec-body {
+      flex: 1;
+      padding: var(--edge);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── SIDENAV ── */
+    .sidenav {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+    .sidenav-dot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      justify-content: flex-end;
+    }
+    .sidenav-dot::before {
+      content: attr(data-label);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .sidenav-dot:hover::before,
+    .sidenav-dot.active::before { opacity: 1; }
+    .sidenav-dot.active::before { color: var(--text-secondary); }
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-ghost);
+      transition: background 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .sidenav-dot:hover .dot { background: var(--text-tertiary); }
+    .sidenav-dot.active .dot {
+      background: var(--text-default);
+      transform: scale(1.4);
+    }
+
+    /* ══════════════════════════════════════
+       01 INPUT
+    ══════════════════════════════════════ */
+    #input .sec-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 32px;
+    }
+
+    .input-headline {
+      font-size: clamp(32px, 6vw, 80px);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .input-headline .hl-secondary {
+      font-size: clamp(18px, 3.5vw, 48px);
+      color: var(--text-ghost);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .input-headline .hl-primary {
+      color: var(--text-primary);
+      display: block;
+    }
+
+
+    /* input section visuals row */
+    .input-visuals {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      height: 50%;
+    }
+
+    .gmap-rect {
+      height: 100%;
+      aspect-ratio: 3 / 4;
+      flex-shrink: 0;
+    }
+
+    .input-bg {
+      height: 100%;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .input-bg img {
+      height: 100%;
+      width: auto;
+      display: block;
+      filter: saturate(0.4) brightness(0.44);
+    }
+    .input-bg-fade {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center,
+        transparent 40%,
+        var(--ground-void) 100%);
+    }
+
+    .color-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .color-tag {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+    }
+    .color-tag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .input-hint {
+      font-size: 11px;
+      color: var(--text-ghost);
+      letter-spacing: 0.1em;
+    }
+
+    /* ══════════════════════════════════════
+       02 PALETTE
+    ══════════════════════════════════════ */
+    #palette .sec-body {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      justify-content: center;
+    }
+
+    .palette-row {
+      display: flex;
+      gap: 0;
+      height: 80px;
+      border: 1px solid var(--border-default);
+    }
+    .palette-cell {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 12px;
+    }
+    .palette-cell-info {
+      font-size: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .palette-values {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .palette-value-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .palette-value-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .palette-value-key { color: var(--text-tertiary); letter-spacing: 0.1em; }
+    .palette-value-val { color: var(--text-secondary); font-weight: 500; }
+
+    /* ══════════════════════════════════════
+       03 TINTS
+    ══════════════════════════════════════ */
+    #tints .sec-body {
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .tint-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tint-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .tint-strip {
+      display: flex;
+      height: 48px;
+      gap: 2px;
+    }
+    .tint-cell {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+      font-size: 9px;
+      color: rgba(0,0,0,0.5);
+      letter-spacing: 0.05em;
+      transition: transform 0.1s;
+      cursor: default;
+    }
+    .tint-cell:hover { transform: scaleY(1.1); transform-origin: bottom; }
+    .tint-cell.light-text { color: rgba(255,255,255,0.5); }
+
+    /* ══════════════════════════════════════
+       04 BLEND
+    ══════════════════════════════════════ */
+    #blend .sec-body {
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .blend-pair-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+    .blend-strip {
+      height: 56px;
+      display: flex;
+      gap: 2px;
+      margin-bottom: 16px;
+    }
+    .blend-cell {
+      flex: 1;
+      transition: transform 0.1s;
+      cursor: default;
+    }
+    .blend-cell:hover { transform: scaleY(1.12); transform-origin: center; }
+
+    /* ══════════════════════════════════════
+       05 ACCENT
+    ══════════════════════════════════════ */
+    #accent .sec-body {
+      gap: 32px;
+      justify-content: center;
+    }
+
+    .accent-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .accent-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px;
+      border: 1px solid var(--border-default);
+    }
+    .accent-col-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+    .accent-swatch {
+      width: 100%;
+      height: 4px;
+      margin-bottom: 16px;
+    }
+
+    /* ui component demos */
+    .ui-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.1s;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .ui-btn:hover { opacity: 0.8; }
+
+    .ui-btn-fill { color: #0a0a0a; }
+    .ui-btn-outline { background: transparent; border: 1px solid; }
+    .ui-btn-ghost { background: transparent; }
+
+    .ui-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .ui-progress {
+      height: 2px;
+      background: var(--border-default);
+      margin: 12px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .ui-progress-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 65%;
+      animation: progress-breathe 3s ease-in-out infinite;
+    }
+    @keyframes progress-breathe {
+      0%, 100% { width: 65%; }
+      50% { width: 72%; }
+    }
+
+    .ui-link {
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+
+    /* ══════════════════════════════════════
+       06 WALK
+    ══════════════════════════════════════ */
+    #dataviz .sec-body {
+      padding: 0;
+    }
+    #walk-canvas {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    /* ══════════════════════════════════════
+       07 TYPE
+    ══════════════════════════════════════ */
+    #type .sec-body {
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      flex: 1;
+    }
+    .type-cell {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .type-cell-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+    .type-specimen {
+      font-size: clamp(14px, 2.5vw, 28px);
+      font-weight: 300;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .type-specimen-sm {
+      font-size: 11px;
+      line-height: 1.7;
+      color: inherit;
+      opacity: 0.7;
+      margin-top: 12px;
+    }
+    .contrast-badge {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      opacity: 0.5;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+
+    /* ══════════════════════════════════════
+       08 COMPOSE
+    ══════════════════════════════════════ */
+    /* ══════════════════════════════════════
+       07 GRADIENT MAP
+    ══════════════════════════════════════ */
+    #compose .sec-body {
+      gap: 0;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* .gmap-rect sizing handled by .input-visuals flex context */
+
+    #gmap-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: auto;
+      position: absolute;
+      inset: 0;
+    }
+
+    /* .gmap-rect sizing handled by .input-visuals flex context */
+    #input .gmap-rect {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* responsive */
+    @media (max-width: 640px) {
+      .sidenav { display: none; }
+      .palette-values { grid-template-columns: 1fr; }
+
+      /* accent: single column, compact */
+      .accent-grid { grid-template-columns: 1fr; gap: 12px; }
+      #accent .sec-body { overflow-y: auto; gap: 16px; }
+      .accent-col { padding: 16px; gap: 10px; }
+      .accent-swatch { margin-bottom: 8px; }
+      .ui-btn { padding: 6px 12px; font-size: 10px; margin-bottom: 6px; }
+      .ui-tag { font-size: 9px; }
+
+      /* input section mobile: side by side, fit width */
+      .input-visuals { height: auto; align-items: stretch; }
+      .gmap-rect { flex: 1; height: auto; aspect-ratio: 3 / 4; min-height: 0; }
+      #gmap-canvas { position: static; width: 100%; height: 100%; }
+      .input-bg { flex: 1; height: auto; aspect-ratio: 3 / 4; overflow: hidden; }
+      .input-bg img { width: 100%; height: 100%; object-fit: cover; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDENAV -->
+<nav class="sidenav" id="sidenav"></nav>
+
+<!-- 01 INPUT -->
+<section id="input">
+  <div class="sec-label">
+    <span class="sec-num" style="--c-accent: var(--c1)">01</span>
+    <span class="sec-name">set</span>
+  </div>
+  <div class="sec-body">
+    <div class="input-headline">
+      <span class="hl-secondary">color set</span>
+      <span class="hl-primary">kaizen ube</span>
+    </div>
+
+    <div class="input-visuals">
+      <div class="gmap-rect" id="gmap-rect"><canvas id="gmap-canvas"></canvas></div>
+      <div class="input-bg" id="input-bg">
+        <img src="PXL_20260328_182300123.jpg" alt="">
+        <div class="input-bg-fade"></div>
+      </div>
+    </div>
+
+    <div class="color-tags" id="color-tags"></div>
+    <div class="input-hint">scroll to explore</div>
+  </div>
+</section>
+
+<!-- 02 PALETTE -->
+<section id="palette">
+  <div class="sec-label">
+    <span class="sec-num" style="--c-accent: var(--c1)">02</span>
+    <span class="sec-name">palette</span>
+  </div>
+  <div class="sec-body">
+    <div class="palette-row" id="palette-row"></div>
+    <div class="palette-values" id="palette-values"></div>
+  </div>
+</section>
+
+<!-- 03 TINTS -->
+<section id="tints">
+  <div class="sec-label">
+    <span class="sec-num" style="--c-accent: var(--c2)">03</span>
+    <span class="sec-name">tints + shades</span>
+  </div>
+  <div class="sec-body" id="tints-body"></div>
+</section>
+
+<!-- 04 BLEND -->
+<section id="blend">
+  <div class="sec-label">
+    <span class="sec-num" style="--c-accent: var(--c2)">04</span>
+    <span class="sec-name">blend</span>
+  </div>
+  <div class="sec-body" id="blend-body"></div>
+</section>
+
+<!-- 05 ACCENT -->
+<section id="accent">
+  <div class="sec-label">
+    <span class="sec-num" style="--c-accent: var(--c3)">05</span>
+    <span class="sec-name">accent roles</span>
+  </div>
+  <div class="sec-body">
+    <div class="accent-grid" id="accent-grid"></div>
+  </div>
+</section>
+
+<!-- 06 WALK -->
+<section id="dataviz">
+  <div class="sec-label">
+    <span class="sec-num" style="--c-accent: var(--c3)">06</span>
+    <span class="sec-name">random walk</span>
+  </div>
+  <div class="sec-body">
+    <canvas id="walk-canvas"></canvas>
+  </div>
+</section>
+
+
+<script>
+// ═══════════════════════════════════════════════════════
+// COLOR UTILITIES
+// ═══════════════════════════════════════════════════════
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r, g, b];
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + [r,g,b].map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2,'0')).join('');
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return [Math.round(h*360), Math.round(s*100), Math.round(l*100)];
+}
+
+function hslToRgb(h, s, l) {
+  h /= 360; s /= 100; l /= 100;
+  let r, g, b;
+  if (s === 0) { r = g = b = l; }
+  else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q-p)*6*t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q-p)*(2/3-t)*6;
+      return p;
+    };
+    const q = l < 0.5 ? l*(1+s) : l+s-l*s;
+    const p = 2*l - q;
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+  return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+}
+
+function lerpColor(hexA, hexB, t) {
+  const [r1,g1,b1] = hexToRgb(hexA);
+  const [r2,g2,b2] = hexToRgb(hexB);
+  return rgbToHex(r1+(r2-r1)*t, g1+(g2-g1)*t, b1+(b2-b1)*t);
+}
+
+function luminance(hex) {
+  const [r,g,b] = hexToRgb(hex).map(v => {
+    v /= 255;
+    return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+  });
+  return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+
+function contrastRatio(hexA, hexB) {
+  const l1 = luminance(hexA), l2 = luminance(hexB);
+  const [lighter, darker] = l1 > l2 ? [l1, l2] : [l2, l1];
+  return ((lighter + 0.05) / (darker + 0.05));
+}
+
+function needsLightText(hex) {
+  return luminance(hex) < 0.35;
+}
+
+function tintShade(hex, steps = 9) {
+  const [r, g, b] = hexToRgb(hex);
+  const [h, s, l] = rgbToHsl(r, g, b);
+  const result = [];
+  for (let i = 0; i < steps; i++) {
+    const t = i / (steps - 1);
+    const newL = 15 + t * 70; // 15% to 85%
+    result.push(rgbToHex(...hslToRgb(h, s, newL)));
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+
+const colors = ['#7b6fa5', '#9d91b0', '#9e6240'];
+
+function getColors() { return [...colors]; }
+
+function setColor(i, hex) {
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+  colors[i] = hex;
+  document.documentElement.style.setProperty(`--c${i+1}`, hex);
+  updateAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// INPUT SECTION
+// ═══════════════════════════════════════════════════════
+
+function updateInputDisplay() {
+  const tags = document.getElementById('color-tags');
+  tags.innerHTML = '';
+  colors.forEach(hex => {
+    const tag = document.createElement('div');
+    tag.className = 'color-tag';
+    tag.innerHTML = `<div class="color-tag-dot" style="background:${hex}"></div>${hex}`;
+    tags.appendChild(tag);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// PALETTE SECTION
+// ═══════════════════════════════════════════════════════
+
+function updatePalette() {
+  const row = document.getElementById('palette-row');
+  const vals = document.getElementById('palette-values');
+
+  row.innerHTML = '';
+  vals.innerHTML = '';
+
+  colors.forEach((hex, i) => {
+    const [r,g,b] = hexToRgb(hex);
+    const [h,s,l] = rgbToHsl(r,g,b);
+    const light = needsLightText(hex);
+
+    const cell = document.createElement('div');
+    cell.className = 'palette-cell';
+    cell.style.background = hex;
+    cell.innerHTML = `<span class="palette-cell-info" style="color:${light?'rgba(255,255,255,0.7)':'rgba(0,0,0,0.6)'}">${hex}</span>`;
+    row.appendChild(cell);
+
+    const col = document.createElement('div');
+    col.className = 'palette-value-col';
+    col.innerHTML = `
+      <div style="width:12px;height:12px;background:${hex};margin-bottom:8px;"></div>
+      <div class="palette-value-row"><span class="palette-value-key">hex</span><span class="palette-value-val">${hex}</span></div>
+      <div class="palette-value-row"><span class="palette-value-key">rgb</span><span class="palette-value-val">${r}, ${g}, ${b}</span></div>
+      <div class="palette-value-row"><span class="palette-value-key">hsl</span><span class="palette-value-val">${h}° ${s}% ${l}%</span></div>
+      <div class="palette-value-row"><span class="palette-value-key">lum</span><span class="palette-value-val">${luminance(hex).toFixed(3)}</span></div>
+    `;
+    vals.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TINTS SECTION
+// ═══════════════════════════════════════════════════════
+
+function updateTints() {
+  const body = document.getElementById('tints-body');
+  body.innerHTML = '';
+
+  // add some visual breathing room
+  const spacer = document.createElement('div');
+  spacer.style.flex = '1';
+  body.appendChild(spacer);
+
+  colors.forEach((hex, i) => {
+    const steps = tintShade(hex, 11);
+    const row = document.createElement('div');
+    row.className = 'tint-row';
+    row.innerHTML = `<div class="tint-label">color 0${i+1} — tints &amp; shades</div>`;
+
+    const strip = document.createElement('div');
+    strip.className = 'tint-strip';
+
+    steps.forEach((shade, si) => {
+      const cell = document.createElement('div');
+      cell.className = 'tint-cell' + (needsLightText(shade) ? ' light-text' : '');
+      cell.style.background = shade;
+      const pct = Math.round(15 + (si / 10) * 70);
+      cell.textContent = pct + '%';
+      strip.appendChild(cell);
+    });
+
+    row.appendChild(strip);
+    body.appendChild(row);
+  });
+
+  const spacer2 = document.createElement('div');
+  spacer2.style.flex = '1';
+  body.appendChild(spacer2);
+}
+
+// ═══════════════════════════════════════════════════════
+// BLEND SECTION
+// ═══════════════════════════════════════════════════════
+
+function updateBlend() {
+  const body = document.getElementById('blend-body');
+  body.innerHTML = '';
+
+  const spacer = document.createElement('div');
+  spacer.style.flex = '1';
+  body.appendChild(spacer);
+
+  const pairs = [
+    [0, 1, '01 → 02'],
+    [1, 2, '02 → 03'],
+    [0, 2, '01 → 03'],
+  ];
+
+  const STEPS = 20;
+
+  pairs.forEach(([a, b, label]) => {
+    const wrap = document.createElement('div');
+
+    const lbl = document.createElement('div');
+    lbl.className = 'blend-pair-label';
+    lbl.textContent = label;
+    wrap.appendChild(lbl);
+
+    const strip = document.createElement('div');
+    strip.className = 'blend-strip';
+
+    for (let s = 0; s <= STEPS; s++) {
+      const t = s / STEPS;
+      const hex = lerpColor(colors[a], colors[b], t);
+      const cell = document.createElement('div');
+      cell.className = 'blend-cell';
+      cell.style.background = hex;
+      strip.appendChild(cell);
+    }
+
+    wrap.appendChild(strip);
+    body.appendChild(wrap);
+  });
+
+  const spacer2 = document.createElement('div');
+  spacer2.style.flex = '1';
+  body.appendChild(spacer2);
+}
+
+// ═══════════════════════════════════════════════════════
+// ACCENT SECTION
+// ═══════════════════════════════════════════════════════
+
+function updateAccent() {
+  const grid = document.getElementById('accent-grid');
+  grid.innerHTML = '';
+
+  colors.forEach((hex, i) => {
+    const light = needsLightText(hex);
+    const textCol = light ? '#ffffff' : '#0a0a0a';
+
+    const col = document.createElement('div');
+    col.className = 'accent-col';
+    col.innerHTML = `
+      <div>
+        <div class="accent-col-label">color 0${i+1}</div>
+        <div class="accent-swatch" style="background:${hex}"></div>
+      </div>
+      <button class="ui-btn ui-btn-fill" style="background:${hex};color:${textCol}">primary action</button>
+      <button class="ui-btn ui-btn-outline" style="color:${hex};border-color:${hex}">secondary</button>
+      <button class="ui-btn ui-btn-ghost" style="color:${hex}">ghost link</button>
+      <div>
+        <div style="margin-bottom:8px">
+          <span class="ui-tag" style="background:${hex}22;color:${hex};border:1px solid ${hex}44">active</span>
+          &nbsp;
+          <span class="ui-tag" style="background:${hex}11;color:${hex};border:1px solid ${hex}22">tag</span>
+        </div>
+        <div class="ui-progress">
+          <div class="ui-progress-fill" style="background:${hex}"></div>
+        </div>
+        <a class="ui-link" style="color:${hex}">anchor link text</a>
+      </div>
+    `;
+    grid.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// WALK SECTION
+// ═══════════════════════════════════════════════════════
+
+(function() {
+  const STEP = 2;           // px grid size
+  const STEP_MS = 70;       // ms per discrete step
+  const LIFETIME_MS = 8000; // trail length in ms
+  const TRAIL_STEPS = Math.floor(LIFETIME_MS / STEP_MS);
+  const DIRS = [[1,0],[-1,0],[0,1],[0,-1]];
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return [r,g,b];
+  }
+
+  let walkers = [], raf = null, lastStep = 0;
+  let canvas, ctx, W, H, GW, GH, paused = false;
+
+  function initWalk() {
+    canvas = document.getElementById('walk-canvas');
+    if (!canvas) return;
+    ctx = canvas.getContext('2d');
+
+    W = Math.floor(window.innerWidth);
+    H = Math.floor(window.innerHeight);
+    canvas.width = W;
+    canvas.height = H;
+    GW = Math.floor(W / STEP);
+    GH = Math.floor(H / STEP);
+
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, H);
+
+    // auto-calculate N for ~50% grid density
+    const cells = GW * GH;
+    const N = Math.ceil((cells * 0.5) / TRAIL_STEPS);
+    const palette = colors.map(hexToRgb);
+
+    walkers = [];
+    for (let i = 0; i < N; i++) {
+      walkers.push({
+        x: Math.floor(Math.random() * GW),
+        y: Math.floor(Math.random() * GH),
+        rgb: palette[i % 3],
+        trail: []
+      });
+    }
+
+    lastStep = performance.now();
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(walkLoop);
+  }
+
+  function step() {
+    for (const w of walkers) {
+      w.trail.push({ x: w.x, y: w.y });
+      if (w.trail.length > TRAIL_STEPS) w.trail.shift();
+      const d = DIRS[Math.floor(Math.random() * 4)];
+      w.x = (w.x + d[0] + GW) % GW;
+      w.y = (w.y + d[1] + GH) % GH;
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, H);
+    for (const w of walkers) {
+      const len = w.trail.length;
+      for (let i = 0; i < len; i++) {
+        const age = (i + 1) / len;
+        const [r,g,b] = w.rgb;
+        ctx.fillStyle = `rgba(${r},${g},${b},${age * 0.85})`;
+        ctx.fillRect(w.trail[i].x * STEP, w.trail[i].y * STEP, STEP, STEP);
+      }
+    }
+  }
+
+  function walkLoop(now) {
+    if (paused) { raf = null; return; }
+    const elapsed = now - lastStep;
+    const steps = Math.floor(elapsed / STEP_MS);
+    if (steps > 0) {
+      for (let s = 0; s < steps; s++) step();
+      lastStep = now - (elapsed % STEP_MS);
+      draw();
+    }
+    raf = requestAnimationFrame(walkLoop);
+  }
+
+  function stopWalk() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+  }
+
+  window.initRandomWalk = initWalk;
+  window.stopRandomWalk = stopWalk;
+
+  // pause/resume via IntersectionObserver
+  function observeWalk() {
+    const section = document.getElementById('dataviz');
+    if (!section) return;
+    new IntersectionObserver(entries => {
+      paused = !entries[0].isIntersecting;
+      if (!paused && !raf) {
+        lastStep = performance.now();
+        raf = requestAnimationFrame(walkLoop);
+      }
+    }, { threshold: 0.1 }).observe(section);
+  }
+
+  document.addEventListener('DOMContentLoaded', observeWalk);
+})();
+
+// ═══════════════════════════════════════════════════════
+// TYPE SECTION
+// ═══════════════════════════════════════════════════════
+
+function updateType() {
+  const grid = document.getElementById('type-grid');
+  grid.innerHTML = '';
+
+  const text = 'the quick brown fox';
+  const textSm = 'jumps over the lazy dog';
+
+  const combos = [];
+
+  // color on dark
+  colors.forEach((hex, i) => {
+    combos.push({ bg: '#0a0a0a', fg: hex, label: `c0${i+1} on dark` });
+  });
+
+  // color on light
+  colors.forEach((hex, i) => {
+    combos.push({ bg: '#f5f5f7', fg: hex, label: `c0${i+1} on light` });
+  });
+
+  // color on color
+  combos.push({ bg: colors[0], fg: colors[1], label: 'c01 bg · c02 fg' });
+  combos.push({ bg: colors[1], fg: colors[2], label: 'c02 bg · c03 fg' });
+  combos.push({ bg: colors[2], fg: colors[0], label: 'c03 bg · c01 fg' });
+
+  combos.forEach(({ bg, fg, label }) => {
+    const cr = contrastRatio(fg, bg).toFixed(2);
+    const wcag = cr >= 7 ? 'aaa' : cr >= 4.5 ? 'aa' : cr >= 3 ? 'aa lg' : 'fail';
+
+    const cell = document.createElement('div');
+    cell.className = 'type-cell';
+    cell.style.background = bg;
+    cell.innerHTML = `
+      <div class="type-cell-label" style="color:${fg}">${label}</div>
+      <div class="type-specimen" style="color:${fg}">${text}</div>
+      <div class="type-specimen-sm" style="color:${fg}">${textSm}</div>
+      <div class="contrast-badge" style="color:${fg}">contrast ${cr} · wcag ${wcag}</div>
+    `;
+    grid.appendChild(cell);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPOSE SECTION
+// ═══════════════════════════════════════════════════════
+
+
+let _gmapRaf = null;
+
+function buildCompose() {
+  if (_gmapRaf) { cancelAnimationFrame(_gmapRaf); _gmapRaf = null; }
+
+  const canvas = document.getElementById('gmap-canvas');
+  if (!canvas) return;
+
+  const W = 90, H = 240; // low-res, CSS scales up smoothly
+  canvas.width = W;
+  canvas.height = H;
+
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(W, H);
+
+  const [r1,g1,b1] = hexToRgb(colors[2]);
+  const [r2,g2,b2] = hexToRgb(colors[1]);
+  const [r3,g3,b3] = hexToRgb(colors[0]);
+
+  function lerpCh(a, b, t) { return Math.round(a + (b - a) * t); }
+
+  let t = 0;
+  function draw() {
+    const d = img.data;
+    for (let y = 0; y < H; y++) {
+      const ny = y / (H - 1);
+      for (let x = 0; x < W; x++) {
+        const nx = x / (W - 1);
+        // layered sine distortion of the vertical position
+        const dist =
+          0.07 * Math.sin(nx * 4.1 + t * 0.7) +
+          0.05 * Math.sin(nx * 7.3 - t * 0.45 + 1.8) +
+          0.03 * Math.sin(ny * 5.6 + t * 0.55 + 0.9) +
+          0.02 * Math.sin(nx * 2.2 + ny * 3.1 - t * 0.3);
+        const ey = Math.max(0, Math.min(1, ny + dist));
+
+        let r, g, b;
+        if (ey < 0.5) {
+          const tt = ey / 0.5;
+          r = lerpCh(r1, r2, tt); g = lerpCh(g1, g2, tt); b = lerpCh(b1, b2, tt);
+        } else {
+          const tt = (ey - 0.5) / 0.5;
+          r = lerpCh(r2, r3, tt); g = lerpCh(g2, g3, tt); b = lerpCh(b2, b3, tt);
+        }
+
+        const i = (y * W + x) * 4;
+        d[i] = r; d[i+1] = g; d[i+2] = b; d[i+3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    t += 0.012;
+    _gmapRaf = requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+function initCompose() {}
+
+// ═══════════════════════════════════════════════════════
+// SIDENAV
+// ═══════════════════════════════════════════════════════
+
+const SECTIONS = [
+  { id: 'input',   label: 'set'     },
+  { id: 'palette', label: 'palette' },
+  { id: 'tints',   label: 'tints'   },
+  { id: 'blend',   label: 'blend'   },
+  { id: 'accent',  label: 'accent'  },
+  { id: 'dataviz', label: 'random walk' },
+];
+
+function initNav() {
+  const nav = document.getElementById('sidenav');
+  SECTIONS.forEach(({ id, label }) => {
+    const dot = document.createElement('div');
+    dot.className = 'sidenav-dot';
+    dot.dataset.label = label;
+    dot.innerHTML = '<div class="dot"></div>';
+    dot.addEventListener('click', () => {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    });
+    nav.appendChild(dot);
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = SECTIONS.findIndex(s => s.id === e.target.id);
+        document.querySelectorAll('.sidenav-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === idx);
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+
+  SECTIONS.forEach(({ id }) => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ORCHESTRATE
+// ═══════════════════════════════════════════════════════
+
+function updateAll() {
+  updateInputDisplay();
+  updatePalette();
+  updateTints();
+  updateBlend();
+  updateAccent();
+}
+
+// init
+document.addEventListener('DOMContentLoaded', () => {
+  initNav();
+  buildCompose();
+  initRandomWalk();
+
+  // apply initial CSS vars
+  colors.forEach((c, i) => {
+    document.documentElement.style.setProperty(`--c${i+1}`, c);
+  });
+
+  updateAll();
+});
+</script>
+</body>
+</html>

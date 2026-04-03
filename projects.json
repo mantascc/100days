@@ -298,5 +298,15 @@
     "id": "62-terminal-cli",
     "path": "100days/62-terminal-cli",
     "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat"
+  },
+  {
+    "id": "63-ube-kaizen",
+    "path": "100days/63-ube-kaizen",
+    "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings"
+  },
+  {
+    "id": "64-viz-grouped",
+    "path": "100days/64-viz-grouped",
+    "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal"
   }
 ]

@@ -2,6 +2,18 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "sketch-color-explorer-v2",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8811", "--directory", "daily-sketch/sketch-color-explorer-v2"],
+      "port": 8811
+    },
+    {
+      "name": "sketch-color-explorer",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8810", "--directory", "daily-sketch/sketch-color-explorer"],
+      "port": 8810
+    },
+    {
       "name": "sketch-terminal-cli",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8803", "--directory", "daily-sketch/sketch-terminal-cli"],

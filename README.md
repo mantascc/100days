@@ -65,3 +65,5 @@ This collection explores the intersection of human creativity and artificial int
 | [57-color-themes](57-color-themes) | 57-color-themes | Theme-switchable constrained-variation viewer exploring palette identity across shared sketches |
 | [58-shapes](58-shapes) | 58-shapes | Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking |
 | [59-font-explorer](59-font-explorer) | 59-font-explorer | Font Explorer — skill to visualize any font |
+| [63-ube-kaizen](63-ube-kaizen) | 63-ube-kaizen | Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings |
+| [64-viz-grouped](64-viz-grouped) | 64-viz-grouped | Viz Grouped — reference gallery of visualization types grouped by analytical goal |

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretext Canvas Hello World</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 600px;
+    }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    p { color: #aaa; margin-bottom: 20px; line-height: 1.5;}
+    
+    .canvas-container {
+      background: #1a1a1a;
+      border: 1px dashed #444;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    canvas {
+      background: #000;
+      border: 1px solid #333;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 14px;
+      font-size: 16px;
+      font-family: inherit;
+      margin-bottom: 20px;
+      outline: none;
+      resize: vertical;
+    }
+    textarea:focus {
+      border-color: #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>2. Pretext - Canvas Layout Demo</h1>
+    <p>This demonstrates perfectly wrapped multiline text natively rendered on <code>&lt;canvas&gt;</code>, mimicking a game engine or custom WebGL UI. <strong>Start typing below!</strong></p>
+
+    <textarea id="text-input">Pretext makes it trivial to render perfectly wrapped, multiline text onto a raw Canvas. Try typing in here! It handles emojis 🚀 and bidi (مرحبا) natively.</textarea>
+    
+    <div class="canvas-container">
+      <canvas id="canvas" width="400" height="300"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { prepareWithSegments, layoutWithLines } from 'https://esm.sh/@chenglou/pretext';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const textInput = document.getElementById('text-input');
+
+    const FONT = '18px system-ui';
+    const LINE_HEIGHT = 28;
+    const MAX_WIDTH = 360; // Leave 20px padding on 400px canvas
+
+    // Enable high-DPI canvas (Retina displays)
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+    ctx.scale(dpr, dpr);
+
+    function renderText() {
+      const text = textInput.value;
+      
+      // Phase 1: Prepare segments (supports pre-wrap for newlines)
+      const prepared = prepareWithSegments(text, FONT, { whiteSpace: 'pre-wrap' });
+      
+      // Phase 2: Get absolute layout strings
+      const { height, lines } = layoutWithLines(prepared, MAX_WIDTH, LINE_HEIGHT);
+
+      // Clears canvas
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      // Setup font state
+      ctx.font = FONT;
+      ctx.fillStyle = '#ffffff';
+      ctx.textBaseline = 'top'; // Easier to align via Y increment
+
+      const paddingX = 20;
+      const paddingY = 20;
+
+      // Phase 3: Paint manually loop
+      for (let i = 0; i < lines.length; i++) {
+        const lineText = lines[i].text;
+        const yPos = paddingY + (i * LINE_HEIGHT);
+        
+        ctx.fillText(lineText, paddingX, yPos);
+      }
+      
+      // Optional: Draw a tiny debug bounding box to show the shrink wrapping!
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(paddingX, paddingY, MAX_WIDTH, height);
+      ctx.setLineDash([]);
+    }
+
+    textInput.addEventListener('input', renderText);
+    
+    // Initial Render
+    renderText();
+  </script>
+</body>
+</html>

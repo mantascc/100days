@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretext DOM Hello World</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 600px;
+    }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    p { color: #aaa; margin-bottom: 40px; line-height: 1.5; }
+    
+    .slider-container { margin-bottom: 20px; width: 100%; }
+    input[type=range] { width: 100%; cursor: pointer; }
+
+    .target {
+      margin-top: 20px;
+      /* Notice NO height is set here natively */
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      font: 18px "Inter", sans-serif;
+      line-height: 28px;
+      padding: 0; 
+      /* We use 0 padding so the text dimension exact matches the container dimension for purity of the demo */
+      box-sizing: content-box;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+      transition: width 0.1s linear;
+    }
+    .stats {
+      margin-top: 20px;
+      padding: 12px;
+      background: #1a1a1a;
+      border-radius: 6px;
+      font-family: monospace;
+      color: #0f0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>1. Pretext - DOM Measurement Demo</h1>
+    <p>Watch the calculated height update instantly without DOM layout thrashing. The stats update before CSS is even applied. <strong>Slide the slider to see!</strong></p>
+
+    <div class="slider-container">
+      <label for="width-slider">Container Width: <span id="width-val">400</span>px</label>
+      <input type="range" id="width-slider" min="200" max="600" value="400">
+    </div>
+
+    <!-- The exact target container -->
+    <div id="text-container" class="target">This is a dynamic text block that uses Pretext to calculate its exact wrapped height before rendering. Try resizing the slider and watch the height snap perfectly without the browser ever having to reflow the DOM layout to figure out the dimensions! 🚀✨</div>
+
+    <div class="stats" id="stats-panel">
+      Calculated Width: --px<br>
+      Calculated Height: --px<br>
+      Lines: --<br>
+      layout() Calc Time: --ms
+    </div>
+  </div>
+
+  <script type="module">
+    import { prepare, layout } from 'https://esm.sh/@chenglou/pretext';
+
+    const textToMeasure = document.getElementById('text-container').innerText;
+    // VERY IMPORTANT: The font string must match exactly what is applied via CSS!
+    const fontString = '18px Inter'; 
+    const lineHeight = 28;
+
+    // Phase 1: Heavy lifting (done only once!)
+    const t0 = performance.now();
+    const preparedText = prepare(textToMeasure, fontString);
+    const t1 = performance.now();
+    console.log(`Prepare took ${(t1 - t0).toFixed(2)}ms`);
+
+    const slider = document.getElementById('width-slider');
+    const widthVal = document.getElementById('width-val');
+    const container = document.getElementById('text-container');
+    const statsPanel = document.getElementById('stats-panel');
+
+    function updateLayout(width) {
+      const t2 = performance.now();
+      
+      // Phase 2: Instant math layout (run on every frame/change)
+      const { height, lineCount } = layout(preparedText, width, lineHeight);
+      
+      const t3 = performance.now();
+
+      // Update UI 
+      widthVal.innerText = width;
+      container.style.width = width + 'px';
+      
+      // Magic piece: setting absolute calculated height
+      container.style.height = height + 'px';
+
+      statsPanel.innerHTML = `
+        Calculated Width: ${width}px<br>
+        Calculated Height: ${height}px<br>
+        Lines: ${lineCount}<br>
+        layout() Calc Time: ${(t3 - t2).toFixed(4)}ms
+      `;
+    }
+
+    slider.addEventListener('input', (e) => {
+      updateLayout(parseInt(e.target.value, 10));
+    });
+
+    // Initial run
+    updateLayout(400);
+  </script>
+</body>
+</html>
