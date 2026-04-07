@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-mode-toggle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --border-bright: rgba(255,255,255,0.15);
+      --accent: #7F77DD;
+      --accent-dim: #3C3489;
+      --accent-fill: #1a1830;
+      --accent-text: #AFA9EC;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --r: 5px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      min-height: 100vh;
+    }
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 48px;
+      padding-bottom: 16px;
+      border-bottom: 0.5px solid var(--border-default);
+    }
+    header h1 { font-size: 13px; font-weight: 400; color: var(--text-default); letter-spacing: 0.04em; }
+    header span { font-size: 11px; color: var(--text-tertiary); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1px;
+      background: var(--border-default);
+      border: 0.5px solid var(--border-default);
+    }
+
+    .cell {
+      background: var(--ground-void);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .cell-label {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .variants { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .variants-col { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .pair { display: flex; gap: 8px; align-items: center; }
+    .pair-sep { color: var(--text-ghost); font-size: 9px; }
+
+    /* ── CHIP ── */
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      padding: 5px 10px; cursor: pointer; background: transparent;
+      color: var(--text-tertiary); font-family: var(--font-mono); font-size: 11px;
+      transition: border-color .15s, color .15s, background .15s; user-select: none;
+    }
+    .chip .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-bright); flex-shrink: 0; transition: background .15s; }
+    .chip.on { border-color: var(--accent); color: var(--text-default); }
+    .chip.on .pip { background: var(--accent); }
+
+    .chip-dot {
+      width: 28px; height: 28px; border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color .15s; user-select: none;
+    }
+    .chip-dot .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-bright); transition: background .15s; }
+    .chip-dot.on { border-color: var(--accent); }
+    .chip-dot.on .pip { background: var(--accent); }
+
+    .chip-swap {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      padding: 5px 10px; cursor: pointer; background: transparent;
+      color: var(--text-tertiary); font-family: var(--font-mono); font-size: 11px;
+      min-width: 72px; transition: all .15s; user-select: none;
+    }
+    .chip-swap .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-bright); flex-shrink: 0; transition: background .15s; }
+    .chip-swap.on { border-color: var(--accent); background: var(--accent-fill); color: var(--accent-text); }
+    .chip-swap.on .pip { background: var(--accent); }
+
+    .chipgroup { display: inline-flex; gap: 4px; }
+
+    /* ── SEGMENTED ── */
+    .seg { display: inline-flex; border: 0.5px solid var(--border-bright); border-radius: var(--r); overflow: hidden; }
+    .seg .s {
+      padding: 5px 12px; font-size: 11px; font-family: var(--font-mono);
+      color: var(--text-tertiary); background: transparent; transition: all .15s;
+      cursor: pointer; border-right: 0.5px solid var(--border-bright); user-select: none;
+    }
+    .seg .s:last-child { border-right: none; }
+    .seg .s.on { background: var(--accent); color: #EEEDFE; }
+
+    .seg-slash { display: inline-flex; align-items: center; font-size: 11px; font-family: var(--font-mono); cursor: pointer; user-select: none; }
+    .seg-slash .st { padding: 4px 7px; color: var(--text-tertiary); transition: color .15s; border: 0.5px solid transparent; border-radius: var(--r); }
+    .seg-slash .st.on { color: var(--text-default); border-color: var(--border-bright); }
+    .seg-slash .sl { color: var(--text-ghost); }
+
+    .seg-icon { display: inline-flex; border: 0.5px solid var(--border-bright); border-radius: var(--r); overflow: hidden; }
+    .seg-icon .si { width: 30px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border-right: 0.5px solid var(--border-bright); transition: background .15s; user-select: none; }
+    .seg-icon .si:last-child { border-right: none; }
+    .seg-icon .si.on { background: var(--accent); }
+    .seg-icon .si svg { width: 12px; height: 12px; stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; transition: stroke .15s; }
+    .seg-icon .si.on svg { stroke: #fff; }
+
+    .seg-pill { display: inline-flex; border: 0.5px solid var(--border-bright); border-radius: 20px; overflow: hidden; }
+    .seg-pill .sp { padding: 4px 14px; font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); background: transparent; transition: all .15s; cursor: pointer; border-right: 0.5px solid var(--border-bright); user-select: none; }
+    .seg-pill .sp:last-child { border-right: none; }
+    .seg-pill .sp.on { background: var(--accent); color: #EEEDFE; }
+
+    /* ── KEYCAP ── */
+    .key {
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      background: var(--ground-raised); cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px; font-family: var(--font-mono); color: var(--text-tertiary);
+      transition: all .1s; box-shadow: 0 2px 0 var(--text-ghost); user-select: none;
+    }
+    .key:active, .key.on {
+      box-shadow: none; transform: translateY(2px);
+      background: var(--accent-fill); color: var(--accent-text);
+      border-color: var(--accent-dim);
+    }
+    .key-wide { padding: 6px 18px; }
+    .key-sq { width: 36px; height: 32px; }
+    .key-tall { width: 36px; height: 44px; line-height: 1.1; font-size: 9px; }
+    .key-dot { position: relative; padding: 6px 16px; }
+    .key-dot .kdot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-ghost); position: absolute; top: 5px; right: 5px; transition: background .1s; }
+    .key-dot.on .kdot { background: var(--accent); }
+
+    /* ── UNDERLINE ── */
+    .urow { display: inline-flex; border-bottom: 0.5px solid var(--border-default); }
+    .urow .ut { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); padding: 4px 10px; border-bottom: 1.5px solid transparent; margin-bottom: -0.5px; cursor: pointer; transition: all .15s; user-select: none; }
+    .urow .ut.on { color: var(--text-default); border-bottom-color: var(--accent); }
+
+    .urow-ghost { display: inline-flex; }
+    .urow-ghost .ug { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); padding: 4px 10px; border-bottom: 1px solid transparent; cursor: pointer; transition: all .15s; user-select: none; }
+    .urow-ghost .ug.on { color: var(--text-default); border-bottom-color: var(--text-default); }
+
+    .urow-full { display: flex; border-bottom: 0.5px solid var(--border-default); width: 100%; }
+    .urow-full .uf { flex: 1; text-align: center; font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); padding: 5px 0; border-bottom: 1.5px solid transparent; margin-bottom: -0.5px; cursor: pointer; transition: all .15s; user-select: none; }
+    .urow-full .uf.on { color: var(--text-default); border-bottom-color: var(--accent); }
+
+    .vbar-row { display: inline-flex; flex-direction: column; gap: 1px; }
+    .vbar-row .vt { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); padding: 4px 10px; border-left: 1.5px solid transparent; cursor: pointer; transition: all .15s; user-select: none; }
+    .vbar-row .vt.on { color: var(--text-default); border-left-color: var(--accent); }
+
+    /* ── ICON BUTTON ── */
+    .ibtn {
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      background: transparent; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all .15s; user-select: none;
+    }
+    .ibtn svg { stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; transition: stroke .15s; }
+    .ibtn.on { background: var(--accent); border-color: var(--accent); }
+    .ibtn.on svg { stroke: #fff; }
+
+    .ibtn-label { display: inline-flex; align-items: center; gap: 7px; border: 0.5px solid var(--border-bright); border-radius: var(--r); padding: 5px 10px; cursor: pointer; background: transparent; transition: all .15s; user-select: none; }
+    .ibtn-label svg { width: 12px; height: 12px; stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; flex-shrink: 0; transition: stroke .15s; }
+    .ibtn-label span { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); transition: color .15s; }
+    .ibtn-label.on { border-color: var(--accent); }
+    .ibtn-label.on svg { stroke: var(--accent); }
+    .ibtn-label.on span { color: var(--text-default); }
+
+    .ibtn-circle { width: 30px; height: 30px; border-radius: 50%; border: 0.5px solid var(--border-bright); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; user-select: none; }
+    .ibtn-circle svg { width: 13px; height: 13px; stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; transition: stroke .15s; }
+    .ibtn-circle.on { background: var(--accent); border-color: var(--accent); }
+    .ibtn-circle.on svg { stroke: #fff; }
+
+    .ibtn-ghost { width: 28px; height: 28px; border-radius: var(--r); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border: 0.5px solid transparent; transition: all .15s; user-select: none; }
+    .ibtn-ghost svg { width: 13px; height: 13px; stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; transition: stroke .15s; }
+    .ibtn-ghost.on { border-color: var(--accent); }
+    .ibtn-ghost.on svg { stroke: var(--accent); }
+
+    /* ── PURE SIGNAL ── */
+    .led { width: 8px; height: 8px; border-radius: 50%; background: var(--text-ghost); cursor: pointer; transition: background .15s; flex-shrink: 0; }
+    .led.on { background: var(--accent); }
+
+    .bar { width: 24px; height: 2px; background: var(--border-default); cursor: pointer; transition: background .15s; border-radius: 1px; }
+    .bar.on { background: var(--accent); }
+
+    .ring { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--border-bright); background: transparent; cursor: pointer; transition: all .15s; flex-shrink: 0; }
+    .ring.on { background: var(--accent); border-color: var(--accent); }
+
+    .corner-box { width: 24px; height: 24px; border: 0.5px solid var(--border-bright); border-radius: var(--r); position: relative; cursor: pointer; overflow: hidden; transition: border-color .15s; }
+    .corner-box::after { content: ''; position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 7px 7px 0; border-color: transparent var(--text-ghost) transparent transparent; transition: border-color .15s; }
+    .corner-box.on { border-color: var(--accent-dim); }
+    .corner-box.on::after { border-color: transparent var(--accent) transparent transparent; }
+
+    /* ── TYPOGRAPHIC ── */
+    .bracket { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); cursor: pointer; transition: color .15s; user-select: none; }
+    .bracket .bk { opacity: 0; transition: opacity .15s; color: var(--accent); }
+    .bracket.on { color: var(--text-default); }
+    .bracket.on .bk { opacity: 1; }
+
+    .wshift { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); font-weight: 300; cursor: pointer; transition: all .15s; user-select: none; letter-spacing: 0.01em; }
+    .wshift.on { color: var(--text-default); font-weight: 500; }
+
+    .opaque { font-size: 11px; font-family: var(--font-mono); color: var(--text-default); opacity: 0.15; cursor: pointer; transition: opacity .15s; user-select: none; }
+    .opaque.on { opacity: 1; }
+
+    .slash-pre { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-family: var(--font-mono); cursor: pointer; user-select: none; }
+    .slash-pre .sl { color: var(--text-ghost); transition: color .15s; }
+    .slash-pre .lbl { color: var(--text-tertiary); transition: color .15s; }
+    .slash-pre.on .sl { color: var(--accent); }
+    .slash-pre.on .lbl { color: var(--text-default); }
+
+    /* ── MECHANICAL ── */
+    .track { width: 40px; height: 16px; border: 0.5px solid var(--border-bright); border-radius: 8px; position: relative; cursor: pointer; transition: border-color .15s; flex-shrink: 0; }
+    .track .pin { width: 8px; height: 8px; border-radius: 50%; background: var(--text-ghost); position: absolute; top: 50%; transform: translateY(-50%); left: 4px; transition: left .15s, background .15s; }
+    .track.on { border-color: var(--accent); }
+    .track.on .pin { left: 28px; background: var(--accent); }
+
+    .rocker { display: inline-flex; align-items: flex-end; gap: 0; font-size: 11px; font-family: var(--font-mono); cursor: pointer; user-select: none; border: 0.5px solid var(--border-bright); border-radius: var(--r); overflow: hidden; }
+    .rocker .r0 { padding: 5px 10px; color: var(--text-default); background: var(--ground-raised); transition: all .15s; border-right: 0.5px solid var(--border-bright); }
+    .rocker .r1 { padding: 5px 10px; color: var(--text-tertiary); background: transparent; transition: all .15s; }
+    .rocker.on .r0 { color: var(--text-tertiary); background: transparent; }
+    .rocker.on .r1 { color: var(--text-default); background: var(--ground-raised); }
+
+    /* ── CONTEXTUAL ── */
+    .mrow { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+    .mrow-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; user-select: none; }
+    .mrow-item .mpip { width: 4px; height: 4px; border-radius: 50%; background: transparent; flex-shrink: 0; transition: background .15s; }
+    .mrow-item .mlbl { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); transition: color .15s; }
+    .mrow-item.on .mpip { background: var(--accent); }
+    .mrow-item.on .mlbl { color: var(--text-default); }
+
+    .inline-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); cursor: pointer; transition: color .15s; user-select: none; }
+    .inline-dot .idot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; flex-shrink: 0; }
+    .inline-dot.on { color: var(--text-default); }
+    .inline-dot.on .idot { background: var(--accent); }
+
+    /* ── CHAT INPUT ── */
+    .chat-section {
+      margin-top: 48px;
+    }
+    .chat-section-label {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .chat-wrap {
+      border: 0.5px solid var(--border-bright);
+      border-radius: var(--r);
+      background: var(--ground-base);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-wrap textarea {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.7;
+      padding: 16px;
+      resize: none;
+      min-height: 112px;
+      caret-color: var(--accent);
+    }
+    .chat-wrap textarea::placeholder {
+      color: var(--text-ghost);
+    }
+    .chat-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-top: 0.5px solid var(--border-default);
+    }
+    .attach-btn {
+      width: 28px; height: 28px;
+      border: 0.5px solid var(--border-bright);
+      border-radius: var(--r);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color .15s;
+    }
+    .attach-btn svg { stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; transition: stroke .15s; }
+    .attach-btn:hover { border-color: var(--text-tertiary); }
+    .attach-btn:hover svg { stroke: var(--text-default); }
+    .mode-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      padding: 4px 9px; cursor: pointer;
+      color: var(--text-tertiary); font-family: var(--font-mono); font-size: 11px;
+      transition: border-color .15s, color .15s; user-select: none;
+    }
+    .mode-toggle .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-bright); flex-shrink: 0; transition: background .15s; }
+    .mode-toggle.on { border-color: var(--accent); color: var(--text-default); }
+    .mode-toggle.on .pip { background: var(--accent); }
+    .toolbar-gap { flex: 1; }
+    .send-btn {
+      width: 28px; height: 28px;
+      border: 0.5px solid var(--border-bright);
+      border-radius: var(--r);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all .15s;
+    }
+    .send-btn svg { stroke: var(--text-tertiary); stroke-width: 1.5; fill: none; transition: stroke .15s; }
+    .send-btn:hover { background: var(--accent); border-color: var(--accent); }
+    .send-btn:hover svg { stroke: #fff; }
+
+    /* ── COMPOSED INPUTS ── */
+    .section-label { font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+    .input-section { margin-top: 48px; }
+    .input-rows { display: flex; flex-direction: column; gap: 1px; background: var(--border-default); border: 0.5px solid var(--border-default); }
+    .input-row { background: var(--ground-void); padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+    .input-row-lbl { font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; width: 80px; flex-shrink: 0; }
+    .input-demo { flex: 1; }
+
+    /* shared input reset */
+    .ci-input { background: transparent; border: none; outline: none; color: var(--text-default); font-family: var(--font-mono); font-size: 11px; padding: 7px 10px; caret-color: var(--accent); flex: 1; min-width: 0; }
+    .ci-input::placeholder { color: var(--text-ghost); }
+
+    /* container */
+    .ci { display: flex; align-items: stretch; border: 0.5px solid var(--border-bright); border-radius: var(--r); overflow: hidden; transition: border-color .15s; width: 100%; }
+    .ci:focus-within { border-color: var(--accent); }
+
+    /* internal separator */
+    .ci-sep { width: 0.5px; background: var(--border-bright); flex-shrink: 0; }
+
+    /* mode chip with label */
+    .ci-mode { display: flex; align-items: center; gap: 6px; padding: 0 10px; cursor: pointer; user-select: none; flex-shrink: 0; transition: background .15s; }
+    .ci-mode .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; flex-shrink: 0; }
+    .ci-mode .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); transition: color .15s; white-space: nowrap; }
+    .ci-mode.on { background: var(--accent-fill); }
+    .ci-mode.on .pip { background: var(--accent); }
+    .ci-mode.on .lbl { color: var(--accent-text); }
+
+    /* pip only */
+    .ci-pip { display: flex; align-items: center; justify-content: center; width: 32px; cursor: pointer; user-select: none; flex-shrink: 0; transition: background .15s; }
+    .ci-pip .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; }
+    .ci-pip.on { background: var(--accent-fill); }
+    .ci-pip.on .pip { background: var(--accent); }
+
+    /* stacked (above / below) */
+    .ci-stack { display: flex; flex-direction: column; border: 0.5px solid var(--border-bright); border-radius: var(--r); overflow: hidden; transition: border-color .15s; width: 100%; }
+    .ci-stack:focus-within { border-color: var(--accent); }
+    .ci-bar { display: flex; align-items: center; gap: 6px; padding: 5px 10px; background: var(--ground-raised); cursor: pointer; user-select: none; transition: background .15s; }
+    .ci-bar .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; flex-shrink: 0; }
+    .ci-bar .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); transition: color .15s; }
+    .ci-bar.on { background: var(--accent-fill); }
+    .ci-bar.on .pip { background: var(--accent); }
+    .ci-bar.on .lbl { color: var(--accent-text); }
+    .ci-bar-top { border-bottom: 0.5px solid var(--border-bright); }
+    .ci-bar-bot { border-top: 0.5px solid var(--border-bright); }
+
+    /* above: chip tab attached to top */
+    .ci-above-wrap { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+    .ci-above-chip { display: inline-flex; align-items: center; gap: 6px; border: 0.5px solid var(--border-bright); border-bottom: none; border-radius: var(--r) var(--r) 0 0; padding: 4px 10px; cursor: pointer; user-select: none; transition: border-color .15s; }
+    .ci-above-chip .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; }
+    .ci-above-chip .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); transition: color .15s; }
+    .ci-above-chip.on { border-color: var(--accent); }
+    .ci-above-chip.on .pip { background: var(--accent); }
+    .ci-above-chip.on .lbl { color: var(--text-default); }
+    .ci-above-wrap .ci { border-radius: 0 var(--r) var(--r) var(--r); }
+    .ci-above-chip.on + .ci { border-color: var(--accent); }
+
+    /* ghost + detached standalone chip */
+    .ci-ghost-row { display: flex; align-items: flex-end; gap: 12px; width: 100%; }
+    .ci-ghost { flex: 1; min-width: 0; background: transparent; border: none; border-bottom: 0.5px solid var(--border-bright); border-radius: 0; outline: none; color: var(--text-default); font-family: var(--font-mono); font-size: 11px; padding: 6px 2px; caret-color: var(--accent); transition: border-color .15s; }
+    .ci-ghost::placeholder { color: var(--text-ghost); }
+    .ci-ghost:focus { border-bottom-color: var(--accent); }
+    .ci-standalone { display: inline-flex; align-items: center; gap: 6px; border: 0.5px solid var(--border-bright); border-radius: var(--r); padding: 5px 9px; cursor: pointer; user-select: none; transition: all .15s; flex-shrink: 0; }
+    .ci-standalone .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; }
+    .ci-standalone .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); transition: color .15s; }
+    .ci-standalone.on { border-color: var(--accent); }
+    .ci-standalone.on .pip { background: var(--accent); }
+    .ci-standalone.on .lbl { color: var(--text-default); }
+
+    /* suffix — no separator, mode floats inside */
+    .ci-sfx { display: flex; align-items: center; gap: 5px; padding: 0 10px; cursor: pointer; user-select: none; flex-shrink: 0; }
+    .ci-sfx .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-ghost); transition: color .15s; }
+    .ci-sfx .pip { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; }
+    .ci-sfx.on .pip { background: var(--accent); }
+    .ci-sfx.on .lbl { color: var(--text-tertiary); }
+
+    /* corner badge */
+    .ci-corner-wrap { position: relative; width: 100%; }
+    .ci-corner-badge { position: absolute; top: -1px; right: -1px; width: 16px; height: 16px; border: 0.5px solid var(--border-bright); border-radius: 0 var(--r) 0 var(--r); background: var(--ground-raised); display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: all .15s; z-index: 1; }
+    .ci-corner-badge .pip { width: 4px; height: 4px; border-radius: 50%; background: var(--text-ghost); transition: background .15s; }
+    .ci-corner-badge.on { background: var(--accent-fill); border-color: var(--accent); }
+    .ci-corner-badge.on .pip { background: var(--accent); }
+
+    /* sidebar — left border IS the toggle */
+    .ci-sidebar-wrap { display: flex; width: 100%; }
+    .ci-sidebar { width: 3px; border-radius: var(--r) 0 0 var(--r); background: var(--text-ghost); cursor: pointer; flex-shrink: 0; transition: background .15s; }
+    .ci-sidebar.on { background: var(--accent); }
+    .ci-sidebar-wrap .ci { flex: 1; border-left: none; border-radius: 0 var(--r) var(--r) 0; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>mode toggle</h1>
+  <span>reference sheet · 9 families · all interactive</span>
+</header>
+
+<div class="grid">
+
+  <!-- 04 chip -->
+  <div class="cell">
+    <div class="cell-label">04 · chip + pip</div>
+    <div class="variants">
+      <div class="pair">
+        <div class="chip on" onclick="toggle(this)"><div class="pip"></div><span>mode</span></div>
+        <span class="pair-sep">·</span>
+        <div class="chip" onclick="toggle(this)"><div class="pip"></div><span>mode</span></div>
+      </div>
+    </div>
+    <div class="variants">
+      <div class="pair">
+        <div class="chip-dot on" onclick="toggle(this)"><div class="pip"></div></div>
+        <span class="pair-sep">dot only</span>
+      </div>
+    </div>
+    <div class="variants">
+      <div class="chip-swap on" onclick="toggleSwap(this,'active','idle')"><div class="pip"></div><span>active</span></div>
+      <div class="chip-swap" onclick="toggleSwap(this,'active','idle')"><div class="pip"></div><span>idle</span></div>
+    </div>
+    <div class="variants">
+      <div class="chipgroup">
+        <div class="chip on" onclick="chipGroup(this)"><div class="pip"></div><span>a</span></div>
+        <div class="chip" onclick="chipGroup(this)"><div class="pip"></div><span>b</span></div>
+        <div class="chip" onclick="chipGroup(this)"><div class="pip"></div><span>c</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 segmented -->
+  <div class="cell">
+    <div class="cell-label">05 · segmented</div>
+    <div class="variants">
+      <div class="seg">
+        <div class="s on" onclick="segClick(this)">on</div>
+        <div class="s" onclick="segClick(this)">off</div>
+      </div>
+      <div class="seg">
+        <div class="s on" onclick="segClick(this)">on</div>
+        <div class="s" onclick="segClick(this)">off</div>
+        <div class="s" onclick="segClick(this)">auto</div>
+      </div>
+    </div>
+    <div class="variants">
+      <div class="seg-slash" onclick="toggleSlash(this)">
+        <span class="st on">on</span>
+        <span class="sl">/</span>
+        <span class="st">off</span>
+      </div>
+    </div>
+    <div class="variants">
+      <div class="seg-icon">
+        <div class="si on" onclick="segClick(this)"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="3"/></svg></div>
+        <div class="si" onclick="segClick(this)"><svg viewBox="0 0 12 12"><line x1="2" y1="6" x2="10" y2="6"/></svg></div>
+      </div>
+      <span class="pair-sep">icon only</span>
+    </div>
+    <div class="variants">
+      <div class="seg-pill">
+        <div class="sp on" onclick="segClick(this)">on</div>
+        <div class="sp" onclick="segClick(this)">off</div>
+      </div>
+      <span class="pair-sep">pill radius</span>
+    </div>
+  </div>
+
+  <!-- 07 keycap -->
+  <div class="cell">
+    <div class="cell-label">07 · keycap</div>
+    <div class="variants">
+      <div class="key key-wide on" onclick="toggle(this)">mode</div>
+      <div class="key key-wide" onclick="toggle(this)">mode</div>
+    </div>
+    <div class="variants">
+      <div class="key key-sq on" onclick="toggle(this)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="3"/><path d="M6.5 1v1.5M6.5 10v1.5M1 6.5h1.5M10 6.5h1.5"/></svg>
+      </div>
+      <div class="key key-sq" onclick="toggle(this)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="3"/><path d="M6.5 1v1.5M6.5 10v1.5M1 6.5h1.5M10 6.5h1.5"/></svg>
+      </div>
+      <span class="pair-sep">icon key</span>
+    </div>
+    <div class="variants">
+      <div class="key key-dot on" onclick="toggle(this)">mode<div class="kdot"></div></div>
+      <div class="key key-dot" onclick="toggle(this)">mode<div class="kdot"></div></div>
+      <span class="pair-sep">dot indicator</span>
+    </div>
+    <div class="variants">
+      <div class="key key-tall on" onclick="toggle(this)">M<br>O<br>D<br>E</div>
+      <div class="key key-tall" onclick="toggle(this)">M<br>O<br>D<br>E</div>
+      <span class="pair-sep">vertical</span>
+    </div>
+  </div>
+
+  <!-- 10 underline -->
+  <div class="cell">
+    <div class="cell-label">10 · underline select</div>
+    <div class="variants-col">
+      <div class="urow">
+        <div class="ut on" onclick="uClick(this)">on</div>
+        <div class="ut" onclick="uClick(this)">off</div>
+      </div>
+      <div class="urow-ghost">
+        <div class="ug on" onclick="uClick(this)">on</div>
+        <div class="ug" onclick="uClick(this)">off</div>
+      </div>
+      <div class="urow-full">
+        <div class="uf on" onclick="uClick(this)">on</div>
+        <div class="uf" onclick="uClick(this)">off</div>
+      </div>
+      <div class="vbar-row">
+        <div class="vt on" onclick="vClick(this)">on</div>
+        <div class="vt" onclick="vClick(this)">off</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 icon button -->
+  <div class="cell">
+    <div class="cell-label">11 · icon button</div>
+    <div class="variants">
+      <div class="ibtn on" style="width:32px;height:30px" onclick="toggle(this)"><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg></div>
+      <div class="ibtn" style="width:32px;height:30px" onclick="toggle(this)"><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg></div>
+      <span class="pair-sep">default</span>
+    </div>
+    <div class="variants">
+      <div class="ibtn-label on" onclick="toggle(this)"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg><span>mode</span></div>
+      <div class="ibtn-label" onclick="toggle(this)"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg><span>mode</span></div>
+    </div>
+    <div class="variants">
+      <div class="ibtn-circle on" onclick="toggle(this)"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg></div>
+      <div class="ibtn-circle" onclick="toggle(this)"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg></div>
+      <span class="pair-sep">circle</span>
+    </div>
+    <div class="variants">
+      <div class="ibtn-ghost on" onclick="toggle(this)"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg></div>
+      <div class="ibtn-ghost" onclick="toggle(this)"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3"/><path d="M7 1v1.5M7 11v1.5M1 7h1.5M11 7h1.5"/></svg></div>
+      <span class="pair-sep">ghost</span>
+    </div>
+  </div>
+
+
+  <!-- 12 pure signal -->
+  <div class="cell">
+    <div class="cell-label">12 · pure signal</div>
+    <div class="variants">
+      <div class="led on" onclick="toggle(this)"></div>
+      <div class="led" onclick="toggle(this)"></div>
+      <span class="pair-sep">led pip</span>
+    </div>
+    <div class="variants">
+      <div class="bar on" onclick="toggle(this)"></div>
+      <div class="bar" onclick="toggle(this)"></div>
+      <span class="pair-sep">bar strip</span>
+    </div>
+    <div class="variants">
+      <div class="ring on" onclick="toggle(this)"></div>
+      <div class="ring" onclick="toggle(this)"></div>
+      <span class="pair-sep">ring fill</span>
+    </div>
+    <div class="variants">
+      <div class="corner-box on" onclick="toggle(this)"></div>
+      <div class="corner-box" onclick="toggle(this)"></div>
+      <span class="pair-sep">corner mark</span>
+    </div>
+  </div>
+
+  <!-- 13 typographic -->
+  <div class="cell">
+    <div class="cell-label">13 · typographic</div>
+    <div class="variants">
+      <div class="bracket on" onclick="toggle(this)"><span class="bk">[</span>mode<span class="bk">]</span></div>
+      <div class="bracket" onclick="toggle(this)"><span class="bk">[</span>mode<span class="bk">]</span></div>
+      <span class="pair-sep">bracket</span>
+    </div>
+    <div class="variants">
+      <div class="wshift on" onclick="toggle(this)">mode</div>
+      <div class="wshift" onclick="toggle(this)">mode</div>
+      <span class="pair-sep">weight</span>
+    </div>
+    <div class="variants">
+      <div class="opaque on" onclick="toggle(this)">mode</div>
+      <div class="opaque" onclick="toggle(this)">mode</div>
+      <span class="pair-sep">opacity</span>
+    </div>
+    <div class="variants">
+      <div class="slash-pre on" onclick="toggle(this)"><span class="sl">/</span><span class="lbl">mode</span></div>
+      <div class="slash-pre" onclick="toggle(this)"><span class="sl">/</span><span class="lbl">mode</span></div>
+      <span class="pair-sep">prefix slash</span>
+    </div>
+  </div>
+
+  <!-- 14 mechanical -->
+  <div class="cell">
+    <div class="cell-label">14 · mechanical</div>
+    <div class="variants">
+      <div class="track on" onclick="toggle(this)"><div class="pin"></div></div>
+      <div class="track" onclick="toggle(this)"><div class="pin"></div></div>
+      <span class="pair-sep">track pin</span>
+    </div>
+    <div class="variants">
+      <div class="rocker on" onclick="toggle(this)"><span class="r0">on</span><span class="r1">off</span></div>
+      <div class="rocker" onclick="toggle(this)"><span class="r0">on</span><span class="r1">off</span></div>
+      <span class="pair-sep">rocker</span>
+    </div>
+  </div>
+
+  <!-- 15 contextual -->
+  <div class="cell">
+    <div class="cell-label">15 · contextual</div>
+    <div class="variants-col">
+      <div class="mrow">
+        <div class="mrow-item on" onclick="mrowClick(this)"><div class="mpip"></div><span class="mlbl">option alpha</span></div>
+        <div class="mrow-item" onclick="mrowClick(this)"><div class="mpip"></div><span class="mlbl">option beta</span></div>
+        <div class="mrow-item" onclick="mrowClick(this)"><div class="mpip"></div><span class="mlbl">option gamma</span></div>
+      </div>
+    </div>
+    <div class="variants">
+      <div class="inline-dot on" onclick="toggle(this)"><span>mode</span><div class="idot"></div></div>
+      <div class="inline-dot" onclick="toggle(this)"><span>mode</span><div class="idot"></div></div>
+      <span class="pair-sep">inline dot</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="chat-section">
+  <div class="chat-section-label">composed example · chat input</div>
+  <div class="chat-wrap">
+    <textarea placeholder="Type a message…" rows="4"></textarea>
+    <div class="chat-toolbar">
+      <div class="attach-btn">
+        <svg width="12" height="12" viewBox="0 0 12 12"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+      </div>
+      <div class="mode-toggle" onclick="toggle(this)">
+        <div class="pip"></div>
+        <span>Mode</span>
+      </div>
+      <div class="toolbar-gap"></div>
+      <div class="send-btn">
+        <svg width="12" height="12" viewBox="0 0 12 12"><line x1="6" y1="10" x2="6" y2="2"/><polyline points="2,6 6,2 10,6"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="input-section">
+  <div class="section-label">composed input · mode toggle · 10 variants</div>
+  <div class="input-rows">
+
+    <div class="input-row">
+      <div class="input-row-lbl">right chip</div>
+      <div class="input-demo">
+        <div class="ci">
+          <input class="ci-input" type="text" placeholder="Type a message…">
+          <div class="ci-sep"></div>
+          <div class="ci-mode" onclick="toggle(this)"><div class="pip"></div><span class="lbl">Mode</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">left chip</div>
+      <div class="input-demo">
+        <div class="ci">
+          <div class="ci-mode" onclick="toggle(this)"><div class="pip"></div><span class="lbl">Mode</span></div>
+          <div class="ci-sep"></div>
+          <input class="ci-input" type="text" placeholder="Type a message…">
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">pip right</div>
+      <div class="input-demo">
+        <div class="ci">
+          <input class="ci-input" type="text" placeholder="Type a message…">
+          <div class="ci-sep"></div>
+          <div class="ci-pip" onclick="toggle(this)"><div class="pip"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">pip left</div>
+      <div class="input-demo">
+        <div class="ci">
+          <div class="ci-pip" onclick="toggle(this)"><div class="pip"></div></div>
+          <div class="ci-sep"></div>
+          <input class="ci-input" type="text" placeholder="Type a message…">
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">below</div>
+      <div class="input-demo">
+        <div class="ci-stack">
+          <input class="ci-input" type="text" placeholder="Type a message…">
+          <div class="ci-bar ci-bar-bot" onclick="toggle(this)"><div class="pip"></div><span class="lbl">Mode</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">above</div>
+      <div class="input-demo">
+        <div class="ci-above-wrap">
+          <div class="ci-above-chip" onclick="toggle(this)"><div class="pip"></div><span class="lbl">Mode</span></div>
+          <div class="ci"><input class="ci-input" type="text" placeholder="Type a message…"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">detached</div>
+      <div class="input-demo">
+        <div class="ci-ghost-row">
+          <input class="ci-ghost" type="text" placeholder="Type a message…">
+          <div class="ci-standalone" onclick="toggle(this)"><div class="pip"></div><span class="lbl">Mode</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">suffix</div>
+      <div class="input-demo">
+        <div class="ci">
+          <input class="ci-input" type="text" placeholder="Type a message…">
+          <div class="ci-sfx" onclick="toggle(this)"><span class="lbl">Mode</span><div class="pip"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">corner</div>
+      <div class="input-demo">
+        <div class="ci-corner-wrap">
+          <div class="ci"><input class="ci-input" type="text" placeholder="Type a message…"></div>
+          <div class="ci-corner-badge" onclick="toggle(this)"><div class="pip"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-row-lbl">sidebar</div>
+      <div class="input-demo">
+        <div class="ci-sidebar-wrap">
+          <div class="ci-sidebar" onclick="toggle(this)"></div>
+          <div class="ci"><input class="ci-input" type="text" placeholder="Type a message…"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /.page -->
+
+<script>
+function toggle(el) { el.classList.toggle('on'); }
+
+function toggleSwap(el, a, b) {
+  el.classList.toggle('on');
+  el.querySelector('span').textContent = el.classList.contains('on') ? a : b;
+}
+
+function chipGroup(el) {
+  el.parentElement.querySelectorAll('.chip').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function segClick(el) {
+  el.parentElement.querySelectorAll('.s,.sp,.si').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function toggleSlash(el) {
+  el.querySelectorAll('.st').forEach(s => s.classList.toggle('on'));
+}
+
+function uClick(el) {
+  el.parentElement.querySelectorAll('.ut,.ug,.uf').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function vClick(el) {
+  el.parentElement.querySelectorAll('.vt').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function mrowClick(el) {
+  el.parentElement.querySelectorAll('.mrow-item').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+}
+</script>
+
+</body>
+</html>
