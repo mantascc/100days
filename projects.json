@@ -318,5 +318,10 @@
     "id": "66-ascii-field-gallery",
     "path": "100days/66-ascii-field-gallery",
     "description": "ASCII Field Gallery \u2014 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp"
+  },
+  {
+    "id": "67-audio-reactive-ascii",
+    "path": "100days/67-audio-reactive-ascii",
+    "description": "Audio Reactive ASCII Field \u2014 ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning"
   }
 ]
