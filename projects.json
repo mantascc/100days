@@ -272,46 +272,51 @@
   {
     "id": "55-ascii-loading",
     "path": "100days/55-ascii-loading",
-    "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar"
+    "description": "ASCII Loading \u2014 dual-grid crystallization animation with face emergence and progress bar"
   },
   {
     "id": "56-constrained-variation",
     "path": "100days/56-constrained-variation",
-    "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously"
+    "description": "Constrained Variation \u2014 fix the scaffold, switch the algorithm, compare simultaneously"
   },
   {
     "id": "57-color-themes",
     "path": "100days/57-color-themes",
-    "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities"
+    "description": "Five chapters, three palettes: Peach, Clay, and Aus \u2014 same sketch system remapped through different color identities"
   },
   {
     "id": "58-shapes",
     "path": "100days/58-shapes",
-    "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking"
+    "description": "Geometric shapes explorer \u2014 lines, arcs, and curves organized into chapters with animated parameter tweaking"
   },
   {
     "id": "59-font-explorer",
     "path": "100days/59-font-explorer",
-    "description": "Font Explorer — skill to visualize any font"
+    "description": "Font Explorer \u2014 skill to visualize any font"
   },
   {
     "id": "62-terminal-cli",
     "path": "100days/62-terminal-cli",
-    "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat"
+    "description": "Terminal REPL \u2014 minimal shell interface with boot sequence, command streaming, and ASCII cat"
   },
   {
     "id": "63-ube-kaizen",
     "path": "100days/63-ube-kaizen",
-    "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings"
+    "description": "Ube Kaizen \u2014 enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings"
   },
   {
     "id": "64-viz-grouped",
     "path": "100days/64-viz-grouped",
-    "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal"
+    "description": "Viz Grouped \u2014 reference gallery of visualization types grouped by analytical goal"
   },
   {
     "id": "65-mode-toggle",
     "path": "100days/65-mode-toggle",
-    "description": "Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations"
+    "description": "Mode Toggle \u2014 component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations"
+  },
+  {
+    "id": "66-ascii-field-gallery",
+    "path": "100days/66-ascii-field-gallery",
+    "description": "ASCII Field Gallery \u2014 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp"
   }
 ]
