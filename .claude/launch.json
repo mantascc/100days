@@ -2,12 +2,6 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "100days-index",
-      "runtimeExecutable": "/usr/local/bin/python3.10",
-      "runtimeArgs": ["-c", "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8800),H); httpd.serve_forever()"],
-      "port": 8800
-    },
-    {
       "name": "64-viz-grouped",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8812", "--directory", "/Users/mantas/Desktop/min7is/100days/64-viz-grouped"],
