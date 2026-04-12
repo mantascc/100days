@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 68: Moog Waveform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+        }
+
+        #stage {
+            position: relative;
+            width: 80vmin;
+            height: 80vmin;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+        }
+
+        canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #prompt {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        #prompt button {
+            background: none;
+            border: none;
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            padding: 0;
+            transition: color 100ms linear;
+        }
+
+        #prompt button:hover { color: #ffaa00; }
+    </style>
+</head>
+<body>
+<div id="stage">
+    <canvas id="canvas"></canvas>
+    <div id="prompt">
+        <button id="start-btn">enable input</button>
+    </div>
+</div>
+
+<script>
+'use strict';
+
+const stage  = document.getElementById('stage');
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+const prompt = document.getElementById('prompt');
+
+let W, H, dpr;
+
+function resize() {
+    const rect = stage.getBoundingClientRect();
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = rect.width;
+    H = rect.height;
+}
+
+resize();
+window.addEventListener('resize', resize);
+
+let analyser = null;
+let timeData = null;
+
+async function startAudio() {
+    try {
+        const stream   = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const audioCtx = new AudioContext();
+        const source   = audioCtx.createMediaStreamSource(stream);
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0.0;
+
+        source.connect(analyser);
+        timeData = new Uint8Array(analyser.fftSize);
+
+        prompt.style.display = 'none';
+    } catch (e) {
+        document.getElementById('start-btn').textContent = 'input denied';
+    }
+}
+
+document.getElementById('start-btn').addEventListener('click', startAudio);
+
+function renderPhase() {
+    ctx.fillStyle = 'rgba(15,15,15,0.25)';
+    ctx.fillRect(0, 0, W, H);
+
+    analyser.getByteTimeDomainData(timeData);
+
+    const len    = timeData.length;
+    const offset = Math.floor(len / 4);
+
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,170,0,0.7)';
+    ctx.lineWidth   = 0.8;
+
+    for (let i = 0; i < len - offset; i++) {
+        const xv = timeData[i]          / 128.0 - 1.0;
+        const yv = timeData[i + offset] / 128.0 - 1.0;
+
+        const x = W / 2 + xv * W * 0.46;
+        const y = H / 2 + yv * H * 0.46;
+
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+
+    ctx.stroke();
+
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth   = 1;
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H);
+    ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2);
+    ctx.stroke();
+}
+
+let frame = 0;
+
+function renderIdle() {
+    ctx.fillStyle = 'rgba(15,15,15,0.15)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H);
+    ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2);
+    ctx.stroke();
+
+    // slow ghost circle
+    const r = Math.min(W, H) * 0.2;
+    const t = frame * 0.008;
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,170,0,0.08)';
+    ctx.lineWidth = 0.8;
+    for (let i = 0; i <= 256; i++) {
+        const a = (i / 256) * Math.PI * 2 + t;
+        const x = W / 2 + Math.cos(a) * r;
+        const y = H / 2 + Math.sin(a) * r;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    frame++;
+    analyser ? renderPhase() : renderIdle();
+}
+
+animate();
+</script>
+</body>
+</html>
