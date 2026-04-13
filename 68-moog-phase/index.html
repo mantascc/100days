@@ -16,6 +16,13 @@
             place-items: center;
         }
 
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
         #stage {
             position: relative;
             width: 80vmin;
@@ -31,46 +38,90 @@
             height: 100%;
         }
 
-        #prompt {
-            position: absolute;
-            inset: 0;
+        .player-btn {
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        #prompt button {
+            gap: 8px;
             background: none;
-            border: none;
+            border: 1px solid #2a2a2a;
+            padding: 6px 14px;
+            cursor: pointer;
             font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
             font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
+            color: #555;
             letter-spacing: 0.08em;
-            cursor: pointer;
-            padding: 0;
-            transition: color 100ms linear;
+            text-transform: uppercase;
+            transition: border-color 120ms, color 120ms;
         }
 
-        #prompt button:hover { color: #ffaa00; }
+        .player-btn:hover {
+            border-color: #3a3a3a;
+            color: #888;
+        }
+
+        .player-btn.playing {
+            border-color: rgba(255,170,0,0.25);
+            color: #888;
+        }
+
+        .player-light {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            flex-shrink: 0;
+            transition: background 120ms, box-shadow 120ms;
+        }
+
+        .player-btn.playing .player-light {
+            background: #ffaa00;
+            box-shadow: 0 0 6px rgba(255,170,0,0.7);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1px;
+        }
+
+        .snap-bar {
+            width: 80vmin;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
     </style>
 </head>
 <body>
-<div id="stage">
-    <canvas id="canvas"></canvas>
-    <div id="prompt">
-        <button id="start-btn">enable input</button>
+<div class="wrapper">
+    <div class="snap-bar">
+        <span class="player-btn" style="border:none; cursor:default;">Aida 01</span>
+        <button class="player-btn" id="snap-btn">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+            </svg>
+            snapshot
+        </button>
+    </div>
+    <div id="stage">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div class="controls">
+        <button class="player-btn" id="player-btn">
+            <span class="player-light" id="player-light"></span>
+            <span>windy-hillclimb.wav</span>
+        </button>
     </div>
 </div>
 
 <script>
 'use strict';
 
-const stage  = document.getElementById('stage');
-const canvas = document.getElementById('canvas');
-const ctx    = canvas.getContext('2d');
-const prompt = document.getElementById('prompt');
+const stage     = document.getElementById('stage');
+const canvas    = document.getElementById('canvas');
+const ctx       = canvas.getContext('2d');
+const playerBtn = document.getElementById('player-btn');
 
 let W, H, dpr;
 
@@ -87,29 +138,41 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-let analyser = null;
-let timeData = null;
+let audioCtx  = null;
+let analyser  = null;
+let timeData  = null;
+let isPlaying = false;
 
-async function startAudio() {
-    try {
-        const stream   = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        const audioCtx = new AudioContext();
-        const source   = audioCtx.createMediaStreamSource(stream);
+const audioEl = new Audio('windy-hillclimb.wav');
+audioEl.loop = true;
 
+async function togglePlay() {
+    if (!audioCtx) {
+        audioCtx = new AudioContext();
+        const src = audioCtx.createMediaElementSource(audioEl);
         analyser = audioCtx.createAnalyser();
         analyser.fftSize = 2048;
         analyser.smoothingTimeConstant = 0.0;
-
-        source.connect(analyser);
+        src.connect(analyser);
+        analyser.connect(audioCtx.destination);
         timeData = new Uint8Array(analyser.fftSize);
+    }
 
-        prompt.style.display = 'none';
-    } catch (e) {
-        document.getElementById('start-btn').textContent = 'input denied';
+    if (isPlaying) {
+        audioEl.pause();
+        isPlaying = false;
+        playerBtn.classList.remove('playing');
+    } else {
+        await audioCtx.resume();
+        await audioEl.play();
+        isPlaying = true;
+        playerBtn.classList.add('playing');
     }
 }
 
-document.getElementById('start-btn').addEventListener('click', startAudio);
+playerBtn.addEventListener('click', togglePlay);
+
+// ── Rendering ──────────────────────────────────────────────────────────────
 
 function renderPhase() {
     ctx.fillStyle = 'rgba(15,15,15,0.25)';
@@ -127,13 +190,10 @@ function renderPhase() {
     for (let i = 0; i < len - offset; i++) {
         const xv = timeData[i]          / 128.0 - 1.0;
         const yv = timeData[i + offset] / 128.0 - 1.0;
-
-        const x = W / 2 + xv * W * 0.46;
-        const y = H / 2 + yv * H * 0.46;
-
+        const x  = W / 2 + xv * W * 0.46;
+        const y  = H / 2 + yv * H * 0.46;
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
-
     ctx.stroke();
 
     ctx.strokeStyle = '#1a1a1a';
@@ -157,7 +217,6 @@ function renderIdle() {
     ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2);
     ctx.stroke();
 
-    // slow ghost circle
     const r = Math.min(W, H) * 0.2;
     const t = frame * 0.008;
     ctx.beginPath();
@@ -172,10 +231,19 @@ function renderIdle() {
     ctx.stroke();
 }
 
+document.getElementById('snap-btn').addEventListener('click', () => {
+    const ts  = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const url = canvas.toDataURL('image/png');
+    const a   = document.createElement('a');
+    a.href     = url;
+    a.download = `moog-phase-${ts}.png`;
+    a.click();
+});
+
 function animate() {
     requestAnimationFrame(animate);
     frame++;
-    analyser ? renderPhase() : renderIdle();
+    isPlaying ? renderPhase() : renderIdle();
 }
 
 animate();

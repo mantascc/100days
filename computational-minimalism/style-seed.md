@@ -60,6 +60,17 @@ Pick ONE per project. High contrast, intentional.
 | `--accent-amber` | `#ffaa00` | Warning, warmth |
 | `--accent-red` | `#ff0000` | Rare emphasis |
 
+### Named Colors
+
+Specific colors with provenance or recurring identity across projects.
+
+| Name | Hex | Origin |
+|------|-----|--------|
+| `cph-yellow` | `#ffaa00` | Copenhagen — used in Aida 01 phase portrait, oscilloscope warmth |
+| `ube-violet` | `#7b6fa5` | Ube Kaizen — primary accent, muted purple-violet |
+| `ube-lavender` | `#9d91b0` | Ube Kaizen — secondary, desaturated lilac |
+| `ube-terra` | `#9e6240` | Ube Kaizen — tertiary, warm brown terra cotta |
+
 ### Overlay
 
 | Token | Value | Usage |
