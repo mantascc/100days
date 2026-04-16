@@ -78,6 +78,13 @@
             border-bottom: 1px solid var(--border-default);
         }
 
+        .header-cols {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 32px;
+            align-items: start;
+        }
+
         h1 {
             color: var(--text-primary);
             font-size: 20px;
@@ -89,6 +96,47 @@
         .description {
             color: var(--text-secondary);
             max-width: 600px;
+        }
+
+        .cc-card {
+            width: 160px;
+            height: 160px;
+            border: 1px solid rgba(0, 255, 170, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-decoration: none;
+            transition: border-color var(--duration-fast) var(--ease-out);
+        }
+
+        .cc-card:hover {
+            border-color: #00ffaa;
+        }
+
+        .cc-card span {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        .cc-card:hover span {
+            color: var(--text-primary);
+        }
+
+        .cc-card .cc-arrow {
+            color: var(--text-tertiary);
+            font-size: 14px;
+            line-height: 1;
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        .cc-card:hover .cc-arrow {
+            color: var(--text-primary);
         }
 
         .project-list {
@@ -164,11 +212,18 @@
                 <canvas id="banner-field"></canvas>
                 <div class="banner-label">Hello world</div>
             </div>
-            <h1>Hej</h1>
-            <p class="description">
-                100 day routine to explore computational aesthetics, data expression, coding concepts. Inspired by <a href="https://www.instagram.com/tiantianxu/" style="color: inherit; text-decoration: underline; text-decoration-color: var(--text-tertiary); opacity: 0.8;">Tiantian Xu</a>
-            </p>
-            <a href="https://github.com/mantascc/100days" class="clone-link">github.com/mantascc/100days</a>
+            <div class="header-cols">
+                <div>
+                    <h1>Hej</h1>
+                    <p class="description">
+                        100 day routine to explore computational aesthetics, data expression, coding concepts. Inspired by <a href="https://www.instagram.com/tiantianxu/" style="color: inherit; text-decoration: underline; text-decoration-color: var(--text-tertiary); opacity: 0.8;">Tiantian Xu</a>
+                    </p>
+                    <a href="https://github.com/mantascc/100days" class="clone-link">github.com/mantascc/100days</a>
+                </div>
+                <a href="computational-minimalism/visual-language.html" class="cc-card">
+                    <span><span class="cc-arrow">↘</span> Clear Channel</span>
+                </a>
+            </div>
         </header>
 
         <div class="project-list">
