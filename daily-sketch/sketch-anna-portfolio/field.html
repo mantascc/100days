@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Field — Anna Smeragliuolo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: #0a0a0a;
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════════════════════════
+       CH V — FIELD
+       ASCII wave field (53) · ube structure (63)
+    ══════════════════════════════════════════════════ */
+    #ch-5 {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      display: block;
+    }
+
+    .fld-grid-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #fld-grid {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78vh;
+      line-height: 1;
+      white-space: pre;
+      color: #2e2848;
+      user-select: none;
+      letter-spacing: 0;
+    }
+
+    .fld-content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 64px 48px 140px;
+    }
+
+    .fld-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .fld-header {
+      border-top: 0.5px solid #2e2848;
+      padding-top: 18px;
+      margin-bottom: 40px;
+    }
+
+    .fld-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #f5f5f7;
+      margin-bottom: 4px;
+    }
+
+    .fld-role {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #7b6fa5;
+    }
+
+    .fld-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 0 28px;
+      padding: 18px 0;
+      border-bottom: 0.5px solid #1a1628;
+    }
+
+    .fld-row-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: #7b6fa5;
+      letter-spacing: 0.1em;
+      padding-top: 1px;
+    }
+
+    .fld-row-content {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 300;
+      color: #9090a8;
+      line-height: 1.85;
+    }
+
+    .fld-work-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 7px 0;
+      border-bottom: 0.5px solid #1a1630;
+    }
+
+    .fld-work-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: #ccc8e0;
+    }
+
+    .fld-work-year {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: #444;
+    }
+
+    .fld-footer {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 0.5px solid #1a1630;
+    }
+
+    .fld-footer p {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: #444;
+      line-height: 2;
+      letter-spacing: 0.04em;
+    }
+
+    .fld-footer a { color: #7b6fa5; text-decoration: none; }
+    .fld-footer a:hover { color: #9d91b0; }
+  </style>
+</head>
+<body>
+
+  <section id="ch-5">
+    <div class="fld-grid-wrap">
+      <pre id="fld-grid"></pre>
+    </div>
+    <div class="fld-content">
+      <div class="fld-inner">
+        <div class="fld-header">
+          <div class="fld-name">Anna Smeragliuolo</div>
+          <div class="fld-role">Design Technologist</div>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·00·</span>
+          <span class="fld-row-content" style="color:#c8c0e0;">design is consideration</span>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·01·</span>
+          <div class="fld-row-content">
+            Moved from Sweden to the Bay Area.<br>
+            Hardware, space, and interaction.<br>
+            Drawn to concrete. Rooms that ask things.
+          </div>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·02·</span>
+          <div>
+            <div class="fld-work-row">
+              <span class="fld-work-title">Threshold Study</span>
+              <span class="fld-work-year">2022</span>
+            </div>
+            <div class="fld-work-row">
+              <span class="fld-work-title">Instruction Distance</span>
+              <span class="fld-work-year">2023</span>
+            </div>
+            <div class="fld-work-row">
+              <span class="fld-work-title">Visible Field</span>
+              <span class="fld-work-year">2024</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·03·</span>
+          <div class="fld-row-content">
+            anna@domain.com<br>
+            Work presented in person.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // CH V — ASCII wave field
+    class AsciiField {
+      constructor() {
+        this.el = document.getElementById('fld-grid');
+        this.cols = 100;
+        this.rows = 60;
+        this.frame = 0;
+        this.raf = null;
+        this.lastT = 0;
+        this.fps = 1000 / 20;
+      }
+      start() {
+        if (this.raf) return;
+        const tick = (t) => {
+          if (t - this.lastT > this.fps) {
+            this.render();
+            this.lastT = t;
+            this.frame++;
+          }
+          this.raf = requestAnimationFrame(tick);
+        };
+        this.raf = requestAnimationFrame(tick);
+      }
+      stop() {
+        if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+      }
+      render() {
+        const s = [' ', '·', '∙', '∘', '○', '◌', '◎', '⊙', '●'];
+        const n = s.length - 1;
+        const t = this.frame * 0.022;
+        let out = '';
+        for (let y = 0; y < this.rows; y++) {
+          for (let x = 0; x < this.cols; x++) {
+            const v = (Math.sin(x * 0.1 + t) + Math.cos(y * 0.12 - t * 0.7) + Math.sin((x + y) * 0.05 + t * 0.5) + 3) / 6;
+            out += s[Math.floor(v * n)];
+          }
+          out += '\n';
+        }
+        this.el.textContent = out;
+      }
+    }
+
+    const field = new AsciiField();
+    field.start();
+  </script>
+</body>
+</html>

@@ -2,6 +2,18 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "aesthetic-genome",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "/Users/mantas/Desktop/min7is/100days/aesthetic-genome"],
+      "port": 8080
+    },
+    {
+      "name": "68-moog-phase",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8813", "--directory", "/Users/mantas/Desktop/min7is/100days/68-moog-phase"],
+      "port": 8813
+    },
+    {
       "name": "64-viz-grouped",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8812", "--directory", "/Users/mantas/Desktop/min7is/100days/64-viz-grouped"],

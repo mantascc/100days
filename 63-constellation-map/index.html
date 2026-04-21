@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Days — Constellation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #070710;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        canvas { display: block; }
+
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #333;
+            font-size: 11px;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        #day-counter {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #555;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s;
+            white-space: nowrap;
+        }
+
+        #day-counter .num {
+            color: #888;
+        }
+
+        #tooltip {
+            position: absolute;
+            background: rgba(7, 7, 16, 0.96);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            border: 1px solid #1a1a2e;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        #tooltip .title { font-weight: 600; margin-bottom: 3px; color: #ddd; }
+        #tooltip .idea { color: #666; font-size: 11px; font-style: italic; }
+        #tooltip .nav  { color: #333; margin-top: 6px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+        #tooltip .ghost-label { color: #333; font-size: 11px; }
+
+        #replay {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            color: #2a2a3a;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s;
+            user-select: none;
+        }
+        #replay:hover { color: #555; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="info">100 Days</div>
+    <div id="day-counter"><span class="num" id="day-num">—</span> <span id="day-title"></span></div>
+    <div id="tooltip"></div>
+    <div id="replay">replay ↺</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const dayCounter = document.getElementById('day-counter');
+        const dayNum = document.getElementById('day-num');
+        const dayTitle = document.getElementById('day-title');
+        const replayBtn = document.getElementById('replay');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // ── supplementary projects (55–62, not in concept-graph JSON) ──────────
+        const EXTRA_PROJECTS = [
+            { day: 55, title: 'ASCII Loading',         idea: 'Dual-grid crystallization animation with face emergence',  concepts: ['visual'] },
+            { day: 56, title: 'Constrained Variation', idea: 'Fix the scaffold, switch the algorithm, compare simultaneously', concepts: ['emergence'] },
+            { day: 57, title: 'Color Themes',          idea: 'Same sketch system remapped through different color identities', concepts: ['visual'] },
+            { day: 58, title: 'Shapes',                idea: 'Lines, arcs, and curves with animated parameter tweaking',  concepts: ['visual'] },
+            { day: 59, title: 'Font Explorer',         idea: 'Visualize any font — anatomy, spacing, rhythm',            concepts: ['visual'] },
+            { day: 60, title: 'Agentic Patterns',      idea: 'Patterns of autonomous agent behavior',                    concepts: ['emergence'] },
+            { day: 61, title: 'HITL Patterns',         idea: 'Human-in-the-loop interaction patterns',                   concepts: ['network'] },
+            { day: 62, title: 'Terminal CLI',          idea: 'Minimal shell interface with boot sequence and command streaming', concepts: ['temporal'] },
+        ];
+
+        const DAY_FOLDERS = {
+            1:'01-entropy', 2:'02-vicsek-model', 3:'03-chaos-agent',
+            4:'04-random-walk', 5:'05-fall', 6:'06-orbital',
+            7:'07-apophenia', 8:'08-graph-clusters', 9:'09-planar-graph',
+            10:'10-audio-reactive-agents', 11:'11-brownian-tree', 12:'12-wind-field',
+            13:'13-image-flow-field', 14:'14-dna-mutations', 15:'15-binary-camera-grid',
+            16:'16-hub-spoke-network', 17:'17-audio-reactive-network', 18:'18-cellular-automaton',
+            19:'19-coworker-network', 20:'20-schelling-model', 21:'21-interaction-heatmap',
+            22:'22-directed-network', 23:'23-interactive-typography', 24:'24-rock-paper-scissors',
+            25:'25-spotlight-grid', 26:'26-widget-dashboard', 27:'27-muse',
+            28:'28-liquid-glass', 29:'29-progress-indicators', 30:'30-thinking-states',
+            31:'31-cli-material-palette', 32:'32-genart-cards', 33:'33-three-body-problem',
+            34:'34-particle-text-morph', 35:'35-flight-path-viz', 36:'36-spinning-globe',
+            37:'37-sentiment-analyzer', 38:'38-baltic-pattern', 39:'39-wave-morph',
+            40:'40-cube-grid-rules', 41:'41-metaball', 42:'42-metaball-grid',
+            43:'43-style-seed', 44:'44-whiff', 45:'45-gravity-pills',
+            46:'46-oklch-vs-hsl', 47:'47-2gif', 49:'49-grid-trace',
+            50:'50-execution-trace-graph', 51:'51-resonant-lattice', 52:'52-reaction-diffusion',
+            53:'53-ascii-grid', 54:'54-concept-graph', 55:'55-ascii-loading',
+            56:'56-constrained-variation', 57:'57-color-themes', 58:'58-shapes',
+            59:'59-font-explorer', 60:'60-agentic-patterns', 61:'61-hitl-patterns',
+            62:'62-terminal-cli'
+        };
+
+        // ── state ──────────────────────────────────────────────────────────────
+        let data = null;
+        let nodes = [];       // concept + project nodes (physics)
+        let edges = [];
+        let dayMap = {};      // day (1-100) → node or ghostEntry
+        let ghostEntries = []; // {day, x, y, isGhost}
+
+        // trail
+        let trailProgress = 0;   // 0..100
+        let trailAnimating = false;
+        let trailComplete  = false;
+        const TRAIL_SPEED  = 100 / 220; // days per frame (~3.5 s at 60fps)
+
+        // mouse
+        let hoveredNode  = null;
+        let draggedNode  = null;
+        const mouse = { x: 0, y: 0 };
+
+        // physics
+        const SPRING_LENGTH   = 110;
+        const SPRING_STRENGTH = 0.008;
+        const REPULSION       = 3800;
+        const CENTER_STRENGTH = 0.0008;
+        let simulationStep = 0;
+
+        // ── load ───────────────────────────────────────────────────────────────
+        Promise.resolve({"generated":"2026-02-20T05:22:06.995Z","totalProjects":52,"concepts":[{"id":"network","label":"Network & Graph","color":"#ff6b6b"},{"id":"clustering","label":"Clustering","color":"#f9ca24"},{"id":"statistical","label":"Statistical","color":"#a29bfe"},{"id":"temporal","label":"Temporal","color":"#4ecdc4"},{"id":"spatial","label":"Spatial & Geo","color":"#45b7d1"},{"id":"audio","label":"Audio & Signal","color":"#fd79a8"},{"id":"visual","label":"Image & Visual","color":"#00b894"},{"id":"emergence","label":"Emergence","color":"#feca57"}],"groups":{"network":{"concept":{"id":"network","label":"Network & Graph","color":"#ff6b6b"},"projects":[{"day":2,"title":"Vicsek Model","idea":"Collective flocking behavior emerges from simple local alignment rules"},{"day":8,"title":"Graph Clusters","idea":"Multiple wandering graph clusters with exact or minimum degree constraints and soft-body repulsion"},{"day":9,"title":"Planar Graph Network","idea":"Wandering agents connected by a dynamically-computed planar graph structure with MST backbone and non-crossing extra edges"},{"day":16,"title":"Hub-Spoke Force Network","idea":"Force-directed graph with designated hub nodes, shared vs exclusive agent connections, and draggable hub repositioning"},{"day":17,"title":"Audio-Reactive Force Network","idea":"Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength"},{"day":19,"title":"Coworker Network (React)","idea":"Force-directed graph visualization of coworker relationships built with React and TypeScript"},{"day":21,"title":"Agent Interaction Heatmap","idea":"Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns"},{"day":22,"title":"Directed Network Graph","idea":"SVG-based force-directed graph with directional edges, rectangular nodes, and drag interaction"},{"day":26,"title":"Dynamic Widget Dashboard","idea":"Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays"},{"day":50,"title":"Execution Trace Graph","idea":"Visualization of code execution flow as interactive node graph with left panel showing execution context"},{"day":54,"title":"Concept Graph Visualization","idea":"Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts"}]},"clustering":{"concept":{"id":"clustering","label":"Clustering","color":"#f9ca24"},"projects":[{"day":3,"title":"Clusters and a Chaos Agent","idea":"How a single disruptive agent affects collective clustering behavior"},{"day":7,"title":"Apophenia","idea":"Perceiving patterns in random motion\u2014proximity links emerge and dissolve"}]},"statistical":{"concept":{"id":"statistical","label":"Statistical","color":"#a29bfe"},"projects":[{"day":1,"title":"Entropy","idea":"Interactive visualization of entropy as a gradient from perfect order to total chaos"},{"day":2,"title":"Vicsek Model","idea":"Collective flocking behavior emerges from simple local alignment rules"},{"day":4,"title":"Random Walk","idea":"Stochastic patterns emerge from purely random individual motion"},{"day":5,"title":"Fall","idea":"Biased random walk where gravity interrupts pure randomness"},{"day":37,"title":"Sentiment Analyzer","idea":"Real-time text sentiment analysis with industrial-themed visualization interface"},{"day":51,"title":"Resonant Lattice","idea":"Interactive spring-mass lattice showing energy propagation, resonance, and damping effects"},{"day":54,"title":"Concept Graph Visualization","idea":"Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts"}]},"temporal":{"concept":{"id":"temporal","label":"Temporal","color":"#4ecdc4"},"projects":[{"day":11,"title":"Ambient Clock","idea":"Fullscreen clock with typing animation overlaid on particle network background"},{"day":14,"title":"Synchronizing Fireflies","idea":"Proximity-based phase synchronization where clustered agents pulse together and drift upward, isolated agents remain dim and sink"},{"day":20,"title":"Schelling Segregation Model","idea":"Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns"},{"day":21,"title":"Agent Interaction Heatmap","idea":"Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns"},{"day":24,"title":"Rock Paper Scissors Simulation","idea":"Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates"},{"day":32,"title":"Entropy Patterns","idea":"Visual taxonomy of creative work rhythms mapping cognitive load oscillations and thinking quality across different production modes"},{"day":33,"title":"Slit-Scan Camera","idea":"Webcam-based slit-scan photography tool that captures 30-second temporal slices with programmatic color effects and cinematic post-processing"},{"day":40,"title":"Cube Grid Rules Engine","idea":"3D cube grid governed by customizable cellular automaton-like rules with parameter controls"},{"day":44,"title":"Whiff","idea":"Command-line tool that instantly visualizes JSON data as tables, line graphs, or bar charts in the browser"},{"day":50,"title":"Execution Trace Graph","idea":"Visualization of code execution flow as interactive node graph with left panel showing execution context"},{"day":52,"title":"Reaction-Diffusion (Gray-Scott)","idea":"Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions"}]},"spatial":{"concept":{"id":"spatial","label":"Spatial & Geo","color":"#45b7d1"},"projects":[{"day":6,"title":"Orbital","idea":"Miniature solar systems in a grid\u201416 unique orbital configurations"},{"day":7,"title":"Apophenia","idea":"Perceiving patterns in random motion\u2014proximity links emerge and dissolve"},{"day":12,"title":"Wind Field","idea":"Grid of particles displaced by multi-octave Perlin noise forming animated wind-like flows with embedded text"},{"day":18,"title":"Custom Cellular Automaton","idea":"Step-by-step cellular automaton with custom rules: birth on 3 neighbors, death on 5+ neighbors"},{"day":20,"title":"Schelling Segregation Model","idea":"Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns"},{"day":24,"title":"Rock Paper Scissors Simulation","idea":"Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates"},{"day":25,"title":"Spotlight Grid","idea":"Interactive dot grid where dots near mouse cursor illuminate with adjustable density and color"},{"day":27,"title":"Muse (Desktop Only)","idea":"Desktop-only interactive creative tool or playground with fly element"},{"day":35,"title":"Flight Path Visualization","idea":"iPad-optimized flight tracking interface showing real-time route optimization with great circle paths and waypoint notifications"},{"day":40,"title":"Cube Grid Rules Engine","idea":"3D cube grid governed by customizable cellular automaton-like rules with parameter controls"},{"day":45,"title":"Gravity Pills","idea":"Physics simulation of pill-shaped objects with gravity, drag interaction, and collision dynamics"},{"day":49,"title":"Grid Trace","idea":"Animated grid with path-tracing effects and typewriter text using Geist Pixel Square font"},{"day":51,"title":"Resonant Lattice","idea":"Interactive spring-mass lattice showing energy propagation, resonance, and damping effects"},{"day":52,"title":"Reaction-Diffusion (Gray-Scott)","idea":"Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions"}]},"audio":{"concept":{"id":"audio","label":"Audio & Signal","color":"#fd79a8"},"projects":[{"day":10,"title":"Audio-Reactive Agents","idea":"Microphone-driven particle swarm where loudness controls movement speed and chaos"},{"day":17,"title":"Audio-Reactive Force Network","idea":"Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength"},{"day":39,"title":"Wave Morph","idea":"Audio waveform morphing between different wave types (sine, triangle, square, sawtooth) with interactive slider"}]},"visual":{"concept":{"id":"visual","label":"Image & Visual","color":"#00b894"},"projects":[{"day":13,"title":"Image Flow Field","idea":"Upload images transformed into flowing particle fields using Perlin noise displacement"},{"day":15,"title":"Binary Camera Grid","idea":"Real-time webcam feed converted to binary grid visualization with adjustable threshold and cell size"},{"day":23,"title":"Interactive Typography","idea":"\"Hello World\" text where each letter cycles through different fonts on hover and randomizes on click"},{"day":26,"title":"Dynamic Widget Dashboard","idea":"Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays"},{"day":28,"title":"Liquid Glass Effect","idea":"Draggable frosted glass pane with liquid distortion filter and customizable backdrop effects"},{"day":29,"title":"100 Progress Indicators","idea":"Comprehensive collection of 100 unique loading/progress indicator animations organized by style categories"},{"day":30,"title":"Thinking States","idea":"Experimental iteration exploring \"thinking\" metaphor through animated loading indicators"},{"day":31,"title":"CLI Material Palette","idea":"Comprehensive design reference documenting the fundamental visual and interactive materials of command-line interfaces"},{"day":34,"title":"Particle Text Morph","idea":"Canvas particle system where text decomposes into particles controlled by stability slider (desktop only)"},{"day":38,"title":"Generative Baltic Pattern","idea":"Generative pattern generator creating Baltic folk art inspired geometric designs"},{"day":41,"title":"Metaball","idea":"Interactive metaball physics simulation with mouse-driven particle attraction"},{"day":42,"title":"Metaball Grid","idea":"Grid of multiple metaball sketches with responsive 4-column (desktop) / 2-column (mobile) layout"},{"day":43,"title":"Computational Minimalism Style Seed","idea":"Design system document defining visual language for creative coding sketches"},{"day":46,"title":"OKLCH vs HSL Gradient Comparison","idea":"Side-by-side comparison of color gradients using OKLCH and HSL color spaces"},{"day":47,"title":"2GIF","idea":"Browser-based tool for converting screen recordings into polished, shareable gifs with styled backgrounds"},{"day":53,"title":"ASCII Animated Grid (Refined UI)","idea":"Character-based animation grid with five distinct modes: ripple, wave, rain, breath, and worm"}]},"emergence":{"concept":{"id":"emergence","label":"Emergence","color":"#feca57"},"projects":[{"day":2,"title":"Vicsek Model","idea":"Collective flocking behavior emerges from simple local alignment rules"}]}},"projects":[{"day":1,"title":"Entropy","idea":"Interactive visualization of entropy as a gradient from perfect order to total chaos","primaryConcept":"Statistical / Entropy","secondaryConcept":"Temporal (motion over time)","concepts":["statistical"]},{"day":2,"title":"Vicsek Model","idea":"Collective flocking behavior emerges from simple local alignment rules","primaryConcept":"Network","secondaryConcept":"Statistical (noise as stochasticity), Emergence","concepts":["network","statistical","emergence"]},{"day":3,"title":"Clusters and a Chaos Agent","idea":"How a single disruptive agent affects collective clustering behavior","primaryConcept":"Clustering","secondaryConcept":"Network (connected components), Statistical (noise injection)","concepts":["clustering"]},{"day":4,"title":"Random Walk","idea":"Stochastic patterns emerge from purely random individual motion","primaryConcept":"Statistical","secondaryConcept":"Temporal (trails show motion history), Spatial (diffusion patterns)","concepts":["statistical"]},{"day":5,"title":"Fall","idea":"Biased random walk where gravity interrupts pure randomness","primaryConcept":"Statistical","secondaryConcept":"Temporal (periodic forcing), Spatial (directional flow)","concepts":["statistical"]},{"day":6,"title":"Orbital","idea":"Miniature solar systems in a grid\u201416 unique orbital configurations","primaryConcept":"Spatial","secondaryConcept":"Temporal (periodic motion, phase relationships)","concepts":["spatial"]},{"day":7,"title":"Apophenia","idea":"Perceiving patterns in random motion\u2014proximity links emerge and dissolve","primaryConcept":"Clustering","secondaryConcept":"Network (dynamic edges), Spatial (distance-based relationships)","concepts":["clustering","spatial"]},{"day":8,"title":"Graph Clusters","idea":"Multiple wandering graph clusters with exact or minimum degree constraints and soft-body repulsion","primaryConcept":"Network","secondaryConcept":"Clustering (spatial grouping, soft-body repulsion), Spatial (bounded wandering, position-based forces)","concepts":["network"]},{"day":9,"title":"Planar Graph Network","idea":"Wandering agents connected by a dynamically-computed planar graph structure with MST backbone and non-crossing extra edges","primaryConcept":"Network","secondaryConcept":"Spatial (geometric constraints, intersection testing), Statistical (random walk, Brownian motion)","concepts":["network"]},{"day":10,"title":"Audio-Reactive Agents","idea":"Microphone-driven particle swarm where loudness controls movement speed and chaos","primaryConcept":"Audio","secondaryConcept":"Network (proximity connections, dynamic topology), Spatial (particle positions, boundary constraints)","concepts":["audio"]},{"day":11,"title":"Ambient Clock","idea":"Fullscreen clock with typing animation overlaid on particle network background","primaryConcept":"Temporal","secondaryConcept":"Network (particle proximity connections), Spatial (particle positions and movement)","concepts":["temporal"]},{"day":12,"title":"Wind Field","idea":"Grid of particles displaced by multi-octave Perlin noise forming animated wind-like flows with embedded text","primaryConcept":"Spatial","secondaryConcept":"Statistical (Perlin noise, fractal processes), Visual (text masking, particle rendering)","concepts":["spatial"]},{"day":13,"title":"Image Flow Field","idea":"Upload images transformed into flowing particle fields using Perlin noise displacement","primaryConcept":"Visual","secondaryConcept":"Spatial (vector field displacement, grid-based layout), Statistical (Perlin noise, fractal processes)","concepts":["visual"]},{"day":14,"title":"Synchronizing Fireflies","idea":"Proximity-based phase synchronization where clustered agents pulse together and drift upward, isolated agents remain dim and sink","primaryConcept":"Temporal","secondaryConcept":"Clustering (proximity detection, emergent grouping), Spatial (drift forces, velocity-based motion)","concepts":["temporal"]},{"day":15,"title":"Binary Camera Grid","idea":"Real-time webcam feed converted to binary grid visualization with adjustable threshold and cell size","primaryConcept":"Visual","secondaryConcept":"Spatial (grid-based sampling, resolution control)","concepts":["visual"]},{"day":16,"title":"Hub-Spoke Force Network","idea":"Force-directed graph with designated hub nodes, shared vs exclusive agent connections, and draggable hub repositioning","primaryConcept":"Network","secondaryConcept":"Spatial (force-directed layout, collision physics)","concepts":["network"]},{"day":17,"title":"Audio-Reactive Force Network","idea":"Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength","primaryConcept":"Audio","secondaryConcept":"Network (graph topology, force-directed layout), Temporal (smooth transitions, EMA filtering)","concepts":["audio","network"]},{"day":18,"title":"Custom Cellular Automaton","idea":"Step-by-step cellular automaton with custom rules: birth on 3 neighbors, death on 5+ neighbors","primaryConcept":"Spatial","secondaryConcept":"Temporal (discrete generations, state evolution)","concepts":["spatial"]},{"day":19,"title":"Coworker Network (React)","idea":"Force-directed graph visualization of coworker relationships built with React and TypeScript","primaryConcept":"Network","secondaryConcept":"Spatial (force-directed layout)","concepts":["network"]},{"day":20,"title":"Schelling Segregation Model","idea":"Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns","primaryConcept":"Spatial","secondaryConcept":"Statistical (threshold-based decisions, emergent patterns), Temporal (iterative evolution)","concepts":["spatial","temporal"]},{"day":21,"title":"Agent Interaction Heatmap","idea":"Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns","primaryConcept":"Temporal","secondaryConcept":"Statistical (success rates, aggregate metrics), Network (agent-user relationships)","concepts":["temporal","network"]},{"day":22,"title":"Directed Network Graph","idea":"SVG-based force-directed graph with directional edges, rectangular nodes, and drag interaction","primaryConcept":"Network","secondaryConcept":"Spatial (force-directed layout, geometric calculations)","concepts":["network"]},{"day":23,"title":"Interactive Typography","idea":"\"Hello World\" text where each letter cycles through different fonts on hover and randomizes on click","primaryConcept":"Visual","secondaryConcept":"Temporal (state cycling, interaction response)","concepts":["visual"]},{"day":24,"title":"Rock Paper Scissors Simulation","idea":"Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates","primaryConcept":"Spatial","secondaryConcept":"Statistical (population dynamics, competitive exclusion), Temporal (simulation evolution)","concepts":["spatial","temporal"]},{"day":25,"title":"Spotlight Grid","idea":"Interactive dot grid where dots near mouse cursor illuminate with adjustable density and color","primaryConcept":"Spatial","secondaryConcept":"Visual (color variation, dynamic styling)","concepts":["spatial"]},{"day":26,"title":"Dynamic Widget Dashboard","idea":"Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays","primaryConcept":"Visual","secondaryConcept":"Temporal (moon phase cycles, agent usage over time), Network (agent interaction data)","concepts":["visual","network"]},{"day":27,"title":"Muse (Desktop Only)","idea":"Desktop-only interactive creative tool or playground with fly element","primaryConcept":"Spatial","secondaryConcept":"Temporal (animation, responsive behavior)","concepts":["spatial"]},{"day":28,"title":"Liquid Glass Effect","idea":"Draggable frosted glass pane with liquid distortion filter and customizable backdrop effects","primaryConcept":"Visual","secondaryConcept":"Spatial (drag interaction, element positioning)","concepts":["visual"]},{"day":29,"title":"100 Progress Indicators","idea":"Comprehensive collection of 100 unique loading/progress indicator animations organized by style categories","primaryConcept":"Visual","secondaryConcept":"Temporal (looping animations, timing variations)","concepts":["visual"]},{"day":30,"title":"Thinking States","idea":"Experimental iteration exploring \"thinking\" metaphor through animated loading indicators","primaryConcept":"Visual","secondaryConcept":"Temporal (processing states, cognitive timing)","concepts":["visual"]},{"day":31,"title":"CLI Material Palette","idea":"Comprehensive design reference documenting the fundamental visual and interactive materials of command-line interfaces","primaryConcept":"Visual","secondaryConcept":"Temporal (animation patterns, progress indicators), Interactive (UI patterns, state feedback)","concepts":["visual"]},{"day":32,"title":"Entropy Patterns","idea":"Visual taxonomy of creative work rhythms mapping cognitive load oscillations and thinking quality across different production modes","primaryConcept":"Temporal","secondaryConcept":"Statistical (pattern classification, mode taxonomy), Visual (curve representation, spatial mapping)","concepts":["temporal"]},{"day":33,"title":"Slit-Scan Camera","idea":"Webcam-based slit-scan photography tool that captures 30-second temporal slices with programmatic color effects and cinematic post-processing","primaryConcept":"Temporal","secondaryConcept":"Visual (image processing, color effects, slit-scan aesthetic), Spatial (column-based composition, vertical slicing)","concepts":["temporal"]},{"day":34,"title":"Particle Text Morph","idea":"Canvas particle system where text decomposes into particles controlled by stability slider (desktop only)","primaryConcept":"Visual","secondaryConcept":"Spatial (particle positions, text formation), Temporal (animation, transition states)","concepts":["visual"]},{"day":35,"title":"Flight Path Visualization","idea":"iPad-optimized flight tracking interface showing real-time route optimization with great circle paths and waypoint notifications","primaryConcept":"Spatial","secondaryConcept":"Temporal (flight progress, estimated times, duration), Network (waypoint connections, route optimization)","concepts":["spatial"]},{"day":37,"title":"Sentiment Analyzer","idea":"Real-time text sentiment analysis with industrial-themed visualization interface","primaryConcept":"Statistical","secondaryConcept":"Temporal (debounced input, real-time updates)","concepts":["statistical"]},{"day":38,"title":"Generative Baltic Pattern","idea":"Generative pattern generator creating Baltic folk art inspired geometric designs","primaryConcept":"Visual","secondaryConcept":"Spatial (pattern tiling, symmetry)","concepts":["visual"]},{"day":39,"title":"Wave Morph","idea":"Audio waveform morphing between different wave types (sine, triangle, square, sawtooth) with interactive slider","primaryConcept":"Audio","secondaryConcept":"Temporal (animation cycles, morphing transitions), Visual (waveform rendering)","concepts":["audio"]},{"day":40,"title":"Cube Grid Rules Engine","idea":"3D cube grid governed by customizable cellular automaton-like rules with parameter controls","primaryConcept":"Spatial","secondaryConcept":"Temporal (evolution steps, update cycles), Statistical (rule application, state transitions)","concepts":["spatial","temporal"]},{"day":41,"title":"Metaball","idea":"Interactive metaball physics simulation with mouse-driven particle attraction","primaryConcept":"Visual","secondaryConcept":"Spatial (particle positions, distance fields, surface computation)","concepts":["visual"]},{"day":42,"title":"Metaball Grid","idea":"Grid of multiple metaball sketches with responsive 4-column (desktop) / 2-column (mobile) layout","primaryConcept":"Visual","secondaryConcept":"Spatial (grid layout, responsive design)","concepts":["visual"]},{"day":43,"title":"Computational Minimalism Style Seed","idea":"Design system document defining visual language for creative coding sketches","primaryConcept":"Visual","secondaryConcept":"Conceptual (design philosophy, anti-patterns)","concepts":["visual"]},{"day":44,"title":"Whiff","idea":"Command-line tool that instantly visualizes JSON data as tables, line graphs, or bar charts in the browser","primaryConcept":"Temporal","secondaryConcept":"Network (WebSocket communication), Visual (data rendering)","concepts":["temporal"]},{"day":45,"title":"Gravity Pills","idea":"Physics simulation of pill-shaped objects with gravity, drag interaction, and collision dynamics","primaryConcept":"Spatial","secondaryConcept":"Temporal (continuous physics updates, drag interactions)","concepts":["spatial"]},{"day":46,"title":"OKLCH vs HSL Gradient Comparison","idea":"Side-by-side comparison of color gradients using OKLCH and HSL color spaces","primaryConcept":"Visual","secondaryConcept":"Statistical (perceptual uniformity, color metrics)","concepts":["visual"]},{"day":47,"title":"2GIF","idea":"Browser-based tool for converting screen recordings into polished, shareable gifs with styled backgrounds","primaryConcept":"Visual","secondaryConcept":"Temporal (timeline editing, trimming)","concepts":["visual"]},{"day":49,"title":"Grid Trace","idea":"Animated grid with path-tracing effects and typewriter text using Geist Pixel Square font","primaryConcept":"Spatial","secondaryConcept":"Temporal (animation paths, typewriter timing), Visual (dot patterns, line drawing)","concepts":["spatial"]},{"day":50,"title":"Execution Trace Graph","idea":"Visualization of code execution flow as interactive node graph with left panel showing execution context","primaryConcept":"Network","secondaryConcept":"Temporal (execution sequence, timing), Visual (code highlighting, graph layout)","concepts":["network","temporal"]},{"day":51,"title":"Resonant Lattice","idea":"Interactive spring-mass lattice showing energy propagation, resonance, and damping effects","primaryConcept":"Spatial","secondaryConcept":"Temporal (wave propagation, oscillation), Statistical (energy distribution, damping)","concepts":["spatial","statistical"]},{"day":52,"title":"Reaction-Diffusion (Gray-Scott)","idea":"Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions","primaryConcept":"Spatial","secondaryConcept":"Temporal (pattern evolution, reaction dynamics), Statistical (concentration gradients, equilibrium states)","concepts":["spatial","temporal"]},{"day":53,"title":"ASCII Animated Grid (Refined UI)","idea":"Character-based animation grid with five distinct modes: ripple, wave, rain, breath, and worm","primaryConcept":"Visual","secondaryConcept":"Temporal (animation loops, character cycling), Spatial (grid layout, pattern movement)","concepts":["visual"]},{"day":54,"title":"Concept Graph Visualization","idea":"Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts","primaryConcept":"Network & Graph","secondaryConcept":"Statistical (concept distribution analysis)","concepts":["network","statistical"]}]}).then(dataset => {
+                data = dataset;
+                // inject extra projects into data
+                EXTRA_PROJECTS.forEach(p => {
+                    data.projects.push({ day: p.day, title: p.title, idea: p.idea, concepts: p.concepts });
+                });
+                initGraph();
+                buildDayMap();
+
+                document.getElementById('info').textContent = 'Settling…';
+                for (let i = 0; i < 160; i++) simulate();
+                document.getElementById('info').textContent = '100 Days';
+
+                setTimeout(startTrail, 900);
+                animate();
+            })
+
+
+        // ── graph init ─────────────────────────────────────────────────────────
+        function initGraph() {
+            const conceptPos = {};
+
+            data.concepts.forEach((c, i) => {
+                const angle  = (i / data.concepts.length) * Math.PI * 2 - Math.PI / 2;
+                const radius = Math.min(canvas.width, canvas.height) * 0.21;
+                const x = canvas.width  / 2 + Math.cos(angle) * radius;
+                const y = canvas.height / 2 + Math.sin(angle) * radius;
+                conceptPos[c.id] = { x, y };
+
+                nodes.push({
+                    id: `concept-${c.id}`, label: c.label,
+                    x, y, vx: 0, vy: 0,
+                    type: 'concept', color: c.color, radius: 8, data: c
+                });
+            });
+
+            data.projects.forEach(p => {
+                const cp    = conceptPos[p.concepts[0]];
+                const angle = Math.random() * Math.PI * 2;
+                const dist  = 70 + Math.random() * 60;
+                nodes.push({
+                    id: `project-${p.day}`,
+                    label: String(p.day),
+                    title: p.title, idea: p.idea,
+                    x: cp.x + Math.cos(angle) * dist,
+                    y: cp.y + Math.sin(angle) * dist,
+                    vx: 0, vy: 0,
+                    type: 'project', concepts: p.concepts,
+                    radius: 3, data: p
+                });
+
+                p.concepts.forEach(cid => {
+                    edges.push({ source: `project-${p.day}`, target: `concept-${cid}` });
+                });
+            });
+        }
+
+        function buildDayMap() {
+            nodes.forEach(n => {
+                if (n.type === 'project') dayMap[n.data.day] = n;
+            });
+
+            // ghost entries for missing / future days
+            for (let day = 1; day <= 100; day++) {
+                if (!dayMap[day]) {
+                    const angle = (day / 100) * Math.PI * 2;
+                    const r     = 160 + (day > 62 ? 60 + Math.random() * 80 : 40 + Math.random() * 60);
+                    const g = {
+                        day, isGhost: true,
+                        x: canvas.width  / 2 + Math.cos(angle) * r,
+                        y: canvas.height / 2 + Math.sin(angle) * r
+                    };
+                    ghostEntries.push(g);
+                    dayMap[day] = g;
+                }
+            }
+        }
+
+        // ── trail ──────────────────────────────────────────────────────────────
+        function startTrail() {
+            trailProgress  = 0;
+            trailAnimating = true;
+            trailComplete  = false;
+            dayCounter.style.opacity = '1';
+        }
+
+        replayBtn.addEventListener('click', startTrail);
+
+        // colour along the temporal arc: indigo → teal → amber
+        function trailColor(day, alpha) {
+            const t = day / 100;
+            let r, g, b;
+            if (t < 0.5) {
+                const s = t * 2;
+                r = Math.round(80  + s * 20);
+                g = Math.round(100 + s * 100);
+                b = Math.round(220 - s * 60);
+            } else {
+                const s = (t - 0.5) * 2;
+                r = Math.round(100 + s * 155);
+                g = Math.round(200 - s * 60);
+                b = Math.round(160 - s * 110);
+            }
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+
+        // ── physics ────────────────────────────────────────────────────────────
+        function getDamping() {
+            if (simulationStep < 200) return 0.70 + 0.22 * (simulationStep / 200);
+            return 0.92;
+        }
+
+        function nodeById(id) { return nodes.find(n => n.id === id); }
+
+        function simulate() {
+            simulationStep++;
+            const d = getDamping();
+
+            edges.forEach(e => {
+                const s = nodeById(e.source), t = nodeById(e.target);
+                if (!s || !t) return;
+                const dx = t.x - s.x, dy = t.y - s.y;
+                const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                const f = (dist - SPRING_LENGTH) * SPRING_STRENGTH;
+                s.vx += dx/dist*f; s.vy += dy/dist*f;
+                t.vx -= dx/dist*f; t.vy -= dy/dist*f;
+            });
+
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i+1; j < nodes.length; j++) {
+                    const a = nodes[i], b = nodes[j];
+                    const dx = b.x-a.x, dy = b.y-a.y;
+                    const dist = Math.sqrt(dx*dx+dy*dy) || 1;
+                    const m = (a.type==='project'&&b.type==='project') ? 0.3 : 1;
+                    const f = REPULSION * m / (dist*dist);
+                    a.vx -= dx/dist*f; a.vy -= dy/dist*f;
+                    b.vx += dx/dist*f; b.vy += dy/dist*f;
+                }
+            }
+
+            nodes.forEach(n => {
+                if (n.type === 'concept') {
+                    n.vx += (canvas.width/2  - n.x) * CENTER_STRENGTH * 3;
+                    n.vy += (canvas.height/2 - n.y) * CENTER_STRENGTH * 3;
+                }
+                if (n !== draggedNode) {
+                    n.vx *= d; n.vy *= d;
+                    n.x  += n.vx; n.y += n.vy;
+                    const m = 50;
+                    n.x = Math.max(m, Math.min(canvas.width -m, n.x));
+                    n.y = Math.max(m, Math.min(canvas.height-m, n.y));
+                }
+            });
+        }
+
+        // ── render ─────────────────────────────────────────────────────────────
+        function render() {
+            ctx.fillStyle = '#070710';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // subtle background star-dust
+            ctx.fillStyle = 'rgba(255,255,255,0.018)';
+            // (pre-seeded static stars drawn once into offscreen — skip for simplicity)
+
+            // ── concept → project edges ──
+            ctx.strokeStyle = '#10101e';
+            ctx.lineWidth = 1;
+            edges.forEach(e => {
+                const s = nodeById(e.source), t = nodeById(e.target);
+                if (!s||!t) return;
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y);
+                ctx.lineTo(t.x, t.y);
+                ctx.stroke();
+            });
+
+            // highlight hovered concept connections
+            if (hoveredNode && hoveredNode.type === 'concept') {
+                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+                ctx.lineWidth = 1;
+                edges.forEach(e => {
+                    if (e.target !== hoveredNode.id) return;
+                    const s = nodeById(e.source);
+                    if (!s) return;
+                    ctx.beginPath();
+                    ctx.moveTo(s.x, s.y);
+                    ctx.lineTo(hoveredNode.x, hoveredNode.y);
+                    ctx.stroke();
+                });
+            }
+            if (hoveredNode && hoveredNode.type === 'project') {
+                ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+                ctx.lineWidth = 1;
+                hoveredNode.concepts.forEach(cid => {
+                    const t = nodeById(`concept-${cid}`);
+                    if (!t) return;
+                    ctx.beginPath();
+                    ctx.moveTo(hoveredNode.x, hoveredNode.y);
+                    ctx.lineTo(t.x, t.y);
+                    ctx.stroke();
+                });
+            }
+
+            // ── temporal trail ──
+            const maxDay = trailAnimating ? trailProgress : (trailComplete ? 100 : 0);
+
+            if (maxDay > 0) {
+                let prev = null;
+                for (let day = 1; day <= Math.floor(maxDay); day++) {
+                    const cur = dayMap[day];
+                    if (!cur) continue;
+                    if (prev) {
+                        const bothReal = !prev.isGhost && !cur.isGhost;
+                        const alpha    = bothReal ? 0.28 : 0.07;
+                        ctx.strokeStyle = trailColor(day, alpha);
+                        ctx.lineWidth   = bothReal ? 1 : 0.5;
+                        ctx.setLineDash(bothReal ? [] : [3, 7]);
+                        ctx.beginPath();
+                        ctx.moveTo(prev.x, prev.y);
+                        ctx.lineTo(cur.x,  cur.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                    prev = cur;
+                }
+
+                // animated pulse on current day
+                if (trailAnimating) {
+                    const curDay  = Math.max(1, Math.floor(trailProgress));
+                    const curNode = dayMap[curDay];
+                    if (curNode && !curNode.isGhost) {
+                        const frac = trailProgress % 1;
+                        const glow = ctx.createRadialGradient(
+                            curNode.x, curNode.y, 0,
+                            curNode.x, curNode.y, 18
+                        );
+                        glow.addColorStop(0,   trailColor(curDay, 0.5));
+                        glow.addColorStop(1,   'transparent');
+                        ctx.fillStyle = glow;
+                        ctx.beginPath();
+                        ctx.arc(curNode.x, curNode.y, 18, 0, Math.PI*2);
+                        ctx.fill();
+
+                        // hard dot
+                        ctx.fillStyle = trailColor(curDay, 0.9);
+                        ctx.beginPath();
+                        ctx.arc(curNode.x, curNode.y, 4 + 2*Math.sin(frac*Math.PI), 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // ── ghost nodes ──
+            ghostEntries.forEach(g => {
+                if (g.day > Math.floor(maxDay)) return;
+                const isHov = g === hoveredNode;
+                ctx.fillStyle = isHov ? 'rgba(120,120,160,0.5)' : 'rgba(80,80,110,0.15)';
+                ctx.beginPath();
+                ctx.arc(g.x, g.y, isHov ? 3 : 1.5, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            // ── concept nodes ──
+            nodes.forEach(n => {
+                if (n.type !== 'concept') return;
+                const isHov = n === hoveredNode;
+                if (isHov) {
+                    const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 28);
+                    glow.addColorStop(0, n.color + '44');
+                    glow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, 28, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = isHov ? n.color : n.color + 'aa';
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, isHov ? 10 : 8, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.fillStyle = '#444';
+                ctx.font = '10px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(n.label, n.x, n.y - 14);
+            });
+
+            // ── project nodes ──
+            nodes.forEach(n => {
+                if (n.type !== 'project') return;
+                // only reveal once trail reaches this day
+                if (trailAnimating && n.data.day > Math.floor(trailProgress)) return;
+
+                const isHov  = n === hoveredNode;
+                const isCon  = hoveredNode?.type === 'concept' && n.concepts.includes(hoveredNode.data?.id);
+                const isActive = isHov || isCon;
+
+                if (isActive) {
+                    // subtle glow
+                    const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 10);
+                    glow.addColorStop(0, 'rgba(255,255,255,0.15)');
+                    glow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, 10, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
+                ctx.fillStyle = isActive ? '#ddd' : '#444';
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, isHov ? 4.5 : 2.5, 0, Math.PI*2);
+                ctx.fill();
+
+                if (isHov) {
+                    ctx.fillStyle = '#555';
+                    ctx.font = '9px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`${n.data.day}`, n.x, n.y + 14);
+                }
+            });
+        }
+
+        // ── update trail + counter ─────────────────────────────────────────────
+        function updateTrail() {
+            if (!trailAnimating) return;
+            trailProgress += TRAIL_SPEED;
+
+            const cur = dayMap[Math.floor(trailProgress)];
+            if (cur) {
+                dayNum.textContent   = `Day ${Math.floor(trailProgress)}`;
+                dayTitle.textContent = cur.isGhost ? '—' : (cur.title || cur.data?.title || '');
+            }
+
+            if (trailProgress >= 100) {
+                trailProgress  = 100;
+                trailAnimating = false;
+                trailComplete  = true;
+                dayCounter.style.opacity = '0';
+            }
+        }
+
+        // ── animation loop ─────────────────────────────────────────────────────
+        function animate() {
+            simulate();
+            updateTrail();
+            render();
+            requestAnimationFrame(animate);
+        }
+
+        // ── mouse ──────────────────────────────────────────────────────────────
+        canvas.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            hoveredNode = null;
+            const allNodes = [...nodes, ...ghostEntries];
+            for (const n of allNodes) {
+                const dx   = mouse.x - n.x;
+                const dy   = mouse.y - n.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const hit  = n.type === 'concept' ? 14 : n.isGhost ? 8 : 10;
+                if (dist < hit) { hoveredNode = n; break; }
+            }
+
+            if (hoveredNode) {
+                tooltip.style.opacity = '1';
+                tooltip.style.left    = mouse.x + 16 + 'px';
+                tooltip.style.top     = mouse.y + 16 + 'px';
+
+                if (hoveredNode.type === 'concept') {
+                    const count = data.groups?.[hoveredNode.data.id]?.projects?.length ?? '—';
+                    tooltip.innerHTML = `
+                        <div class="title">${hoveredNode.label}</div>
+                        <div class="idea">${count} projects</div>`;
+                } else if (hoveredNode.isGhost) {
+                    tooltip.innerHTML = `
+                        <div class="title">Day ${hoveredNode.day}</div>
+                        <div class="ghost-label">not yet</div>`;
+                } else {
+                    const d = hoveredNode.data;
+                    tooltip.innerHTML = `
+                        <div class="title">Day ${d.day}: ${hoveredNode.title || d.title}</div>
+                        <div class="idea">${hoveredNode.idea || d.idea}</div>
+                        <div class="nav">click to open →</div>`;
+                }
+            } else {
+                tooltip.style.opacity = '0';
+            }
+
+            if (draggedNode && !draggedNode.isGhost) {
+                draggedNode.x  = mouse.x;
+                draggedNode.y  = mouse.y;
+                draggedNode.vx = 0;
+                draggedNode.vy = 0;
+            }
+
+            canvas.style.cursor =
+                hoveredNode?.type === 'project' ? 'pointer' :
+                hoveredNode ? 'grab' : 'default';
+        });
+
+        canvas.addEventListener('mousedown', () => {
+            if (hoveredNode) draggedNode = hoveredNode;
+        });
+        canvas.addEventListener('mouseup', () => { draggedNode = null; });
+
+        canvas.addEventListener('click', () => {
+            if (hoveredNode?.type === 'project') {
+                const folder = DAY_FOLDERS[hoveredNode.data.day];
+                if (folder) window.location.href = `../${folder}/index.html`;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

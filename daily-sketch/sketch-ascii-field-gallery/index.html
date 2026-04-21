@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII Field Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&display=swap">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { background: #0a0a0a; }
+
+    .gallery {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 1px;
+      background: #161616;
+    }
+
+    .cell {
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+
+    .cell canvas {
+      position: absolute;
+      inset: 0;
+    }
+
+    .cell-label {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #2a2a2a;
+      z-index: 2;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="gallery">
+  <div class="cell"><canvas id="f0"></canvas><span class="cell-label">I · wave</span></div>
+  <div class="cell"><canvas id="f1"></canvas><span class="cell-label">II · ripple</span></div>
+  <div class="cell"><canvas id="f2"></canvas><span class="cell-label">III · radial</span></div>
+  <div class="cell"><canvas id="f3"></canvas><span class="cell-label">IV · diagonal</span></div>
+  <div class="cell"><canvas id="f4"></canvas><span class="cell-label">V · interference</span></div>
+  <div class="cell"><canvas id="f5"></canvas><span class="cell-label">VI · pulse</span></div>
+  <div class="cell"><canvas id="f6"></canvas><span class="cell-label">VII · orbit</span></div>
+  <div class="cell"><canvas id="f7"></canvas><span class="cell-label">VIII · turbulence</span></div>
+</div>
+
+<script>
+  const GLYPHS = [' ', '·', '∙', '∘', '○', '◌', '◎', '⊙', '●'];
+  const N = GLYPHS.length - 1;
+
+  const VARIANTS = [
+    { color: '#7b6fa5', fn: (x, y, t) =>
+        (Math.sin(x * 0.13 + t) + Math.cos(y * 0.09 - t * 0.6) + 2) / 4 },
+
+    { color: '#9d91b0', fn: (x, y, t, cx, cy) => {
+        const d = Math.sqrt((x-cx)**2 + (y-cy)**2);
+        return (Math.sin(d * 0.4 - t * 2) + 1) / 2; }},
+
+    { color: '#7090c0', fn: (x, y, t, cx, cy) => {
+        const a = Math.atan2(y-cy, x-cx);
+        const d = Math.sqrt((x-cx)**2 + (y-cy)**2);
+        return (Math.sin(a * 3 + d * 0.2 - t * 1.5) + 1) / 2; }},
+
+    { color: '#7a7a8a', fn: (x, y, t) =>
+        (Math.sin((x+y) * 0.12 + t) + Math.sin((x-y) * 0.1 - t * 0.8) + 2) / 4 },
+
+    { color: '#7b6fa5', fn: (x, y, t) =>
+        (Math.sin(x*0.1+t) + Math.cos(y*0.12-t*0.7) + Math.sin((x+y)*0.05+t*0.5) + 3) / 6 },
+
+    { color: '#9d91b0', fn: (x, y, t, cx, cy) => {
+        const d = Math.sqrt((x-cx)**2 + (y-cy)**2);
+        return (Math.sin(d * 0.25 - t) * Math.cos(t * 0.4) + 1) / 2; }},
+
+    { color: '#7090c0', fn: (x, y, t) => {
+        const ax = Math.cos(t)*20, ay = Math.sin(t)*12;
+        const bx = Math.cos(t+Math.PI)*20, by = Math.sin(t+Math.PI)*12;
+        const da = Math.sqrt((x-ax)**2 + (y-ay)**2);
+        const db = Math.sqrt((x-bx)**2 + (y-by)**2);
+        return (Math.sin(da*0.3-t) + Math.sin(db*0.3-t) + 2) / 4; }},
+
+    { color: '#7a7a8a', fn: (x, y, t) =>
+        (Math.sin(x*0.07+t*1.1) * Math.cos(y*0.11-t*0.9) +
+         Math.sin(x*0.19-t*0.5) * Math.sin(y*0.13+t*0.7) + 2) / 4 },
+  ];
+
+  class Field {
+    constructor(canvas, variant, fontSize) {
+      this.cv  = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.variant = variant;
+      this.frame = 0;
+      this.lastT = 0;
+      this.fps   = 1000 / 20;
+      this.fontSize = fontSize;
+
+      this.cv.width  = canvas.parentElement.clientWidth;
+      this.cv.height = canvas.parentElement.clientHeight;
+
+      this.ctx.font = `300 ${fontSize}px "IBM Plex Mono"`;
+      this.charW = this.ctx.measureText('·').width;
+      this.charH = fontSize * 1.2;
+
+      this.cols = Math.ceil(this.cv.width  / this.charW) + 1;
+      this.rows = Math.ceil(this.cv.height / this.charH) + 1;
+      this.cx = this.cols / 2;
+      this.cy = this.rows / 2;
+
+      // pre-allocated typed array — no GC pressure per frame
+      this._vals = new Float32Array(this.cols * this.rows);
+
+      const r = parseInt(variant.color.slice(1,3),16);
+      const g = parseInt(variant.color.slice(3,5),16);
+      const b = parseInt(variant.color.slice(5,7),16);
+      this.rgb = `${r},${g},${b}`;
+    }
+
+    start() {
+      const tick = (t) => {
+        if (t - this.lastT > this.fps) {
+          this.render();
+          this.lastT = t;
+          this.frame++;
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    render() {
+      const ctx = this.ctx;
+      const t = this.frame * 0.025;
+      const vals = this._vals;
+
+      // phosphor fade
+      ctx.fillStyle = 'rgba(10,10,10,0.18)';
+      ctx.fillRect(0, 0, this.cv.width, this.cv.height);
+
+      ctx.font = `300 ${this.fontSize}px "IBM Plex Mono"`;
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = `rgb(${this.rgb})`;
+
+      // pre-compute all values — no allocations
+      for (let row = 0; row < this.rows; row++) {
+        for (let col = 0; col < this.cols; col++) {
+          vals[row * this.cols + col] = Math.max(0, Math.min(1,
+            this.variant.fn(col, row, t, this.cx, this.cy)));
+        }
+      }
+
+      // 4 alpha passes — globalAlpha set once per pass, not per character
+      // no shadowBlur — that was the main perf killer
+      const ALPHAS = [0.2, 0.45, 0.7, 1.0];
+      for (let p = 0; p < 4; p++) {
+        const vMin = p * 0.25;
+        const vMax = vMin + 0.25;
+        ctx.globalAlpha = ALPHAS[p];
+        for (let row = 0; row < this.rows; row++) {
+          for (let col = 0; col < this.cols; col++) {
+            const v = vals[row * this.cols + col];
+            if (v < vMin || v >= vMax) continue;
+            const glyph = GLYPHS[Math.round(v * N)];
+            if (glyph === ' ') continue;
+            ctx.fillText(glyph, col * this.charW, row * this.charH);
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  document.fonts.ready.then(() => {
+    const fontSize = Math.round(window.innerWidth / 4 * 0.045);
+    VARIANTS.forEach((v, i) => {
+      new Field(document.getElementById('f' + i), v, fontSize).start();
+    });
+  });
+</script>
+
+</body>
+</html>

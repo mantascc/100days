@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>curatorial agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #f5f5f7;
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            letter-spacing: 0.3px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .header {
+            margin-bottom: 48px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: #00ffaa;
+        }
+
+        .input-section {
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            font-size: 11px;
+            color: #a8aab8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: #f5f5f7;
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #00ffaa;
+        }
+
+        input[type="text"]::placeholder {
+            color: #666666;
+        }
+
+        .preset-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .chip {
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            color: #a8aab8;
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chip:hover {
+            border-color: #00ffaa;
+            color: #00ffaa;
+            background: rgba(0, 255, 170, 0.05);
+        }
+
+        .chip.active {
+            border-color: #00ffaa;
+            color: #00ffaa;
+            background: rgba(0, 255, 170, 0.1);
+        }
+
+        .recommendations-section {
+            margin-top: 48px;
+        }
+
+        .recommendations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 12px;
+        }
+
+        .recommendations-header h2 {
+            font-size: 12px;
+            font-weight: 400;
+            color: #a8aab8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .result-count {
+            font-size: 11px;
+            color: #666666;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .recommendation-card {
+            border: 1px solid #2a2a2a;
+            padding: 20px;
+            background: #0a0a0a;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .recommendation-card:hover {
+            border-color: #00ffaa;
+            background: rgba(0, 255, 170, 0.02);
+        }
+
+        .card-header {
+            margin-bottom: 16px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 12px;
+        }
+
+        .card-id {
+            font-size: 13px;
+            font-weight: 500;
+            color: #00ffaa;
+            margin-bottom: 4px;
+        }
+
+        .card-description {
+            font-size: 11px;
+            color: #a8aab8;
+            line-height: 1.6;
+        }
+
+        .card-relevance {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #666666;
+            background: rgba(0, 255, 170, 0.05);
+            padding: 2px 6px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .spider-chart {
+            flex-shrink: 0;
+        }
+
+        .axes-bars {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .axis-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .axis-label {
+            width: 100px;
+            font-size: 10px;
+            color: #a8aab8;
+            text-transform: lowercase;
+        }
+
+        .axis-fill {
+            flex: 1;
+            height: 4px;
+            background: #2a2a2a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .axis-value {
+            height: 100%;
+            background: #00ffaa;
+            transition: width 0.3s ease;
+        }
+
+        .axis-number {
+            width: 30px;
+            text-align: right;
+            font-size: 9px;
+            color: #666666;
+        }
+
+        .categorical-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            font-size: 9px;
+            padding: 3px 6px;
+            background: rgba(255, 85, 127, 0.1);
+            border: 1px solid #2a2a2a;
+            color: #a8aab8;
+            text-transform: lowercase;
+        }
+
+        .rationale {
+            background: rgba(0, 255, 170, 0.05);
+            border: 1px solid #2a2a2a;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 11px;
+            color: #a8aab8;
+            line-height: 1.6;
+        }
+
+        .take-change {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .take-section, .change-section {
+            font-size: 10px;
+            padding: 8px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .take-section {
+            background: rgba(0, 200, 100, 0.08);
+            border-color: #2a2a2a;
+        }
+
+        .change-section {
+            background: rgba(255, 100, 100, 0.08);
+            border-color: #2a2a2a;
+        }
+
+        .section-title {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666666;
+            margin-bottom: 6px;
+        }
+
+        .take-section .section-title {
+            color: #00aa77;
+        }
+
+        .change-section .section-title {
+            color: #ff5577;
+        }
+
+        .section-content {
+            font-size: 10px;
+            color: #a8aab8;
+            line-height: 1.4;
+        }
+
+        .footer {
+            border-top: 1px solid #2a2a2a;
+            padding-top: 24px;
+            margin-top: 48px;
+        }
+
+        .taste-profile {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .taste-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #a8aab8;
+            margin-bottom: 12px;
+        }
+
+        .taste-axes {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .taste-axis {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+        }
+
+        .taste-label {
+            width: 120px;
+            color: #666666;
+            text-transform: lowercase;
+        }
+
+        .taste-bar {
+            flex: 1;
+            height: 3px;
+            background: #2a2a2a;
+            position: relative;
+        }
+
+        .taste-fill {
+            height: 100%;
+            background: #00ffaa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666666;
+            font-size: 12px;
+        }
+
+        .empty-state p {
+            margin-bottom: 12px;
+        }
+
+        .empty-state .hint {
+            font-size: 11px;
+            color: #666666;
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666666;
+            font-size: 11px;
+        }
+
+        @media (max-width: 768px) {
+            .recommendations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .take-change {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>curatorial agent</h1>
+            <p style="color: #666666; font-size: 11px; margin-top: 8px;">
+                describe what you want to make. find unexpected starting points from your aesthetic genome.
+            </p>
+        </div>
+
+        <div class="input-section">
+            <label class="input-label">what are you thinking of building?</label>
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="queryInput"
+                    placeholder="e.g., something quiet with glyphs, or physics-based interaction, or ascii mood..."
+                    autocomplete="off"
+                >
+            </div>
+            <div class="preset-chips">
+                <button class="chip" data-preset="quiet">something quiet</button>
+                <button class="chip" data-preset="density">maximum density</button>
+                <button class="chip" data-preset="interaction">needs interaction</button>
+                <button class="chip" data-preset="ascii">ascii territory</button>
+                <button class="chip" data-preset="physics">physics playground</button>
+                <button class="chip" data-preset="data">data as material</button>
+                <button class="chip" data-preset="surprise">surprise me</button>
+            </div>
+        </div>
+
+        <div class="recommendations-section" id="recommendationsSection" style="display: none;">
+            <div class="recommendations-header">
+                <h2>recommendations</h2>
+                <div class="result-count">
+                    <span id="resultCount">0</span> project<span id="pluralS">s</span>
+                </div>
+            </div>
+            <div class="recommendations-grid" id="recommendationsGrid"></div>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <p>start typing or pick a preset to explore your aesthetic genome</p>
+            <div class="hint">
+                try describing mood, constraints, materials, or references
+            </div>
+        </div>
+
+        <div class="footer" id="footerSection" style="display: none;">
+            <div class="taste-profile">
+                <div>
+                    <h3>your continuous taste</h3>
+                    <div class="taste-axes" id="continuousAxes"></div>
+                </div>
+                <div>
+                    <h3>material & mode preferences</h3>
+                    <div id="categoricalPrefs" style="font-size: 11px; color: #a8aab8; line-height: 1.8;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // STATE & LOADING
+        // ============================================================================
+        let genomeData = null;
+        let currentQuery = '';
+        let currentMode = '';
+
+        async function loadGenome() {
+            try {
+                const response = await fetch('./genome-proposed.json');
+                if (!response.ok) throw new Error('Failed to load genome');
+                genomeData = await response.json();
+                console.log(`loaded ${genomeData.project_count} projects`);
+            } catch (error) {
+                console.error('error loading genome:', error);
+                document.getElementById('emptyState').innerHTML =
+                    '<p style="color: #ff5577;">failed to load aesthetic genome</p>';
+            }
+        }
+
+        // ============================================================================
+        // SEMANTIC MAPPING: Query → Genome Vector
+        // ============================================================================
+        const semanticMap = {
+            // Continuous axis keywords
+            'quiet': { density: -0.3, palette_restraint: 0.3 },
+            'calm': { density: -0.25, motion_character: -0.2 },
+            'minimal': { density: -0.3, complexity: -0.3, palette_restraint: 0.3 },
+            'dense': { density: 0.4 },
+            'maximum density': { density: 0.5 },
+            'busy': { density: 0.3, complexity: 0.2 },
+            'interaction': { agency: 0.3 },
+            'interactive': { agency: 0.35 },
+            'responsive': { agency: 0.25 },
+            'chaotic': { determinism: -0.3, agency: 0.2 },
+            'random': { determinism: -0.25 },
+            'ordered': { determinism: 0.3, legibility: 0.2 },
+            'complex': { complexity: 0.3 },
+            'intricate': { complexity: 0.35 },
+            'simple': { complexity: -0.3, legibility: 0.2 },
+            'clear': { legibility: 0.3 },
+            'readable': { legibility: 0.25 },
+            'legible': { legibility: 0.3 },
+            'obscure': { legibility: -0.3 },
+            'physical': { physicality: 0.3 },
+            'physics': { physicality: 0.35 },
+            'constrained': { palette_restraint: 0.3 },
+            'restrained': { palette_restraint: 0.35 },
+            'bold': { palette_restraint: -0.3 },
+            'colorful': { palette_restraint: -0.25 },
+            'motion': { motion_character: 0.3 },
+            'animated': { motion_character: 0.25 },
+            'static': { motion_character: -0.3 },
+            'still': { motion_character: -0.35 },
+
+            // Categorical keywords
+            'ascii': { material: 'glyph', density: -0.1 },
+            'glyph': { material: 'glyph', legibility: 0.2 },
+            'canvas': { material: 'pixel', rendering: 'canvas' },
+            'pixel': { material: 'pixel' },
+            'dom': { material: 'dom', legibility: 0.1 },
+            'html': { material: 'dom' },
+            'svg': { material: 'svg' },
+            'audio': { material: 'audio' },
+            'sound': { material: 'audio' },
+            'loop': { temporal_mode: 'loop', motion_character: 0.1 },
+            'evolve': { temporal_mode: 'evolve', agency: 0.2 },
+            'static': { temporal_mode: 'static', motion_character: -0.3 },
+            'data': { referent: 'data-mapped' },
+            'generative': { referent: 'generative', agency: 0.1 },
+            'abstract': { referent: 'abstract' },
+            'educational': { referent: 'educational', legibility: 0.2 },
+            'decorative': { referent: 'decorative' },
+            'macro': { scale: 'macro' },
+            'micro': { scale: 'micro', complexity: 0.2 },
+            'multi': { scale: 'multi', complexity: 0.1 },
+        };
+
+        const presetQueries = {
+            quiet: {
+                vector: { density: -0.4, palette_restraint: 0.35, motion_character: -0.3, complexity: -0.25 },
+                description: 'something quiet'
+            },
+            density: {
+                vector: { density: 0.5, complexity: 0.3 },
+                description: 'maximum density'
+            },
+            interaction: {
+                vector: { agency: 0.4, determinism: -0.2 },
+                description: 'needs interaction'
+            },
+            ascii: {
+                vector: { material: 'glyph', legibility: 0.2, density: -0.1 },
+                description: 'ascii territory'
+            },
+            physics: {
+                vector: { physicality: 0.4, motion_character: 0.3 },
+                description: 'physics playground'
+            },
+            data: {
+                vector: { referent: 'data-mapped', legibility: 0.15, complexity: 0.2 },
+                description: 'data as material'
+            },
+            surprise: {
+                vector: null,
+                description: 'surprise me'
+            }
+        };
+
+        function parseQuery(text) {
+            if (!text.trim()) return null;
+
+            const vector = {
+                density: 0,
+                agency: 0,
+                legibility: 0,
+                determinism: 0,
+                complexity: 0,
+                physicality: 0,
+                palette_restraint: 0,
+                motion_character: 0
+            };
+
+            const categorical = {
+                material: null,
+                temporal_mode: null,
+                referent: null,
+                scale: null
+            };
+
+            const lowerText = text.toLowerCase();
+
+            // Check for project references: "like 49-grid-trace"
+            const projectRef = lowerText.match(/like\s+([a-z0-9\-]+)/);
+            if (projectRef && genomeData) {
+                const refId = projectRef[1];
+                const refProject = genomeData.genomes.find(p => p.id.includes(refId) || p.id === refId);
+                if (refProject) {
+                    Object.assign(vector, refProject.continuous);
+                    Object.assign(categorical, refProject.categorical);
+                }
+            }
+
+            // Apply semantic keywords
+            Object.entries(semanticMap).forEach(([keyword, signals]) => {
+                if (lowerText.includes(keyword)) {
+                    Object.entries(signals).forEach(([key, value]) => {
+                        if (key in vector) {
+                            vector[key] += value;
+                        } else if (key in categorical && value) {
+                            categorical[key] = value;
+                        }
+                    });
+                }
+            });
+
+            // Clamp continuous values to [-1, 1]
+            Object.keys(vector).forEach(key => {
+                vector[key] = Math.max(-1, Math.min(1, vector[key]));
+            });
+
+            return { continuous: vector, categorical };
+        }
+
+        function getProjectVector(project) {
+            return project.continuous;
+        }
+
+        function cosineSimilarity(v1, v2) {
+            const keys = Object.keys(v1);
+            let dotProduct = 0;
+            let mag1 = 0;
+            let mag2 = 0;
+
+            keys.forEach(key => {
+                dotProduct += v1[key] * v2[key];
+                mag1 += v1[key] * v1[key];
+                mag2 += v2[key] * v2[key];
+            });
+
+            mag1 = Math.sqrt(mag1);
+            mag2 = Math.sqrt(mag2);
+
+            if (mag1 === 0 || mag2 === 0) return 0;
+            return dotProduct / (mag1 * mag2);
+        }
+
+        function computeVariance(projects) {
+            const mean = {};
+            const axes = Object.keys(projects[0].continuous);
+
+            // Compute mean
+            axes.forEach(axis => {
+                mean[axis] = projects.reduce((sum, p) => sum + p.continuous[axis], 0) / projects.length;
+            });
+
+            // Compute variance
+            const variance = {};
+            axes.forEach(axis => {
+                variance[axis] = projects.reduce((sum, p) => {
+                    const diff = p.continuous[axis] - mean[axis];
+                    return sum + diff * diff;
+                }, 0) / projects.length;
+            });
+
+            return { variance, mean };
+        }
+
+        function findSurpriseProjects(projects, count = 5) {
+            const { variance, mean } = computeVariance(projects);
+
+            // Score each project by how outlier it is
+            const scored = projects.map(project => {
+                let outlierScore = 0;
+                Object.keys(variance).forEach(axis => {
+                    const diff = Math.abs(project.continuous[axis] - mean[axis]);
+                    outlierScore += (diff * diff) / (variance[axis] || 0.01);
+                });
+                return { project, score: outlierScore };
+            });
+
+            return scored
+                .sort((a, b) => b.score - a.score)
+                .slice(0, count)
+                .map(s => s.project);
+        }
+
+        function rankProjects(query, projects, count = 5) {
+            // Special case: surprise me
+            if (currentMode === 'surprise') {
+                const surprises = findSurpriseProjects(projects, count);
+                return surprises.map((p, i) => ({
+                    project: p,
+                    score: 1 - i * 0.15,
+                    reason: 'outlier in your taste — unexpected territory'
+                }));
+            }
+
+            if (!query) return [];
+
+            const targetVector = query.continuous;
+            const scored = projects.map(project => {
+                const similarity = cosineSimilarity(targetVector, project.continuous);
+                return {
+                    project,
+                    score: similarity,
+                    reason: null
+                };
+            });
+
+            return scored
+                .sort((a, b) => b.score - a.score)
+                .slice(0, count)
+                .map((item, i) => ({
+                    ...item,
+                    reason: `${(item.score * 100).toFixed(0)}% aligned with your direction`
+                }));
+        }
+
+        function computeTasteProfile(projects) {
+            const axes = ['density', 'agency', 'legibility', 'determinism', 'complexity', 'physicality', 'palette_restraint', 'motion_character'];
+            const means = {};
+
+            axes.forEach(axis => {
+                means[axis] = projects.reduce((sum, p) => sum + p.continuous[axis], 0) / projects.length;
+            });
+
+            return means;
+        }
+
+        // ============================================================================
+        // RENDERING
+        // ============================================================================
+        function renderSpiderChart(vector, size = 100) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const axes = ['density', 'agency', 'legibility', 'determinism', 'complexity', 'physicality', 'palette_restraint', 'motion_character'];
+            const numAxes = axes.length;
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const maxRadius = size / 2 - 8;
+
+            ctx.strokeStyle = '#2a2a2a';
+            ctx.lineWidth = 0.5;
+            ctx.fillStyle = 'rgba(0, 255, 170, 0.15)';
+
+            // Draw axes
+            for (let i = 0; i < numAxes; i++) {
+                const angle = (i / numAxes) * Math.PI * 2 - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * maxRadius;
+                const y = centerY + Math.sin(angle) * maxRadius;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+
+            // Draw grid circles
+            for (let r = 0.25; r <= 1; r += 0.25) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#2a2a2a';
+                for (let i = 0; i < numAxes; i++) {
+                    const angle = (i / numAxes) * Math.PI * 2 - Math.PI / 2;
+                    const x = centerX + Math.cos(angle) * (maxRadius * r);
+                    const y = centerY + Math.sin(angle) * (maxRadius * r);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            // Draw data polygon
+            ctx.strokeStyle = '#00ffaa';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            for (let i = 0; i < numAxes; i++) {
+                const value = (vector[axes[i]] || 0 + 1) / 2; // Normalize to [0, 1]
+                const angle = (i / numAxes) * Math.PI * 2 - Math.PI / 2;
+                const r = maxRadius * Math.max(0, Math.min(1, value));
+                const x = centerX + Math.cos(angle) * r;
+                const y = centerY + Math.sin(angle) * r;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            return canvas;
+        }
+
+        function renderRecommendation(ranked) {
+            const { project, score, reason } = ranked;
+            const card = document.createElement('div');
+            card.className = 'recommendation-card';
+
+            const percentile = Math.round(score * 100);
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            header.innerHTML = `
+                <div class="card-id">${project.id}</div>
+                <div class="card-description">${project.description}</div>
+                <div class="card-relevance">${percentile}% aligned</div>
+            `;
+            card.appendChild(header);
+
+            // Chart & Axes
+            const chartContainer = document.createElement('div');
+            chartContainer.className = 'chart-container';
+
+            const spiderCanvas = renderSpiderChart(project.continuous);
+            const spiderWrap = document.createElement('div');
+            spiderWrap.className = 'spider-chart';
+            spiderWrap.appendChild(spiderCanvas);
+            chartContainer.appendChild(spiderWrap);
+
+            // Axes bars
+            const axesContainer = document.createElement('div');
+            axesContainer.className = 'axes-bars';
+
+            ['density', 'agency', 'legibility', 'determinism'].forEach(axis => {
+                const value = (project.continuous[axis] + 1) / 2 * 100;
+                axesContainer.innerHTML += `
+                    <div class="axis-bar">
+                        <div class="axis-label">${axis}</div>
+                        <div class="axis-fill">
+                            <div class="axis-value" style="width: ${value}%"></div>
+                        </div>
+                        <div class="axis-number">${(project.continuous[axis]).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            chartContainer.appendChild(axesContainer);
+            card.appendChild(chartContainer);
+
+            // Categorical tags
+            const tags = document.createElement('div');
+            tags.className = 'categorical-tags';
+            const cat = project.categorical;
+            if (cat.material) tags.innerHTML += `<div class="tag">material: ${cat.material}</div>`;
+            if (cat.temporal_mode) tags.innerHTML += `<div class="tag">mode: ${cat.temporal_mode}</div>`;
+            if (cat.referent) tags.innerHTML += `<div class="tag">ref: ${cat.referent}</div>`;
+            if (cat.scale) tags.innerHTML += `<div class="tag">scale: ${cat.scale}</div>`;
+            card.appendChild(tags);
+
+            // Rationale
+            const rationale = document.createElement('div');
+            rationale.className = 'rationale';
+            rationale.innerHTML = `start here because: <strong>${reason}</strong>`;
+            card.appendChild(rationale);
+
+            // Take / Change recommendations
+            const takeChange = document.createElement('div');
+            takeChange.className = 'take-change';
+
+            const takeSection = document.createElement('div');
+            takeSection.className = 'take-section';
+            takeSection.innerHTML = `
+                <div class="section-title">take</div>
+                <div class="section-content">
+                    ${generateTakeAdvice(project)}
+                </div>
+            `;
+
+            const changeSection = document.createElement('div');
+            changeSection.className = 'change-section';
+            changeSection.innerHTML = `
+                <div class="section-title">change</div>
+                <div class="section-content">
+                    ${generateChangeAdvice(project)}
+                </div>
+            `;
+
+            takeChange.appendChild(takeSection);
+            takeChange.appendChild(changeSection);
+            card.appendChild(takeChange);
+
+            return card;
+        }
+
+        function generateTakeAdvice(project) {
+            const strengths = [];
+            const cont = project.continuous;
+
+            if (cont.palette_restraint > 0.7) strengths.push('palette discipline');
+            if (cont.legibility > 0.6) strengths.push('clarity');
+            if (cont.agency > 0.6) strengths.push('responsiveness');
+            if (cont.physicality > 0.5) strengths.push('physics');
+            if (cont.determinism > 0.7) strengths.push('precision');
+            if (cont.motion_character > 0.6) strengths.push('motion character');
+
+            const material = project.categorical.material;
+            if (material) strengths.push(`${material} technique`);
+
+            return strengths.length > 0 ? strengths.join(', ') : 'overall structure';
+        }
+
+        function generateChangeAdvice(project) {
+            const changes = [];
+            const cont = project.continuous;
+
+            if (cont.density > 0.6) changes.push('reduce density');
+            if (cont.density < 0.3) changes.push('add complexity');
+            if (cont.palette_restraint < 0.3) changes.push('tighten palette');
+            if (cont.legibility < 0.3) changes.push('increase clarity');
+            if (cont.motion_character < 0.2) changes.push('add motion');
+            if (cont.agency < 0.2) changes.push('add interaction');
+
+            return changes.length > 0 ? changes.join(', ') : 'unexpected pairing';
+        }
+
+        function renderTasteProfile(projects) {
+            const profile = computeTasteProfile(projects);
+            const continuous = document.getElementById('continuousAxes');
+
+            continuous.innerHTML = '';
+            Object.entries(profile).forEach(([axis, value]) => {
+                const pct = ((value + 1) / 2) * 100;
+                continuous.innerHTML += `
+                    <div class="taste-axis">
+                        <div class="taste-label">${axis}</div>
+                        <div class="taste-bar">
+                            <div class="taste-fill" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const categorical = document.getElementById('categoricalPrefs');
+            const allProjects = genomeData.genomes;
+            const materials = {};
+            const modes = {};
+            const referents = {};
+
+            allProjects.forEach(p => {
+                if (p.categorical.material) {
+                    materials[p.categorical.material] = (materials[p.categorical.material] || 0) + 1;
+                }
+                if (p.categorical.temporal_mode) {
+                    modes[p.categorical.temporal_mode] = (modes[p.categorical.temporal_mode] || 0) + 1;
+                }
+                if (p.categorical.referent) {
+                    referents[p.categorical.referent] = (referents[p.categorical.referent] || 0) + 1;
+                }
+            });
+
+            const sortedMaterials = Object.entries(materials).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            categorical.innerHTML = `
+                <div><strong>materials:</strong> ${sortedMaterials.map(([m]) => m).join(', ')}</div>
+                <div style="margin-top: 8px;"><strong>modes:</strong> ${Object.keys(modes).join(', ')}</div>
+                <div style="margin-top: 8px;"><strong>scope:</strong> ${Object.entries(referents).map(([r]) => r).join(', ')}</div>
+            `;
+        }
+
+        function updateRecommendations(query, mode = '') {
+            if (!genomeData) return;
+
+            currentQuery = query;
+            currentMode = mode;
+
+            if (!query && mode !== 'surprise') {
+                document.getElementById('recommendationsSection').style.display = 'none';
+                document.getElementById('footerSection').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            const parsedQuery = query ? parseQuery(query) : (mode === 'surprise' ? { continuous: {}, categorical: {} } : null);
+            const ranked = rankProjects(parsedQuery, genomeData.genomes, 5);
+
+            if (ranked.length === 0) {
+                document.getElementById('recommendationsSection').style.display = 'none';
+                return;
+            }
+
+            const grid = document.getElementById('recommendationsGrid');
+            grid.innerHTML = '';
+            ranked.forEach(r => {
+                grid.appendChild(renderRecommendation(r));
+            });
+
+            document.getElementById('resultCount').textContent = ranked.length;
+            document.getElementById('pluralS').textContent = ranked.length === 1 ? '' : 's';
+            document.getElementById('recommendationsSection').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+
+            // Render taste profile
+            renderTasteProfile(genomeData.genomes);
+            document.getElementById('footerSection').style.display = 'block';
+        }
+
+        // ============================================================================
+        // EVENT LISTENERS
+        // ============================================================================
+        document.getElementById('queryInput').addEventListener('input', (e) => {
+            updateRecommendations(e.target.value, '');
+        });
+
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const preset = chip.dataset.preset;
+                const presetData = presetQueries[preset];
+
+                if (preset === 'surprise') {
+                    document.getElementById('queryInput').value = presetData.description;
+                    updateRecommendations('', 'surprise');
+                } else {
+                    document.getElementById('queryInput').value = presetData.description;
+                    updateRecommendations(presetData.description, preset);
+                }
+
+                // Highlight active chip
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        });
+
+        // ============================================================================
+        // INIT
+        // ============================================================================
+        window.addEventListener('load', () => {
+            loadGenome();
+        });
+    </script>
+</body>
+</html>

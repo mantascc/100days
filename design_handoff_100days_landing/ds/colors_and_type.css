@@ -1,0 +1,236 @@
+/* =========================================================================
+   Clear Channel Design System — Colors & Type
+   Dark-canvas, monospace-first. Derived from mantascc/100days visual language.
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ------------------------------------------------------------------
+     NEUTRALS — a 10-step ramp, signature `#0a0a0a` is canvas.
+     Not pure black. A hair warmer. Every surface comes from this ramp.
+     ------------------------------------------------------------------ */
+  --bg-0:      #0a0a0a;   /* canvas */
+  --bg-1:      #0f0f0f;   /* cards, demo boxes, elevated fields */
+  --bg-2:      #111;      /* floating tooltips */
+  --bg-3:      #1a1a1a;   /* table headers */
+  --bg-4:      #1e1e1e;   /* output/terminal panes */
+
+  --line-1:    #222;      /* default hairline border */
+  --line-2:    #333;      /* border hover / scrollbar active */
+  --line-3:    #444;      /* border focus / emphasized */
+
+  --fg-5:      #444;      /* li::before dash, tertiary ink */
+  --fg-4:      #666;      /* links default, tab inactive */
+  --fg-3:      #888;      /* body secondary */
+  --fg-2:      #999;      /* headings h3, link hover */
+  --fg-1:      #ccc;      /* code ink, emphasized body */
+  --fg-0:      #fff;      /* primary, headlines, CTA-ink */
+
+  /* Alternate canvas (used in some experiments) */
+  --bg-alt:    #0f0f12;   /* warmer-violet tinted dark */
+  --bg-light:  #ffffff;   /* light-mode canvas (Liquid Glass, Muse) */
+
+  /* ------------------------------------------------------------------
+     SEMANTIC — from the CLI palette experiment. ANSI-adjacent.
+     Use SPARINGLY: status cues, diffs, syntax. Never brand color.
+     ------------------------------------------------------------------ */
+  --sem-success:  #3fb950;   /* ✓ success / diff-add */
+  --sem-error:    #f85149;   /* ✗ error / diff-del */
+  --sem-warn:     #d29922;   /* ⚠ warn */
+  --sem-info:     #58a6ff;   /* ℹ info / link-accent in dark mode */
+  --sem-special:  #bc8cff;   /* highlight / magenta special */
+  --sem-meta:     #39c5cf;   /* cyan metadata */
+
+  /* ------------------------------------------------------------------
+     TYPE FAMILIES
+     ------------------------------------------------------------------ */
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Cascadia Code', ui-monospace, monospace;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-sys: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+
+  /* ------------------------------------------------------------------
+     TYPE SCALE — numbers pulled directly from the corpus.
+     ------------------------------------------------------------------ */
+  --fz-display: 64px;    /* hero serif (genart-cards) */
+  --fz-hero:    48px;    /* scene overlay serif */
+  --fz-h1:      32px;    /* page title */
+  --fz-h2:      20px;    /* section title */
+  --fz-h3:      16px;    /* subsection */
+  --fz-body:    14px;    /* body */
+  --fz-micro:   12px;    /* code, nav, labels */
+  --fz-mini:    11px;    /* intro, meta */
+  --fz-tiny:    10px;    /* axis labels, table cells */
+
+  --lh-tight:   1.4;
+  --lh-body:    1.6;
+  --lh-loose:   1.7;
+
+  --ls-display: -0.02em; /* tighten at large sizes */
+  --ls-h2:      -0.01em;
+  --ls-label:    0.02em; /* loosen at tiny uppercase */
+  --ls-caps:     0.5px;  /* uppercase micro labels */
+
+  /* ------------------------------------------------------------------
+     SPACING — 8px-grid rhythm, used across the corpus.
+     ------------------------------------------------------------------ */
+  --space-0:   0;
+  --space-1:   0.25rem;  /* 4  */
+  --space-2:   0.5rem;   /* 8  */
+  --space-3:   0.75rem;  /* 12 */
+  --space-4:   1rem;     /* 16 */
+  --space-5:   1.5rem;   /* 24 */
+  --space-6:   2rem;     /* 32 */
+  --space-7:   3rem;     /* 48 */
+  --space-8:   4rem;     /* 64 */
+
+  /* ------------------------------------------------------------------
+     RADII — mostly square. When rounded, small and purposeful.
+     ------------------------------------------------------------------ */
+  --radius-0:   0;
+  --radius-xs:  4px;
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-pill: 999px;
+
+  /* ------------------------------------------------------------------
+     ELEVATION — flat by default. Shadows only for floating UI.
+     ------------------------------------------------------------------ */
+  --shadow-0: none;
+  --shadow-float:  0 6px 18px rgba(0,0,0,.35);
+  --shadow-lift:   0 20px 60px rgba(0,0,0,.30);
+  --shadow-inner-top: inset 0 1px 0 rgba(255,255,255,.30);
+
+  /* ------------------------------------------------------------------
+     LAYOUT — single column, 680 max, generous padding.
+     ------------------------------------------------------------------ */
+  --content-max: 680px;
+  --page-padding-y: var(--space-8);
+  --page-padding-x: var(--space-6);
+
+  /* ------------------------------------------------------------------
+     MOTION
+     ------------------------------------------------------------------ */
+  --dur-fast:   0.2s;
+  --dur-mid:    0.3s;
+  --ease-default: ease;
+  --ease-in:    ease-in;
+  --ease-out:   ease-out;
+}
+
+/* =========================================================================
+   SEMANTIC ELEMENT STYLES
+   Apply by tag OR by utility class. Opt-in: add `.sys` to a root container
+   if you want these to cascade without global pollution.
+   ========================================================================= */
+
+.sys, .sys * { box-sizing: border-box; }
+
+.sys {
+  background: var(--bg-0);
+  color: var(--fg-0);
+  font-family: var(--font-mono);
+  font-size: var(--fz-body);
+  line-height: var(--lh-body);
+}
+
+.sys h1, .h1 {
+  font-family: var(--font-mono);
+  font-size: var(--fz-h1);
+  font-weight: 400;
+  letter-spacing: var(--ls-display);
+  margin-bottom: var(--space-4);
+}
+
+.sys h2, .h2 {
+  font-family: var(--font-mono);
+  font-size: var(--fz-h2);
+  font-weight: 500;
+  letter-spacing: var(--ls-h2);
+  margin: var(--space-7) 0 var(--space-5);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line-1);
+}
+
+.sys h3, .h3 {
+  font-family: var(--font-mono);
+  font-size: var(--fz-h3);
+  font-weight: 500;
+  color: var(--fg-2);
+  letter-spacing: var(--ls-label);
+  margin: var(--space-6) 0 var(--space-4);
+}
+
+.sys p, .body {
+  font-size: var(--fz-body);
+  color: var(--fg-2);
+  margin-bottom: var(--space-4);
+}
+
+/* The signature "display" title — Instrument Serif on dark */
+.display {
+  font-family: var(--font-serif);
+  font-size: var(--fz-display);
+  font-weight: 400;
+  color: var(--fg-0);
+  letter-spacing: var(--ls-display);
+  line-height: 1.05;
+}
+.display-sm { font-family: var(--font-serif); font-size: var(--fz-hero); font-weight: 400; letter-spacing: var(--ls-display); }
+
+/* Micro labels — uppercase caps with tracking */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fz-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--fg-3);
+  opacity: 0.7;
+}
+
+/* Code + mono */
+.sys code, .code, .mono {
+  font-family: var(--font-mono);
+  font-size: var(--fz-micro);
+  color: var(--fg-1);
+}
+
+.sys pre, .pre {
+  background: var(--bg-1);
+  border: 1px solid var(--line-1);
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--fz-micro);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
+  overflow-x: auto;
+}
+
+/* Links */
+.sys a, .link {
+  color: var(--fg-4);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-default);
+}
+.sys a:hover, .link:hover { color: var(--fg-2); }
+
+/* Signature em-dash list */
+.sys ul, .dash-list {
+  list-style: none;
+  margin: var(--space-4) 0;
+  padding-left: 0;
+}
+.sys ul li, .dash-list li {
+  color: var(--fg-3);
+  margin: var(--space-2) 0;
+  padding-left: var(--space-4);
+  position: relative;
+  font-size: var(--fz-body);
+}
+.sys ul li::before, .dash-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--fg-5);
+}

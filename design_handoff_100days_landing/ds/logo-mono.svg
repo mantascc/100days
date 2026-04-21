@@ -1,0 +1,7 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60" width="360" height="60">
+  <rect width="360" height="60" fill="#0a0a0a"></rect>
+  <text x="20" y="40" font-family="&#39;JetBrains Mono&#39;,&#39;SF Mono&#39;,monospace" font-size="22" font-weight="500" fill="#fff" letter-spacing="-0.02em">Clear</text>
+  <text x="100" y="40" font-family="&#39;JetBrains Mono&#39;,&#39;SF Mono&#39;,monospace" font-size="22" font-weight="400" fill="#666" letter-spacing="-0.02em">Channel</text>
+  <line x1="20" y1="50" x2="340" y2="50" stroke="#222" stroke-width="1"></line>
+</svg>
