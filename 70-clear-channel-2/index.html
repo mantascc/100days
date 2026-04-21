@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clear channel — introduction</title>
+    <meta name="description" content="A design system for computational aesthetics. Working with data as raw material. The aesthetic is a byproduct of function — what remains when noise is removed.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           CLEAR CHANNEL / INTRODUCTION
+           ═══════════════════════════════════════════════════════ */
+
+        :root {
+            --bg:           #0a0a0a;
+            --bg-1:         #0f0f0f;
+            --bg-2:         #141414;
+            --bg-3:         #1a1a1a;
+
+            --line-1:       #1e1e1e;
+            --line-2:       #2a2a2a;
+            --line-3:       #3a3d52;
+
+            --fg-0:         #ffffff;
+            --fg-1:         #f5f5f7;
+            --fg-2:         #a8aab8;
+            --fg-3:         #666666;
+            --fg-4:         #444444;
+            --fg-5:         #2a2a2a;
+
+            --accent:       #00ffaa;
+            --accent-dim:   rgba(0,255,170,0.12);
+            --accent-mid:   rgba(0,255,170,0.4);
+
+            --font-mono:    'JetBrains Mono', 'SF Mono', Monaco, monospace;
+            --font-serif:   'Instrument Serif', Georgia, serif;
+
+            --fz-tiny:      10px;
+            --fz-sm:        11px;
+            --fz-base:      13px;
+            --fz-md:        14px;
+            --fz-lg:        16px;
+            --fz-xl:        20px;
+            --fz-2xl:       28px;
+            --fz-display:   64px;
+            --fz-poster:    112px;
+
+            --sp-1:  4px;
+            --sp-2:  8px;
+            --sp-3:  12px;
+            --sp-4:  16px;
+            --sp-5:  24px;
+            --sp-6:  32px;
+            --sp-7:  48px;
+            --sp-8:  64px;
+            --sp-9:  96px;
+
+            --dur-fast:  120ms;
+            --dur-base:  200ms;
+            --ease:      cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--fg-1);
+            font-family: var(--font-mono);
+            font-size: var(--fz-base);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── LAYOUT ── */
+
+        .page {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 var(--sp-7);
+        }
+
+        @media (max-width: 720px) {
+            .page { padding: 0 var(--sp-4); }
+            :root { --fz-display: 40px; --fz-poster: 64px; }
+        }
+
+        /* ── TICK NAV ── */
+
+        .tick-nav {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0;
+            z-index: 90;
+        }
+
+        .tick-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            text-decoration: none;
+            padding: 4px 0;
+        }
+
+        .tick-label {
+            font-size: 9px;
+            color: var(--fg-3);
+            letter-spacing: 0.06em;
+            text-transform: lowercase;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(6px);
+            transition: opacity var(--dur-fast) linear, transform var(--dur-fast) linear;
+            pointer-events: none;
+            padding-right: 8px;
+        }
+
+        .tick-nav a:hover .tick-label,
+        .tick-nav a.active .tick-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .tick-mark {
+            width: 8px;
+            height: 1px;
+            background: var(--fg-4);
+            transition: width var(--dur-fast) linear, background var(--dur-fast) linear;
+        }
+
+        .tick-nav a:hover .tick-mark { width: 14px; background: var(--fg-2); }
+        .tick-nav a.active .tick-mark { width: 18px; background: var(--accent); }
+
+        /* ── TOP SLUG ── */
+
+        .slug-bar {
+            padding: var(--sp-5) 0 var(--sp-4);
+            border-bottom: 1px solid var(--line-1);
+            font-size: var(--fz-sm);
+            color: var(--fg-3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            letter-spacing: 0.04em;
+        }
+
+        .slug-bar .sep { color: var(--fg-5); }
+        .slug-bar .current { color: var(--fg-2); }
+
+        /* ── HERO ── */
+
+        .hero {
+            padding: var(--sp-9) 0 var(--sp-8);
+            border-bottom: 1px solid var(--line-2);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: var(--sp-7);
+            align-items: end;
+        }
+
+        @media (max-width: 720px) {
+            .hero { grid-template-columns: 1fr; }
+            .hero-canvas-wrap { display: none; }
+        }
+
+        .hero-left {}
+
+        .hero-eyebrow {
+            font-size: var(--fz-tiny);
+            color: var(--accent);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-4);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: var(--fz-poster);
+            font-weight: 400;
+            color: var(--fg-0);
+            letter-spacing: -0.03em;
+            line-height: 0.95;
+            margin-bottom: var(--sp-5);
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--fg-2);
+        }
+
+        .hero-sub {
+            font-size: var(--fz-md);
+            color: var(--fg-3);
+            font-weight: 300;
+            font-style: italic;
+            margin-bottom: var(--sp-6);
+            letter-spacing: 0.01em;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-1) var(--sp-5);
+        }
+
+        .hero-meta-item {
+            font-size: var(--fz-sm);
+            color: var(--fg-3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .hero-meta-item .dot {
+            width: 3px;
+            height: 3px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .hero-canvas-wrap {
+            width: 200px;
+            height: 200px;
+            border: 1px solid var(--line-2);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-canvas-label {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            font-size: var(--fz-tiny);
+            color: var(--fg-4);
+            letter-spacing: 0.08em;
+        }
+
+        /* ── SECTION ── */
+
+        .section {
+            padding: var(--sp-8) 0;
+            border-bottom: 1px solid var(--line-1);
+        }
+
+        .section:last-child { border-bottom: none; }
+
+        .section-label {
+            font-size: var(--fz-tiny);
+            color: var(--fg-3);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-3);
+        }
+
+        .section-title {
+            font-size: var(--fz-xl);
+            color: var(--fg-0);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            text-transform: lowercase;
+            margin-bottom: var(--sp-5);
+        }
+
+        .section-desc {
+            font-size: var(--fz-sm);
+            color: var(--fg-2);
+            max-width: 560px;
+            line-height: 1.8;
+            margin-bottom: var(--sp-6);
+        }
+
+        /* ── STATEMENT ── */
+
+        .statement {
+            padding: var(--sp-8) 0;
+            border-bottom: 1px solid var(--line-2);
+        }
+
+        .statement-text {
+            font-family: var(--font-mono);
+            font-size: var(--fz-xl);
+            font-weight: 300;
+            color: var(--fg-1);
+            letter-spacing: -0.01em;
+            line-height: 1.7;
+            max-width: 680px;
+        }
+
+        .statement-text em {
+            font-style: normal;
+            color: var(--accent);
+        }
+
+        /* ── PRINCIPLES ── */
+
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1px;
+            background: var(--line-1);
+            border: 1px solid var(--line-1);
+            margin-top: var(--sp-6);
+        }
+
+        .principle-card {
+            background: var(--bg);
+            padding: var(--sp-5);
+            transition: background var(--dur-base) var(--ease);
+        }
+
+        .principle-card:hover { background: var(--bg-1); }
+
+        .principle-num {
+            font-size: var(--fz-tiny);
+            color: var(--accent);
+            letter-spacing: 0.08em;
+            margin-bottom: var(--sp-3);
+            display: block;
+        }
+
+        .principle-head {
+            font-size: var(--fz-md);
+            color: var(--fg-0);
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            text-transform: lowercase;
+            margin-bottom: var(--sp-2);
+        }
+
+        .principle-body {
+            font-size: var(--fz-sm);
+            color: var(--fg-3);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* ── COLORS ── */
+
+        .color-system {
+            margin-top: var(--sp-5);
+        }
+
+        .color-group {
+            margin-bottom: var(--sp-5);
+        }
+
+        .color-group-label {
+            font-size: var(--fz-tiny);
+            color: var(--fg-3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-3);
+            padding-bottom: var(--sp-2);
+            border-bottom: 1px solid var(--line-1);
+        }
+
+        .color-row {
+            display: flex;
+            gap: 1px;
+        }
+
+        .color-swatch {
+            flex: 1;
+            position: relative;
+            cursor: default;
+        }
+
+        .color-swatch-fill {
+            height: 40px;
+            width: 100%;
+            transition: height var(--dur-fast) linear;
+        }
+
+        .color-swatch:hover .color-swatch-fill { height: 56px; }
+
+        .color-swatch-info {
+            padding: var(--sp-2) 0 var(--sp-1);
+        }
+
+        .color-token {
+            font-size: var(--fz-tiny);
+            color: var(--fg-3);
+            display: block;
+            letter-spacing: 0.02em;
+            margin-bottom: 2px;
+        }
+
+        .color-hex {
+            font-size: var(--fz-tiny);
+            color: var(--fg-4);
+            letter-spacing: 0.04em;
+        }
+
+        .accent-row {
+            display: flex;
+            gap: 1px;
+            margin-top: 1px;
+        }
+
+        .accent-swatch {
+            flex: 1;
+        }
+
+        .accent-swatch-fill {
+            height: 32px;
+            width: 100%;
+            transition: height var(--dur-fast) linear;
+        }
+
+        .accent-swatch:hover .accent-swatch-fill { height: 44px; }
+
+        .accent-swatch-name {
+            font-size: var(--fz-tiny);
+            color: var(--fg-3);
+            padding-top: var(--sp-1);
+            letter-spacing: 0.04em;
+        }
+
+        /* ── TYPOGRAPHY ── */
+
+        .type-scale {
+            margin-top: var(--sp-5);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .type-row {
+            display: grid;
+            grid-template-columns: 80px 60px 1fr;
+            gap: var(--sp-4);
+            align-items: baseline;
+            padding: var(--sp-3) 0;
+            border-bottom: 1px solid var(--line-1);
+        }
+
+        .type-row:first-child { border-top: 1px solid var(--line-1); }
+
+        .type-meta-size {
+            font-size: var(--fz-tiny);
+            color: var(--fg-3);
+            letter-spacing: 0.04em;
+        }
+
+        .type-meta-token {
+            font-size: var(--fz-tiny);
+            color: var(--fg-4);
+            letter-spacing: 0.02em;
+        }
+
+        .type-sample {
+            color: var(--fg-1);
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Display type */
+        .type-serif-block {
+            margin-top: var(--sp-6);
+            padding: var(--sp-6);
+            border: 1px solid var(--line-2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--sp-5);
+        }
+
+        @media (max-width: 600px) {
+            .type-serif-block { grid-template-columns: 1fr; }
+        }
+
+        .type-serif-item {}
+
+        .type-serif-label {
+            font-size: var(--fz-tiny);
+            color: var(--fg-3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-3);
+        }
+
+        .type-serif-demo {
+            font-family: var(--font-serif);
+            font-size: 40px;
+            font-weight: 400;
+            color: var(--fg-0);
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+        }
+
+        .type-serif-demo em {
+            font-style: italic;
+            color: var(--fg-3);
+        }
+
+        /* ── MOTION / CANVAS DEMOS ── */
+
+        .canvas-demos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--line-1);
+            border: 1px solid var(--line-1);
+            margin-top: var(--sp-5);
+        }
+
+        @media (max-width: 600px) {
+            .canvas-demos { grid-template-columns: 1fr; }
+        }
+
+        .canvas-demo {
+            background: var(--bg);
+            padding: var(--sp-4);
+        }
+
+        .canvas-demo canvas {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            border: 1px solid var(--line-1);
+        }
+
+        .canvas-demo-label {
+            font-size: var(--fz-tiny);
+            color: var(--fg-4);
+            margin-top: var(--sp-2);
+            letter-spacing: 0.08em;
+        }
+
+        /* ── ANTI-PATTERNS ── */
+
+        .anti-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0;
+            border: 1px solid var(--line-1);
+            margin-top: var(--sp-5);
+        }
+
+        .anti-item {
+            padding: var(--sp-3) var(--sp-4);
+            border-bottom: 1px solid var(--line-1);
+            border-right: 1px solid var(--line-1);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .anti-item .x {
+            font-size: var(--fz-sm);
+            color: #f85149;
+            flex-shrink: 0;
+        }
+
+        .anti-item span {
+            font-size: var(--fz-sm);
+            color: var(--fg-3);
+            font-weight: 300;
+        }
+
+        /* ── REFS ── */
+
+        .ref-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-2);
+            margin-top: var(--sp-5);
+        }
+
+        .ref-link {
+            padding: var(--sp-2) var(--sp-3);
+            border: 1px solid var(--line-2);
+            font-size: var(--fz-sm);
+            color: var(--fg-2);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            transition: border-color var(--dur-fast) linear, color var(--dur-fast) linear;
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .ref-link:hover {
+            border-color: var(--accent-mid);
+            color: var(--fg-0);
+        }
+
+        .ref-link .arrow { color: var(--accent); }
+
+        /* ── FOOTER ── */
+
+        .footer {
+            padding: var(--sp-7) 0 var(--sp-8);
+            border-top: 1px solid var(--line-1);
+            margin-top: var(--sp-8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-sig {
+            font-size: var(--fz-sm);
+            color: var(--fg-4);
+            letter-spacing: 0.04em;
+        }
+
+        .footer-sig em { color: var(--accent); font-style: normal; }
+
+        .footer-ver {
+            font-size: var(--fz-tiny);
+            color: var(--fg-4);
+            letter-spacing: 0.08em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TICK NAV -->
+<nav class="tick-nav" id="tickNav">
+    <a href="#intro" data-section="intro"><span class="tick-label">intro</span><span class="tick-mark"></span></a>
+    <a href="#statement" data-section="statement"><span class="tick-label">statement</span><span class="tick-mark"></span></a>
+    <a href="#principles" data-section="principles"><span class="tick-label">principles</span><span class="tick-mark"></span></a>
+    <a href="#color" data-section="color"><span class="tick-label">color</span><span class="tick-mark"></span></a>
+    <a href="#type" data-section="type"><span class="tick-label">type</span><span class="tick-mark"></span></a>
+    <a href="#motion" data-section="motion"><span class="tick-label">motion</span><span class="tick-mark"></span></a>
+    <a href="#anti" data-section="anti"><span class="tick-label">anti-patterns</span><span class="tick-mark"></span></a>
+</nav>
+
+<div class="page">
+
+    <!-- SLUG -->
+    <div class="slug-bar">
+        <span>clear channel</span>
+        <span class="sep">/</span>
+        <span class="current">introduction</span>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero" id="intro">
+        <div class="hero-left">
+            <div class="hero-eyebrow">design system</div>
+            <h1 class="hero-title">Clear<br><em>Channel</em></h1>
+            <p class="hero-sub">"like watching something think."</p>
+            <div class="hero-meta">
+                <div class="hero-meta-item"><div class="dot"></div><span>monospace-first</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>dark canvas</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>computational aesthetics</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>single accent</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>60fps</span></div>
+            </div>
+        </div>
+        <div class="hero-canvas-wrap">
+            <canvas id="heroCanvas" width="400" height="400"></canvas>
+            <span class="hero-canvas-label">field / live</span>
+        </div>
+    </section>
+
+    <!-- STATEMENT -->
+    <section class="statement" id="statement">
+        <p class="statement-text">Working with data as raw material. Low-level primitives that carry complexity without decorating it. Every element earns its presence by transmitting meaning. The aesthetic is <em>a byproduct of function</em> — what remains when noise is removed.</p>
+    </section>
+
+    <!-- PRINCIPLES -->
+    <section class="section" id="principles">
+        <div class="section-label">§01</div>
+        <div class="section-title">principles</div>
+        <p class="section-desc">Five rules that hold. When in doubt, apply them in order — each one removes something.</p>
+        <div class="principles-grid">
+            <div class="principle-card">
+                <span class="principle-num">01</span>
+                <div class="principle-head">quiet systems over loud interfaces</div>
+                <div class="principle-body">The interface recedes. Data is foregrounded. Decoration signals insecurity — a system that works has nothing to prove.</div>
+            </div>
+            <div class="principle-card">
+                <span class="principle-num">02</span>
+                <div class="principle-head">visible logic, emergent complexity</div>
+                <div class="principle-body">Rules are simple. Behaviour is complex. The viewer should be able to infer the rule from watching — then be surprised by what it generates.</div>
+            </div>
+            <div class="principle-card">
+                <span class="principle-num">03</span>
+                <div class="principle-head">reduction as polish</div>
+                <div class="principle-body">Strip, don't add. Every element must earn its presence. If removing it doesn't break meaning, it was noise.</div>
+            </div>
+            <div class="principle-card">
+                <span class="principle-num">04</span>
+                <div class="principle-head">data as material — show the grain</div>
+                <div class="principle-body">Don't smooth over the texture of the data. Variance, drift, error, boundary — these are the material. Let them show.</div>
+            </div>
+            <div class="principle-card">
+                <span class="principle-num">05</span>
+                <div class="principle-head">physics over easing, linear over theatrical</div>
+                <div class="principle-body">Euler integration beats CSS transitions. Things drift and settle. They do not bounce. They do not spring. They move because forces act on them.</div>
+            </div>
+            <div class="principle-card">
+                <span class="principle-num">06</span>
+                <div class="principle-head">one accent, total discipline</div>
+                <div class="principle-body">Pick a single high-contrast accent per project. Use it exactly where meaning needs to land. Everywhere it appears is a claim — so make the claim count.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COLOR -->
+    <section class="section" id="color">
+        <div class="section-label">§02</div>
+        <div class="section-title">color system</div>
+        <p class="section-desc">A 10-step dark ramp anchored on <code>#0a0a0a</code> — not pure black. A hair warmer. Every surface comes from this ramp. One accent per project. No gradients.</p>
+
+        <div class="color-system">
+            <div class="color-group">
+                <div class="color-group-label">ground / elevation</div>
+                <div class="color-row">
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#0a0a0a; border: 1px solid #1e1e1e;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">void</span>
+                            <span class="color-hex">#0a0a0a</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#0f0f0f;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">base</span>
+                            <span class="color-hex">#0f0f0f</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#141414;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">raised</span>
+                            <span class="color-hex">#141414</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#1a1a1a;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">surface</span>
+                            <span class="color-hex">#1a1a1a</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#202232;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">float</span>
+                            <span class="color-hex">#202232</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#242424;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">modal</span>
+                            <span class="color-hex">#242424</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-group">
+                <div class="color-group-label">text / foreground</div>
+                <div class="color-row">
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#ffffff;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">primary</span>
+                            <span class="color-hex">#ffffff</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#f5f5f7;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">default</span>
+                            <span class="color-hex">#f5f5f7</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#a8aab8;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">secondary</span>
+                            <span class="color-hex">#a8aab8</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#666666;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">tertiary</span>
+                            <span class="color-hex">#666666</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#444444;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">muted</span>
+                            <span class="color-hex">#444444</span>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-swatch-fill" style="background:#2a2a2a;"></div>
+                        <div class="color-swatch-info">
+                            <span class="color-token">ghost</span>
+                            <span class="color-hex">#2a2a2a</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-group">
+                <div class="color-group-label">accent spectrum — pick one per project</div>
+                <div class="accent-row">
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#00ffaa;"></div>
+                        <div class="accent-swatch-name">cyan</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#00a8ff;"></div>
+                        <div class="accent-swatch-name">blue</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#bc8cff;"></div>
+                        <div class="accent-swatch-name">violet</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#ff0066;"></div>
+                        <div class="accent-swatch-name">magenta</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#ffaa00;"></div>
+                        <div class="accent-swatch-name">amber</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#00ff88;"></div>
+                        <div class="accent-swatch-name">green</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#f85149;"></div>
+                        <div class="accent-swatch-name">red</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#39c5cf;"></div>
+                        <div class="accent-swatch-name">teal</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-group">
+                <div class="color-group-label">semantic — status only, never brand</div>
+                <div class="accent-row">
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#3fb950;"></div>
+                        <div class="accent-swatch-name">success</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#f85149;"></div>
+                        <div class="accent-swatch-name">error</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#d29922;"></div>
+                        <div class="accent-swatch-name">warn</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#58a6ff;"></div>
+                        <div class="accent-swatch-name">info</div>
+                    </div>
+                    <div class="accent-swatch">
+                        <div class="accent-swatch-fill" style="background:#bc8cff;"></div>
+                        <div class="accent-swatch-name">special</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TYPOGRAPHY -->
+    <section class="section" id="type">
+        <div class="section-label">§03</div>
+        <div class="section-title">typography</div>
+        <p class="section-desc">Monospace for everything. Instrument Serif for display moments only — hero titles, pull quotes, editorial. All lowercase OR all uppercase. Never mixed.</p>
+
+        <div class="type-scale">
+            <div class="type-row">
+                <span class="type-meta-size">10px</span>
+                <span class="type-meta-token">tiny</span>
+                <span class="type-sample" style="font-size:10px; letter-spacing:0.1em; color:#666; text-transform:uppercase;">AXIS LABEL / TIMESTAMP / META</span>
+            </div>
+            <div class="type-row">
+                <span class="type-meta-size">11px</span>
+                <span class="type-meta-token">sm</span>
+                <span class="type-sample" style="font-size:11px; color:#a8aab8;">secondary information, helper text</span>
+            </div>
+            <div class="type-row">
+                <span class="type-meta-size">13px</span>
+                <span class="type-meta-token">base</span>
+                <span class="type-sample" style="font-size:13px;">body copy, primary content, default</span>
+            </div>
+            <div class="type-row">
+                <span class="type-meta-size">14px</span>
+                <span class="type-meta-token">md</span>
+                <span class="type-sample" style="font-size:14px;">emphasized body, interface copy</span>
+            </div>
+            <div class="type-row">
+                <span class="type-meta-size">16px</span>
+                <span class="type-meta-token">lg</span>
+                <span class="type-sample" style="font-size:16px; font-weight:400;">subsection heading, nav items</span>
+            </div>
+            <div class="type-row">
+                <span class="type-meta-size">20px</span>
+                <span class="type-meta-token">xl</span>
+                <span class="type-sample" style="font-size:20px; font-weight:400; letter-spacing:-0.01em;">section title</span>
+            </div>
+            <div class="type-row">
+                <span class="type-meta-size">28px</span>
+                <span class="type-meta-token">2xl</span>
+                <span class="type-sample" style="font-size:28px; font-weight:300; letter-spacing:-0.02em;">subhead</span>
+            </div>
+        </div>
+
+        <div class="type-serif-block">
+            <div class="type-serif-item">
+                <div class="type-serif-label">instrument serif / upright</div>
+                <div class="type-serif-demo">Clear Channel</div>
+            </div>
+            <div class="type-serif-item">
+                <div class="type-serif-label">instrument serif / italic</div>
+                <div class="type-serif-demo"><em>like watching something think.</em></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOTION -->
+    <section class="section" id="motion">
+        <div class="section-label">§04</div>
+        <div class="section-title">motion & primitives</div>
+        <p class="section-desc">RequestAnimationFrame. Linear interpolation. No springs, no bounces. Circles, lines, rectangles — no organic curves unless algorithmically generated. Density creates form.</p>
+
+        <div class="canvas-demos">
+            <div class="canvas-demo">
+                <canvas id="c1" width="240" height="240"></canvas>
+                <div class="canvas-demo-label">particle field / brownian</div>
+            </div>
+            <div class="canvas-demo">
+                <canvas id="c2" width="240" height="240"></canvas>
+                <div class="canvas-demo-label">signal / wave</div>
+            </div>
+            <div class="canvas-demo">
+                <canvas id="c3" width="240" height="240"></canvas>
+                <div class="canvas-demo-label">grid trace / state</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANTI-PATTERNS -->
+    <section class="section" id="anti">
+        <div class="section-label">§05</div>
+        <div class="section-title">anti-patterns</div>
+        <p class="section-desc">The system is defined as much by what it refuses as by what it includes.</p>
+
+        <div class="anti-list">
+            <div class="anti-item"><span class="x">✗</span><span>gradients</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>drop shadows</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>rounded corners > 4px</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>decorative borders</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>easing theatrics</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>multiple accent colors</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>mixed case in headers</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>emojis (unless functional)</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>dense without breathing room</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>css transitions for physics</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>external icon libraries</span></div>
+            <div class="anti-item"><span class="x">✗</span><span>sans-serif for body</span></div>
+        </div>
+
+        <div class="ref-links" style="margin-top: var(--sp-7);">
+            <a class="ref-link" href="computational-minimalism/visual-language.html">
+                <span class="arrow">→</span>
+                <span>visual language</span>
+            </a>
+            <a class="ref-link" href="computational-minimalism/component-kit.html">
+                <span class="arrow">→</span>
+                <span>component kit</span>
+            </a>
+            <a class="ref-link" href="design_handoff_100days_landing/100days-landing.html">
+                <span class="arrow">→</span>
+                <span>landing variants</span>
+            </a>
+            <a class="ref-link" href="index.html">
+                <span class="arrow">→</span>
+                <span>100 days index</span>
+            </a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <span class="footer-sig">clear channel — <em>computational aesthetics</em></span>
+        <span class="footer-ver">v2 / 2026</span>
+    </footer>
+
+</div>
+
+<script>
+    /* ── TICK NAV ACTIVE ── */
+
+    const sections = document.querySelectorAll('[id]');
+    const tickLinks = document.querySelectorAll('.tick-nav a[data-section]');
+
+    const sectionMap = {};
+    sections.forEach(s => { sectionMap[s.id] = s; });
+
+    function updateTick() {
+        let active = null;
+        sections.forEach(s => {
+            const rect = s.getBoundingClientRect();
+            if (rect.top <= window.innerHeight * 0.4) active = s.id;
+        });
+        tickLinks.forEach(a => {
+            a.classList.toggle('active', a.dataset.section === active);
+        });
+    }
+
+    window.addEventListener('scroll', updateTick, { passive: true });
+    updateTick();
+
+    /* ── HERO CANVAS: particle field ── */
+
+    (function() {
+        const canvas = document.getElementById('heroCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const N = 120;
+        const accent = [0, 255, 170];
+
+        const pts = Array.from({ length: N }, () => ({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            life: Math.random(),
+        }));
+
+        let t = 0;
+
+        function draw() {
+            ctx.fillStyle = 'rgba(10,10,10,0.18)';
+            ctx.fillRect(0, 0, W, H);
+
+            t += 0.005;
+
+            pts.forEach((p, i) => {
+                // flow field influence
+                const angle = Math.sin(p.x * 0.012 + t) * Math.cos(p.y * 0.012 + t * 0.7) * Math.PI * 2;
+                p.vx += Math.cos(angle) * 0.03;
+                p.vy += Math.sin(angle) * 0.03;
+
+                const speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+                if (speed > 1.2) { p.vx *= 0.9; p.vy *= 0.9; }
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0) p.x = W;
+                if (p.x > W) p.x = 0;
+                if (p.y < 0) p.y = H;
+                if (p.y > H) p.y = 0;
+
+                const isAccent = i % 12 === 0;
+                const alpha = isAccent ? 0.8 : 0.25 + Math.sin(p.life * Math.PI * 2 + t * 2) * 0.15;
+                p.life += 0.003;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, isAccent ? 1.5 : 0.8, 0, Math.PI * 2);
+                if (isAccent) {
+                    ctx.fillStyle = `rgba(${accent[0]},${accent[1]},${accent[2]},${alpha})`;
+                } else {
+                    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+                }
+                ctx.fill();
+            });
+
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    /* ── DEMO 1: brownian / particles ── */
+
+    (function() {
+        const canvas = document.getElementById('c1');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const pts = Array.from({ length: 60 }, () => ({
+            x: W/2 + (Math.random()-0.5)*80,
+            y: H/2 + (Math.random()-0.5)*80,
+            trail: [],
+        }));
+        let t = 0;
+
+        function draw() {
+            ctx.fillStyle = 'rgba(10,10,10,0.12)';
+            ctx.fillRect(0, 0, W, H);
+            t += 0.01;
+
+            pts.forEach((p, i) => {
+                p.x += (Math.random()-0.5)*2.5;
+                p.y += (Math.random()-0.5)*2.5;
+                p.x = Math.max(4, Math.min(W-4, p.x));
+                p.y = Math.max(4, Math.min(H-4, p.y));
+                p.trail.push({x: p.x, y: p.y});
+                if (p.trail.length > 8) p.trail.shift();
+
+                if (p.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.trail[0].x, p.trail[0].y);
+                    for (let j = 1; j < p.trail.length; j++) ctx.lineTo(p.trail[j].x, p.trail[j].y);
+                    ctx.strokeStyle = i % 8 === 0 ? 'rgba(0,255,170,0.5)' : 'rgba(255,255,255,0.12)';
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, i % 8 === 0 ? 2 : 1, 0, Math.PI*2);
+                ctx.fillStyle = i % 8 === 0 ? 'rgba(0,255,170,0.9)' : 'rgba(255,255,255,0.4)';
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    /* ── DEMO 2: signal wave ── */
+
+    (function() {
+        const canvas = document.getElementById('c2');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const LINES = 3;
+        let t = 0;
+        const phases = [0, 0.7, 1.4];
+        const amps = [30, 20, 14];
+        const freqs = [1, 1.7, 2.3];
+
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+            t += 0.018;
+
+            // grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 0.5;
+            for (let y = 0; y < H; y += 20) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+            }
+            for (let x = 0; x < W; x += 20) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+            }
+
+            for (let l = 0; l < LINES; l++) {
+                const isMain = l === 0;
+                ctx.beginPath();
+                for (let x = 0; x < W; x++) {
+                    const y = H/2
+                        + Math.sin((x / W) * Math.PI * 2 * freqs[l] + t + phases[l]) * amps[l]
+                        + Math.sin((x / W) * Math.PI * 4 * freqs[l] * 0.5 + t * 1.3 + phases[l]) * amps[l] * 0.3;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = isMain
+                    ? `rgba(0,255,170,${0.8 - l*0.1})`
+                    : `rgba(255,255,255,${0.15 - l*0.04})`;
+                ctx.lineWidth = isMain ? 1.5 : 0.8;
+                ctx.stroke();
+            }
+
+            // cursor line
+            const cx = (Math.sin(t * 0.5) * 0.5 + 0.5) * W;
+            ctx.beginPath();
+            ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+            ctx.strokeStyle = 'rgba(0,255,170,0.2)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    /* ── DEMO 3: grid state ── */
+
+    (function() {
+        const canvas = document.getElementById('c3');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const COLS = 16, ROWS = 16;
+        const CW = W / COLS, CH = H / ROWS;
+        const state = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+        let t = 0;
+
+        // seed
+        for (let r = 0; r < ROWS; r++)
+            for (let c = 0; c < COLS; c++)
+                state[r][c] = Math.random() < 0.3 ? 1 : 0;
+
+        function next() {
+            const ns = state.map(row => [...row]);
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    let n = 0;
+                    for (let dr = -1; dr <= 1; dr++)
+                        for (let dc = -1; dc <= 1; dc++) {
+                            if (dr === 0 && dc === 0) continue;
+                            const nr = (r + dr + ROWS) % ROWS;
+                            const nc = (c + dc + COLS) % COLS;
+                            n += state[nr][nc];
+                        }
+                    if (state[r][c] === 1) ns[r][c] = (n === 2 || n === 3) ? 1 : 0;
+                    else ns[r][c] = n === 3 ? 1 : 0;
+                }
+            }
+            for (let r = 0; r < ROWS; r++)
+                for (let c = 0; c < COLS; c++)
+                    state[r][c] = ns[r][c];
+        }
+
+        let frame = 0;
+        function draw() {
+            frame++;
+            if (frame % 8 === 0) next();
+            t += 0.01;
+
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, W, H);
+
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const x = c * CW, y = r * CH;
+                    if (state[r][c]) {
+                        const isAccent = (r + c) % 9 === 0;
+                        ctx.fillStyle = isAccent ? 'rgba(0,255,170,0.85)' : 'rgba(255,255,255,0.65)';
+                        ctx.fillRect(x+1, y+1, CW-2, CH-2);
+                    } else {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                        ctx.lineWidth = 0.5;
+                        ctx.strokeRect(x+0.5, y+0.5, CW-1, CH-1);
+                    }
+                }
+            }
+
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+</script>
+
+</body>
+</html>
