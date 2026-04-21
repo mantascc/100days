@@ -295,6 +295,16 @@
     "description": "Font Explorer \u2014 skill to visualize any font"
   },
   {
+    "id": "60-agentic-patterns",
+    "path": "100days/60-agentic-patterns",
+    "description": "Agentic Patterns \u2014 interactive reference for AI agent design patterns"
+  },
+  {
+    "id": "61-hitl-patterns",
+    "path": "100days/61-hitl-patterns",
+    "description": "Human in the Loop \u2014 four patterns across a single autonomy axis"
+  },
+  {
     "id": "62-terminal-cli",
     "path": "100days/62-terminal-cli",
     "description": "Terminal REPL \u2014 minimal shell interface with boot sequence, command streaming, and ASCII cat"
@@ -325,8 +335,23 @@
     "description": "Audio Reactive ASCII Field \u2014 ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning"
   },
   {
+    "id": "68-moog-phase",
+    "path": "100days/68-moog-phase",
+    "description": "Moog Phase \u2014 XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner"
+  },
+  {
     "id": "69-clear-channel",
     "path": "100days/69-clear-channel",
     "description": "Clear Channel \u2014 visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system"
+  },
+  {
+    "id": "70-clear-channel-2",
+    "path": "100days/70-clear-channel-2",
+    "description": "Clear Channel \u2014 introduction: a design system for computational aesthetics; working with data as raw material"
+  },
+  {
+    "id": "71-index-100days",
+    "path": "100days/71-index-100days",
+    "description": "Index \u2014 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags"
   }
 ]
