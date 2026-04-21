@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en" data-ch="1">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anna Smeragliuolo — Design Technologist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&family=JetBrains+Mono:wght@300;400;500&family=Press+Start+2P&display=swap">
+  <style>
+
+    /* ══════════════════════════════════════════════════
+       RESET & GLOBAL
+    ══════════════════════════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      transition: background 0.35s ease;
+    }
+    html[data-ch="1"] { background: #f5f2ee; }
+    html[data-ch="2"] { background: #0a0a0a; }
+    html[data-ch="3"] { background: #ede8e0; }
+    html[data-ch="4"] { background: #090909; }
+    html[data-ch="5"] { background: #0a0a0a; }
+    html[data-ch="6"] { background: #0a0a0a; }
+    html[data-ch="7"] { background: #182828; }
+
+    body { min-height: 100vh; }
+
+    /* ── Chapter visibility ── */
+    .chapter { display: none; }
+    [data-ch="1"] #ch-1,
+    [data-ch="2"] #ch-2,
+    [data-ch="3"] #ch-3,
+    [data-ch="5"] #ch-5 { display: block; }
+
+    [data-ch="4"] #ch-4 { display: grid; }
+    [data-ch="6"] #ch-6 { display: grid; }
+    [data-ch="7"] #ch-7 { display: flex; }
+
+    .chapter {
+      animation: chIn 0.25s ease both;
+    }
+    @keyframes chIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ══════════════════════════════════════════════════
+       META NAV — computational minimalism toggle
+    ══════════════════════════════════════════════════ */
+    .ch-nav {
+      position: fixed;
+      bottom: 32px;
+      right: 48px;
+      z-index: 1000;
+      display: flex;
+      align-items: stretch;
+      background: #111;
+      border: 0.5px solid #2a2a2a;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+      user-select: none;
+    }
+
+    .ch-btn {
+      background: none;
+      border: none;
+      color: #444;
+      cursor: pointer;
+      padding: 9px 14px;
+      transition: color 0.1s, background 0.1s;
+      font-size: 13px;
+      line-height: 1;
+      font-family: inherit;
+    }
+    .ch-btn:hover { color: #fff; background: #1a1a1a; }
+    .ch-btn:active { background: #222; }
+
+    .ch-info {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-left: 0.5px solid #2a2a2a;
+      border-right: 0.5px solid #2a2a2a;
+      min-width: 188px;
+    }
+
+    .ch-pip {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background 0.35s;
+    }
+
+    .ch-num {
+      color: #f5f5f7;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    .ch-sep { color: #2a2a2a; font-size: 10px; }
+
+    .ch-label {
+      color: #555;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 10px;
+      flex: 1;
+    }
+
+    /* ══════════════════════════════════════════════════
+       CH I — RESTRAINT
+       Warm off-white. Playfair italic. Generous air.
+    ══════════════════════════════════════════════════ */
+    #ch-1 {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #1a1a18;
+      line-height: 1.6;
+    }
+
+    #c1-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .c1-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 48px 160px;
+    }
+
+    #ch-1 .name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    #ch-1 .role {
+      font-size: 13px;
+      font-weight: 300;
+      color: #5a5a54;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 80px;
+    }
+    #ch-1 .statement {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.3;
+      min-height: 1.3em;
+      margin-bottom: 72px;
+    }
+    #ch-1 .statement::after {
+      content: '|';
+      font-style: normal;
+      font-weight: 300;
+      color: #c8401a;
+      animation: blink 1s step-end infinite;
+      margin-left: 1px;
+    }
+    #ch-1 .statement.done::after { display: none; }
+
+    #ch-1 .divider {
+      width: 32px;
+      height: 1px;
+      background: #9a9a90;
+      margin-bottom: 72px;
+    }
+    #ch-1 .bio { margin-bottom: 72px; }
+    #ch-1 .bio p {
+      font-size: 15px;
+      font-weight: 300;
+      color: #5a5a54;
+      line-height: 1.75;
+      max-width: 560px;
+    }
+    #ch-1 .bio p + p { margin-top: 16px; }
+    #ch-1 .bio strong { font-weight: 500; color: #1a1a18; }
+
+    #ch-1 .clients {
+      margin-bottom: 72px;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    #ch-1 .clients.visible { opacity: 1; }
+    #ch-1 .clients-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9a9a90;
+      margin-bottom: 14px;
+    }
+    #ch-1 .clients-list {
+      font-size: 14px;
+      font-weight: 300;
+      color: #5a5a54;
+    }
+
+    #ch-1 .projects-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9a9a90;
+      margin-bottom: 40px;
+    }
+    #ch-1 .project { margin-bottom: 56px; }
+    #ch-1 .project-img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #ccc8c2;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: crosshair;
+    }
+    #ch-1 .project:nth-child(3) .project-img { margin-right: -32px; }
+    #ch-1 .project-img:hover {
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%231a1a18' d='M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z'/%3E%3C/svg%3E") 12 12, crosshair;
+    }
+    #ch-1 .img-ph {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9a9a90;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    #ch-1 .project-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+    #ch-1 .project-note {
+      font-size: 13px;
+      font-weight: 300;
+      color: #5a5a54;
+      margin-bottom: 6px;
+    }
+    #ch-1 .project-year { font-size: 12px; color: #9a9a90; letter-spacing: 0.04em; }
+
+    #ch-1 .footer {
+      border-top: 1px solid #ddd9d3;
+      padding-top: 32px;
+    }
+    #ch-1 .footer p {
+      font-size: 13px;
+      font-weight: 300;
+      color: #5a5a54;
+      line-height: 1.8;
+    }
+    #ch-1 .footer a {
+      color: #1a1a18;
+      text-decoration: none;
+      border-bottom: 1px solid #9a9a90;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #ch-1 .footer a:hover { color: #c8401a; border-color: #c8401a; }
+
+    /* ══════════════════════════════════════════════════
+       CH II — SYSTEMS
+       Dark void. IBM Plex Mono. Technical index.
+    ══════════════════════════════════════════════════ */
+    #ch-2 {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 56px 48px 160px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #f5f5f7;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #ch-2 .sys-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    #ch-2 .sys-name {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    #ch-2 .sys-role {
+      font-size: 10px;
+      font-weight: 300;
+      color: #444;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    #ch-2 hr {
+      border: none;
+      border-top: 0.5px solid #1e1e1e;
+    }
+    #ch-2 .sys-prompt {
+      font-size: 14px;
+      font-weight: 300;
+      color: #7F77DD;
+      padding: 24px 0 0;
+    }
+
+    #ch-2 .sys-block { margin-top: 36px; }
+    #ch-2 .sys-key {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #333;
+      margin-bottom: 14px;
+    }
+    #ch-2 .sys-val {
+      font-size: 12px;
+      font-weight: 300;
+      color: #a8aab8;
+      padding-left: 20px;
+      max-width: 580px;
+      line-height: 1.85;
+    }
+
+    #ch-2 .sys-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 52px;
+      column-gap: 16px;
+      padding-left: 20px;
+      margin-bottom: 18px;
+      align-items: start;
+    }
+    #ch-2 .sys-idx { font-size: 10px; color: #333; padding-top: 1px; }
+    #ch-2 .sys-title { font-size: 12px; color: #e8e8e8; }
+    #ch-2 .sys-year { font-size: 10px; color: #333; text-align: right; padding-top: 1px; }
+    #ch-2 .sys-desc {
+      grid-column: 2 / 3;
+      font-size: 11px;
+      font-weight: 300;
+      color: #555;
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    #ch-2 .sys-foot {
+      margin-top: 36px;
+      padding-left: 20px;
+      border-top: 0.5px solid #1e1e1e;
+      padding-top: 20px;
+    }
+    #ch-2 .sys-foot p { font-size: 11px; color: #333; line-height: 2; }
+    #ch-2 .sys-foot a { color: #7F77DD; text-decoration: none; }
+    #ch-2 .sys-foot a:hover { text-decoration: underline; }
+
+    /* ══════════════════════════════════════════════════
+       CH III — MATTER
+       Linen. Bold editorial. Structured rules.
+    ══════════════════════════════════════════════════ */
+    #ch-3 {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 64px 48px 160px;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #2a2520;
+    }
+
+    #ch-3 .mat-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      border-top: 2px solid #2a2520;
+      padding-top: 20px;
+      margin-bottom: 40px;
+      gap: 24px;
+    }
+    #ch-3 .mat-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(52px, 9vw, 88px);
+      font-weight: 700;
+      line-height: 0.88;
+      letter-spacing: -0.025em;
+    }
+    #ch-3 .mat-role {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7a6e64;
+      text-align: right;
+      line-height: 1.8;
+      padding-bottom: 6px;
+    }
+    #ch-3 .mat-stmt {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(17px, 2.8vw, 24px);
+      font-weight: 400;
+      font-style: italic;
+      color: #2a2520;
+      border-top: 0.5px solid #c0b8ac;
+      border-bottom: 0.5px solid #c0b8ac;
+      padding: 22px 0;
+      margin-bottom: 52px;
+    }
+
+    #ch-3 .mat-row {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      column-gap: 40px;
+      margin-bottom: 52px;
+    }
+    #ch-3 .mat-row-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #b8b0a0;
+      padding-top: 3px;
+      line-height: 1.6;
+    }
+    #ch-3 .mat-row-body {
+      font-size: 15px;
+      font-weight: 300;
+      color: #6a6058;
+      line-height: 1.75;
+    }
+    #ch-3 .mat-row-body strong { font-weight: 500; color: #2a2520; }
+
+    #ch-3 .mat-clients-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 0;
+    }
+    #ch-3 .mat-client {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #2a2520;
+      margin-right: 22px;
+    }
+
+    #ch-3 .mat-projects { margin-bottom: 56px; }
+    #ch-3 .mat-project {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      column-gap: 40px;
+      padding: 22px 0;
+      border-top: 0.5px solid #c8c0b2;
+    }
+    #ch-3 .mat-project:last-child { border-bottom: 0.5px solid #c8c0b2; }
+    #ch-3 .mat-proj-idx {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #b8b0a0;
+      line-height: 1.6;
+    }
+    #ch-3 .mat-proj-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      line-height: 1.1;
+    }
+    #ch-3 .mat-proj-note {
+      font-size: 13px;
+      font-weight: 300;
+      color: #7a6e64;
+    }
+
+    #ch-3 .mat-foot {
+      font-size: 13px;
+      font-weight: 300;
+      color: #7a6e64;
+      line-height: 2;
+    }
+    #ch-3 .mat-foot a {
+      color: #2a2520;
+      text-decoration: none;
+      border-bottom: 1px solid #c0b8ac;
+      transition: border-color 0.2s;
+    }
+    #ch-3 .mat-foot a:hover { border-color: #2a2520; }
+
+    /* ══════════════════════════════════════════════════
+       CH IV — SIGNAL
+       Near-void. One statement. Everything else: ghost.
+    ══════════════════════════════════════════════════ */
+    #ch-4 {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 36px 48px 88px;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    #ch-4 .sig-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #ch-4 .sig-name {
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.18);
+    }
+    #ch-4 .sig-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c8401a;
+      box-shadow: 0 0 8px rgba(200, 64, 26, 0.7);
+      animation: sigpulse 2.4s ease-in-out infinite;
+    }
+    @keyframes sigpulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(200,64,26,0.7); }
+      50%       { opacity: 0.35; box-shadow: 0 0 2px rgba(200,64,26,0.3); }
+    }
+
+    #ch-4 .sig-body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 56px;
+    }
+    #ch-4 .sig-stmt {
+      font-size: clamp(17px, 3vw, 26px);
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.82);
+      line-height: 1.5;
+    }
+    #ch-4 .sig-works {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      opacity: 0.16;
+    }
+    #ch-4 .sig-work {
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.07em;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    #ch-4 .sig-foot {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.12);
+      letter-spacing: 0.06em;
+      line-height: 2;
+    }
+    #ch-4 .sig-foot a {
+      color: rgba(255, 255, 255, 0.12);
+      text-decoration: none;
+      transition: color 0.4s;
+    }
+    #ch-4 .sig-foot a:hover { color: rgba(255, 255, 255, 0.45); }
+
+
+    /* ══════════════════════════════════════════════════
+       CH V — FIELD
+       ASCII wave field (53) · ube structure (63)
+    ══════════════════════════════════════════════════ */
+    #ch-5 {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .fld-grid-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #fld-grid {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78vh;
+      line-height: 1;
+      white-space: pre;
+      color: #2e2848;
+      user-select: none;
+      letter-spacing: 0;
+    }
+
+    .fld-content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 64px 48px 140px;
+    }
+
+    .fld-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .fld-header {
+      border-top: 0.5px solid #2e2848;
+      padding-top: 18px;
+      margin-bottom: 40px;
+    }
+
+    .fld-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #f5f5f7;
+      margin-bottom: 4px;
+    }
+
+    .fld-role {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #7b6fa5;
+    }
+
+    .fld-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 0 28px;
+      padding: 18px 0;
+      border-bottom: 0.5px solid #1a1628;
+    }
+
+    .fld-row-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: #7b6fa5;
+      letter-spacing: 0.1em;
+      padding-top: 1px;
+    }
+
+    .fld-row-content {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 300;
+      color: #9090a8;
+      line-height: 1.85;
+    }
+
+    .fld-work-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 7px 0;
+      border-bottom: 0.5px solid #1a1630;
+    }
+
+    .fld-work-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: #ccc8e0;
+    }
+
+    .fld-work-year {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: #444;
+    }
+
+    .fld-footer {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 0.5px solid #1a1630;
+    }
+
+    .fld-footer p {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: #444;
+      line-height: 2;
+      letter-spacing: 0.04em;
+    }
+
+    .fld-footer a { color: #7b6fa5; text-decoration: none; }
+    .fld-footer a:hover { color: #9d91b0; }
+
+    /* ══════════════════════════════════════════════════
+       CH VI — ENGINEERING
+       JetBrains Mono · LCARS-minimal · personnel readout
+    ══════════════════════════════════════════════════ */
+    #ch-6 {
+      min-height: 100vh;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f5f5f7;
+      grid-template-rows: 4px auto 1fr auto;
+      padding-bottom: 80px;
+    }
+
+    .eng-topbar {
+      background: linear-gradient(90deg, #00a8ff 60%, #0066aa 100%);
+      height: 4px;
+    }
+
+    .eng-header {
+      padding: 20px 48px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 0.5px solid #1a1a1a;
+    }
+
+    .eng-id {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #00a8ff;
+      font-weight: 400;
+    }
+
+    .eng-title {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #333;
+    }
+
+    .eng-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    .eng-led {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #00a8ff;
+      box-shadow: 0 0 6px rgba(0, 168, 255, 0.5);
+      animation: engpulse 3s ease-in-out infinite;
+    }
+
+    @keyframes engpulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(0,168,255,0.5); }
+      50%       { opacity: 0.3; box-shadow: none; }
+    }
+
+    .eng-body {
+      padding: 36px 48px 32px;
+      max-width: 720px;
+    }
+
+    .eng-field {
+      display: grid;
+      grid-template-columns: 176px 1fr;
+      padding: 6px 0;
+      border-bottom: 0.5px solid #111;
+    }
+
+    .eng-key {
+      font-size: 10px;
+      font-weight: 400;
+      color: #3a3a3a;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .eng-key::after {
+      content: ' ........';
+      color: #1e1e1e;
+      letter-spacing: 0;
+    }
+
+    .eng-val {
+      font-size: 11px;
+      font-weight: 300;
+      color: #888898;
+      letter-spacing: 0.04em;
+    }
+
+    .eng-val-hi {
+      font-size: 11px;
+      font-weight: 500;
+      color: #f5f5f7;
+      letter-spacing: 0.06em;
+    }
+
+    .eng-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 22px 0 14px;
+    }
+
+    .eng-divider-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #00a8ff;
+      white-space: nowrap;
+      font-weight: 400;
+    }
+
+    .eng-divider-line {
+      flex: 1;
+      height: 0.5px;
+      background: #1a1a1a;
+    }
+
+    .eng-mission {
+      padding: 0 0 22px;
+      font-size: 14px;
+      font-weight: 300;
+      color: #c8c8d8;
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .eng-entry {
+      padding: 12px 0;
+      border-bottom: 0.5px solid #111;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0 20px;
+    }
+
+    .eng-entry-id {
+      font-size: 10px;
+      font-weight: 400;
+      color: #00a8ff;
+      letter-spacing: 0.08em;
+      padding-top: 1px;
+      white-space: nowrap;
+    }
+
+    .eng-entry-title {
+      font-size: 12px;
+      font-weight: 400;
+      color: #d8d8e8;
+      margin-bottom: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .eng-entry-note {
+      font-size: 10px;
+      font-weight: 300;
+      color: #444;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+    }
+
+    .eng-foot {
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #2a2a2a;
+      border-top: 0.5px solid #1a1a1a;
+      padding-top: 16px;
+    }
+
+    .eng-foot a { color: #00a8ff; text-decoration: none; }
+    .eng-foot a:hover { color: #60c8ff; }
+
+    /* ══════════════════════════════════════════════════
+       CH VII — ENCOUNTER
+       Pixel RPG NPC card · dark teal · golden accent
+    ══════════════════════════════════════════════════ */
+    #ch-7 {
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 140px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #c8c8a8;
+      image-rendering: pixelated;
+    }
+
+    .rpg-card {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* Portrait with nameplate overlaid — matches the reference image */
+    .rpg-portrait-wrap {
+      position: relative;
+      width: 100%;
+      border: 3px solid #d4a030;
+    }
+
+    .rpg-portrait-wrap img {
+      width: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .rpg-nameplate {
+      position: absolute;
+      top: 12px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 22, 20, 0.92);
+      border: 2px solid #d4a030;
+      padding: 8px 12px;
+    }
+
+    .rpg-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 13px;
+      color: #e8e8c8;
+      letter-spacing: 0.04em;
+    }
+
+    .rpg-cross {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      color: #d4a030;
+      line-height: 1;
+    }
+
+    /* Main info panel */
+    .rpg-panel {
+      border: 3px solid #d4a030;
+      border-top: none;
+      background: #0c1a18;
+      padding: 16px 18px;
+    }
+
+    .rpg-sep {
+      border: none;
+      border-top: 1px solid #2a3e36;
+      margin: 14px 0;
+    }
+
+    .rpg-section {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: #d4a030;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .rpg-stat {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      padding: 3px 0;
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .rpg-key {
+      color: #5a7868;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 9px;
+    }
+
+    .rpg-val {
+      color: #b8b898;
+      letter-spacing: 0.04em;
+      font-size: 10px;
+    }
+
+    /* Dialogue box */
+    .rpg-dialogue {
+      border: 3px solid #d4a030;
+      border-top: none;
+      background: #091412;
+      padding: 14px 18px;
+    }
+
+    .rpg-prompt {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: #e8e8c8;
+      line-height: 2.2;
+      letter-spacing: 0.04em;
+    }
+
+    .rpg-prompt::before {
+      content: '▶ ';
+      color: #d4a030;
+    }
+
+    /* Mission log */
+    .rpg-mission-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 5px 0;
+      font-size: 9px;
+      border-bottom: 1px solid #1a2e28;
+    }
+
+    .rpg-mission-row:last-child { border-bottom: none; }
+
+    .rpg-mission-name {
+      color: #9ab898;
+      letter-spacing: 0.04em;
+    }
+
+    .rpg-mission-name::before {
+      content: '■ ';
+      color: #d4a030;
+      font-size: 7px;
+    }
+
+    .rpg-mission-year {
+      color: #3a5848;
+      font-size: 8px;
+      letter-spacing: 0.06em;
+    }
+
+    /* Footer */
+    .rpg-foot {
+      border: 3px solid #d4a030;
+      border-top: none;
+      background: #0c1a18;
+      padding: 12px 18px;
+      font-size: 9px;
+      color: #5a7868;
+      letter-spacing: 0.06em;
+    }
+
+    .rpg-foot a {
+      color: #d4a030;
+      text-decoration: none;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+    }
+    .rpg-foot a:hover { color: #f0c050; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════
+       I — RESTRAINT
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-1">
+    <canvas id="c1-canvas"></canvas>
+    <div class="c1-content">
+      <div class="name">Anna Smeragliuolo</div>
+      <div class="role">Design Technologist</div>
+
+      <div class="statement" id="s1"></div>
+
+      <div class="divider"></div>
+
+      <div class="bio">
+        <p>Moved from Sweden to the Bay Area. Works at the intersection of hardware, space, and interaction — installations, spatial systems, physical interfaces.</p>
+        <p>Drawn to <strong>concrete</strong> and the thresholds between materials. Keeps returning to rooms that ask something of the people inside them. Interested in what a design makes possible, not what it looks like.</p>
+      </div>
+
+      <div class="clients" id="c1">
+        <p class="clients-label">Selected clients</p>
+        <p class="clients-list">IKEA. Mercedes-Benz. McDonald's. Above.</p>
+      </div>
+
+      <div class="projects">
+        <p class="projects-label">Work</p>
+        <div class="project">
+          <div class="project-img"><span class="img-ph">Image</span></div>
+          <p class="project-name">Threshold Study</p>
+          <p class="project-note">how a space changes when it knows you're there</p>
+          <p class="project-year">2022</p>
+        </div>
+        <div class="project">
+          <div class="project-img"><span class="img-ph">Image</span></div>
+          <p class="project-name">Instruction Distance</p>
+          <p class="project-note">the distance between a body and an instruction</p>
+          <p class="project-year">2023</p>
+        </div>
+        <div class="project">
+          <div class="project-img"><span class="img-ph">Image</span></div>
+          <p class="project-name">Visible Field</p>
+          <p class="project-note">what sensors make visible that eyes don't</p>
+          <p class="project-year">2024</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Work presented in person.</p>
+        <p><a href="mailto:anna@domain.com">anna@domain.com</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       II — SYSTEMS
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-2">
+    <div class="sys-head">
+      <span class="sys-name">Anna Smeragliuolo</span>
+      <span class="sys-role">Design Technologist</span>
+    </div>
+    <hr>
+    <div class="sys-prompt">&gt; design is consideration</div>
+
+    <div class="sys-block">
+      <div class="sys-key">Profile</div>
+      <p class="sys-val">Moved from Sweden to the Bay Area. Works at the intersection of hardware, space, and interaction — installations, spatial systems, physical interfaces. Drawn to concrete. Keeps returning to rooms that ask something of the people inside them.</p>
+    </div>
+
+    <div class="sys-block">
+      <div class="sys-key">Clients</div>
+      <p class="sys-val">IKEA &nbsp;·&nbsp; Mercedes-Benz &nbsp;·&nbsp; McDonald's &nbsp;·&nbsp; Above</p>
+    </div>
+
+    <div class="sys-block">
+      <div class="sys-key">Work</div>
+      <div class="sys-row">
+        <span class="sys-idx">001</span>
+        <span class="sys-title">Threshold Study</span>
+        <span class="sys-year">2022</span>
+        <span class="sys-desc">how a space changes when it knows you're there</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-idx">002</span>
+        <span class="sys-title">Instruction Distance</span>
+        <span class="sys-year">2023</span>
+        <span class="sys-desc">the distance between a body and an instruction</span>
+      </div>
+      <div class="sys-row">
+        <span class="sys-idx">003</span>
+        <span class="sys-title">Visible Field</span>
+        <span class="sys-year">2024</span>
+        <span class="sys-desc">what sensors make visible that eyes don't</span>
+      </div>
+    </div>
+
+    <div class="sys-foot">
+      <p>Work presented in person.</p>
+      <p><a href="mailto:anna@domain.com">anna@domain.com</a></p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       III — MATTER
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-3">
+    <div class="mat-top">
+      <div class="mat-name">Anna Smeragliuolo</div>
+      <div class="mat-role">Design<br>Technologist</div>
+    </div>
+
+    <div class="mat-stmt">design is consideration</div>
+
+    <div class="mat-row">
+      <div class="mat-row-label">Bio</div>
+      <div class="mat-row-body">
+        Moved from Sweden to the Bay Area. Works at the intersection of hardware, space, and interaction — installations, spatial systems, physical interfaces.<br><br>
+        Drawn to <strong>concrete</strong> and the thresholds between materials. Keeps returning to rooms that ask something of the people inside them.
+      </div>
+    </div>
+
+    <div class="mat-row">
+      <div class="mat-row-label">Clients</div>
+      <div class="mat-clients-list">
+        <span class="mat-client">IKEA</span>
+        <span class="mat-client">Mercedes-Benz</span>
+        <span class="mat-client">McDonald's</span>
+        <span class="mat-client">Above</span>
+      </div>
+    </div>
+
+    <div class="mat-projects">
+      <div class="mat-project">
+        <div class="mat-proj-idx">001 · 2022</div>
+        <div>
+          <div class="mat-proj-name">Threshold Study</div>
+          <div class="mat-proj-note">how a space changes when it knows you're there</div>
+        </div>
+      </div>
+      <div class="mat-project">
+        <div class="mat-proj-idx">002 · 2023</div>
+        <div>
+          <div class="mat-proj-name">Instruction Distance</div>
+          <div class="mat-proj-note">the distance between a body and an instruction</div>
+        </div>
+      </div>
+      <div class="mat-project">
+        <div class="mat-proj-idx">003 · 2024</div>
+        <div>
+          <div class="mat-proj-name">Visible Field</div>
+          <div class="mat-proj-note">what sensors make visible that eyes don't</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mat-foot">
+      Work presented in person.<br>
+      <a href="mailto:anna@domain.com">anna@domain.com</a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       IV — SIGNAL
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-4">
+    <div class="sig-head">
+      <span class="sig-name">Anna Smeragliuolo</span>
+      <span class="sig-dot"></span>
+    </div>
+
+    <div class="sig-body">
+      <div class="sig-stmt">design is consideration</div>
+      <div class="sig-works">
+        <span class="sig-work">Threshold Study — 2022</span>
+        <span class="sig-work">Instruction Distance — 2023</span>
+        <span class="sig-work">Visible Field — 2024</span>
+      </div>
+    </div>
+
+    <div class="sig-foot">
+      Work presented in person. &nbsp;·&nbsp;
+      <a href="mailto:anna@domain.com">anna@domain.com</a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       V — FIELD
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-5">
+    <div class="fld-grid-wrap">
+      <pre id="fld-grid"></pre>
+    </div>
+    <div class="fld-content">
+      <div class="fld-inner">
+        <div class="fld-header">
+          <div class="fld-name">Anna Smeragliuolo</div>
+          <div class="fld-role">Design Technologist</div>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·00·</span>
+          <span class="fld-row-content" style="color:#c8c0e0;">design is consideration</span>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·01·</span>
+          <div class="fld-row-content">
+            Moved from Sweden to the Bay Area.<br>
+            Hardware, space, and interaction.<br>
+            Drawn to concrete. Rooms that ask things.
+          </div>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·02·</span>
+          <div>
+            <div class="fld-work-row">
+              <span class="fld-work-title">Threshold Study</span>
+              <span class="fld-work-year">2022</span>
+            </div>
+            <div class="fld-work-row">
+              <span class="fld-work-title">Instruction Distance</span>
+              <span class="fld-work-year">2023</span>
+            </div>
+            <div class="fld-work-row">
+              <span class="fld-work-title">Visible Field</span>
+              <span class="fld-work-year">2024</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="fld-row">
+          <span class="fld-row-label">·03·</span>
+          <div class="fld-row-content">
+            anna@domain.com<br>
+            Work presented in person.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       VI — ENGINEERING
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-6">
+    <div class="eng-topbar"></div>
+
+    <div class="eng-header">
+      <div class="eng-id">ACC·7749·ANNA·DesignTech</div>
+      <div class="eng-title">Personnel File</div>
+      <div class="eng-status">
+        <span class="eng-led"></span>
+        Active
+      </div>
+    </div>
+
+    <div class="eng-body">
+      <div class="eng-field">
+        <span class="eng-key">Name</span>
+        <span class="eng-val-hi">Anna Smeragliuolo</span>
+      </div>
+      <div class="eng-field">
+        <span class="eng-key">Designation</span>
+        <span class="eng-val">Design Technologist</span>
+      </div>
+      <div class="eng-field">
+        <span class="eng-key">Origin</span>
+        <span class="eng-val">Sweden → Bay Area</span>
+      </div>
+      <div class="eng-field">
+        <span class="eng-key">Active stations</span>
+        <span class="eng-val">Hardware / Space / Interaction</span>
+      </div>
+      <div class="eng-field">
+        <span class="eng-key">Materials</span>
+        <span class="eng-val">Concrete. Thresholds. Physical interfaces.</span>
+      </div>
+
+      <div class="eng-divider">
+        <span class="eng-divider-label">Mission statement</span>
+        <span class="eng-divider-line"></span>
+      </div>
+      <div class="eng-mission">design is consideration</div>
+
+      <div class="eng-divider">
+        <span class="eng-divider-label">Active work log</span>
+        <span class="eng-divider-line"></span>
+      </div>
+
+      <div class="eng-entry">
+        <span class="eng-entry-id">[STDY·2022]</span>
+        <div>
+          <div class="eng-entry-title">Threshold Study</div>
+          <div class="eng-entry-note">how a space changes when it knows you're there</div>
+        </div>
+      </div>
+      <div class="eng-entry">
+        <span class="eng-entry-id">[DIST·2023]</span>
+        <div>
+          <div class="eng-entry-title">Instruction Distance</div>
+          <div class="eng-entry-note">the distance between a body and an instruction</div>
+        </div>
+      </div>
+      <div class="eng-entry">
+        <span class="eng-entry-id">[FILD·2024]</span>
+        <div>
+          <div class="eng-entry-title">Visible Field</div>
+          <div class="eng-entry-note">what sensors make visible that eyes don't</div>
+        </div>
+      </div>
+
+      <div class="eng-divider">
+        <span class="eng-divider-label">Contact protocol</span>
+        <span class="eng-divider-line"></span>
+      </div>
+      <div class="eng-field">
+        <span class="eng-key">Protocol</span>
+        <span class="eng-val">Work presented in person.</span>
+      </div>
+      <div class="eng-field">
+        <span class="eng-key">Comm link</span>
+        <span class="eng-val"><a href="mailto:anna@domain.com" style="color:#00a8ff;text-decoration:none;">anna@domain.com</a></span>
+      </div>
+    </div>
+
+    <div class="eng-foot">
+      <span>Clients: IKEA · Mercedes-Benz · McDonald's · Above</span>
+      <span>Stardates 2022–2024</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       VII — ENCOUNTER
+  ══════════════════════════════════════════════════ -->
+  <section class="chapter" id="ch-7">
+    <div class="rpg-card">
+
+      <div class="rpg-portrait-wrap">
+        <img src="img/image.png" alt="Anna Smeragliuolo">
+        <div class="rpg-nameplate">
+          <span class="rpg-name">Anna Smeragliuolo</span>
+          <span class="rpg-cross">+</span>
+        </div>
+      </div>
+
+      <div class="rpg-panel">
+        <div class="rpg-stat">
+          <span class="rpg-key">Class</span>
+          <span class="rpg-val">Design Technologist</span>
+        </div>
+        <div class="rpg-stat">
+          <span class="rpg-key">Origin</span>
+          <span class="rpg-val">Sweden → Bay Area</span>
+        </div>
+        <div class="rpg-stat">
+          <span class="rpg-key">Specialty</span>
+          <span class="rpg-val">Hardware / Space / Interaction</span>
+        </div>
+        <div class="rpg-stat">
+          <span class="rpg-key">Material</span>
+          <span class="rpg-val">Concrete. Thresholds.</span>
+        </div>
+
+        <div class="rpg-sep"></div>
+        <div class="rpg-section">Clients</div>
+        <div class="rpg-stat">
+          <span class="rpg-key"></span>
+          <span class="rpg-val">IKEA · Mercedes-Benz<br>McDonald's · Above</span>
+        </div>
+      </div>
+
+      <div class="rpg-dialogue">
+        <div class="rpg-prompt">design is consideration</div>
+      </div>
+
+      <div class="rpg-panel">
+        <div class="rpg-section">Missions completed</div>
+        <div class="rpg-mission-row">
+          <span class="rpg-mission-name">Threshold Study</span>
+          <span class="rpg-mission-year">[2022]</span>
+        </div>
+        <div class="rpg-mission-row">
+          <span class="rpg-mission-name">Instruction Distance</span>
+          <span class="rpg-mission-year">[2023]</span>
+        </div>
+        <div class="rpg-mission-row">
+          <span class="rpg-mission-name">Visible Field</span>
+          <span class="rpg-mission-year">[2024]</span>
+        </div>
+      </div>
+
+      <div class="rpg-foot">
+        Work presented in person.<br>
+        <a href="mailto:anna@domain.com">anna@domain.com</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       META NAV
+  ══════════════════════════════════════════════════ -->
+  <nav class="ch-nav">
+    <button class="ch-btn" onclick="go(-1)">←</button>
+    <div class="ch-info">
+      <span class="ch-pip" id="pip"></span>
+      <span class="ch-num" id="num">I</span>
+      <span class="ch-sep">·</span>
+      <span class="ch-label" id="lbl">RESTRAINT</span>
+    </div>
+    <button class="ch-btn" onclick="go(1)">→</button>
+  </nav>
+
+  <script>
+    const CHS = [
+      { num: 'I',   label: 'Restraint',   pip: '#c8401a' },
+      { num: 'II',  label: 'Systems',     pip: '#7F77DD' },
+      { num: 'III', label: 'Matter',      pip: '#a09060' },
+      { num: 'IV',  label: 'Signal',      pip: '#c8401a' },
+      { num: 'V',   label: 'Field',       pip: '#7b6fa5' },
+      { num: 'VI',  label: 'Engineering', pip: '#00a8ff' },
+      { num: 'VII', label: 'Encounter',   pip: '#d4a030' },
+    ];
+
+    let cur = 0;
+
+    // CH V — ASCII wave field
+    class AsciiField {
+      constructor() {
+        this.el = document.getElementById('fld-grid');
+        this.cols = 100;
+        this.rows = 60;
+        this.frame = 0;
+        this.raf = null;
+        this.lastT = 0;
+        this.fps = 1000 / 20;
+      }
+      start() {
+        if (this.raf) return;
+        const tick = (t) => {
+          if (t - this.lastT > this.fps) {
+            this.render();
+            this.lastT = t;
+            this.frame++;
+          }
+          this.raf = requestAnimationFrame(tick);
+        };
+        this.raf = requestAnimationFrame(tick);
+      }
+      stop() {
+        if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+      }
+      render() {
+        const s = [' ', '·', '∙', '∘', '○', '◌', '◎', '⊙', '●'];
+        const n = s.length - 1;
+        const t = this.frame * 0.022;
+        let out = '';
+        for (let y = 0; y < this.rows; y++) {
+          for (let x = 0; x < this.cols; x++) {
+            const v = (Math.sin(x * 0.1 + t) + Math.cos(y * 0.12 - t * 0.7) + Math.sin((x + y) * 0.05 + t * 0.5) + 3) / 6;
+            out += s[Math.floor(v * n)];
+          }
+          out += '\n';
+        }
+        this.el.textContent = out;
+      }
+    }
+
+    const field = new AsciiField();
+
+    // CH I — ambient spotlight grid (no interaction)
+    class SpotCanvas {
+      constructor() {
+        this.el = document.getElementById('c1-canvas');
+        this.ctx = this.el.getContext('2d');
+        this.raf = null;
+        this.t = 0;
+        this.spacing = 26;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+      resize() {
+        this.el.width = window.innerWidth;
+        this.el.height = window.innerHeight;
+      }
+      start() {
+        if (this.raf) return;
+        const tick = () => { this.draw(); this.raf = requestAnimationFrame(tick); };
+        this.raf = requestAnimationFrame(tick);
+      }
+      stop() {
+        if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+      }
+      draw() {
+        this.t += 0.004;
+        const { el, ctx, spacing } = this;
+        const W = el.width, H = el.height;
+        // slow Lissajous drift
+        const sx = W * (0.5 + 0.38 * Math.sin(this.t));
+        const sy = H * (0.5 + 0.38 * Math.sin(this.t * 0.61 + 1.0));
+        const r = Math.min(W, H) * 0.3;
+        ctx.clearRect(0, 0, W, H);
+        const cols = Math.ceil(W / spacing) + 1;
+        const rows = Math.ceil(H / spacing) + 1;
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const x = col * spacing;
+            const y = row * spacing;
+            const dist = Math.hypot(x - sx, y - sy);
+            const strength = Math.max(0, 1 - dist / r);
+            const t2 = strength * strength;
+            // base warm grey → terracotta bloom
+            const rr = Math.round(154 + t2 * (200 - 154));
+            const gg = Math.round(138 + t2 * (64 - 138));
+            const bb = Math.round(122 + t2 * (26 - 122));
+            const alpha = 0.065 + t2 * 0.18;
+            ctx.beginPath();
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${rr},${gg},${bb},${alpha.toFixed(3)})`;
+            ctx.fill();
+          }
+        }
+      }
+    }
+
+    const spot = new SpotCanvas();
+
+    function go(d) {
+      cur = (cur + d + CHS.length) % CHS.length;
+      const ch = CHS[cur];
+      document.documentElement.setAttribute('data-ch', cur + 1);
+      document.getElementById('num').textContent = ch.num;
+      document.getElementById('lbl').textContent = ch.label.toUpperCase();
+      document.getElementById('pip').style.background = ch.pip;
+      cur === 4 ? field.start() : field.stop();
+      cur === 0 ? spot.start() : spot.stop();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp')   go(-1);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+    });
+
+    // CH I — statement types once, never repeats
+    const s1 = document.getElementById('s1');
+    const txt = 'design is consideration';
+    let i = 0;
+    (function type() {
+      if (i < txt.length) {
+        s1.textContent += txt[i++];
+        setTimeout(type, 55 + Math.random() * 38);
+      } else {
+        s1.classList.add('done');
+      }
+    })();
+
+    // CH I — clients appear after 7s
+    setTimeout(() => document.getElementById('c1').classList.add('visible'), 7000);
+
+    // Init pip color
+    document.getElementById('pip').style.background = CHS[0].pip;
+    spot.start(); // ch-1 is default
+  </script>
+
+</body>
+</html>

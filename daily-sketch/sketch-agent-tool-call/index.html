@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>agent tool call + thinking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --border-bright: rgba(255,255,255,0.12);
+      --accent: #00a8ff;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --r: 4px;
+
+      /* state colors */
+      --s-thinking: #a8aab8;
+      --s-thinking-bg: rgba(168,170,184,0.06);
+      --s-running: #ffaa00;
+      --s-running-bg: rgba(255,170,0,0.06);
+      --s-done: #00cc66;
+      --s-done-bg: rgba(0,204,102,0.06);
+      --s-error: #ff4455;
+      --s-error-bg: rgba(255,68,85,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { background: var(--ground-void); color: var(--text-default); font-family: var(--font-mono); font-size: 12px; min-height: 100vh; }
+
+    .page { max-width: 800px; margin: 0 auto; padding: 48px 40px; }
+
+    header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 48px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border-default); }
+    header h1 { font-size: 13px; font-weight: 400; color: var(--text-default); letter-spacing: 0.04em; }
+    header span { font-size: 11px; color: var(--text-tertiary); }
+
+    /* ── GRID ── */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; background: var(--border-default); border: 0.5px solid var(--border-default); }
+    .cell { background: var(--ground-void); padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+    .cell-label { font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; }
+    .variants { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .variants-col { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; width: 100%; }
+    .pair-sep { color: var(--text-ghost); font-size: 9px; }
+
+    /* state dot used across components */
+    .sdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .sdot.thinking { background: var(--s-thinking); }
+    .sdot.running  { background: var(--s-running); }
+    .sdot.done     { background: var(--s-done); }
+    .sdot.error    { background: var(--s-error); }
+
+    /* ── 01 INLINE STATUS ── */
+    .inline-call {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; font-family: var(--font-mono);
+      padding: 5px 0; cursor: pointer; user-select: none;
+      color: var(--text-tertiary); transition: color .1s;
+    }
+    .inline-call .arrow { color: var(--text-ghost); }
+    .inline-call .tool  { color: var(--text-secondary); }
+    .inline-call .args  { color: var(--text-tertiary); }
+    .inline-call .sep   { color: var(--text-ghost); }
+    .inline-call .status-text { font-size: 10px; transition: color .1s; }
+
+    .inline-call[data-state="thinking"] .status-text { color: var(--s-thinking); }
+    .inline-call[data-state="running"]  .status-text { color: var(--s-running); }
+    .inline-call[data-state="done"]     .status-text { color: var(--s-done); }
+    .inline-call[data-state="error"]    .status-text { color: var(--s-error); }
+    .inline-call[data-state="thinking"] .arrow { color: var(--s-thinking); opacity: .5; }
+    .inline-call[data-state="running"]  .arrow { color: var(--s-running); opacity: .7; }
+
+    /* ── 02 CHIP ── */
+    .tool-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      padding: 4px 9px; font-size: 10px; font-family: var(--font-mono);
+      cursor: pointer; user-select: none; transition: border-color .15s, background .15s;
+    }
+    .tool-chip .tool-name { color: var(--text-tertiary); transition: color .15s; }
+    .tool-chip[data-state="thinking"] { border-color: rgba(168,170,184,0.2); }
+    .tool-chip[data-state="thinking"] .sdot { background: var(--s-thinking); opacity: .5; }
+    .tool-chip[data-state="thinking"] .tool-name { color: var(--text-tertiary); }
+    .tool-chip[data-state="running"]  { border-color: rgba(255,170,0,0.3); background: var(--s-running-bg); }
+    .tool-chip[data-state="running"]  .sdot { background: var(--s-running); }
+    .tool-chip[data-state="running"]  .tool-name { color: var(--text-secondary); }
+    .tool-chip[data-state="done"]     { border-color: rgba(0,204,102,0.2); }
+    .tool-chip[data-state="done"]     .sdot { background: var(--s-done); }
+    .tool-chip[data-state="done"]     .tool-name { color: var(--text-tertiary); }
+    .tool-chip[data-state="error"]    { border-color: rgba(255,68,85,0.3); background: var(--s-error-bg); }
+    .tool-chip[data-state="error"]    .sdot { background: var(--s-error); }
+    .tool-chip[data-state="error"]    .tool-name { color: var(--s-error); }
+
+    /* ── 03 THINKING ── */
+    .thinking-dots { font-size: 11px; color: var(--s-thinking); cursor: pointer; user-select: none; letter-spacing: 0.2em; padding: 2px 0; }
+    .thinking-bracket { font-size: 11px; font-family: var(--font-mono); cursor: pointer; user-select: none; }
+    .thinking-bracket .tb-bk { color: var(--text-ghost); }
+    .thinking-bracket .tb-text { color: var(--s-thinking); }
+    .thinking-cursor { font-size: 11px; font-family: var(--font-mono); color: var(--s-thinking); cursor: pointer; user-select: none; }
+    .thinking-cursor .cur { color: var(--text-ghost); }
+    .thinking-fade { font-size: 11px; font-family: var(--font-mono); color: var(--text-ghost); cursor: pointer; user-select: none; letter-spacing: 0.04em; }
+    .thinking-slash { font-size: 11px; font-family: var(--font-mono); cursor: pointer; user-select: none; }
+    .thinking-slash .sl { color: var(--s-thinking); margin-right: 5px; }
+    .thinking-slash .st { color: var(--text-tertiary); }
+
+    /* ── 04 LOG LINE ── */
+    .log-line {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 10px; font-family: var(--font-mono);
+      padding: 3px 0; cursor: pointer; user-select: none;
+      border-bottom: 0.5px solid transparent; transition: border-color .1s;
+    }
+    .log-line .ts   { color: var(--text-ghost); flex-shrink: 0; width: 44px; }
+    .log-line .verb { font-size: 9px; letter-spacing: 0.08em; width: 28px; flex-shrink: 0; }
+    .log-line .ltool { color: var(--text-secondary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .log-line .lstat { font-size: 9px; flex-shrink: 0; }
+    .log-line[data-state="thinking"] .verb { color: var(--s-thinking); }
+    .log-line[data-state="thinking"] .lstat { color: var(--s-thinking); }
+    .log-line[data-state="running"]  .verb { color: var(--s-running); }
+    .log-line[data-state="running"]  .lstat { color: var(--s-running); }
+    .log-line[data-state="done"]     .verb { color: var(--s-done); }
+    .log-line[data-state="done"]     .lstat { color: var(--s-done); }
+    .log-line[data-state="error"]    .verb { color: var(--s-error); }
+    .log-line[data-state="error"]    .lstat { color: var(--s-error); }
+
+    /* ── 05 BLOCK CARD ── */
+    .tool-block {
+      border: 0.5px solid var(--border-bright); border-radius: var(--r);
+      overflow: hidden; cursor: pointer; user-select: none;
+      transition: border-color .15s; width: 100%;
+    }
+    .tool-block-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 10px; background: var(--ground-raised);
+      border-bottom: 0.5px solid var(--border-bright);
+    }
+    .tool-block-name { font-size: 10px; color: var(--text-secondary); }
+    .tool-block-state { font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; transition: color .15s; }
+    .tool-block-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+    .tool-block-row { display: flex; gap: 8px; font-size: 10px; }
+    .tool-block-row .k { color: var(--text-ghost); width: 32px; flex-shrink: 0; }
+    .tool-block-row .v { color: var(--text-tertiary); }
+
+    .tool-block[data-state="thinking"] { border-color: rgba(168,170,184,0.15); }
+    .tool-block[data-state="thinking"] .tool-block-state { color: var(--s-thinking); }
+    .tool-block[data-state="running"]  { border-color: rgba(255,170,0,0.25); }
+    .tool-block[data-state="running"]  .tool-block-state { color: var(--s-running); }
+    .tool-block[data-state="running"]  .tool-block-head { background: var(--s-running-bg); }
+    .tool-block[data-state="done"]     { border-color: rgba(0,204,102,0.2); }
+    .tool-block[data-state="done"]     .tool-block-state { color: var(--s-done); }
+    .tool-block[data-state="error"]    { border-color: rgba(255,68,85,0.25); }
+    .tool-block[data-state="error"]    .tool-block-state { color: var(--s-error); }
+    .tool-block[data-state="error"]    .tool-block-head { background: var(--s-error-bg); }
+
+    /* ── 06 STEP ── */
+    .step-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; cursor: pointer; user-select: none; }
+    .step-num { width: 16px; height: 16px; border-radius: 50%; border: 0.5px solid var(--border-bright); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--text-ghost); flex-shrink: 0; transition: all .15s; }
+    .step-name { font-size: 11px; color: var(--text-tertiary); transition: color .15s; flex: 1; }
+    .step-tag { font-size: 9px; letter-spacing: 0.06em; flex-shrink: 0; transition: color .15s; }
+
+    .step-row[data-state="thinking"] .step-num  { border-color: rgba(168,170,184,0.3); color: var(--s-thinking); }
+    .step-row[data-state="thinking"] .step-name { color: var(--text-secondary); }
+    .step-row[data-state="thinking"] .step-tag  { color: var(--s-thinking); }
+    .step-row[data-state="running"]  .step-num  { border-color: var(--s-running); color: var(--s-running); background: var(--s-running-bg); }
+    .step-row[data-state="running"]  .step-name { color: var(--text-default); }
+    .step-row[data-state="running"]  .step-tag  { color: var(--s-running); }
+    .step-row[data-state="done"]     .step-num  { border-color: rgba(0,204,102,0.3); color: var(--s-done); background: var(--s-done-bg); }
+    .step-row[data-state="done"]     .step-name { color: var(--text-tertiary); }
+    .step-row[data-state="done"]     .step-tag  { color: var(--s-done); }
+    .step-row[data-state="error"]    .step-num  { border-color: rgba(255,68,85,0.3); color: var(--s-error); background: var(--s-error-bg); }
+    .step-row[data-state="error"]    .step-name { color: var(--s-error); }
+    .step-row[data-state="error"]    .step-tag  { color: var(--s-error); }
+
+    /* ── 07 TIMELINE ── */
+    .timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+    .tl-item { display: flex; align-items: flex-start; gap: 10px; position: relative; padding-bottom: 12px; cursor: pointer; user-select: none; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-spine { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .tl-dot { width: 7px; height: 7px; border-radius: 50%; border: 0.5px solid var(--border-bright); background: var(--ground-void); transition: all .15s; flex-shrink: 0; margin-top: 2px; }
+    .tl-line { width: 0.5px; background: var(--border-bright); flex: 1; min-height: 12px; margin-top: 2px; }
+    .tl-item:last-child .tl-line { display: none; }
+    .tl-content { display: flex; align-items: baseline; gap: 8px; flex: 1; }
+    .tl-name { font-size: 11px; color: var(--text-tertiary); transition: color .15s; }
+    .tl-meta { font-size: 9px; color: var(--text-ghost); transition: color .15s; }
+
+    .tl-item[data-state="thinking"] .tl-dot { border-color: rgba(168,170,184,0.4); background: var(--s-thinking-bg); }
+    .tl-item[data-state="thinking"] .tl-name { color: var(--text-secondary); }
+    .tl-item[data-state="thinking"] .tl-meta { color: var(--s-thinking); }
+    .tl-item[data-state="running"]  .tl-dot { border-color: var(--s-running); background: var(--s-running-bg); }
+    .tl-item[data-state="running"]  .tl-name { color: var(--text-default); }
+    .tl-item[data-state="running"]  .tl-meta { color: var(--s-running); }
+    .tl-item[data-state="done"]     .tl-dot { border-color: rgba(0,204,102,0.4); background: var(--s-done-bg); }
+    .tl-item[data-state="done"]     .tl-name { color: var(--text-tertiary); }
+    .tl-item[data-state="done"]     .tl-meta { color: var(--s-done); }
+    .tl-item[data-state="error"]    .tl-dot { border-color: rgba(255,68,85,0.4); background: var(--s-error-bg); }
+    .tl-item[data-state="error"]    .tl-name { color: var(--s-error); }
+    .tl-item[data-state="error"]    .tl-meta { color: var(--s-error); }
+
+    /* ── 08 PREFIX MARK ── */
+    .msg-row { display: flex; align-items: flex-start; gap: 8px; width: 100%; cursor: pointer; user-select: none; }
+    .msg-mark { width: 3px; border-radius: 2px; align-self: stretch; min-height: 28px; flex-shrink: 0; transition: background .15s; }
+    .msg-body { flex: 1; }
+    .msg-label { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; transition: color .15s; }
+    .msg-text { font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
+
+    .msg-row[data-state="thinking"] .msg-mark  { background: var(--s-thinking); opacity: .4; }
+    .msg-row[data-state="thinking"] .msg-label { color: var(--s-thinking); }
+    .msg-row[data-state="running"]  .msg-mark  { background: var(--s-running); }
+    .msg-row[data-state="running"]  .msg-label { color: var(--s-running); }
+    .msg-row[data-state="done"]     .msg-mark  { background: var(--s-done); opacity: .5; }
+    .msg-row[data-state="done"]     .msg-label { color: var(--s-done); }
+    .msg-row[data-state="error"]    .msg-mark  { background: var(--s-error); }
+    .msg-row[data-state="error"]    .msg-label { color: var(--s-error); }
+
+    /* ── COMPOSED EXAMPLE ── */
+    .chat-section { margin-top: 48px; }
+    .section-label { font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+    .chat-turn { border: 0.5px solid var(--border-bright); border-radius: var(--r); overflow: hidden; }
+    .chat-msg { padding: 12px 16px; border-bottom: 0.5px solid var(--border-default); }
+    .chat-msg:last-child { border-bottom: none; }
+    .chat-role { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 6px; }
+    .chat-body { font-size: 11px; color: var(--text-default); line-height: 1.6; }
+    .chat-body.dim { color: var(--text-tertiary); }
+
+    .agent-thinking-msg { background: var(--s-thinking-bg); }
+    .agent-thinking-msg .chat-role { color: var(--s-thinking); }
+    .agent-tool-msg { background: var(--s-running-bg); }
+    .agent-tool-msg .chat-role { color: var(--s-running); }
+    .agent-tool-done { background: var(--s-done-bg); }
+    .agent-tool-done .chat-role { color: var(--s-done); }
+
+    /* ── COMBINATION CATALOG ── */
+    .combo-section { margin-top: 48px; }
+    .combo-rows { display: flex; flex-direction: column; gap: 1px; background: var(--border-default); border: 0.5px solid var(--border-default); }
+    .combo-row { background: var(--ground-void); padding: 14px 24px; display: flex; align-items: center; gap: 24px; }
+    .combo-lbl { font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; width: 88px; flex-shrink: 0; }
+    .combo-demo { flex: 1; }
+
+    /* combo variants */
+    .cmsg { font-size: 11px; color: var(--text-default); line-height: 1.5; }
+    .cmsg .ctag { display: inline-flex; align-items: center; gap: 5px; border: 0.5px solid var(--border-bright); border-radius: 3px; padding: 1px 6px; font-size: 10px; color: var(--text-tertiary); cursor: pointer; user-select: none; transition: all .15s; vertical-align: middle; margin: 0 2px; }
+    .cmsg .ctag .sdot { width: 5px; height: 5px; }
+    .cmsg .ctag[data-state="running"] { border-color: rgba(255,170,0,0.35); color: var(--s-running); background: var(--s-running-bg); }
+    .cmsg .ctag[data-state="running"] .sdot { background: var(--s-running); }
+    .cmsg .ctag[data-state="done"]    { border-color: rgba(0,204,102,0.2); color: var(--s-done); }
+    .cmsg .ctag[data-state="done"]    .sdot { background: var(--s-done); }
+
+    .above-row { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .above-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .above-bubble { font-size: 11px; color: var(--text-default); padding: 8px 10px; border: 0.5px solid var(--border-bright); border-radius: var(--r); line-height: 1.5; }
+
+    .below-row { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .below-bubble { font-size: 11px; color: var(--text-default); padding: 8px 10px; border: 0.5px solid var(--border-bright); border-radius: var(--r); line-height: 1.5; }
+    .below-strip { display: flex; gap: 6px; flex-wrap: wrap; padding: 4px 2px; }
+
+    .left-mark-row { display: flex; gap: 10px; align-items: stretch; }
+    .left-mark-bar { width: 2px; border-radius: 1px; background: var(--s-running); flex-shrink: 0; }
+    .left-mark-content { flex: 1; }
+    .left-mark-tools { display: flex; gap: 6px; margin-bottom: 5px; flex-wrap: wrap; }
+    .left-mark-text { font-size: 11px; color: var(--text-default); line-height: 1.5; }
+
+    .float-wrap { position: relative; display: inline-block; width: 100%; }
+    .float-bubble { font-size: 11px; color: var(--text-default); padding: 8px 10px; border: 0.5px solid var(--border-bright); border-radius: var(--r); line-height: 1.5; }
+    .float-badge { position: absolute; top: -9px; right: 8px; display: flex; gap: 4px; }
+
+    .log-block { border: 0.5px solid var(--border-default); border-radius: var(--r); overflow: hidden; width: 100%; }
+    .log-block-head { padding: 8px 10px; background: var(--ground-raised); border-bottom: 0.5px solid var(--border-default); font-size: 11px; color: var(--text-default); line-height: 1.5; }
+    .log-block-rows { padding: 6px 10px; display: flex; flex-direction: column; gap: 3px; }
+
+    .step-thread { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+    .thread-line { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+    .thread-line .tl-connector { width: 0.5px; height: 8px; background: var(--border-bright); margin-left: 3px; }
+
+    .footer-bar { display: flex; align-items: center; gap: 8px; padding-top: 6px; border-top: 0.5px solid var(--border-default); margin-top: 6px; }
+    .footer-bar .ft { font-size: 10px; color: var(--text-ghost); }
+    .footer-bar .tool-chip { transform: scale(0.9); transform-origin: left; }
+
+    .typing-indicator { display: flex; align-items: center; gap: 6px; }
+    .typing-indicator .dots { display: flex; gap: 3px; }
+    .typing-indicator .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--s-thinking); }
+    .typing-indicator .dot:nth-child(2) { opacity: .6; }
+    .typing-indicator .dot:nth-child(3) { opacity: .3; }
+    .typing-indicator .lbl { font-size: 10px; color: var(--s-thinking); }
+
+    .overlay-wrap { position: relative; width: 100%; }
+    .overlay-bubble { font-size: 11px; color: var(--text-default); padding: 8px 10px; border: 0.5px solid var(--border-bright); border-radius: var(--r); line-height: 1.5; }
+    .overlay-status { position: absolute; bottom: -1px; left: -1px; right: -1px; display: flex; gap: 6px; align-items: center; padding: 4px 10px; background: var(--ground-raised); border: 0.5px solid var(--s-running); border-top: none; border-radius: 0 0 var(--r) var(--r); }
+    .overlay-status .lbl { font-size: 9px; color: var(--s-running); letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>agent tool call + thinking</h1>
+  <span>reference sheet · 8 families · click to cycle states</span>
+</header>
+
+<div class="grid">
+
+  <!-- 01 · inline status -->
+  <div class="cell">
+    <div class="cell-label">01 · inline status</div>
+    <div class="variants-col">
+      <div class="inline-call" data-state="thinking" onclick="cycle(this)">
+        <span class="arrow">↳</span>
+        <span class="tool">web_search</span>
+        <span class="args">("query")</span>
+        <span class="sep">·</span>
+        <span class="status-text">thinking</span>
+      </div>
+      <div class="inline-call" data-state="running" onclick="cycle(this)">
+        <span class="arrow">↳</span>
+        <span class="tool">read_file</span>
+        <span class="args">("path")</span>
+        <span class="sep">·</span>
+        <span class="status-text">running</span>
+      </div>
+      <div class="inline-call" data-state="done" onclick="cycle(this)">
+        <span class="arrow">↳</span>
+        <span class="tool">bash</span>
+        <span class="args">("ls -la")</span>
+        <span class="sep">·</span>
+        <span class="status-text">0.4s</span>
+      </div>
+      <div class="inline-call" data-state="error" onclick="cycle(this)">
+        <span class="arrow">↳</span>
+        <span class="tool">write_file</span>
+        <span class="args">("out")</span>
+        <span class="sep">·</span>
+        <span class="status-text">failed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 · chip -->
+  <div class="cell">
+    <div class="cell-label">02 · chip</div>
+    <div class="variants-col">
+      <div class="tool-chip" data-state="thinking" onclick="cycle(this)">
+        <div class="sdot thinking"></div>
+        <span class="tool-name">web_search</span>
+      </div>
+      <div class="tool-chip" data-state="running" onclick="cycle(this)">
+        <div class="sdot running"></div>
+        <span class="tool-name">read_file</span>
+      </div>
+      <div class="tool-chip" data-state="done" onclick="cycle(this)">
+        <div class="sdot done"></div>
+        <span class="tool-name">bash</span>
+      </div>
+      <div class="tool-chip" data-state="error" onclick="cycle(this)">
+        <div class="sdot error"></div>
+        <span class="tool-name">write_file</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 · thinking -->
+  <div class="cell">
+    <div class="cell-label">03 · thinking</div>
+    <div class="variants-col">
+      <div class="thinking-dots">· · ·</div>
+      <div class="thinking-bracket"><span class="tb-bk">[</span><span class="tb-text">thinking</span><span class="tb-bk">]</span></div>
+      <div class="thinking-cursor"><span class="cur">▋</span></div>
+      <div class="thinking-fade">reasoning</div>
+      <div class="thinking-slash"><span class="sl">/</span><span class="st">thinking</span></div>
+    </div>
+  </div>
+
+  <!-- 04 · log line -->
+  <div class="cell">
+    <div class="cell-label">04 · log line</div>
+    <div class="variants-col">
+      <div class="log-line" data-state="thinking" onclick="cycle(this)">
+        <span class="ts">00:00</span>
+        <span class="verb">THINK</span>
+        <span class="ltool">reasoning</span>
+        <span class="lstat">···</span>
+      </div>
+      <div class="log-line" data-state="running" onclick="cycle(this)">
+        <span class="ts">00:01</span>
+        <span class="verb">CALL</span>
+        <span class="ltool">web_search</span>
+        <span class="lstat">running</span>
+      </div>
+      <div class="log-line" data-state="done" onclick="cycle(this)">
+        <span class="ts">00:02</span>
+        <span class="verb">RET</span>
+        <span class="ltool">web_search</span>
+        <span class="lstat">0.4s</span>
+      </div>
+      <div class="log-line" data-state="error" onclick="cycle(this)">
+        <span class="ts">00:03</span>
+        <span class="verb">ERR</span>
+        <span class="ltool">write_file</span>
+        <span class="lstat">timeout</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 · block card -->
+  <div class="cell">
+    <div class="cell-label">05 · block card</div>
+    <div class="variants-col">
+      <div class="tool-block" data-state="running" onclick="cycle(this)">
+        <div class="tool-block-head">
+          <span class="tool-block-name">web_search</span>
+          <span class="tool-block-state">running</span>
+        </div>
+        <div class="tool-block-body">
+          <div class="tool-block-row"><span class="k">in</span><span class="v">"latest AI news"</span></div>
+        </div>
+      </div>
+      <div class="tool-block" data-state="done" onclick="cycle(this)">
+        <div class="tool-block-head">
+          <span class="tool-block-name">web_search</span>
+          <span class="tool-block-state">done · 0.4s</span>
+        </div>
+        <div class="tool-block-body">
+          <div class="tool-block-row"><span class="k">in</span><span class="v">"latest AI news"</span></div>
+          <div class="tool-block-row"><span class="k">out</span><span class="v">12 results</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 · step -->
+  <div class="cell">
+    <div class="cell-label">06 · step</div>
+    <div class="variants-col">
+      <div class="step-row" data-state="done" onclick="cycle(this)">
+        <div class="step-num">1</div>
+        <span class="step-name">web_search</span>
+        <span class="step-tag">done</span>
+      </div>
+      <div class="step-row" data-state="running" onclick="cycle(this)">
+        <div class="step-num">2</div>
+        <span class="step-name">read_file</span>
+        <span class="step-tag">running</span>
+      </div>
+      <div class="step-row" data-state="thinking" onclick="cycle(this)">
+        <div class="step-num">3</div>
+        <span class="step-name">write_file</span>
+        <span class="step-tag">pending</span>
+      </div>
+      <div class="step-row" data-state="error" onclick="cycle(this)">
+        <div class="step-num">4</div>
+        <span class="step-name">bash</span>
+        <span class="step-tag">error</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 · timeline -->
+  <div class="cell">
+    <div class="cell-label">07 · timeline</div>
+    <div class="variants-col">
+      <div class="timeline">
+        <div class="tl-item" data-state="done" onclick="cycle(this)">
+          <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-content"><span class="tl-name">thinking</span><span class="tl-meta">1.2s</span></div>
+        </div>
+        <div class="tl-item" data-state="done" onclick="cycle(this)">
+          <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-content"><span class="tl-name">web_search</span><span class="tl-meta">0.4s</span></div>
+        </div>
+        <div class="tl-item" data-state="running" onclick="cycle(this)">
+          <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+          <div class="tl-content"><span class="tl-name">read_file</span><span class="tl-meta">running</span></div>
+        </div>
+        <div class="tl-item" data-state="thinking" onclick="cycle(this)">
+          <div class="tl-spine"><div class="tl-dot"></div></div>
+          <div class="tl-content"><span class="tl-name">write_file</span><span class="tl-meta">pending</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 · prefix mark -->
+  <div class="cell">
+    <div class="cell-label">08 · prefix mark</div>
+    <div class="variants-col">
+      <div class="msg-row" data-state="thinking" onclick="cycle(this)">
+        <div class="msg-mark"></div>
+        <div class="msg-body">
+          <div class="msg-label">thinking</div>
+          <div class="msg-text">Analyzing the request…</div>
+        </div>
+      </div>
+      <div class="msg-row" data-state="running" onclick="cycle(this)">
+        <div class="msg-mark"></div>
+        <div class="msg-body">
+          <div class="msg-label">web_search</div>
+          <div class="msg-text">Searching for results…</div>
+        </div>
+      </div>
+      <div class="msg-row" data-state="done" onclick="cycle(this)">
+        <div class="msg-mark"></div>
+        <div class="msg-body">
+          <div class="msg-label">web_search · done</div>
+          <div class="msg-text">Found 12 results</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- composed example -->
+<div class="chat-section">
+  <div class="section-label">composed example · agent turn</div>
+  <div class="chat-turn">
+
+    <div class="chat-msg">
+      <div class="chat-role">user</div>
+      <div class="chat-body">What are the latest developments in AI agents?</div>
+    </div>
+
+    <div class="chat-msg agent-thinking-msg">
+      <div class="chat-role">thinking</div>
+      <div class="chat-body dim">The user wants recent news. I should search the web for current information on AI agents.</div>
+    </div>
+
+    <div class="chat-msg agent-tool-msg">
+      <div class="chat-role">tool call · running</div>
+      <div class="chat-body dim">
+        <div class="inline-call" data-state="running" style="padding:0;cursor:default;">
+          <span class="arrow">↳</span>
+          <span class="tool">web_search</span>
+          <span class="args">("AI agents 2025")</span>
+          <span class="sep">·</span>
+          <span class="status-text">running</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-msg agent-tool-done">
+      <div class="chat-role">tool result · done · 0.6s</div>
+      <div class="chat-body dim">12 results returned. Top sources: arxiv.org, techcrunch.com, openai.com…</div>
+    </div>
+
+    <div class="chat-msg">
+      <div class="chat-role">assistant</div>
+      <div class="chat-body">Based on recent sources, there are several notable developments in AI agents…</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- combination catalog -->
+<div class="combo-section">
+  <div class="section-label">combination catalog · tool call × chat message · 10 variants</div>
+  <div class="combo-rows">
+
+    <div class="combo-row">
+      <div class="combo-lbl">inline tag</div>
+      <div class="combo-demo">
+        <div class="cmsg">
+          Found results using
+          <span class="ctag" data-state="done" onclick="cycleTag(this)"><div class="sdot done"></div>web_search</span>
+          and
+          <span class="ctag" data-state="done" onclick="cycleTag(this)"><div class="sdot done"></div>read_file</span>.
+          Here is what I found…
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">above chips</div>
+      <div class="combo-demo">
+        <div class="above-row">
+          <div class="above-chips">
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">web_search</span></div>
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">read_file</span></div>
+          </div>
+          <div class="above-bubble">Here is what I found based on my research…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">below strip</div>
+      <div class="combo-demo">
+        <div class="below-row">
+          <div class="below-bubble">Here is what I found based on my research…</div>
+          <div class="below-strip">
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">web_search</span></div>
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">read_file</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">left bar</div>
+      <div class="combo-demo">
+        <div class="left-mark-row">
+          <div class="left-mark-bar"></div>
+          <div class="left-mark-content">
+            <div class="left-mark-tools">
+              <div class="tool-chip" data-state="running" onclick="cycle(this)"><div class="sdot running"></div><span class="tool-name">web_search</span></div>
+            </div>
+            <div class="left-mark-text">Searching for the latest information…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">float badge</div>
+      <div class="combo-demo">
+        <div class="float-wrap">
+          <div class="float-bubble">Here is what I found based on my research…</div>
+          <div class="float-badge">
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">web_search</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">log block</div>
+      <div class="combo-demo">
+        <div class="log-block">
+          <div class="log-block-head">Here is what I found based on my research…</div>
+          <div class="log-block-rows">
+            <div class="log-line" data-state="done" onclick="cycle(this)" style="padding:0">
+              <span class="ts">00:01</span><span class="verb">CALL</span><span class="ltool">web_search</span><span class="lstat">0.4s</span>
+            </div>
+            <div class="log-line" data-state="done" onclick="cycle(this)" style="padding:0">
+              <span class="ts">00:02</span><span class="verb">CALL</span><span class="ltool">read_file</span><span class="lstat">0.2s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">step thread</div>
+      <div class="combo-demo">
+        <div class="step-thread">
+          <div class="step-row" data-state="done" onclick="cycle(this)" style="padding:2px 0">
+            <div class="step-num">1</div><span class="step-name">web_search</span><span class="step-tag">done</span>
+          </div>
+          <div class="step-row" data-state="running" onclick="cycle(this)" style="padding:2px 0">
+            <div class="step-num">2</div><span class="step-name">read_file</span><span class="step-tag">running</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-tertiary);padding-left:26px;padding-top:6px;line-height:1.5">Summarizing findings…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">footer bar</div>
+      <div class="combo-demo">
+        <div>
+          <div style="font-size:11px;color:var(--text-default);line-height:1.5;padding-bottom:6px">Here is what I found based on my research…</div>
+          <div class="footer-bar">
+            <span class="ft">used:</span>
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">web_search</span></div>
+            <div class="tool-chip" data-state="done" onclick="cycle(this)"><div class="sdot done"></div><span class="tool-name">read_file</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">typing state</div>
+      <div class="combo-demo">
+        <div class="typing-indicator">
+          <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <span class="lbl">thinking</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="combo-row">
+      <div class="combo-lbl">overlay bar</div>
+      <div class="combo-demo">
+        <div class="overlay-wrap">
+          <div class="overlay-bubble" style="padding-bottom:28px">Searching for the latest information on AI agents…</div>
+          <div class="overlay-status">
+            <div class="sdot running"></div>
+            <span class="lbl">web_search · running</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /.page -->
+
+<script>
+const STATES = ['thinking', 'running', 'done', 'error'];
+const LABELS = {
+  thinking: { text: '···', log: '···' },
+  running:  { text: 'running', log: 'running' },
+  done:     { text: '0.4s', log: '0.4s' },
+  error:    { text: 'failed', log: 'timeout' }
+};
+const STEP_TAGS = { thinking: 'pending', running: 'running', done: 'done', error: 'error' };
+const LOG_VERBS = { thinking: 'THINK', running: 'CALL', done: 'RET', error: 'ERR' };
+
+function cycle(el) {
+  const cur = el.dataset.state;
+  const next = STATES[(STATES.indexOf(cur) + 1) % STATES.length];
+  el.dataset.state = next;
+
+  // update text nodes based on component type
+  const statusText = el.querySelector('.status-text');
+  if (statusText) statusText.textContent = LABELS[next].text;
+
+  const blockState = el.querySelector('.tool-block-state');
+  if (blockState) blockState.textContent = next === 'done' ? 'done · 0.4s' : next;
+
+  const stepTag = el.querySelector('.step-tag');
+  if (stepTag) stepTag.textContent = STEP_TAGS[next];
+
+  const lstat = el.querySelector('.lstat');
+  if (lstat) lstat.textContent = LABELS[next].log;
+
+  const verb = el.querySelector('.verb');
+  if (verb) verb.textContent = LOG_VERBS[next];
+
+  const msgLabel = el.querySelector('.msg-label');
+  if (msgLabel) msgLabel.textContent = next;
+
+  // update sdot class
+  el.querySelectorAll('.sdot').forEach(d => {
+    d.className = 'sdot ' + next;
+  });
+}
+
+function cycleTag(el) {
+  const cur = el.dataset.state;
+  const next = cur === 'running' ? 'done' : 'running';
+  el.dataset.state = next;
+  el.querySelectorAll('.sdot').forEach(d => { d.className = 'sdot ' + next; });
+}
+</script>
+
+</body>
+</html>

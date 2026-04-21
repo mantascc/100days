@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lineage graph — 100days aesthetic genome</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+      background: #0a0a0a;
+      color: #f5f5f7;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* header stats */
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      padding: 20px 24px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #f5f5f7;
+      pointer-events: none;
+    }
+
+    .header-title {
+      font-size: 12px;
+      margin-bottom: 8px;
+      color: #f5f5f7;
+    }
+
+    .header-stat {
+      color: #a8aab8;
+      margin: 4px 0;
+    }
+
+    .header-stat .value {
+      color: #f5f5f7;
+      font-weight: normal;
+    }
+
+    /* timeline ruler */
+    .timeline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: #0a0a0a;
+      border-top: 1px solid #2a2a2a;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 10px;
+      color: #a8aab8;
+      pointer-events: none;
+      z-index: 9;
+    }
+
+    .timeline-mark {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    /* controls */
+    .controls {
+      position: absolute;
+      bottom: 48px;
+      right: 24px;
+      z-index: 10;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid #2a2a2a;
+      border-radius: 2px;
+      padding: 12px;
+      font-size: 11px;
+      pointer-events: all;
+    }
+
+    .control-group {
+      margin-bottom: 12px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: block;
+      color: #a8aab8;
+      margin-bottom: 4px;
+      font-size: 10px;
+    }
+
+    .control-slider {
+      width: 140px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #2a2a2a;
+      border-radius: 2px;
+      outline: none;
+      accent-color: #00a8ff;
+    }
+
+    .control-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00a8ff;
+      cursor: pointer;
+    }
+
+    .control-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00a8ff;
+      cursor: pointer;
+      border: none;
+    }
+
+    .control-value {
+      display: inline-block;
+      margin-left: 8px;
+      color: #f5f5f7;
+      font-size: 10px;
+    }
+
+    /* legend */
+    .legend {
+      position: absolute;
+      top: 96px;
+      right: 24px;
+      z-index: 10;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid #2a2a2a;
+      border-radius: 2px;
+      padding: 12px;
+      font-size: 10px;
+    }
+
+    .legend-title {
+      color: #a8aab8;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+      color: #a8aab8;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      border: 1px solid currentColor;
+      flex-shrink: 0;
+    }
+
+    /* detail panel */
+    .detail-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 360px;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.98);
+      border-left: 1px solid #2a2a2a;
+      overflow-y: auto;
+      z-index: 8;
+      transform: translateX(100%);
+      transition: transform 0.2s ease;
+      padding: 20px;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .detail-panel.open {
+      transform: translateX(0);
+    }
+
+    .detail-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: none;
+      color: #a8aab8;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-close:hover {
+      color: #f5f5f7;
+    }
+
+    .detail-title {
+      font-size: 14px;
+      color: #f5f5f7;
+      margin-bottom: 16px;
+      margin-top: 4px;
+      word-break: break-word;
+    }
+
+    .detail-section {
+      margin-bottom: 20px;
+    }
+
+    .detail-section-title {
+      font-size: 10px;
+      color: #a8aab8;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-stat {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+      padding: 4px 0;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .detail-stat-label {
+      color: #a8aab8;
+    }
+
+    .detail-stat-value {
+      color: #f5f5f7;
+      text-align: right;
+    }
+
+    .detail-genome {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .detail-axis {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      padding: 8px;
+      border-radius: 2px;
+    }
+
+    .detail-axis-name {
+      font-size: 10px;
+      color: #a8aab8;
+      margin-bottom: 4px;
+    }
+
+    .detail-axis-bar {
+      width: 100%;
+      height: 3px;
+      background: #2a2a2a;
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .detail-axis-fill {
+      height: 100%;
+      background: #00a8ff;
+    }
+
+    .detail-axis-value {
+      font-size: 10px;
+      color: #f5f5f7;
+      margin-top: 2px;
+    }
+
+    .detail-description {
+      color: #a8aab8;
+      line-height: 1.5;
+      font-size: 10px;
+    }
+
+    /* tooltip */
+    .tooltip {
+      position: absolute;
+      background: rgba(10, 10, 10, 0.98);
+      border: 1px solid #2a2a2a;
+      padding: 8px 12px;
+      border-radius: 2px;
+      font-size: 10px;
+      color: #f5f5f7;
+      pointer-events: none;
+      z-index: 7;
+      white-space: nowrap;
+      max-width: 300px;
+      white-space: normal;
+    }
+
+    .tooltip-hidden {
+      display: none;
+    }
+
+    /* scrollbar styling */
+    .detail-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .detail-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .detail-panel::-webkit-scrollbar-thumb {
+      background: #2a2a2a;
+      border-radius: 3px;
+    }
+
+    .detail-panel::-webkit-scrollbar-thumb:hover {
+      background: #3a3a3a;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="graph"></canvas>
+
+  <div class="header">
+    <div class="header-title">lineage graph</div>
+    <div class="header-stat">projects: <span class="value" id="stat-projects">0</span></div>
+    <div class="header-stat">connections: <span class="value" id="stat-connections">0</span></div>
+    <div class="header-stat">threads: <span class="value" id="stat-threads">0</span></div>
+    <div class="header-stat">avg similarity: <span class="value" id="stat-similarity">0.00</span></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-title">materials</div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #00a8ff;"></div>
+      <span>pixel</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #00ffaa;"></div>
+      <span>glyph</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ff0066;"></div>
+      <span>geometry</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ffaa00;"></div>
+      <span>data</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #666666;"></div>
+      <span>dom</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #a8aab8;"></div>
+      <span>hybrid</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label class="control-label">threshold</label>
+      <input type="range" id="threshold-slider" class="control-slider" min="0.5" max="0.95" step="0.05" value="0.7">
+      <span class="control-value" id="threshold-value">0.70</span>
+    </div>
+    <div class="control-group">
+      <label class="control-label">physics</label>
+      <input type="range" id="physics-slider" class="control-slider" min="0" max="1" step="0.1" value="0.5">
+      <span class="control-value" id="physics-value">0.50</span>
+    </div>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="tooltip tooltip-hidden" id="tooltip"></div>
+
+  <div class="detail-panel" id="detail-panel">
+    <button class="detail-close" id="detail-close">×</button>
+    <div class="detail-title" id="detail-name"></div>
+    <div class="detail-section">
+      <div class="detail-section-title">description</div>
+      <div class="detail-description" id="detail-description"></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">metadata</div>
+      <div class="detail-stat">
+        <span class="detail-stat-label">day</span>
+        <span class="detail-stat-value" id="detail-day">—</span>
+      </div>
+      <div class="detail-stat">
+        <span class="detail-stat-label">confidence</span>
+        <span class="detail-stat-value" id="detail-confidence">—</span>
+      </div>
+      <div class="detail-stat">
+        <span class="detail-stat-label">material</span>
+        <span class="detail-stat-value" id="detail-material">—</span>
+      </div>
+      <div class="detail-stat">
+        <span class="detail-stat-label">complexity</span>
+        <span class="detail-stat-value" id="detail-complexity">—</span>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">genome axes</div>
+      <div class="detail-genome" id="detail-genome"></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">lineage</div>
+      <div id="detail-lineage"></div>
+    </div>
+  </div>
+
+  <script>
+    // ────────────────────────────────────────────────────────────────────
+    // data structures
+    // ────────────────────────────────────────────────────────────────────
+
+    let genome_data = null;
+    let projects = [];
+    let nodes = [];
+    let edges = [];
+    let canvas = null;
+    let ctx = null;
+
+    const MATERIAL_COLORS = {
+      pixel: '#00a8ff',
+      glyph: '#00ffaa',
+      geometry: '#ff0066',
+      data: '#ffaa00',
+      dom: '#666666',
+      hybrid: '#a8aab8'
+    };
+
+    let simulation = {
+      threshold: 0.7,
+      physics: 0.5,
+      time: 0,
+      running: true
+    };
+
+    let ui = {
+      selected: null,
+      hovered: null,
+      pan: { x: 0, y: 0 },
+      zoom: 1.0,
+      panStart: null
+    };
+
+    // ────────────────────────────────────────────────────────────────────
+    // cosine similarity
+    // ────────────────────────────────────────────────────────────────────
+
+    function cosineSimilarity(a, b) {
+      const axes = ['density', 'agency', 'legibility', 'determinism', 'complexity', 'physicality', 'palette_restraint', 'motion_character'];
+      let dotProduct = 0, magnA = 0, magnB = 0;
+      for (const axis of axes) {
+        const av = a.continuous[axis];
+        const bv = b.continuous[axis];
+        dotProduct += av * bv;
+        magnA += av * av;
+        magnB += bv * bv;
+      }
+      magnA = Math.sqrt(magnA);
+      magnB = Math.sqrt(magnB);
+      return magnA === 0 || magnB === 0 ? 0 : dotProduct / (magnA * magnB);
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // lineage inference
+    // ────────────────────────────────────────────────────────────────────
+
+    function inferLineage() {
+      edges = [];
+      const dayMap = new Map();
+      for (const proj of projects) {
+        const match = proj.id.match(/^(\d+)/);
+        const day = match ? parseInt(match[1]) : 0;
+        dayMap.set(proj.id, day);
+      }
+
+      for (let i = 0; i < projects.length; i++) {
+        const proj = projects[i];
+        const projDay = dayMap.get(proj.id);
+        const candidates = [];
+
+        for (let j = 0; j < i; j++) {
+          const prev = projects[j];
+          const prevDay = dayMap.get(prev.id);
+          if (prevDay < projDay) {
+            const similarity = cosineSimilarity(prev, proj);
+            candidates.push({ from: j, similarity });
+          }
+        }
+
+        candidates.sort((a, b) => b.similarity - a.similarity);
+        const topCandidates = candidates.slice(0, 3).filter(c => c.similarity > simulation.threshold);
+
+        for (const cand of topCandidates) {
+          edges.push({
+            from: cand.from,
+            to: i,
+            strength: cand.similarity
+          });
+        }
+      }
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // detect threads (chains of connected projects)
+    // ────────────────────────────────────────────────────────────────────
+
+    function detectThreads() {
+      const threads = [];
+      const visited = new Set();
+
+      for (let i = 0; i < nodes.length; i++) {
+        if (visited.has(i)) continue;
+
+        const thread = [i];
+        visited.add(i);
+        let current = i;
+
+        while (true) {
+          let nextNode = null;
+          let maxStrength = 0;
+
+          for (const edge of edges) {
+            if (edge.from === current && !visited.has(edge.to)) {
+              if (edge.strength > maxStrength) {
+                maxStrength = edge.strength;
+                nextNode = edge.to;
+              }
+            }
+          }
+
+          if (nextNode === null) break;
+          thread.push(nextNode);
+          visited.add(nextNode);
+          current = nextNode;
+        }
+
+        if (thread.length >= 2) {
+          threads.push(thread);
+        }
+      }
+
+      threads.sort((a, b) => b.length - a.length);
+      return threads.slice(0, 4);
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // data loading
+    // ────────────────────────────────────────────────────────────────────
+
+    async function loadData() {
+      try {
+        const response = await fetch('genome-proposed.json');
+        const data = await response.json();
+        genome_data = data;
+        projects = data.genomes;
+
+        nodes = projects.map((proj, idx) => {
+          const match = proj.id.match(/^(\d+)/);
+          const day = match ? parseInt(match[1]) : 0;
+          return {
+            id: proj.id,
+            day: day,
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            data: proj,
+            size: 4 + proj.continuous.complexity * 6,
+            color: MATERIAL_COLORS[proj.categorical.material] || '#a8aab8'
+          };
+        });
+
+        inferLineage();
+        updateStats();
+        initializeTimeline();
+        renderCanvas();
+
+      } catch (e) {
+        console.error('Failed to load genome data:', e);
+      }
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // force simulation
+    // ────────────────────────────────────────────────────────────────────
+
+    function stepSimulation() {
+      const canvas = document.getElementById('graph');
+      const margin = 60;
+      const timelineHeight = 32;
+      const width = canvas.width - margin * 2;
+      const height = canvas.height - margin * 2 - timelineHeight;
+      const centerY = canvas.height / 2 - timelineHeight / 2;
+
+      const physics = simulation.physics;
+
+      // horizontal force (toward day position)
+      for (const node of nodes) {
+        const targetX = margin + (node.day / 100) * width;
+        const dx = targetX - node.x;
+        node.vx += dx * 0.01 * physics;
+      }
+
+      // edge attraction
+      for (const edge of edges) {
+        const from = nodes[edge.from];
+        const to = nodes[edge.to];
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 0) {
+          const strength = edge.strength * 0.008 * physics;
+          to.vx -= (dx / dist) * strength;
+          to.vy -= (dy / dist) * strength;
+          from.vx += (dx / dist) * strength;
+          from.vy += (dy / dist) * strength;
+        }
+      }
+
+      // vertical repulsion (avoid overlap)
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const n1 = nodes[i];
+          const n2 = nodes[j];
+          const dx = n2.x - n1.x;
+          const dy = n2.y - n1.y;
+          const dist = Math.hypot(dx, dy) + 1;
+          const minDist = (n1.size + n2.size) * 1.5;
+          if (dist < minDist) {
+            const force = (minDist - dist) * 0.02 * physics;
+            const nx = dx / dist;
+            const ny = dy / dist;
+            n1.vx -= nx * force;
+            n1.vy -= ny * force;
+            n2.vx += nx * force;
+            n2.vy += ny * force;
+          }
+        }
+      }
+
+      // vertical centering force (soft pull toward center)
+      for (const node of nodes) {
+        const dy = centerY - node.y;
+        node.vy += dy * 0.005 * physics;
+      }
+
+      // update positions and damping
+      for (const node of nodes) {
+        node.vx *= 0.92;
+        node.vy *= 0.92;
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // bounds
+        node.x = Math.max(margin - node.size, Math.min(canvas.width - margin + node.size, node.x));
+        node.y = Math.max(margin - node.size, Math.min(canvas.height - timelineHeight - node.size, node.y));
+      }
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // rendering
+    // ────────────────────────────────────────────────────────────────────
+
+    function renderCanvas() {
+      const canvas = document.getElementById('graph');
+      ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // apply pan/zoom
+      ctx.save();
+      ctx.translate(ui.pan.x, ui.pan.y);
+      ctx.scale(ui.zoom, ui.zoom);
+
+      // draw edges
+      for (const edge of edges) {
+        const from = nodes[edge.from];
+        const to = nodes[edge.to];
+
+        ctx.strokeStyle = MATERIAL_COLORS[from.data.categorical.material] || '#a8aab8';
+        ctx.globalAlpha = Math.max(0.15, edge.strength - 0.4);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+
+      // draw nodes
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        const isSelected = ui.selected === i;
+        const isHovered = ui.hovered === i;
+        const isAncestorOrDescendant = isConnected(i, ui.selected);
+
+        let opacity = 1;
+        if (ui.selected !== null && !isSelected && !isAncestorOrDescendant) {
+          opacity = 0.2;
+        } else if (ui.hovered !== null && !isHovered && !isConnected(i, ui.hovered)) {
+          opacity = 0.3;
+        }
+
+        ctx.fillStyle = node.color;
+        ctx.globalAlpha = opacity;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (isSelected || isHovered) {
+          ctx.strokeStyle = '#f5f5f7';
+          ctx.lineWidth = 2;
+          ctx.globalAlpha = 1;
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+
+      if (simulation.running) {
+        requestAnimationFrame(renderCanvas);
+      }
+    }
+
+    function isConnected(from, to) {
+      if (to === null) return false;
+      for (const edge of edges) {
+        if ((edge.from === from && edge.to === to) || (edge.from === to && edge.to === from)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // interaction
+    // ────────────────────────────────────────────────────────────────────
+
+    function updateStats() {
+      const threads = detectThreads();
+      const avgSimilarity = edges.length > 0 ? (edges.reduce((sum, e) => sum + e.strength, 0) / edges.length).toFixed(2) : '0.00';
+
+      document.getElementById('stat-projects').textContent = nodes.length;
+      document.getElementById('stat-connections').textContent = edges.length;
+      document.getElementById('stat-threads').textContent = threads.length;
+      document.getElementById('stat-similarity').textContent = avgSimilarity;
+    }
+
+    function initializeTimeline() {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = '';
+      for (let day = 0; day <= 100; day += 10) {
+        const mark = document.createElement('div');
+        mark.className = 'timeline-mark';
+        mark.textContent = day;
+        timeline.appendChild(mark);
+      }
+    }
+
+    function getNodeAtPoint(px, py) {
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const node = nodes[i];
+        const dx = node.x - px;
+        const dy = node.y - py;
+        if (Math.hypot(dx, dy) <= node.size + 4) {
+          return i;
+        }
+      }
+      return null;
+    }
+
+    function showDetail(idx) {
+      if (idx === null) {
+        document.getElementById('detail-panel').classList.remove('open');
+        ui.selected = null;
+        return;
+      }
+
+      ui.selected = idx;
+      const proj = nodes[idx].data;
+      const parentEdges = edges.filter(e => e.to === idx);
+      const childEdges = edges.filter(e => e.from === idx);
+
+      document.getElementById('detail-name').textContent = proj.id;
+      document.getElementById('detail-description').textContent = proj.description || '(no description)';
+      document.getElementById('detail-day').textContent = nodes[idx].day;
+      document.getElementById('detail-confidence').textContent = (proj.confidence * 100).toFixed(0) + '%';
+      document.getElementById('detail-material').textContent = proj.categorical.material;
+      document.getElementById('detail-complexity').textContent = (proj.continuous.complexity * 100).toFixed(0) + '%';
+
+      // genome axes
+      const genomeEl = document.getElementById('detail-genome');
+      genomeEl.innerHTML = '';
+      const axes = ['density', 'agency', 'legibility', 'determinism', 'complexity', 'physicality', 'palette_restraint', 'motion_character'];
+      for (const axis of axes) {
+        const value = proj.continuous[axis];
+        const div = document.createElement('div');
+        div.className = 'detail-axis';
+        div.innerHTML = `
+          <div class="detail-axis-name">${axis}</div>
+          <div class="detail-axis-bar"><div class="detail-axis-fill" style="width: ${value * 100}%"></div></div>
+          <div class="detail-axis-value">${(value * 100).toFixed(0)}%</div>
+        `;
+        genomeEl.appendChild(div);
+      }
+
+      // lineage
+      let lineageHtml = '';
+      if (parentEdges.length > 0) {
+        lineageHtml += '<div class="detail-stat"><span class="detail-stat-label">inherited from:</span></div>';
+        for (const edge of parentEdges) {
+          const parent = nodes[edge.from];
+          lineageHtml += `<div class="detail-stat" style="padding-left: 8px;"><span class="detail-stat-label">${parent.id}</span><span class="detail-stat-value">${(edge.strength * 100).toFixed(0)}%</span></div>`;
+        }
+      }
+      if (childEdges.length > 0) {
+        lineageHtml += '<div class="detail-stat"><span class="detail-stat-label">influences:</span></div>';
+        for (const edge of childEdges) {
+          const child = nodes[edge.to];
+          lineageHtml += `<div class="detail-stat" style="padding-left: 8px;"><span class="detail-stat-label">${child.id}</span><span class="detail-stat-value">${(edge.strength * 100).toFixed(0)}%</span></div>`;
+        }
+      }
+      if (lineageHtml === '') {
+        lineageHtml = '<div class="detail-stat"><span class="detail-stat-label">no detected lineage</span></div>';
+      }
+      document.getElementById('detail-lineage').innerHTML = lineageHtml;
+
+      document.getElementById('detail-panel').classList.add('open');
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    // event handlers
+    // ────────────────────────────────────────────────────────────────────
+
+    canvas = document.getElementById('graph');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const px = (e.clientX - rect.left - ui.pan.x) / ui.zoom;
+      const py = (e.clientY - rect.top - ui.pan.y) / ui.zoom;
+      const hovered = getNodeAtPoint(px, py);
+
+      if (hovered !== null) {
+        showDetail(hovered);
+      } else {
+        ui.panStart = { x: e.clientX, y: e.clientY, panX: ui.pan.x, panY: ui.pan.y };
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const px = (e.clientX - rect.left - ui.pan.x) / ui.zoom;
+      const py = (e.clientY - rect.top - ui.pan.y) / ui.zoom;
+      ui.hovered = getNodeAtPoint(px, py);
+
+      if (ui.panStart) {
+        ui.pan.x = ui.panStart.panX + (e.clientX - ui.panStart.x);
+        ui.pan.y = ui.panStart.panY + (e.clientY - ui.panStart.y);
+      }
+
+      // tooltip
+      const tooltip = document.getElementById('tooltip');
+      if (ui.hovered !== null) {
+        const node = nodes[ui.hovered];
+        tooltip.textContent = node.id;
+        tooltip.style.left = e.clientX + 12 + 'px';
+        tooltip.style.top = e.clientY + 12 + 'px';
+        tooltip.classList.remove('tooltip-hidden');
+      } else {
+        tooltip.classList.add('tooltip-hidden');
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      ui.panStart = null;
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
+      ui.zoom *= zoomFactor;
+      ui.zoom = Math.max(0.5, Math.min(3, ui.zoom));
+    });
+
+    document.getElementById('detail-close').addEventListener('click', () => {
+      showDetail(null);
+    });
+
+    document.getElementById('threshold-slider').addEventListener('input', (e) => {
+      simulation.threshold = parseFloat(e.target.value);
+      document.getElementById('threshold-value').textContent = simulation.threshold.toFixed(2);
+      inferLineage();
+      updateStats();
+    });
+
+    document.getElementById('physics-slider').addEventListener('input', (e) => {
+      simulation.physics = parseFloat(e.target.value);
+      document.getElementById('physics-value').textContent = simulation.physics.toFixed(2);
+    });
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // ────────────────────────────────────────────────────────────────────
+    // main loop
+    // ────────────────────────────────────────────────────────────────────
+
+    function loop() {
+      stepSimulation();
+      renderCanvas();
+      requestAnimationFrame(loop);
+    }
+
+    // initialize
+    loadData().then(() => {
+      loop();
+    });
+  </script>
+</body>
+</html>

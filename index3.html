@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>a hundred days.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { min-height: 100%; }
+    body { background: #0a0a0a; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    a { text-decoration: none; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ── projects.js ────────────────────────────────────────────────────────────────
+window.PROJECTS = [
+  { id: "68-moog-phase", day: 68, title: "Moog phase", themes: ["audio","field","ascii"],
+    desc: "XY phase portrait of a Moog sequence. Looped WAV, snapshot export, friction-reactive ASCII banner." },
+  { id: "67-audio-reactive-ascii", day: 67, title: "Audio-reactive ASCII", themes: ["audio","ascii","field"],
+    desc: "Wave field driven by the microphone. Eight glyph vocabularies, floating control bar, reactivity modal." },
+  { id: "66-ascii-field-gallery", day: 66, title: "ASCII field gallery", themes: ["ascii","field"],
+    desc: "Eight animated ASCII wave fields. Each a distinct sine-cosine interference, rendered through a dot-density ramp." },
+  { id: "65-mode-toggle", day: 65, title: "Mode toggle", themes: ["ui"],
+    desc: "Binary toggle across nine families. Composed examples and ten input combinations on one sheet." },
+  { id: "64-viz-grouped", day: 64, title: "Viz, grouped", themes: ["data","ui"],
+    desc: "Reference gallery of visualization types, grouped by analytical goal." },
+  { id: "63-ube-kaizen", day: 63, title: "Ube kaizen", themes: ["color","type"],
+    desc: "Enter three colors. Explore them as accents, tints, blends, data viz, typographic pairings." },
+  { id: "62-terminal-cli", day: 62, title: "Terminal REPL", themes: ["ui","ascii"],
+    desc: "Minimal shell. Boot sequence, command streaming, ASCII cat at the end." },
+  { id: "61-hitl-patterns", day: 61, title: "Human-in-the-loop", themes: ["agent","ui"],
+    desc: "Four patterns along a single autonomy axis. Interactive reference." },
+  { id: "60-agentic-patterns", day: 60, title: "Agentic patterns", themes: ["agent","ui"],
+    desc: "Interactive reference for AI agent design patterns." },
+  { id: "59-font-explorer", day: 59, title: "Font explorer", themes: ["type"],
+    desc: "Skill to visualize any font, one specimen at a time." },
+  { id: "58-shapes", day: 58, title: "Shapes", themes: ["grid"],
+    desc: "Geometric explorer. Lines, arcs and curves split into chapters with live parameters." },
+  { id: "57-color-themes", day: 57, title: "Color themes", themes: ["color"],
+    desc: "Five chapters, three palettes — peach, clay, aus. One sketch remapped through three identities." },
+  { id: "56-constrained-variation", day: 56, title: "Constrained variation", themes: ["grid","agent"],
+    desc: "Fix the scaffold, switch the algorithm. Compare simultaneously." },
+  { id: "55-ascii-loading", day: 55, title: "ASCII loading", themes: ["ascii"],
+    desc: "Dual-grid crystallization with face emergence. Progress bar at the floor." },
+  { id: "54-concept-graph", day: 54, title: "Concept graph", themes: ["network","data"],
+    desc: "Force-directed graph of the relationships between projects and data concepts." },
+  { id: "53-ascii-grid", day: 53, title: "ASCII grid", themes: ["ascii","grid","physics"],
+    desc: "Hypnotic 100×100 text grid. Five distinct physical simulation modes." },
+  { id: "52-reaction-diffusion", day: 52, title: "Reaction–diffusion", themes: ["physics","grid"],
+    desc: "Gray–Scott model with interactive parameter controls." },
+  { id: "51-resonant-lattice", day: 51, title: "Resonant lattice", themes: ["physics","grid"],
+    desc: "Interactive physics grid. Mass–spring–damper nodes under drag." },
+  { id: "50-execution-trace-graph", day: 50, title: "Execution trace", themes: ["network","agent"],
+    desc: "An AI response visualized as a traversal through a skill graph." },
+  { id: "49-grid-trace", day: 49, title: "Grid trace", themes: ["grid","type"],
+    desc: "Grid path visualization. Geist Pixel as the ink." },
+  { id: "47-2gif", day: 47, title: "2gif", themes: [], disabled: true,
+    desc: "Sketch. Disabled." },
+  { id: "46-oklch-vs-hsl", day: 46, title: "OKLCH vs HSL", themes: ["color"], disabled: true,
+    desc: "Gradient comparison across color spaces. Disabled." },
+  { id: "45-gravity-pills", day: 45, title: "Gravity pills", themes: ["physics"],
+    desc: "Particle simulation. Pills fall under gravity, collide, settle." },
+  { id: "44-whiff", day: 44, title: "Whiff", themes: [], disabled: true,
+    desc: "Sketch. Disabled." },
+  { id: "43-style-seed", day: 43, title: "Style seed", themes: [], disabled: true,
+    desc: "Sketch. Disabled." },
+  { id: "42-metaball-grid", day: 42, title: "Metaball grid", themes: ["physics","grid"],
+    desc: "Grid-based metaball effects." },
+  { id: "41-metaball", day: 41, title: "Metaball", themes: ["physics"],
+    desc: "Metaball physics and animation." },
+  { id: "40-cube-grid-rules", day: 40, title: "Cube grid rules", themes: ["grid"],
+    desc: "A rules engine animating a cube grid." },
+  { id: "39-wave-morph", day: 39, title: "Wave morph", themes: ["field"],
+    desc: "Morphing wave patterns." },
+  { id: "38-baltic-pattern", day: 38, title: "Baltic pattern", themes: ["grid"],
+    desc: "Generative Baltic pattern." },
+  { id: "37-sentiment-analyzer", day: 37, title: "Sentiment analyzer", themes: ["data"], disabled: true,
+    desc: "Real-time text sentiment. Not ready — needs build setup." },
+  { id: "36-spinning-globe", day: 36, title: "Spinning globe", themes: ["data"],
+    desc: "Vite + React + TypeScript. A globe, spinning." },
+  { id: "35-flight-path-viz", day: 35, title: "Flight paths", themes: ["data"],
+    desc: "Great-circle flight path animation. Leaflet, Turf.js." },
+  { id: "34-particle-text-morph", day: 34, title: "Particle text", themes: ["type","physics"],
+    desc: "Text morphing with particle transitions." },
+  { id: "33-three-body-problem", day: 33, title: "Three-body", themes: ["physics"],
+    desc: "Temporal slitscan imaging effect." },
+  { id: "32-genart-cards", day: 32, title: "Genart cards", themes: ["grid"],
+    desc: "Chaotic entropy pattern generation." },
+  { id: "31-cli-material-palette", day: 31, title: "CLI palette", themes: ["color","ui"],
+    desc: "A material color palette for the command line." },
+  { id: "30-thinking-states", day: 30, title: "Thinking states", themes: ["ui","ascii"],
+    desc: "Experimental loading indicators — metaphors for thinking." },
+  { id: "29-progress-indicators", day: 29, title: "Progress indicators", themes: ["ui","ascii"],
+    desc: "Text generation UI with thinking states." },
+  { id: "28-liquid-glass", day: 28, title: "Liquid glass", themes: ["ui"],
+    desc: "Liquid glass morphism effect." },
+  { id: "27-muse", day: 27, title: "Muse", themes: ["ui","audio"],
+    desc: "Muse v0 — a music/creative tool prototype." },
+  { id: "26-widget-dashboard", day: 26, title: "Widget dashboard", themes: ["ui"],
+    desc: "Dynamic widget dashboard layout." },
+  { id: "25-spotlight-grid", day: 25, title: "Spotlight grid", themes: ["grid","physics"],
+    desc: "Density- and color-controlled particle effect." },
+  { id: "24-rock-paper-scissors", day: 24, title: "Rock paper scissors", themes: ["agent"],
+    desc: "Three-species equilibrium game." },
+  { id: "23-interactive-typography", day: 23, title: "Interactive type", themes: ["type"],
+    desc: "Touch/mouse event handler demo." },
+  { id: "22-directed-network", day: 22, title: "Directed network", themes: ["network"],
+    desc: "Graph network visualization." },
+  { id: "21-interaction-heatmap", day: 21, title: "Interaction heatmap", themes: ["data","grid"],
+    desc: "30-day agent interaction heatmap." },
+  { id: "20-schelling-model", day: 20, title: "Schelling model", themes: ["agent","grid"],
+    desc: "Schelling model of segregation simulation." },
+  { id: "19-coworker-network", day: 19, title: "Coworker network", themes: ["network"],
+    desc: "Force-directed graph of coworker interactions. React/D3." },
+  { id: "18-cellular-automaton", day: 18, title: "Cellular automaton", themes: ["grid","agent"],
+    desc: "A Conway's Game of Life variant." },
+  { id: "17-audio-reactive-network", day: 17, title: "Audio-reactive network", themes: ["audio","type"],
+    desc: "Text-to-speech with animated typography." },
+  { id: "16-hub-spoke-network", day: 16, title: "Hub–spoke", themes: ["network"],
+    desc: "Force graph visualization." },
+  { id: "15-binary-camera-grid", day: 15, title: "Binary camera grid", themes: ["grid"],
+    desc: "Interactive 2D grid navigation with zoom." },
+  { id: "15b-binary-camera-grid-v2", day: 15.5, title: "Binary camera grid v2", themes: ["grid"],
+    desc: "Grid camera variant." },
+  { id: "14-dna-mutations", day: 14, title: "DNA mutations", themes: ["agent","network"],
+    desc: "Dynamic cluster visualization with signals." },
+  { id: "13-image-flow-field", day: 13, title: "Image flow field", themes: ["field"],
+    desc: "Wave pattern generation with ripple effects." },
+  { id: "12-wind-field", day: 12, title: "Wind field", themes: ["field","physics"],
+    desc: "A Perlin-noise wind simulation." },
+  { id: "11-brownian-tree", day: 11, title: "Brownian tree", themes: ["physics","agent"],
+    desc: "Interactive message storage system. Node.js/Express." },
+  { id: "10-audio-reactive-agents", day: 10, title: "Audio-reactive agents", themes: ["audio","agent"],
+    desc: "Audio-reactive agents with spatial positioning." },
+  { id: "09-planar-graph", day: 9, title: "Planar graph", themes: ["network","agent"],
+    desc: "Linked agents, drawn as a planar network." },
+  { id: "08-graph-clusters", day: 8, title: "Graph clusters", themes: ["network"],
+    desc: "Cluster detection with parameter tuning." },
+  { id: "07-apophenia", day: 7, title: "Apophenia", themes: ["grid","network"],
+    desc: "Proximity links on a grid. Patterns where there are none." },
+  { id: "06-orbital", day: 6, title: "Orbital", themes: ["physics"],
+    desc: "Celestial mechanics with orbital planets." },
+  { id: "05-fall", day: 5, title: "Fall", themes: ["physics"],
+    desc: "Gravity and particle physics with falling objects." },
+  { id: "04-random-walk", day: 4, title: "Random walk", themes: ["physics","agent"],
+    desc: "Stochastic random walk patterns on canvas." },
+  { id: "03-chaos-agent", day: 3, title: "Chaos agent", themes: ["agent","physics"],
+    desc: "Particle clustering with chaotic agents." },
+  { id: "02-vicsek-model", day: 2, title: "Vicsek model", themes: ["agent","physics"],
+    desc: "Vicsek model flocking behavior simulation." },
+  { id: "01-entropy", day: 1, title: "Entropy", themes: ["physics"],
+    desc: "Interactive entropy visualization with animated particles." },
+];
+
+window.THEMES = {
+  ascii:   { label: "ascii",   color: "#bc8cff" },
+  network: { label: "network", color: "#39c5cf" },
+  field:   { label: "field",   color: "#58a6ff" },
+  audio:   { label: "audio",   color: "#f85149" },
+  color:   { label: "color",   color: "#d29922" },
+  type:    { label: "type",    color: "#ccc"    },
+  grid:    { label: "grid",    color: "#888"    },
+  physics: { label: "physics", color: "#3fb950" },
+  agent:   { label: "agent",   color: "#bc8cff" },
+  ui:      { label: "ui",      color: "#999"    },
+  data:    { label: "data",    color: "#58a6ff" },
+};
+
+window.THEME_ORDER = ["ascii","network","field","audio","color","type","grid","physics","agent","ui","data"];
+</script>
+
+<script>
+// ── glyph.js ───────────────────────────────────────────────────────────────────
+window.renderGlyph = function renderGlyph(canvas, project, opts) {
+  opts = opts || {};
+  var size = opts.size || 160;
+  var color = opts.color || '#ccc';
+  var bg = opts.bg || 'transparent';
+  var animate = opts.animate !== undefined ? opts.animate : true;
+  var dpr = opts.dpr || (window.devicePixelRatio || 1);
+
+  var ctx = canvas.getContext('2d');
+  var w = size, h = size;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  ctx.scale(dpr, dpr);
+
+  var hash = 0;
+  for (var i = 0; i < project.id.length; i++) hash = ((hash<<5)-hash+project.id.charCodeAt(i))|0;
+  var seed = Math.abs(hash) / 0x7fffffff;
+
+  var theme = (project.themes && project.themes[0]) || 'grid';
+  var fs = 10;
+  ctx.font = '400 ' + fs + 'px JetBrains Mono, monospace';
+  ctx.textBaseline = 'top';
+
+  var cols = Math.floor(w / 6);
+  var rows = Math.floor(h / (fs * 1.1));
+  var t = animate ? (performance.now() / 1000) * (0.4 + seed*0.3) : seed * 10;
+
+  var draw = function(char, r, c, alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.fillText(char, c * 6, r * fs * 1.1);
+  };
+
+  ctx.clearRect(0,0,w,h);
+  if (bg !== 'transparent') { ctx.fillStyle = bg; ctx.fillRect(0,0,w,h); }
+
+  var cx = cols/2, cy = rows/2;
+
+  var GLYPHS_DOT   = [' ','·','∙','∘','○','◌','◎','⊙','●'];
+  var GLYPHS_BLOCK = [' ','░','▒','▓','█'];
+  var GLYPHS_WAVE  = [' ','·','~','-','=','≈'];
+
+  if (theme === 'ascii' || theme === 'field' || theme === 'audio') {
+    var G = theme === 'audio' ? GLYPHS_WAVE : GLYPHS_DOT;
+    var f1 = 0.15 + seed*0.1, f2 = 0.2 + seed*0.08;
+    for (var r=0;r<rows;r++) for (var c=0;c<cols;c++){
+      var v = (Math.sin(c*f1 + t) + Math.cos(r*f2 - t*0.7) + Math.sin((c+r)*0.1+t*0.5) + 3)/6;
+      var idx = Math.floor(v * (G.length-1));
+      if (G[idx] !== ' ') draw(G[idx], r, c, 0.4 + v*0.6);
+    }
+  } else if (theme === 'network') {
+    var n = 8 + Math.floor(seed*6);
+    var nodes = [];
+    for (var i=0;i<n;i++){
+      var a = (i/n)*Math.PI*2 + t*0.3;
+      var rad = 4 + seed*3 + Math.sin(t+i)*1.5;
+      nodes.push({ c: cx + Math.cos(a)*rad, r: cy + Math.sin(a)*rad*0.85 });
+    }
+    for (var i=0;i<n;i++) for (var j=i+1;j<n;j++){
+      if ((i*j+n)%3 !== 0) continue;
+      var a2 = nodes[i], b = nodes[j];
+      for (var k=0;k<10;k++){
+        var rr = a2.r + (b.r-a2.r)*k/10;
+        var cc2 = a2.c + (b.c-a2.c)*k/10;
+        draw('·', Math.round(rr), Math.round(cc2), 0.3);
+      }
+    }
+    for (var ni=0;ni<nodes.length;ni++) draw('●', Math.round(nodes[ni].r), Math.round(nodes[ni].c), 0.9);
+  } else if (theme === 'physics') {
+    var n = 40;
+    for (var i=0;i<n;i++){
+      var a = i*0.618*Math.PI*2 + t*0.2;
+      var rad = Math.sqrt(i/n) * Math.min(cols,rows)*0.45;
+      var r = Math.round(cy + Math.sin(a)*rad);
+      var c = Math.round(cx + Math.cos(a)*rad);
+      if (r<0||r>=rows||c<0||c>=cols) continue;
+      draw('·', r, c, 0.4 + (1-i/n)*0.5);
+    }
+    draw('●', Math.round(cy), Math.round(cx), 1);
+  } else if (theme === 'agent') {
+    var n = 20;
+    for (var i=0;i<n;i++){
+      var px = (i*37 + seed*100) % cols;
+      var py = (i*53 + seed*200) % rows;
+      var a = Math.sin(t+i)*Math.PI;
+      var ch = Math.abs(Math.cos(a))>0.7 ? '─' : Math.abs(Math.sin(a))>0.7 ? '│' : (Math.cos(a)*Math.sin(a)>0 ? '\\' : '/');
+      draw(ch, Math.round(py), Math.round(px), 0.5 + Math.sin(t+i)*0.3);
+    }
+  } else if (theme === 'grid') {
+    for (var r=0;r<rows;r+=2) for (var c=0;c<cols;c+=2){
+      var v = Math.sin(c*0.3 + t)*Math.cos(r*0.3 - t*0.5);
+      if (v > 0.2) draw('□', r, c, 0.5);
+      else if (v > -0.2) draw('·', r, c, 0.3);
+      else draw('■', r, c, 0.7);
+    }
+  } else if (theme === 'color') {
+    for (var r=0;r<rows;r++) for (var c=0;c<cols;c++){
+      var band = Math.floor((r/rows)*5);
+      var v = (Math.sin(c*0.25 + band + t*0.3) + 1)/2;
+      var idx = Math.floor(v*(GLYPHS_BLOCK.length-1));
+      if (GLYPHS_BLOCK[idx] !== ' ') draw(GLYPHS_BLOCK[idx], r, c, 0.4 + band*0.1);
+    }
+  } else if (theme === 'type') {
+    var letter = project.title[0].toUpperCase();
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.font = '400 ' + Math.min(w,h)*0.9 + "px 'Instrument Serif', serif";
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(letter, w/2, h/2 + 4);
+    ctx.restore();
+    var marks = ['·','∙',','];
+    for (var i=0;i<12;i++){
+      var a = i*0.618*Math.PI*2 + t*0.2;
+      var rad = Math.min(cols,rows)*0.42;
+      var r = Math.round(cy + Math.sin(a)*rad);
+      var c = Math.round(cx + Math.cos(a)*rad);
+      draw(marks[i%marks.length], r, c, 0.3);
+    }
+  } else if (theme === 'ui') {
+    for (var r=1; r<rows-1; r+=3){
+      var wd = Math.floor(cols * (0.3 + (Math.sin(r+t)+1)/3));
+      for (var c=1;c<1+wd;c++) draw('▏', r, c, 0.7);
+      for (var c=1;c<1+Math.floor(wd*0.4);c++) draw('─', r+1, c, 0.3);
+    }
+  } else if (theme === 'data') {
+    for (var c=0;c<cols;c+=2){
+      var h0 = Math.floor(rows * (0.3 + (Math.sin(c*0.4+t)+Math.sin(c*0.15-t*0.7))/4 + 0.2));
+      for (var r=rows-1; r>rows-1-h0; r--) draw('▊', r, c, 0.5 + (r-rows+h0)/h0 * 0.4);
+    }
+  } else {
+    for (var r=0;r<rows;r++) for (var c=0;c<cols;c++){
+      var v = Math.sin(c*0.3+r*0.2+t);
+      if (v>0.5) draw('·', r, c, 0.4);
+    }
+  }
+  ctx.globalAlpha = 1;
+};
+
+window.animateGlyph = function(canvas, project, opts) {
+  var loop = function() {
+    if (!canvas.isConnected) return;
+    window.renderGlyph(canvas, project, opts);
+    canvas._raf = requestAnimationFrame(loop);
+  };
+  cancelAnimationFrame(canvas._raf);
+  loop();
+};
+</script>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+function Cell({ n, project, selected, onHover, onLeave, onSelect, isCurrent }) {
+  const ref = React.useRef(null);
+  const themeColor = (window.THEMES[project.themes?.[0]] || {}).color || '#888';
+  React.useEffect(() => {
+    if (!ref.current) return;
+    window.animateGlyph(ref.current, project, { size: 66, color: themeColor });
+    return () => cancelAnimationFrame(ref.current?._raf);
+  }, [project.id]);
+  return (
+    <a
+      href={`./${project.id}/index.html`}
+      onMouseEnter={() => onHover(n)}
+      onMouseLeave={onLeave}
+      onClick={e => { e.preventDefault(); onSelect(); }}
+      onDoubleClick={() => window.location.href = `./${project.id}/index.html`}
+      style={{
+        position: 'relative', aspectRatio: '1', border: '1px solid',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start',
+        padding: '3px 4px', textDecoration: 'none', cursor: 'pointer',
+        transition: 'border-color 0.15s, box-shadow 0.2s', overflow: 'hidden',
+        background: '#070707',
+        borderColor: selected ? themeColor : isCurrent ? '#444' : '#1a1a1a',
+        boxShadow: selected ? `0 0 0 1px ${themeColor}, 0 0 20px ${themeColor}33` : 'none',
+      }}
+    >
+      <canvas ref={ref} style={{ position: 'absolute', inset: 0, opacity: selected ? 1 : 0.85 }} />
+      <span style={{
+        position: 'relative', zIndex: 1, fontSize: 8, letterSpacing: '0.02em',
+        fontVariantNumeric: 'tabular-nums', padding: '1px 3px',
+        color: selected ? '#fff' : '#555', background: 'rgba(7,7,7,0.7)',
+      }}>{String(n).padStart(2, '0')}</span>
+      {isCurrent && (
+        <span style={{
+          position: 'absolute', bottom: 3, right: 4, fontSize: 8,
+          textTransform: 'uppercase', letterSpacing: '0.06em', color: '#3fb950',
+          zIndex: 1, background: 'rgba(7,7,7,0.8)', padding: '1px 3px',
+        }}>now</span>
+      )}
+    </a>
+  );
+}
+
+function App() {
+  const byDay = {};
+  window.PROJECTS.forEach(p => { byDay[Math.floor(p.day)] = p; });
+
+  const active = window.PROJECTS.filter(p => !p.disabled);
+  const maxDay = Math.max(...active.map(p => Math.floor(p.day)));
+
+  const [selected, setSelected] = React.useState(null);
+  const [hover, setHover] = React.useState(null);
+  const current = hover ?? selected;
+
+  let run = 0, streaks = [];
+  for (let i = 1; i <= 100; i++) {
+    if (byDay[i] && !byDay[i].disabled) { run++; }
+    else { if (run) streaks.push(run); run = 0; }
+  }
+  if (run) streaks.push(run);
+  const longest = streaks.length ? Math.max(...streaks) : 0;
+
+  React.useEffect(() => {
+    const handler = e => {
+      if (selected == null) return;
+      let next = selected;
+      if (e.key === 'ArrowRight') next = Math.min(100, selected + 1);
+      else if (e.key === 'ArrowLeft') next = Math.max(1, selected - 1);
+      else if (e.key === 'ArrowDown') next = Math.min(100, selected + 10);
+      else if (e.key === 'ArrowUp') next = Math.max(1, selected - 10);
+      else if (e.key === 'Enter' && byDay[selected] && !byDay[selected].disabled) {
+        window.location.href = `./${byDay[selected].id}/index.html`;
+        return;
+      } else return;
+      e.preventDefault();
+      setSelected(next);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [selected]);
+
+  const cells = [];
+  for (let i = 1; i <= 100; i++) cells.push(i);
+
+  const readout = (() => {
+    if (current && byDay[current] && !byDay[current].disabled) {
+      const p = byDay[current];
+      const c = (window.THEMES[p.themes?.[0]] || {}).color || '#888';
+      return (
+        <>
+          <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14, color: c }}>
+            ● day {String(p.day).padStart(3, '0')} / 100
+          </div>
+          <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: 26, color: '#fff', lineHeight: 1.1, marginBottom: 12, letterSpacing: '-0.01em' }}>
+            {p.title}
+          </div>
+          <div style={{ fontSize: 12, color: '#888', lineHeight: 1.6, marginBottom: 14 }}>{p.desc}</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 16 }}>
+            {p.themes.map(t => <span key={t} style={{ color: (window.THEMES[t] || {}).color }}>· {t}</span>)}
+          </div>
+          <a href={`./${p.id}/index.html`} style={{ fontSize: 11, color: '#58a6ff', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            open {p.id} →
+          </a>
+        </>
+      );
+    }
+    if (current && byDay[current]?.disabled) {
+      const p = byDay[current];
+      return (
+        <>
+          <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14, color: '#666' }}>
+            ✗ day {String(current).padStart(3, '0')} / 100
+          </div>
+          <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: 26, color: '#fff', lineHeight: 1.1, marginBottom: 12, letterSpacing: '-0.01em' }}>
+            {p.title}
+          </div>
+          <div style={{ fontSize: 12, color: '#888', lineHeight: 1.6 }}>archived — {p.desc}</div>
+        </>
+      );
+    }
+    if (current) {
+      return (
+        <>
+          <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14, color: '#666' }}>
+            ○ day {String(current).padStart(3, '0')} / 100
+          </div>
+          <div style={{ fontSize: 12, color: '#888', lineHeight: 1.6 }}>
+            No experiment landed on this day. The routine is ongoing — blanks are honest, not missing.
+          </div>
+        </>
+      );
+    }
+    return (
+      <>
+        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14, color: '#666' }}>
+          — the field
+        </div>
+        <div style={{ fontSize: 12, color: '#888', lineHeight: 1.6, marginBottom: 20 }}>
+          100 cells, one per day. Each living cell is a glyph of its experiment.
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 11, color: '#666' }}>
+          <div>
+            <kbd style={{ background: '#1a1a1a', border: '1px solid #333', padding: '1px 6px', fontSize: 10, color: '#ccc', fontFamily: 'inherit', marginRight: 8 }}>click</kbd>
+            select a cell
+          </div>
+          <div>
+            <kbd style={{ background: '#1a1a1a', border: '1px solid #333', padding: '1px 6px', fontSize: 10, color: '#ccc', fontFamily: 'inherit', marginRight: 8 }}>↑↓←→</kbd>
+            walk the field
+          </div>
+          <div>
+            <kbd style={{ background: '#1a1a1a', border: '1px solid #333', padding: '1px 6px', fontSize: 10, color: '#ccc', fontFamily: 'inherit', marginRight: 8 }}>enter</kbd>
+            open the project
+          </div>
+        </div>
+      </>
+    );
+  })();
+
+  return (
+    <div style={{ background: '#0a0a0a', color: '#fff', fontFamily: 'JetBrains Mono, monospace', padding: '48px 40px 64px', minHeight: '100%' }}>
+      <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#555', marginBottom: 32, paddingBottom: 12, borderBottom: '1px solid #222' }}>
+          <span>clear_channel · 100day · field</span>
+          <span>{active.length} landed · {100 - active.length} blank · longest streak {longest}</span>
+        </div>
+
+        <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 112, fontWeight: 400, lineHeight: 0.9, letterSpacing: '-0.03em', margin: '0 0 20px', color: '#fff' }}>
+          a hundred<br/>
+          <em style={{ color: '#bc8cff', fontStyle: 'italic' }}>days.</em>
+        </h1>
+        <p style={{ fontSize: 13, color: '#888', maxWidth: 560, lineHeight: 1.7, marginBottom: 40 }}>
+          One experiment, one day. Each cell is a living glyph of the experiment it holds; click to open, arrow keys to walk the field. Now at day <span style={{ color: '#fff' }}>{String(maxDay).padStart(3, '0')}</span>.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 28, marginBottom: 32, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 2 }}>
+            {cells.map(n => {
+              const p = byDay[n];
+              const isSelected = selected === n;
+              const isCurrent = n === maxDay;
+              if (!p) {
+                return (
+                  <div key={n}
+                    onClick={() => setSelected(n)}
+                    onMouseEnter={() => setHover(n)}
+                    onMouseLeave={() => setHover(null)}
+                    style={{
+                      position: 'relative', aspectRatio: '1', border: '1px solid',
+                      borderColor: isSelected ? '#666' : '#161616',
+                      display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start',
+                      padding: '3px 4px', cursor: 'pointer', background: '#0a0a0a',
+                      transition: 'border-color 0.15s',
+                    }}
+                  >
+                    <span style={{ fontSize: 8, letterSpacing: '0.02em', fontVariantNumeric: 'tabular-nums', color: '#444', padding: '1px 3px' }}>
+                      {String(n).padStart(2, '0')}
+                    </span>
+                    {isCurrent && <span style={{ position: 'absolute', bottom: 3, right: 4, fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#3fb950', background: 'rgba(7,7,7,0.8)', padding: '1px 3px' }}>now</span>}
+                  </div>
+                );
+              }
+              if (p.disabled) {
+                return (
+                  <div key={n}
+                    onClick={() => setSelected(n)}
+                    onMouseEnter={() => setHover(n)}
+                    onMouseLeave={() => setHover(null)}
+                    style={{
+                      position: 'relative', aspectRatio: '1', border: '1px solid',
+                      borderColor: isSelected ? '#666' : '#161616',
+                      display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start',
+                      padding: '3px 4px', cursor: 'pointer', background: '#0a0a0a',
+                      transition: 'border-color 0.15s',
+                    }}
+                  >
+                    <span style={{ fontSize: 8, letterSpacing: '0.02em', color: '#444', padding: '1px 3px' }}>
+                      {String(n).padStart(2, '0')}
+                    </span>
+                    <span style={{ position: 'absolute', bottom: 3, right: 4, fontSize: 10, color: '#333', zIndex: 1 }}>✗</span>
+                  </div>
+                );
+              }
+              return (
+                <Cell key={n} n={n} project={p}
+                  selected={isSelected} isCurrent={isCurrent}
+                  onHover={setHover} onLeave={() => setHover(null)}
+                  onSelect={() => setSelected(n)} />
+              );
+            })}
+          </div>
+
+          <div>
+            <div style={{ border: '1px solid #222', background: '#0f0f0f', padding: 20, fontSize: 12, minHeight: 260 }}>
+              {readout}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#666', paddingTop: 20, borderTop: '1px solid #222' }}>
+          {window.THEME_ORDER.map(t => {
+            const count = active.filter(p => p.themes?.[0] === t).length;
+            if (!count) return null;
+            return (
+              <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: 3, background: (window.THEMES[t] || {}).color, display: 'inline-block' }} />
+                {t} · {count}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>

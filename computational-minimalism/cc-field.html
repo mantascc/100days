@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cc-field — ascii loading / thinking component</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap');
+
+        :root {
+            --ground-void: #0a0a0a;
+            --ground-base: #0f0f0f;
+            --ground-surface: #1a1a1a;
+            --border-default: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a8aab8;
+            --text-tertiary: #666666;
+            --text-ghost: #333333;
+            --accent: #00ffaa;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--ground-void);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 400;
+            text-transform: lowercase;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 300;
+            margin-bottom: 48px;
+        }
+
+        .demo-section {
+            margin-bottom: 48px;
+        }
+
+        .demo-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .demo-desc {
+            font-size: 11px;
+            color: var(--text-ghost);
+            font-weight: 300;
+            margin-top: 8px;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .demo-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .demo-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 300;
+            color: var(--text-tertiary);
+            background: none;
+            border: 1px solid var(--border-default);
+            padding: 4px 12px;
+            cursor: pointer;
+            transition: color 100ms linear, border-color 100ms linear;
+        }
+
+        .controls button:hover { color: var(--text-secondary); border-color: var(--text-ghost); }
+        .controls button.active { color: var(--accent); border-color: var(--accent); }
+
+        .controls input[type="range"] {
+            width: 120px;
+            accent-color: var(--accent);
+        }
+
+        .controls label {
+            font-size: 10px;
+            color: var(--text-ghost);
+            font-weight: 300;
+        }
+
+        .inline-code {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--ground-surface);
+            padding: 16px;
+            border: 1px solid var(--border-default);
+            margin-top: 12px;
+            white-space: pre;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1>cc-field</h1>
+<div class="subtitle">canvas ascii field — loading / thinking / progress component</div>
+
+<!-- ═══ MODES ═══ -->
+<div class="demo-section">
+    <div class="demo-label">modes</div>
+    <div class="demo-row">
+        <div class="demo-cell">
+            <div class="demo-label">think — interference waves</div>
+            <canvas id="d-think" width="320" height="120"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">breathe — radial pulse</div>
+            <canvas id="d-breathe" width="320" height="120"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">rain — falling particles</div>
+            <canvas id="d-rain" width="320" height="120"></canvas>
+        </div>
+    </div>
+    <div style="height: 24px;"></div>
+    <div class="demo-row">
+        <div class="demo-cell">
+            <div class="demo-label">scan — horizontal sweep</div>
+            <canvas id="d-scan" width="320" height="120"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">ripple — mouse-reactive</div>
+            <canvas id="d-ripple" width="320" height="120"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">progress — fill with data</div>
+            <canvas id="d-progress" width="320" height="120"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SIZES ═══ -->
+<div class="demo-section">
+    <div class="demo-label">sizes</div>
+    <div class="demo-row" style="align-items: center;">
+        <div class="demo-cell">
+            <div class="demo-label">inline (120×16)</div>
+            <canvas id="d-inline" width="120" height="16"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">badge (40×40)</div>
+            <canvas id="d-badge" width="40" height="40"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">bar (280×20)</div>
+            <canvas id="d-bar" width="280" height="20"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">card (200×80)</div>
+            <canvas id="d-card" width="200" height="80"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ RAMPS ═══ -->
+<div class="demo-section">
+    <div class="demo-label">glyph ramps</div>
+    <div class="demo-row">
+        <div class="demo-cell">
+            <div class="demo-label">circles</div>
+            <canvas id="d-r-circles" width="320" height="80"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">blocks</div>
+            <canvas id="d-r-blocks" width="320" height="80"></canvas>
+        </div>
+        <div class="demo-cell">
+            <div class="demo-label">braille</div>
+            <canvas id="d-r-braille" width="320" height="80"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PLAYGROUND ═══ -->
+<div class="demo-section">
+    <div class="demo-label">playground</div>
+    <canvas id="playground" width="640" height="200"></canvas>
+    <div class="controls">
+        <button class="active" data-mode="think" onclick="setMode(this)">think</button>
+        <button data-mode="breathe" onclick="setMode(this)">breathe</button>
+        <button data-mode="rain" onclick="setMode(this)">rain</button>
+        <button data-mode="scan" onclick="setMode(this)">scan</button>
+        <button data-mode="ripple" onclick="setMode(this)">ripple</button>
+        <button data-mode="progress" onclick="setMode(this)">progress</button>
+        <label>speed <input type="range" id="ctrlSpeed" min="0.1" max="3" step="0.1" value="1"></label>
+        <label>density <input type="range" id="ctrlDensity" min="0.3" max="2" step="0.1" value="1"></label>
+        <label>progress <input type="range" id="ctrlProgress" min="0" max="1" step="0.01" value="0.5"></label>
+    </div>
+</div>
+
+<!-- ═══ USAGE ═══ -->
+<div class="demo-section">
+    <div class="demo-label">usage</div>
+    <div class="inline-code">const field = new CCField(canvas, {
+  mode: 'think',        // think | breathe | rain | scan | ripple | progress
+  ramp: 'circles',      // circles | blocks | braille | wave | crystal
+  accent: '#00ffaa',    // any hex color
+  fontSize: 11,         // glyph size in px
+  speed: 1,             // animation speed multiplier
+  density: 1,           // spatial frequency multiplier
+  opacity: 0.8          // global alpha
+});
+
+field.start();          // begin animation loop
+field.stop();           // pause
+field.setProgress(0.7); // for progress mode [0,1]
+field.setMode('rain');  // switch mode live
+field.destroy();        // cleanup</div>
+</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════
+// CCField — canvas ASCII field component
+// ══════════════════════════════════════════════
+
+class CCField {
+    static RAMPS = {
+        circles:  [' ','·','∙','∘','○','◌','◎','⊙','●'],
+        blocks:   [' ','░','▒','▓','█'],
+        braille:  [' ','⠁','⠃','⠇','⡇','⣇','⣧','⣷','⣿'],
+        wave:     [' ','∿','∾','≈','≋','∰','∯','∮','⊛'],
+        crystal:  [' ','∙','∶','∵','∴','∷','⁖','⁘','⁙','✳'],
+    };
+
+    constructor(canvas, opts = {}) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.mode = opts.mode || 'think';
+        this.ramp = CCField.RAMPS[opts.ramp || 'circles'];
+        this.accent = opts.accent || '#00ffaa';
+        this.fontSize = opts.fontSize || 11;
+        this.speed = opts.speed || 1;
+        this.density = opts.density || 1;
+        this.opacity = opts.opacity || 0.8;
+        this.progress = opts.progress || 0;
+        this.t = 0;
+        this.mx = 0.5;
+        this.my = 0.5;
+        this.running = false;
+        this.raf = null;
+
+        // Rain state
+        this.drops = [];
+        this._initDrops();
+
+        // Mouse tracking for ripple mode
+        this._onMouse = (e) => {
+            const r = this.canvas.getBoundingClientRect();
+            this.mx = (e.clientX - r.left) / r.width;
+            this.my = (e.clientY - r.top) / r.height;
+        };
+        this.canvas.addEventListener('mousemove', this._onMouse);
+    }
+
+    _initDrops() {
+        const cols = Math.floor(this.canvas.width / (this.fontSize * 0.7));
+        this.drops = [];
+        for (let i = 0; i < cols * 0.4; i++) {
+            this.drops.push({
+                x: Math.random(),
+                y: Math.random(),
+                speed: 0.3 + Math.random() * 0.7,
+                len: 2 + Math.floor(Math.random() * 6)
+            });
+        }
+    }
+
+    _glyph(v) {
+        const idx = Math.min(Math.floor(Math.max(0, Math.min(1, v)) * this.ramp.length), this.ramp.length - 1);
+        return this.ramp[idx];
+    }
+
+    // ── Mode functions: return [0,1] value per cell ──
+
+    _think(nx, ny) {
+        const d = this.density;
+        return (Math.sin(nx * 12 * d + this.t * 2) * Math.cos(ny * 10 * d - this.t * 1.5) + 1) / 2;
+    }
+
+    _breathe(nx, ny) {
+        const cx = 0.5, cy = 0.5;
+        const dist = Math.sqrt((nx - cx) ** 2 + (ny - cy) ** 2);
+        const pulse = (Math.sin(this.t * 2) + 1) / 2;
+        const ring = Math.sin(dist * 12 * this.density - this.t * 3);
+        return Math.max(0, ring * (1 - dist * 1.5) * pulse);
+    }
+
+    _rain(nx, ny) {
+        let v = 0;
+        for (const drop of this.drops) {
+            const dx = Math.abs(nx - drop.x);
+            if (dx > 0.03) continue;
+            const dy = ny - drop.y;
+            if (dy > 0 || dy < -drop.len * 0.05) continue;
+            v = Math.max(v, (1 + dy / (drop.len * 0.05)) * (1 - dx / 0.03));
+        }
+        return v;
+    }
+
+    _scan(nx, ny) {
+        const sweep = ((this.t * 0.5) % 1);
+        const dist = Math.abs(nx - sweep);
+        const fade = Math.max(0, 1 - dist * 6);
+        const noise = (Math.sin(ny * 20 * this.density + nx * 15) + 1) / 2;
+        return fade * noise;
+    }
+
+    _ripple(nx, ny) {
+        const dx = nx - this.mx;
+        const dy = ny - this.my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const wave = Math.sin(dist * 20 * this.density - this.t * 4);
+        const falloff = Math.exp(-dist * 3);
+        return (wave * falloff + 1) / 2 * falloff;
+    }
+
+    _progress(nx, ny) {
+        const filled = nx <= this.progress;
+        if (!filled) return 0;
+        const edge = Math.abs(nx - this.progress) < 0.05;
+        const noise = (Math.sin(nx * 15 * this.density + this.t * 2) * Math.cos(ny * 12 - this.t) + 1) / 2;
+        return edge ? noise * 0.9 + 0.1 : noise * 0.5 + 0.3;
+    }
+
+    _getValue(nx, ny) {
+        switch (this.mode) {
+            case 'think':    return this._think(nx, ny);
+            case 'breathe':  return this._breathe(nx, ny);
+            case 'rain':     return this._rain(nx, ny);
+            case 'scan':     return this._scan(nx, ny);
+            case 'ripple':   return this._ripple(nx, ny);
+            case 'progress': return this._progress(nx, ny);
+            default:         return this._think(nx, ny);
+        }
+    }
+
+    _tick() {
+        this.t += 0.02 * this.speed;
+
+        // Update rain drops
+        if (this.mode === 'rain') {
+            for (const drop of this.drops) {
+                drop.y += drop.speed * 0.015 * this.speed;
+                if (drop.y > 1.1) {
+                    drop.y = -0.1;
+                    drop.x = Math.random();
+                    drop.speed = 0.3 + Math.random() * 0.7;
+                }
+            }
+        }
+    }
+
+    _draw() {
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+        const ctx = this.ctx;
+        const charW = this.fontSize * 0.65;
+        const charH = this.fontSize * 1.15;
+        const cols = Math.floor(W / charW);
+        const rows = Math.floor(H / charH);
+
+        ctx.fillStyle = '#0f0f0f';
+        ctx.fillRect(0, 0, W, H);
+        ctx.font = `${this.fontSize}px JetBrains Mono, monospace`;
+        ctx.fillStyle = this.accent;
+        ctx.textBaseline = 'top';
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const nx = c / cols;
+                const ny = r / rows;
+                const v = this._getValue(nx, ny);
+                const ch = this._glyph(v);
+                if (ch === ' ') continue;
+                ctx.globalAlpha = v * this.opacity;
+                ctx.fillText(ch, c * charW, r * charH);
+            }
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    _loop() {
+        if (!this.running) return;
+        this._tick();
+        this._draw();
+        this.raf = requestAnimationFrame(() => this._loop());
+    }
+
+    start() {
+        if (this.running) return;
+        this.running = true;
+        this._loop();
+    }
+
+    stop() {
+        this.running = false;
+        if (this.raf) cancelAnimationFrame(this.raf);
+    }
+
+    setProgress(v) {
+        this.progress = Math.max(0, Math.min(1, v));
+    }
+
+    setMode(mode) {
+        this.mode = mode;
+        if (mode === 'rain') this._initDrops();
+    }
+
+    destroy() {
+        this.stop();
+        this.canvas.removeEventListener('mousemove', this._onMouse);
+    }
+}
+
+// ══════════════════════════════════════════════
+// DEMOS
+// ══════════════════════════════════════════════
+
+const demos = [];
+
+// Mode demos
+['think', 'breathe', 'rain', 'scan', 'ripple', 'progress'].forEach(mode => {
+    const canvas = document.getElementById('d-' + mode);
+    if (!canvas) return;
+    const field = new CCField(canvas, { mode, fontSize: 11 });
+    if (mode === 'progress') {
+        field.setProgress(0.65);
+        // Animate progress for demo
+        let dir = 1;
+        const tick = () => {
+            field.progress += 0.003 * dir;
+            if (field.progress >= 1) dir = -1;
+            if (field.progress <= 0) dir = 1;
+        };
+        const origTick = field._tick.bind(field);
+        field._tick = function() { origTick(); tick(); };
+    }
+    field.start();
+    demos.push(field);
+});
+
+// Size demos
+[
+    ['d-inline',  { mode: 'scan',    fontSize: 9 }],
+    ['d-badge',   { mode: 'breathe', fontSize: 9 }],
+    ['d-bar',     { mode: 'progress', fontSize: 10 }],
+    ['d-card',    { mode: 'think',   fontSize: 10 }],
+].forEach(([id, opts]) => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const field = new CCField(canvas, opts);
+    if (opts.mode === 'progress') {
+        field.setProgress(0.4);
+        let dir = 1;
+        const origTick = field._tick.bind(field);
+        field._tick = function() {
+            origTick();
+            field.progress += 0.002 * dir;
+            if (field.progress >= 1) dir = -1;
+            if (field.progress <= 0) dir = 1;
+        };
+    }
+    field.start();
+    demos.push(field);
+});
+
+// Ramp demos
+['circles', 'blocks', 'braille'].forEach(ramp => {
+    const canvas = document.getElementById('d-r-' + ramp);
+    if (!canvas) return;
+    const field = new CCField(canvas, { mode: 'think', ramp, fontSize: 11 });
+    field.start();
+    demos.push(field);
+});
+
+// Playground
+const pgCanvas = document.getElementById('playground');
+const pg = new CCField(pgCanvas, { mode: 'think', fontSize: 12 });
+pg.start();
+
+function setMode(btn) {
+    document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pg.setMode(btn.dataset.mode);
+}
+
+document.getElementById('ctrlSpeed').addEventListener('input', e => {
+    pg.speed = parseFloat(e.target.value);
+});
+document.getElementById('ctrlDensity').addEventListener('input', e => {
+    pg.density = parseFloat(e.target.value);
+});
+document.getElementById('ctrlProgress').addEventListener('input', e => {
+    pg.setProgress(parseFloat(e.target.value));
+});
+</script>
+
+</body>
+</html>

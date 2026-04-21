@@ -1,0 +1,78 @@
+{
+  "$schema": "aesthetic-genome-v1",
+  "description": "Structured vector schema for encoding taste decisions across 100days projects",
+  "axes": {
+    "continuous": {
+      "density": {
+        "range": [0, 1],
+        "low": "negative space dominates, few elements",
+        "high": "screen saturated, many simultaneous elements",
+        "detect": "element count, fill ratio, particle count"
+      },
+      "agency": {
+        "range": [0, 1],
+        "low": "autonomous, no user input changes outcome",
+        "high": "piece is constituted by interaction, meaningless without input",
+        "detect": "event listener count, input elements, audio/camera APIs"
+      },
+      "legibility": {
+        "range": [0, 1],
+        "low": "abstract sensation, felt not read",
+        "high": "information-dense, labels, readable data",
+        "detect": "text content ratio, label elements, data display"
+      },
+      "determinism": {
+        "range": [0, 1],
+        "low": "chaotic, stochastic, never repeats",
+        "high": "same input always same output, parametric",
+        "detect": "Math.random frequency, noise functions, seed usage"
+      },
+      "complexity": {
+        "range": [0, 1],
+        "low": "single rule, minimal logic",
+        "high": "multi-layered system, emergent behavior from many rules",
+        "detect": "line count, function count, algorithm sophistication"
+      },
+      "physicality": {
+        "range": [0, 1],
+        "low": "mathematical/geometric, no physical metaphor",
+        "high": "simulates forces, gravity, springs, fluid, collision",
+        "detect": "physics keywords (velocity, force, mass, spring, gravity, damping)"
+      },
+      "palette_restraint": {
+        "range": [0, 1],
+        "low": "many colors, broad spectrum",
+        "high": "monochrome or single accent, maximum restraint",
+        "detect": "unique color count, accent color count"
+      },
+      "motion_character": {
+        "range": [0, 1],
+        "low": "static or binary state changes",
+        "high": "continuous fluid animation, constant motion",
+        "detect": "requestAnimationFrame, transition count, animation complexity"
+      }
+    },
+    "categorical": {
+      "material": {
+        "values": ["pixel", "glyph", "geometry", "data", "dom", "hybrid"],
+        "description": "perceptual substrate — what the piece is made of",
+        "detect": "canvas vs pre vs svg vs dom, character rendering, fillRect vs fillText"
+      },
+      "temporal_mode": {
+        "values": ["loop", "evolve", "equilibrium", "static", "reactive"],
+        "description": "how the piece relates to time",
+        "detect": "animation loop structure, state convergence, input-driven updates"
+      },
+      "referent": {
+        "values": ["self-contained", "data-mapped", "metaphorical", "educational"],
+        "description": "does it point outside itself",
+        "detect": "data imports, real-world labels, explanatory text"
+      },
+      "scale": {
+        "values": ["micro", "meso", "macro", "multi"],
+        "description": "perceptual scale — particle vs field vs system",
+        "detect": "zoom level, element size relative to canvas, hierarchy depth"
+      }
+    }
+  }
+}

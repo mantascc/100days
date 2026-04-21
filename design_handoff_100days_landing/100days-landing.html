@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>100days — landing page explorations</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    html, body { margin:0; padding:0; background:#f0eee9; height:100%; }
+    @keyframes blink { 50% { opacity: 0; } }
+    canvas { image-rendering: pixelated; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="data/projects.js"></script>
+  <script src="data/glyph.js"></script>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="variants/V2ThumbnailGridV1.jsx"></script>
+  <script type="text/babel" src="variants/V2ThumbnailGrid.jsx"></script>
+  <script type="text/babel" src="variants/V4CalendarV1.jsx"></script>
+  <script type="text/babel" src="variants/V4Calendar.jsx"></script>
+  <script type="text/babel" src="variants/V6ConstellationV1.jsx"></script>
+  <script type="text/babel" src="variants/V6Constellation.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const W = 1120, H = 860;
+    function App() {
+      return (
+        <DesignCanvas>
+          <DCSection id="thumbnails" title="Glyph thumbnails" subtitle="v1 initial → v2 iterated. Cards render a live glyph of each project.">
+            <DCArtboard id="v2-v1" label="v1 · initial" width={W} height={H}>
+              <V2ThumbnailGridV1 />
+            </DCArtboard>
+            <DCArtboard id="v2-v2" label="v2 · featured + filters" width={W} height={H}>
+              <V2ThumbnailGrid />
+            </DCArtboard>
+          </DCSection>
+          <DCSection id="calendar" title="Calendar field" subtitle="v1 initial → v2 iterated. A 10×10 grid of the hundred days.">
+            <DCArtboard id="v4-v1" label="v1 · initial" width={W} height={H}>
+              <V4CalendarV1 />
+            </DCArtboard>
+            <DCArtboard id="v4-v2" label="v2 · live cells + keyboard" width={W} height={H}>
+              <V4Calendar />
+            </DCArtboard>
+          </DCSection>
+          <DCSection id="constellation" title="Constellation" subtitle="v1 initial → v2 iterated. Projects as stars, clustered by theme.">
+            <DCArtboard id="v6-v1" label="v1 · initial" width={W} height={H}>
+              <V6ConstellationV1 />
+            </DCArtboard>
+            <DCArtboard id="v6-v2" label="v2 · physics + drag" width={W} height={H}>
+              <V6Constellation />
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

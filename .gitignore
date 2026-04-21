@@ -42,6 +42,10 @@ build/
 *.swo
 *~
 
+# Video files (too large for GitHub)
+*.mov
+*.mp4
+
 # Environment variables
 .env
 .env.local

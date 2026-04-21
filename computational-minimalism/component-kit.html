@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>computational minimalism — component kit</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+        :root {
+            --ground-void: #0a0a0a;
+            --ground-base: #0f0f0f;
+            --ground-raised: #141414;
+            --ground-surface: #1a1a1a;
+            --ground-float: #202232;
+            --ground-modal: #242424;
+            --text-primary: #ffffff;
+            --text-default: #f5f5f7;
+            --text-secondary: #a8aab8;
+            --text-tertiary: #666666;
+            --text-ghost: #333333;
+            --border-subtle: #1a1a1a;
+            --border-default: #2a2a2a;
+            --border-strong: #3a3d52;
+            --stroke-primary: #ffffff;
+            --stroke-ghost: rgba(255,255,255,0.2);
+            --accent: #00ffaa;
+            --overlay-dim: rgba(10,10,10,0.85);
+            --overlay-ghost: rgba(255,255,255,0.1);
+            --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Monaco, 'Courier New', monospace;
+            --text-xs: 10px; --text-sm: 11px; --text-base: 13px;
+            --text-md: 14px; --text-lg: 16px; --text-xl: 20px;
+            --leading-tight: 1.25; --leading-base: 1.5; --leading-loose: 1.75;
+            --tracking-tight: -0.02em; --tracking-normal: 0; --tracking-wide: 0.08em;
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+            --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+            --space-12: 48px; --space-16: 64px;
+            --stroke-thin: 1px; --stroke-default: 2px; --stroke-heavy: 3px;
+            --duration-instant: 0ms; --duration-fast: 100ms; --duration-base: 150ms;
+            --duration-slow: 300ms; --duration-drift: 800ms;
+            --ease-snap: linear; --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--ground-void);
+            color: var(--text-default);
+            font-family: var(--font-mono);
+            font-size: var(--text-base);
+            line-height: var(--leading-base);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-16) var(--space-8);
+        }
+
+        .kit-header {
+            margin-bottom: var(--space-16);
+            padding-bottom: var(--space-8);
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .kit-title {
+            font-size: var(--text-xl);
+            font-weight: 400;
+            color: var(--text-primary);
+            text-transform: lowercase;
+            margin-bottom: var(--space-2);
+        }
+
+        .kit-sub {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        /* Component section */
+        .component {
+            margin-bottom: var(--space-16);
+        }
+
+        .component-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            margin-bottom: var(--space-2);
+        }
+
+        .component-name {
+            font-size: var(--text-lg);
+            color: var(--text-primary);
+            font-weight: 400;
+            text-transform: lowercase;
+            margin-bottom: var(--space-2);
+        }
+
+        .component-desc {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            max-width: 600px;
+        }
+
+        .component-demo {
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            padding: var(--space-8);
+            margin-bottom: var(--space-4);
+        }
+
+        .component-code {
+            background: var(--ground-raised);
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-5);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            overflow-x: auto;
+            line-height: var(--leading-loose);
+            display: none;
+        }
+
+        .component-code.open { display: block; }
+
+        .code-toggle {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            background: none;
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-1) var(--space-3);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: color var(--duration-fast) var(--ease-snap),
+                        border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .code-toggle:hover {
+            color: var(--accent);
+            border-color: var(--border-default);
+        }
+
+        /* ═══════════════════════════════════════
+           COMPONENT PATTERNS
+           ═══════════════════════════════════════ */
+
+        /* ── 01 STAGE ── */
+        .cm-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            overflow: hidden;
+        }
+
+        .cm-stage canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cm-stage .cm-info {
+            position: absolute;
+            top: var(--space-4);
+            left: var(--space-4);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            pointer-events: none;
+        }
+
+        /* ── 02 CARD ── */
+        .cm-card {
+            background: var(--ground-surface);
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-5);
+            transition: border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-card:hover { border-color: var(--border-default); }
+
+        .cm-card .cm-card-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            margin-bottom: var(--space-3);
+        }
+
+        .cm-card .cm-card-value {
+            font-size: var(--text-xl);
+            color: var(--text-primary);
+            font-weight: 300;
+        }
+
+        .cm-card .cm-card-meta {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            margin-top: var(--space-2);
+        }
+
+        /* ── 03 VARIATION GRID ── */
+        .cm-variation-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+        }
+
+        .cm-variation-cell {
+            aspect-ratio: 1;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cm-variation-cell .cm-cell-label {
+            position: absolute;
+            bottom: var(--space-2);
+            left: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+        }
+
+        /* ── 04 NAV BAR ── */
+        .cm-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .cm-nav .cm-nav-title {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            margin-right: auto;
+        }
+
+        .cm-nav .cm-nav-btn {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            background: none;
+            border: 1px solid var(--border-default);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            transition: color var(--duration-fast) var(--ease-snap),
+                        border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-nav .cm-nav-btn:hover {
+            color: var(--accent);
+            border-color: var(--border-strong);
+        }
+
+        .cm-nav .cm-nav-counter {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        /* ── 05 DATA ROW ── */
+        .cm-data-row {
+            display: flex;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .cm-data-row:last-child { border-bottom: none; }
+
+        .cm-data-row .cm-data-key {
+            width: 120px;
+            flex-shrink: 0;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+        }
+
+        .cm-data-row .cm-data-val {
+            font-size: var(--text-sm);
+            color: var(--text-default);
+        }
+
+        .cm-data-row .cm-data-unit {
+            margin-left: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        /* ── 06 PILL / TAG ── */
+        .cm-pill {
+            display: inline-block;
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            border: 1px solid var(--border-default);
+            padding: var(--space-1) var(--space-3);
+        }
+
+        .cm-pill--accent {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── 07 PROGRESS BAR ── */
+        .cm-progress {
+            height: 4px;
+            background: var(--ground-raised);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cm-progress .cm-progress-fill {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            background: var(--accent);
+            transition: width var(--duration-slow) var(--ease-snap);
+        }
+
+        /* ── 08 TOOLTIP / HOVER REVEAL ── */
+        .cm-tooltip-host {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cm-tooltip {
+            position: absolute;
+            bottom: calc(100% + var(--space-2));
+            left: 0;
+            background: var(--ground-modal);
+            border: 1px solid var(--border-default);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-tooltip-host:hover .cm-tooltip { opacity: 1; }
+
+        /* ── 09 MODAL ── */
+        .cm-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-dim);
+            display: grid;
+            place-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-base) var(--ease-snap);
+        }
+
+        .cm-modal-backdrop.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .cm-modal {
+            background: var(--ground-raised);
+            border: 1px solid var(--border-default);
+            padding: var(--space-8);
+            max-width: 480px;
+            width: 90%;
+        }
+
+        .cm-modal .cm-modal-title {
+            font-size: var(--text-lg);
+            color: var(--text-primary);
+            font-weight: 400;
+            text-transform: lowercase;
+            margin-bottom: var(--space-4);
+        }
+
+        .cm-modal .cm-modal-body {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            line-height: var(--leading-loose);
+        }
+
+        .cm-modal .cm-modal-actions {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: flex-end;
+        }
+
+        /* ── 10 BUTTON ── */
+        .cm-btn {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            padding: var(--space-2) var(--space-5);
+            border: 1px solid var(--border-default);
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color var(--duration-fast) var(--ease-snap),
+                        border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+
+        .cm-btn:active { transform: scale(0.98); }
+
+        .cm-btn--accent {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cm-btn--accent:hover {
+            background: var(--accent);
+            color: var(--ground-void);
+        }
+
+        /* ── 11 CHAPTER VIEWER ── */
+        .cm-chapter-viewer {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cm-chapter-viewer .cm-chapter-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: var(--space-4);
+        }
+
+        .cm-chapter-viewer .cm-chapter-title {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            margin-right: auto;
+        }
+
+        .cm-chapter-viewer .cm-chapter-dots {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .cm-chapter-viewer .cm-chapter-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-ghost);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-chapter-viewer .cm-chapter-dot.active { background: var(--accent); }
+        .cm-chapter-viewer .cm-chapter-dot:hover { background: var(--text-tertiary); }
+
+        /* ── 12 AXIS LABEL ── */
+        .cm-axis-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .cm-axis-label .cm-axis-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .cm-axis-label .cm-axis-text {
+            text-transform: uppercase;
+            letter-spacing: var(--tracking-wide);
+            flex-shrink: 0;
+        }
+
+        /* ── DEMO HELPERS ── */
+        .demo-row {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .demo-col {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .separator {
+            border: none;
+            border-top: 1px solid var(--border-subtle);
+            margin: var(--space-16) 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <div class="kit-header">
+        <div class="kit-title">component kit</div>
+        <div class="kit-sub">reusable patterns — copy into any project following the visual language</div>
+    </div>
+
+    <!-- ═══ 01 STAGE ═══ -->
+    <div class="component">
+        <div class="component-label">component 01</div>
+        <div class="component-name">stage</div>
+        <div class="component-desc">the canvas container. 80vmin square by default, with hi-dpi scaling and an info label.</div>
+        <div class="component-demo">
+            <div class="cm-stage" style="max-width: 400px; aspect-ratio: 1;">
+                <canvas id="stageDemo"></canvas>
+                <div class="cm-info">particle field</div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-stage"&gt;
+  &lt;canvas id="canvas"&gt;&lt;/canvas&gt;
+  &lt;div class="cm-info"&gt;sketch name&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 02 CARD ═══ -->
+    <div class="component">
+        <div class="component-label">component 02</div>
+        <div class="component-name">card</div>
+        <div class="component-desc">data display surface. label + value + optional meta. surface-level ground with subtle border.</div>
+        <div class="component-demo">
+            <div class="demo-row">
+                <div class="cm-card" style="min-width: 160px;">
+                    <div class="cm-card-label">particles</div>
+                    <div class="cm-card-value">2,048</div>
+                    <div class="cm-card-meta">active</div>
+                </div>
+                <div class="cm-card" style="min-width: 160px;">
+                    <div class="cm-card-label">framerate</div>
+                    <div class="cm-card-value">60<span style="font-size: var(--text-sm); color: var(--text-tertiary);">fps</span></div>
+                    <div class="cm-card-meta">target met</div>
+                </div>
+                <div class="cm-card" style="min-width: 160px;">
+                    <div class="cm-card-label">entropy</div>
+                    <div class="cm-card-value" style="color: var(--accent);">0.847</div>
+                    <div class="cm-card-meta">rising</div>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-card"&gt;
+  &lt;div class="cm-card-label"&gt;label&lt;/div&gt;
+  &lt;div class="cm-card-value"&gt;value&lt;/div&gt;
+  &lt;div class="cm-card-meta"&gt;meta&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 03 VARIATION GRID ═══ -->
+    <div class="component">
+        <div class="component-label">component 03</div>
+        <div class="component-name">variation grid</div>
+        <div class="component-desc">the core structural pattern. fix scaffold, vary one axis, show all at once. 4x2 default.</div>
+        <div class="component-demo">
+            <div class="cm-variation-grid" id="miniGrid"></div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-variation-grid"&gt;
+  &lt;div class="cm-variation-cell"&gt;
+    &lt;canvas id="c1"&gt;&lt;/canvas&gt;
+    &lt;div class="cm-cell-label"&gt;variant a&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;!-- repeat for each cell --&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 04 NAV BAR ═══ -->
+    <div class="component">
+        <div class="component-label">component 04</div>
+        <div class="component-name">navigation</div>
+        <div class="component-desc">chapter navigation with prev/next and counter. hash-based for bookmarkable state.</div>
+        <div class="component-demo">
+            <div class="cm-nav">
+                <div class="cm-nav-title">noise functions</div>
+                <div class="cm-nav-counter">03 / 08</div>
+                <button class="cm-nav-btn">&larr;</button>
+                <button class="cm-nav-btn">&rarr;</button>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-nav"&gt;
+  &lt;div class="cm-nav-title"&gt;chapter title&lt;/div&gt;
+  &lt;div class="cm-nav-counter"&gt;01 / 08&lt;/div&gt;
+  &lt;button class="cm-nav-btn"&gt;&amp;larr;&lt;/button&gt;
+  &lt;button class="cm-nav-btn"&gt;&amp;rarr;&lt;/button&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 05 DATA ROW ═══ -->
+    <div class="component">
+        <div class="component-label">component 05</div>
+        <div class="component-name">data row</div>
+        <div class="component-desc">key-value display for parameters, stats, metadata.</div>
+        <div class="component-demo">
+            <div class="cm-data-row">
+                <div class="cm-data-key">algorithm</div>
+                <div class="cm-data-val">perlin noise</div>
+            </div>
+            <div class="cm-data-row">
+                <div class="cm-data-key">frequency</div>
+                <div class="cm-data-val">4.0<span class="cm-data-unit">hz</span></div>
+            </div>
+            <div class="cm-data-row">
+                <div class="cm-data-key">octaves</div>
+                <div class="cm-data-val">6</div>
+            </div>
+            <div class="cm-data-row">
+                <div class="cm-data-key">seed</div>
+                <div class="cm-data-val" style="color: var(--accent);">0x7f3a</div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-data-row"&gt;
+  &lt;div class="cm-data-key"&gt;key&lt;/div&gt;
+  &lt;div class="cm-data-val"&gt;value&lt;span class="cm-data-unit"&gt;unit&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 06 PILLS ═══ -->
+    <div class="component">
+        <div class="component-label">component 06</div>
+        <div class="component-name">pill / tag</div>
+        <div class="component-desc">classification markers. default or accent variant.</div>
+        <div class="component-demo">
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                <span class="cm-pill">static</span>
+                <span class="cm-pill">animated</span>
+                <span class="cm-pill cm-pill--accent">active</span>
+                <span class="cm-pill">8 cells</span>
+                <span class="cm-pill">canvas</span>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;span class="cm-pill"&gt;label&lt;/span&gt;
+&lt;span class="cm-pill cm-pill--accent"&gt;accent&lt;/span&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 07 BUTTONS ═══ -->
+    <div class="component">
+        <div class="component-label">component 07</div>
+        <div class="component-name">button</div>
+        <div class="component-desc">minimal action triggers. scale(0.98) on active, never bounce.</div>
+        <div class="component-demo">
+            <div style="display: flex; gap: var(--space-4);">
+                <button class="cm-btn">default</button>
+                <button class="cm-btn cm-btn--accent">accent</button>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;button class="cm-btn"&gt;default&lt;/button&gt;
+&lt;button class="cm-btn cm-btn--accent"&gt;accent&lt;/button&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 08 PROGRESS ═══ -->
+    <div class="component">
+        <div class="component-label">component 08</div>
+        <div class="component-name">progress</div>
+        <div class="component-desc">linear fill indicator. 4px tall. linear transition, not eased.</div>
+        <div class="component-demo">
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-1);">
+                        <span style="font-size: var(--text-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em;">loading</span>
+                        <span style="font-size: var(--text-xs); color: var(--text-ghost);">73%</span>
+                    </div>
+                    <div class="cm-progress">
+                        <div class="cm-progress-fill" style="width: 73%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-1);">
+                        <span style="font-size: var(--text-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em;">processing</span>
+                        <span style="font-size: var(--text-xs); color: var(--text-ghost);">100%</span>
+                    </div>
+                    <div class="cm-progress">
+                        <div class="cm-progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-progress"&gt;
+  &lt;div class="cm-progress-fill" style="width: 73%;"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 09 TOOLTIP ═══ -->
+    <div class="component">
+        <div class="component-label">component 09</div>
+        <div class="component-name">tooltip</div>
+        <div class="component-desc">hover reveal. appears instantly (duration-fast), no theatrical entrance.</div>
+        <div class="component-demo" style="padding-top: var(--space-12);">
+            <div class="cm-tooltip-host">
+                <span style="border-bottom: 1px dashed var(--text-ghost); color: var(--text-secondary); font-size: var(--text-sm); cursor: default;">hover this element</span>
+                <div class="cm-tooltip">perlin noise — ken perlin, 1983</div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-tooltip-host"&gt;
+  &lt;span&gt;trigger element&lt;/span&gt;
+  &lt;div class="cm-tooltip"&gt;tooltip content&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 10 MODAL ═══ -->
+    <div class="component">
+        <div class="component-label">component 10</div>
+        <div class="component-name">modal</div>
+        <div class="component-desc">overlay surface for focused interaction. dim backdrop, raised ground.</div>
+        <div class="component-demo">
+            <button class="cm-btn" onclick="document.getElementById('demoModal').classList.add('open')">open modal</button>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-modal-backdrop"&gt;
+  &lt;div class="cm-modal"&gt;
+    &lt;div class="cm-modal-title"&gt;title&lt;/div&gt;
+    &lt;div class="cm-modal-body"&gt;content&lt;/div&gt;
+    &lt;div class="cm-modal-actions"&gt;
+      &lt;button class="cm-btn"&gt;cancel&lt;/button&gt;
+      &lt;button class="cm-btn cm-btn--accent"&gt;confirm&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 11 CHAPTER VIEWER ═══ -->
+    <div class="component">
+        <div class="component-label">component 11</div>
+        <div class="component-name">chapter viewer</div>
+        <div class="component-desc">navigation pattern for multi-chapter variation grids. dot indicators show position.</div>
+        <div class="component-demo">
+            <div class="cm-chapter-viewer">
+                <div class="cm-chapter-nav">
+                    <div class="cm-chapter-title" id="chapterTitle">perlin noise</div>
+                    <div class="cm-chapter-dots">
+                        <div class="cm-chapter-dot active" data-ch="0"></div>
+                        <div class="cm-chapter-dot" data-ch="1"></div>
+                        <div class="cm-chapter-dot" data-ch="2"></div>
+                        <div class="cm-chapter-dot" data-ch="3"></div>
+                        <div class="cm-chapter-dot" data-ch="4"></div>
+                    </div>
+                    <button class="cm-nav-btn" id="chPrev">&larr;</button>
+                    <button class="cm-nav-btn" id="chNext">&rarr;</button>
+                </div>
+                <div id="chapterContent" style="padding: var(--space-5); background: var(--ground-raised); min-height: 80px; display: grid; place-items: center;">
+                    <span style="font-size: var(--text-xs); color: var(--text-ghost); text-transform: uppercase; letter-spacing: 0.08em;">chapter content renders here</span>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-chapter-viewer"&gt;
+  &lt;div class="cm-chapter-nav"&gt;
+    &lt;div class="cm-chapter-title"&gt;title&lt;/div&gt;
+    &lt;div class="cm-chapter-dots"&gt;
+      &lt;div class="cm-chapter-dot active"&gt;&lt;/div&gt;
+      &lt;!-- ... --&gt;
+    &lt;/div&gt;
+    &lt;button class="cm-nav-btn"&gt;&amp;larr;&lt;/button&gt;
+    &lt;button class="cm-nav-btn"&gt;&amp;rarr;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div id="content"&gt;&lt;!-- chapter grid --&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ 12 AXIS LABEL ═══ -->
+    <div class="component">
+        <div class="component-label">component 12</div>
+        <div class="component-name">axis label</div>
+        <div class="component-desc">marks the varied dimension. line extends to fill available space.</div>
+        <div class="component-demo">
+            <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+                <div class="cm-axis-label">
+                    <div class="cm-axis-text">frequency</div>
+                    <div class="cm-axis-line"></div>
+                    <div class="cm-axis-text" style="color: var(--text-ghost);">0.1 → 10.0 hz</div>
+                </div>
+                <div class="cm-axis-label">
+                    <div class="cm-axis-text">noise type</div>
+                    <div class="cm-axis-line"></div>
+                    <div class="cm-axis-text" style="color: var(--accent);">axis of variation</div>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-axis-label"&gt;
+  &lt;div class="cm-axis-text"&gt;label&lt;/div&gt;
+  &lt;div class="cm-axis-line"&gt;&lt;/div&gt;
+  &lt;div class="cm-axis-text"&gt;range&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+</div>
+
+<!-- ═══ MODAL (lives outside page flow) ═══ -->
+<div class="cm-modal-backdrop" id="demoModal" onclick="if(event.target===this) this.classList.remove('open')">
+    <div class="cm-modal">
+        <div class="cm-modal-title">confirm action</div>
+        <div class="cm-modal-body">this overlay uses the dim backdrop at 85% opacity. the modal surface sits at ground-raised. no drop shadows — elevation through value only.</div>
+        <div class="cm-modal-actions">
+            <button class="cm-btn" onclick="document.getElementById('demoModal').classList.remove('open')">cancel</button>
+            <button class="cm-btn cm-btn--accent" onclick="document.getElementById('demoModal').classList.remove('open')">confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CODE TOGGLE ──
+function toggleCode(btn) {
+    const code = btn.nextElementSibling;
+    code.classList.toggle('open');
+    btn.textContent = code.classList.contains('open') ? 'hide source' : 'view source';
+}
+
+// ── STAGE DEMO ──
+(function() {
+    const canvas = document.getElementById('stageDemo');
+    if (!canvas) return;
+    const stage = canvas.parentElement;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+    function resize() {
+        const r = stage.getBoundingClientRect();
+        canvas.width = r.width * dpr;
+        canvas.height = r.height * dpr;
+        ctx.scale(dpr, dpr);
+    }
+    resize();
+
+    const particles = [];
+    const W = stage.clientWidth;
+    const H = stage.clientHeight;
+    for (let i = 0; i < 60; i++) {
+        particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5
+        });
+    }
+
+    function animate() {
+        ctx.fillStyle = '#0f0f0f';
+        ctx.fillRect(0, 0, W, H);
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > W) p.vx *= -1;
+            if (p.y < 0 || p.y > H) p.vy *= -1;
+        });
+
+        // Connections
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const d = Math.sqrt(dx * dx + dy * dy);
+                if (d < 80) {
+                    ctx.strokeStyle = `rgba(255,255,255,${(1 - d / 80) * 0.15})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Dots
+        particles.forEach(p => {
+            ctx.fillStyle = accent;
+            ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
+        });
+
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+
+// ── MINI VARIATION GRID ──
+(function() {
+    const grid = document.getElementById('miniGrid');
+    const labels = ['linear', 'quadratic', 'sine', 'step', 'bounce', 'decay', 'pulse', 'noise'];
+
+    labels.forEach((label, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cm-variation-cell';
+        const cv = document.createElement('canvas');
+        cv.id = `mg${i}`;
+        cell.appendChild(cv);
+        const lbl = document.createElement('div');
+        lbl.className = 'cm-cell-label';
+        lbl.textContent = label;
+        cell.appendChild(lbl);
+        grid.appendChild(cell);
+    });
+
+    requestAnimationFrame(() => {
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        labels.forEach((_, i) => {
+            const cv = document.getElementById(`mg${i}`);
+            const cell = cv.parentElement;
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            const w = cell.offsetWidth;
+            const h = cell.offsetHeight;
+            cv.width = w * dpr;
+            cv.height = h * dpr;
+            cv.style.width = w + 'px';
+            cv.style.height = h + 'px';
+            const ctx = cv.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const fns = [
+                t => t,
+                t => t * t,
+                t => (Math.sin(t * Math.PI * 2) + 1) / 2,
+                t => t < 0.5 ? 0 : 1,
+                t => Math.abs(Math.sin(t * Math.PI * 3)) * (1 - t),
+                t => Math.exp(-t * 4),
+                t => t % 0.25 < 0.125 ? 1 : 0,
+                t => (Math.sin(t * 17) * Math.cos(t * 13) + 1) / 2
+            ];
+
+            ctx.strokeStyle = accent;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.6;
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const y = h * 0.15 + (1 - fns[i](t)) * h * 0.6;
+                x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        });
+    });
+})();
+
+// ── CHAPTER VIEWER DEMO ──
+(function() {
+    const chapters = ['perlin noise', 'simplex', 'worley', 'fbm', 'domain warp'];
+    let current = 0;
+    const dots = document.querySelectorAll('.cm-chapter-dot');
+    const title = document.getElementById('chapterTitle');
+
+    function update() {
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        title.textContent = chapters[current];
+    }
+
+    dots.forEach(d => d.addEventListener('click', () => {
+        current = parseInt(d.dataset.ch);
+        update();
+    }));
+
+    document.getElementById('chPrev').addEventListener('click', () => {
+        current = (current - 1 + chapters.length) % chapters.length;
+        update();
+    });
+
+    document.getElementById('chNext').addEventListener('click', () => {
+        current = (current + 1) % chapters.length;
+        update();
+    });
+})();
+</script>
+
+</body>
+</html>

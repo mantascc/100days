@@ -1,0 +1,1870 @@
+{
+  "schema": "aesthetic-genome-v1",
+  "generated": "2026-04-15T01:40:50.511Z",
+  "method": "hybrid/code-analysis",
+  "project_count": 65,
+  "genomes": [
+    {
+      "id": "01-entropy",
+      "description": "Interactive entropy visualization with animated particles",
+      "status": "proposed",
+      "confidence": 0.885,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.28,
+        "legibility": 0.38,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.3,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.5
+      },
+      "categorical": {
+        "material": "dom",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 119,
+        "total_bytes": 6208,
+        "has_external_deps": false,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "02-vicsek-model",
+      "description": "Vicsek model flocking behavior simulation",
+      "status": "proposed",
+      "confidence": 0.825,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.45999999999999996,
+        "legibility": 0.6,
+        "determinism": 0.6,
+        "complexity": 0.55,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 191,
+        "total_bytes": 8374,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "03-chaos-agent",
+      "description": "Particle clustering with chaotic agents",
+      "status": "proposed",
+      "confidence": 0.747,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.16,
+        "legibility": 0.2,
+        "determinism": 0.6,
+        "complexity": 0.55,
+        "physicality": 0.36,
+        "palette_restraint": 0.85,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "evolve",
+        "referent": "educational",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 3,
+        "code_lines": 218,
+        "total_bytes": 40905,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "04-random-walk",
+      "description": "Stochastic random walk patterns on canvas",
+      "status": "proposed",
+      "confidence": 1,
+      "continuous": {
+        "density": 0.35,
+        "agency": 0.05,
+        "legibility": 0.2,
+        "determinism": 0.7,
+        "complexity": 0.3,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "evolve",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 143,
+        "total_bytes": 6452,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "05-fall",
+      "description": "Gravity and particle physics with falling objects",
+      "status": "proposed",
+      "confidence": 0.99,
+      "continuous": {
+        "density": 0.35,
+        "agency": 0.05,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.7,
+        "complexity": 0.3,
+        "physicality": 0.12,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "evolve",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 168,
+        "total_bytes": 7297,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "06-orbital",
+      "description": "Celestial mechanics with orbital planets",
+      "status": "proposed",
+      "confidence": 0.885,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.18,
+        "legibility": 0.3,
+        "determinism": 0.5499999999999999,
+        "complexity": 0.3,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 165,
+        "total_bytes": 8035,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "07-apophenia",
+      "description": "Apophenia proximity links on grid",
+      "status": "proposed",
+      "confidence": 0.819,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.7,
+        "legibility": 0.7,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.6000000000000001,
+        "physicality": 0.12,
+        "palette_restraint": 0.85,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "equilibrium",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 378,
+        "total_bytes": 18617,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "08-graph-clusters",
+      "description": "Cluster detection with parameter tuning",
+      "status": "proposed",
+      "confidence": 0.7949999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.16,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.6,
+        "complexity": 0.85,
+        "physicality": 0.36,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "equilibrium",
+        "referent": "self-contained",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 451,
+        "total_bytes": 19771,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "09-planar-graph",
+      "description": "Linked agents network visualization",
+      "status": "proposed",
+      "confidence": 0.7349999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.47,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.5,
+        "physicality": 0.24,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "evolve",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 228,
+        "total_bytes": 11581,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "10-audio-reactive-agents",
+      "description": "Audio-reactive agents with spatial positioning",
+      "status": "proposed",
+      "confidence": 0.7649999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.6599999999999999,
+        "legibility": 0.2,
+        "determinism": 0.6,
+        "complexity": 0.5,
+        "physicality": 0.36,
+        "palette_restraint": 0.95,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 3,
+        "code_lines": 249,
+        "total_bytes": 14380,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "11-brownian-tree",
+      "description": "Interactive message storage system (Node.js/Express)",
+      "status": "proposed",
+      "confidence": 0.831,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.08,
+        "legibility": 0.45999999999999996,
+        "determinism": 0.5499999999999999,
+        "complexity": 0.7,
+        "physicality": 0.12,
+        "palette_restraint": 0.85,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "equilibrium",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 10,
+        "code_lines": 408,
+        "total_bytes": 49113,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "12-wind-field",
+      "description": "Perlin noise wind simulation",
+      "status": "proposed",
+      "confidence": 0.7349999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.45999999999999996,
+        "legibility": 0.45999999999999996,
+        "determinism": 0.3499999999999999,
+        "complexity": 0.5,
+        "physicality": 0,
+        "palette_restraint": 0.85,
+        "motion_character": 0.5
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "evolve",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 218,
+        "total_bytes": 11268,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "13-image-flow-field",
+      "description": "Wave pattern generation with ripple effects",
+      "status": "proposed",
+      "confidence": 0.873,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.7,
+        "legibility": 0.38,
+        "determinism": 0.3499999999999999,
+        "complexity": 0.7,
+        "physicality": 0.24,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "evolve",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 3,
+        "code_lines": 451,
+        "total_bytes": 3994024,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "14-dna-mutations",
+      "description": "Dynamic cluster visualization with signals",
+      "status": "proposed",
+      "confidence": 0.861,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.08,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.3,
+        "physicality": 0.24,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 158,
+        "total_bytes": 10861,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "15-binary-camera-grid",
+      "description": "Interactive 2D grid navigation with zoom",
+      "status": "proposed",
+      "confidence": 0.885,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.6799999999999999,
+        "legibility": 0.45999999999999996,
+        "determinism": 0.7,
+        "complexity": 0.3,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 182,
+        "total_bytes": 10281,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "15b-binary-camera-grid-v2",
+      "description": "Grid camera variant",
+      "status": "proposed",
+      "confidence": 0.885,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.6799999999999999,
+        "legibility": 0.45999999999999996,
+        "determinism": 0.7,
+        "complexity": 0.3,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 182,
+        "total_bytes": 9410,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "16-hub-spoke-network",
+      "description": "Force graph visualization",
+      "status": "proposed",
+      "confidence": 0.8099999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.65,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.6000000000000001,
+        "physicality": 0.36,
+        "palette_restraint": 0.95,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "static",
+        "referent": "data-mapped",
+        "scale": "micro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 395,
+        "total_bytes": 17541,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "17-audio-reactive-network",
+      "description": "Text-to-speech with animated typography",
+      "status": "proposed",
+      "confidence": 0.7949999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.6399999999999999,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.6000000000000001,
+        "physicality": 0.24,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 383,
+        "total_bytes": 17720,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "18-cellular-automaton",
+      "description": "Conway's Game of Life variant",
+      "status": "proposed",
+      "confidence": 0.885,
+      "continuous": {
+        "density": 0.55,
+        "agency": 0.44,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.7,
+        "complexity": 0.44999999999999996,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "static",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 140,
+        "total_bytes": 8860,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "19-coworker-network",
+      "description": "Force-directed graph of coworker interactions (React/D3)",
+      "status": "proposed",
+      "confidence": 0.7949999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.85,
+        "legibility": 0.6,
+        "determinism": 0.7,
+        "complexity": 0.85,
+        "physicality": 0.36,
+        "palette_restraint": 0.2,
+        "motion_character": 0.7000000000000001
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "equilibrium",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 20,
+        "code_lines": 572,
+        "total_bytes": 535904,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "20-schelling-model",
+      "description": "Schelling model of segregation simulation",
+      "status": "proposed",
+      "confidence": 0.69,
+      "continuous": {
+        "density": 0.55,
+        "agency": 0.7,
+        "legibility": 0.7,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.5,
+        "physicality": 0,
+        "palette_restraint": 0.5,
+        "motion_character": 0.4
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "metaphorical",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 231,
+        "total_bytes": 18315,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "21-interaction-heatmap",
+      "description": "30-day agent interaction heatmap",
+      "status": "proposed",
+      "confidence": 0.7949999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.55,
+        "legibility": 0.7999999999999999,
+        "determinism": 0.29999999999999993,
+        "complexity": 0.9500000000000001,
+        "physicality": 0.6,
+        "palette_restraint": 0.35,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "reactive",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 7,
+        "code_lines": 1348,
+        "total_bytes": 609034,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "22-directed-network",
+      "description": "Graph network visualization",
+      "status": "proposed",
+      "confidence": 0.855,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.26,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.7,
+        "complexity": 0.5,
+        "physicality": 0.36,
+        "palette_restraint": 0.35,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "static",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 8,
+        "code_lines": 593,
+        "total_bytes": 21968,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "23-interactive-typography",
+      "description": "Touch/mouse event handler demo",
+      "status": "proposed",
+      "confidence": 0.75,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.16,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.3,
+        "physicality": 0,
+        "palette_restraint": 0.5,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "dom",
+        "temporal_mode": "static",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 111,
+        "total_bytes": 7762,
+        "has_external_deps": true,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "24-rock-paper-scissors",
+      "description": "Rock paper scissors game",
+      "status": "proposed",
+      "confidence": 0.6930000000000001,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.62,
+        "legibility": 0.48,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.6,
+        "physicality": 0.24,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 6,
+        "code_lines": 443,
+        "total_bytes": 37023,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "25-spotlight-grid",
+      "description": "Density and color-controlled particle effect",
+      "status": "proposed",
+      "confidence": 0.825,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.62,
+        "legibility": 0.45999999999999996,
+        "determinism": 0.7,
+        "complexity": 0.4,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "dom",
+        "temporal_mode": "static",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 301,
+        "total_bytes": 11331,
+        "has_external_deps": false,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "26-widget-dashboard",
+      "description": "Dynamic widget dashboard layout",
+      "status": "proposed",
+      "confidence": 0.8849999999999999,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.7,
+        "legibility": 0.4,
+        "determinism": 0.7,
+        "complexity": 0.8,
+        "physicality": 0.12,
+        "palette_restraint": 0.35,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "geometry",
+        "temporal_mode": "static",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 13,
+        "code_lines": 1189,
+        "total_bytes": 673350,
+        "has_external_deps": false,
+        "rendering": "svg"
+      }
+    },
+    {
+      "id": "27-muse",
+      "description": "Muse v0 - music/creative tool prototype",
+      "status": "proposed",
+      "confidence": 0.855,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.24,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.7,
+        "complexity": 0.4,
+        "physicality": 0.84,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 5,
+        "code_lines": 234,
+        "total_bytes": 9817,
+        "has_external_deps": false,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "28-liquid-glass",
+      "description": "Liquid glass morphism effect",
+      "status": "proposed",
+      "confidence": 1,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.7,
+        "legibility": 0.7,
+        "determinism": 0.29999999999999993,
+        "complexity": 0.8,
+        "physicality": 0.12,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "geometry",
+        "temporal_mode": "evolve",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 1192,
+        "total_bytes": 886469,
+        "has_external_deps": true,
+        "rendering": "svg"
+      }
+    },
+    {
+      "id": "29-progress-indicators",
+      "description": "Text generation UI showing thinking states",
+      "status": "proposed",
+      "confidence": 0.825,
+      "continuous": {
+        "density": 0.25,
+        "agency": 0.32,
+        "legibility": 0.5,
+        "determinism": 0.6499999999999999,
+        "complexity": 1,
+        "physicality": 0.48,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "educational",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 19,
+        "code_lines": 2280,
+        "total_bytes": 64330,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "30-thinking-states",
+      "description": "Experimental loading indicators exploring thinking metaphors",
+      "status": "proposed",
+      "confidence": 0.825,
+      "continuous": {
+        "density": 0.25,
+        "agency": 0.32,
+        "legibility": 0.5,
+        "determinism": 0.6499999999999999,
+        "complexity": 1,
+        "physicality": 0.48,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "educational",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 19,
+        "code_lines": 2280,
+        "total_bytes": 62666,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "31-cli-material-palette",
+      "description": "CLI material color palette",
+      "status": "proposed",
+      "confidence": 0.8400000000000001,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.62,
+        "legibility": 0.7999999999999999,
+        "determinism": 0.7,
+        "complexity": 0.8,
+        "physicality": 0,
+        "palette_restraint": 0.2,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "equilibrium",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 7,
+        "code_lines": 1487,
+        "total_bytes": 109482,
+        "has_external_deps": false,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "32-genart-cards",
+      "description": "Chaotic entropy pattern generation",
+      "status": "proposed",
+      "confidence": 0.711,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.28,
+        "legibility": 0.5,
+        "determinism": 0.6499999999999999,
+        "complexity": 0.8,
+        "physicality": 0.36,
+        "palette_restraint": 0.85,
+        "motion_character": 0.35
+      },
+      "categorical": {
+        "material": "data",
+        "temporal_mode": "equilibrium",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 7,
+        "code_lines": 903,
+        "total_bytes": 28511,
+        "has_external_deps": true,
+        "rendering": "svg"
+      }
+    },
+    {
+      "id": "33-three-body-problem",
+      "description": "Temporal slitscan imaging effect",
+      "status": "proposed",
+      "confidence": 0.8999999999999999,
+      "continuous": {
+        "density": 0.55,
+        "agency": 1,
+        "legibility": 0.4,
+        "determinism": 0.7,
+        "complexity": 0.7,
+        "physicality": 0,
+        "palette_restraint": 0.7,
+        "motion_character": 0.5
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 674,
+        "total_bytes": 28430,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "34-particle-text-morph",
+      "description": "Text morphing with particle transitions",
+      "status": "proposed",
+      "confidence": 0.72,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.54,
+        "legibility": 0.38,
+        "determinism": 0.35,
+        "complexity": 0.65,
+        "physicality": 0.36,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 386,
+        "total_bytes": 16621,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "35-flight-path-viz",
+      "description": "Great circle flight path animation (Leaflet/Turf.js)",
+      "status": "proposed",
+      "confidence": 0.9390000000000001,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.7,
+        "legibility": 0.7,
+        "determinism": 0.7,
+        "complexity": 0.6,
+        "physicality": 0.12,
+        "palette_restraint": 0.85,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "geometry",
+        "temporal_mode": "equilibrium",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 6,
+        "code_lines": 1203,
+        "total_bytes": 39687,
+        "has_external_deps": true,
+        "rendering": "svg"
+      }
+    },
+    {
+      "id": "36-spinning-globe",
+      "description": "Vite React TypeScript project",
+      "status": "proposed",
+      "confidence": 0.9,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.6000000000000001,
+        "legibility": 0.88,
+        "determinism": 0.5499999999999999,
+        "complexity": 1,
+        "physicality": 0.24,
+        "palette_restraint": 0.2,
+        "motion_character": 0.35
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "equilibrium",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 32,
+        "code_lines": 934,
+        "total_bytes": 1289446,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "37-sentiment-analyzer",
+      "description": "Real-time text sentiment analysis with industrial visualization (React/TypeScript)",
+      "status": "proposed",
+      "confidence": 0.9,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.6000000000000001,
+        "legibility": 0.88,
+        "determinism": 0.5499999999999999,
+        "complexity": 1,
+        "physicality": 0.24,
+        "palette_restraint": 0.2,
+        "motion_character": 0.35
+      },
+      "categorical": {
+        "material": "data",
+        "temporal_mode": "equilibrium",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 27,
+        "code_lines": 917,
+        "total_bytes": 240986,
+        "has_external_deps": true,
+        "rendering": "svg"
+      }
+    },
+    {
+      "id": "38-baltic-pattern",
+      "description": "Generative Baltic pattern",
+      "status": "proposed",
+      "confidence": 0.69,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.62,
+        "legibility": 0.48,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.6,
+        "physicality": 0,
+        "palette_restraint": 0.7,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "static",
+        "referent": "educational",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 506,
+        "total_bytes": 17021,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "39-wave-morph",
+      "description": "Morphing wave patterns",
+      "status": "proposed",
+      "confidence": 0.924,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 1,
+        "legibility": 0.4,
+        "determinism": 0.85,
+        "complexity": 0.85,
+        "physicality": 0.12,
+        "palette_restraint": 0.5,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 10,
+        "code_lines": 660,
+        "total_bytes": 20980,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "40-cube-grid-rules",
+      "description": "Cube grid rules engine",
+      "status": "proposed",
+      "confidence": 0.7649999999999999,
+      "continuous": {
+        "density": 0.44999999999999996,
+        "agency": 1,
+        "legibility": 1,
+        "determinism": 0.6,
+        "complexity": 0.9500000000000001,
+        "physicality": 0.48,
+        "palette_restraint": 0.85,
+        "motion_character": 0.8500000000000001
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 15,
+        "code_lines": 1908,
+        "total_bytes": 122916,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "41-metaball",
+      "description": "Metaball physics and animation",
+      "status": "proposed",
+      "confidence": 0.933,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.85,
+        "legibility": 0.7,
+        "determinism": 0.7,
+        "complexity": 0.75,
+        "physicality": 0.24,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "geometry",
+        "temporal_mode": "evolve",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 6,
+        "code_lines": 792,
+        "total_bytes": 37922,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "42-metaball-grid",
+      "description": "Grid-based metaball effects",
+      "status": "proposed",
+      "confidence": 0.7829999999999999,
+      "continuous": {
+        "density": 0.44999999999999996,
+        "agency": 0.36,
+        "legibility": 0.5599999999999999,
+        "determinism": 0.24999999999999994,
+        "complexity": 0.85,
+        "physicality": 0.24,
+        "palette_restraint": 0.35,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 675,
+        "total_bytes": 38106,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "43-style-seed",
+      "description": "Sketch project",
+      "status": "empty",
+      "confidence": 0
+    },
+    {
+      "id": "44-whiff",
+      "description": "Whiff project",
+      "status": "proposed",
+      "confidence": 0.8849999999999999,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.05,
+        "legibility": 0.38,
+        "determinism": 0.7,
+        "complexity": 0.75,
+        "physicality": 0,
+        "palette_restraint": 0.7,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "static",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 25,
+        "code_lines": 432,
+        "total_bytes": 137436,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "45-gravity-pills",
+      "description": "Gravity pills particle simulation",
+      "status": "proposed",
+      "confidence": 0.435,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.6000000000000001,
+        "legibility": 0.48,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.4,
+        "physicality": 0.36,
+        "palette_restraint": 0.35,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 290,
+        "total_bytes": 10079,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "46-oklch-vs-hsl",
+      "description": "OKLCH vs HSL gradient comparison",
+      "status": "proposed",
+      "confidence": 0.6749999999999999,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.36,
+        "legibility": 0.4,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.5,
+        "physicality": 0,
+        "palette_restraint": 0.85,
+        "motion_character": 0.5
+      },
+      "categorical": {
+        "material": "dom",
+        "temporal_mode": "evolve",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 365,
+        "total_bytes": 15822,
+        "has_external_deps": true,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "47-2gif",
+      "description": "Sketch project",
+      "status": "proposed",
+      "confidence": 0.948,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.85,
+        "legibility": 1,
+        "determinism": 0.7,
+        "complexity": 0.9500000000000001,
+        "physicality": 0.24,
+        "palette_restraint": 0.35,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "reactive",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 26,
+        "code_lines": 2665,
+        "total_bytes": 223825,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "49-grid-trace",
+      "description": "Grid Trace - Interactive grid path visualization with Geist Pixel font",
+      "status": "proposed",
+      "confidence": 0.825,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.08,
+        "legibility": 0.09999999999999998,
+        "determinism": 0.5499999999999999,
+        "complexity": 0.5,
+        "physicality": 0,
+        "palette_restraint": 0.95,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "equilibrium",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 3,
+        "code_lines": 253,
+        "total_bytes": 38413,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "50-execution-trace-graph",
+      "description": "Execution Trace Graph - AI response visualized as a traversal through a skill graph",
+      "status": "proposed",
+      "confidence": 0.9,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.5,
+        "legibility": 0.7,
+        "determinism": 0.7,
+        "complexity": 0.8,
+        "physicality": 0,
+        "palette_restraint": 0.5,
+        "motion_character": 0.35
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "equilibrium",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 858,
+        "total_bytes": 38069,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "51-resonant-lattice",
+      "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes",
+      "status": "proposed",
+      "confidence": 0.705,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.55,
+        "legibility": 0.64,
+        "determinism": 0.85,
+        "complexity": 0.75,
+        "physicality": 0.84,
+        "palette_restraint": 0.85,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 6,
+        "code_lines": 411,
+        "total_bytes": 15706,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "52-reaction-diffusion",
+      "description": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls",
+      "status": "proposed",
+      "confidence": 0.879,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.85,
+        "legibility": 0.2,
+        "determinism": 0.7,
+        "complexity": 0.85,
+        "physicality": 0.12,
+        "palette_restraint": 0.5,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 5,
+        "code_lines": 509,
+        "total_bytes": 20068,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "53-ascii-grid",
+      "description": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes",
+      "status": "proposed",
+      "confidence": 0.825,
+      "continuous": {
+        "density": 0.44999999999999996,
+        "agency": 0.4,
+        "legibility": 0.2,
+        "determinism": 0.3499999999999999,
+        "complexity": 0.75,
+        "physicality": 0.36,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 521,
+        "total_bytes": 18022,
+        "has_external_deps": false,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "54-concept-graph",
+      "description": "Interactive force-directed graph visualizing relationships between projects and data concepts",
+      "status": "proposed",
+      "confidence": 0.7349999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.55,
+        "legibility": 0.7999999999999999,
+        "determinism": 0.7,
+        "complexity": 0.85,
+        "physicality": 0.6,
+        "palette_restraint": 0.95,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "loop",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 614,
+        "total_bytes": 63698,
+        "has_external_deps": false,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "55-ascii-loading",
+      "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar",
+      "status": "proposed",
+      "confidence": 0.855,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.08,
+        "legibility": 0.2,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.4,
+        "physicality": 0,
+        "palette_restraint": 0.85,
+        "motion_character": 0.5
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "evolve",
+        "referent": "self-contained",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 334,
+        "total_bytes": 12489,
+        "has_external_deps": true,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "56-constrained-variation",
+      "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously",
+      "status": "proposed",
+      "confidence": 0.9089999999999999,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.7,
+        "legibility": 0.5599999999999999,
+        "determinism": 0.24999999999999994,
+        "complexity": 0.9500000000000001,
+        "physicality": 0.12,
+        "palette_restraint": 0.85,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 14,
+        "code_lines": 1396,
+        "total_bytes": 58855,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "57-color-themes",
+      "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities",
+      "status": "proposed",
+      "confidence": 0.885,
+      "continuous": {
+        "density": 0.75,
+        "agency": 0.7,
+        "legibility": 0.64,
+        "determinism": 0.3999999999999999,
+        "complexity": 0.9500000000000001,
+        "physicality": 0,
+        "palette_restraint": 0.5,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 14,
+        "code_lines": 1787,
+        "total_bytes": 60987,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "58-shapes",
+      "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking",
+      "status": "proposed",
+      "confidence": 0.849,
+      "continuous": {
+        "density": 0.6,
+        "agency": 0.44,
+        "legibility": 0.5599999999999999,
+        "determinism": 0.7,
+        "complexity": 0.9500000000000001,
+        "physicality": 0.12,
+        "palette_restraint": 0.95,
+        "motion_character": 0.75
+      },
+      "categorical": {
+        "material": "pixel",
+        "temporal_mode": "equilibrium",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 10,
+        "code_lines": 986,
+        "total_bytes": 34182,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "59-font-explorer",
+      "description": "Font Explorer — skill to visualize any font",
+      "status": "proposed",
+      "confidence": 0.804,
+      "continuous": {
+        "density": 0.4,
+        "agency": 0.7,
+        "legibility": 0.7999999999999999,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.8,
+        "physicality": 0.12,
+        "palette_restraint": 0.2,
+        "motion_character": 0.55
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "equilibrium",
+        "referent": "educational",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 4,
+        "code_lines": 1316,
+        "total_bytes": 54100,
+        "has_external_deps": true,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "62-terminal-cli",
+      "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat",
+      "status": "proposed",
+      "confidence": 0.9450000000000001,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.18,
+        "legibility": 0.2,
+        "determinism": 0.44999999999999996,
+        "complexity": 0.7,
+        "physicality": 0,
+        "palette_restraint": 0.2,
+        "motion_character": 0.7500000000000001
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "equilibrium",
+        "referent": "data-mapped",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 1,
+        "code_lines": 535,
+        "total_bytes": 14224,
+        "has_external_deps": true,
+        "rendering": "dom"
+      }
+    },
+    {
+      "id": "63-ube-kaizen",
+      "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings",
+      "status": "proposed",
+      "confidence": 0.78,
+      "continuous": {
+        "density": 0.5,
+        "agency": 0.54,
+        "legibility": 0.2,
+        "determinism": 0.5499999999999999,
+        "complexity": 0.8,
+        "physicality": 0,
+        "palette_restraint": 0.5,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "loop",
+        "referent": "data-mapped",
+        "scale": "macro"
+      },
+      "meta": {
+        "file_count": 3,
+        "code_lines": 1187,
+        "total_bytes": 260308,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "64-viz-grouped",
+      "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal",
+      "status": "proposed",
+      "confidence": 0.8849999999999999,
+      "continuous": {
+        "density": 0.6,
+        "agency": 0.05,
+        "legibility": 0.64,
+        "determinism": 0.29999999999999993,
+        "complexity": 0.8,
+        "physicality": 0.12,
+        "palette_restraint": 0.35,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "hybrid",
+        "temporal_mode": "static",
+        "referent": "data-mapped",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 3,
+        "code_lines": 1044,
+        "total_bytes": 38821,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "65-mode-toggle",
+      "description": "Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations",
+      "status": "proposed",
+      "confidence": 0.81,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.7,
+        "legibility": 0.4,
+        "determinism": 0.7,
+        "complexity": 0.6,
+        "physicality": 0,
+        "palette_restraint": 0.5,
+        "motion_character": 0.05
+      },
+      "categorical": {
+        "material": "geometry",
+        "temporal_mode": "static",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 843,
+        "total_bytes": 45773,
+        "has_external_deps": true,
+        "rendering": "svg"
+      }
+    },
+    {
+      "id": "66-ascii-field-gallery",
+      "description": "ASCII Field Gallery — 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp",
+      "status": "proposed",
+      "confidence": 0.855,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 0.05,
+        "legibility": 0.6,
+        "determinism": 0.7,
+        "complexity": 0.3,
+        "physicality": 0.12,
+        "palette_restraint": 0.5,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "loop",
+        "referent": "self-contained",
+        "scale": "multi"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 196,
+        "total_bytes": 6945,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    },
+    {
+      "id": "67-audio-reactive-ascii",
+      "description": "Audio Reactive ASCII Field — ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning",
+      "status": "proposed",
+      "confidence": 1,
+      "continuous": {
+        "density": 0.24999999999999997,
+        "agency": 1,
+        "legibility": 0.7,
+        "determinism": 0.7,
+        "complexity": 0.6,
+        "physicality": 0,
+        "palette_restraint": 0.35,
+        "motion_character": 0.65
+      },
+      "categorical": {
+        "material": "glyph",
+        "temporal_mode": "reactive",
+        "referent": "self-contained",
+        "scale": "meso"
+      },
+      "meta": {
+        "file_count": 2,
+        "code_lines": 426,
+        "total_bytes": 17292,
+        "has_external_deps": true,
+        "rendering": "canvas"
+      }
+    }
+  ]
+}
