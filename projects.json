@@ -323,5 +323,10 @@
     "id": "67-audio-reactive-ascii",
     "path": "100days/67-audio-reactive-ascii",
     "description": "Audio Reactive ASCII Field \u2014 ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning"
+  },
+  {
+    "id": "69-clear-channel",
+    "path": "100days/69-clear-channel",
+    "description": "Clear Channel \u2014 visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system"
   }
 ]

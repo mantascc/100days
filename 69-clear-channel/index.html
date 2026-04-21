@@ -1,0 +1,3693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clear channel — computational aesthetics</title>
+    <meta name="description" content="Working with data as raw material. Low-level primitives that carry complexity without decorating it. Every element earns its presence by transmitting meaning. The aesthetic is a byproduct of function — what remains when noise is removed.">
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           CLEAR CHANNEL / COMPUTATIONAL AESTHETICS
+           "like watching something think."
+           ═══════════════════════════════════════════════════════ */
+
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+        :root {
+            /* Ground Layers (Elevation) */
+            --ground-void: #0a0a0a;
+            --ground-base: #0f0f0f;
+            --ground-raised: #141414;
+            --ground-surface: #1a1a1a;
+            --ground-float: #202232;
+            --ground-modal: #242424;
+
+            /* Text */
+            --text-primary: #ffffff;
+            --text-default: #f5f5f7;
+            --text-secondary: #a8aab8;
+            --text-tertiary: #666666;
+            --text-ghost: #333333;
+
+            /* Structural */
+            --border-subtle: #1a1a1a;
+            --border-default: #2a2a2a;
+            --border-strong: #3a3d52;
+            --stroke-primary: #ffffff;
+            --stroke-ghost: rgba(255,255,255,0.2);
+
+            /* Accent */
+            --accent: #00ffaa;
+
+            /* Named Colors */
+            --cph-yellow: #ffaa00;
+            --ube-violet: #7b6fa5;
+            --ube-lavender: #9d91b0;
+            --ube-terra: #9e6240;
+
+            /* Overlay */
+            --overlay-dim: rgba(10,10,10,0.85);
+            --overlay-ghost: rgba(255,255,255,0.1);
+
+            /* Typography */
+            --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Monaco, 'Courier New', monospace;
+            --font-system: system-ui, -apple-system, sans-serif;
+            --text-xs: 10px;
+            --text-sm: 11px;
+            --text-base: 13px;
+            --text-md: 14px;
+            --text-lg: 16px;
+            --text-xl: 20px;
+            --leading-tight: 1.25;
+            --leading-base: 1.5;
+            --leading-loose: 1.75;
+            --tracking-tight: -0.02em;
+            --tracking-normal: 0;
+            --tracking-wide: 0.08em;
+
+            /* Editorial Scale */
+            --text-caption: 11px;
+            --text-body: 16px;
+            --text-lead: 20px;
+            --text-subhead: 28px;
+            --text-headline: 48px;
+            --text-display: 80px;
+            --text-poster: 128px;
+
+            /* Spacing (4px base unit) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --space-16: 64px;
+
+            /* Stroke */
+            --stroke-thin: 1px;
+            --stroke-default: 2px;
+            --stroke-heavy: 3px;
+
+            /* Motion */
+            --duration-instant: 0ms;
+            --duration-fast: 100ms;
+            --duration-base: 150ms;
+            --duration-slow: 300ms;
+            --duration-drift: 800ms;
+            --ease-snap: linear;
+            --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--ground-void);
+            color: var(--text-default);
+            font-family: var(--font-mono);
+            font-size: var(--text-base);
+            line-height: var(--leading-base);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── LAYOUT ── */
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-16) var(--space-8);
+        }
+
+        section {
+            margin-bottom: var(--space-16);
+            padding-bottom: var(--space-16);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        section:last-child { border-bottom: none; }
+
+        /* ── TYPOGRAPHY CLASSES ── */
+
+        .section-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+            letter-spacing: var(--tracking-wide);
+            margin-bottom: var(--space-2);
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            color: var(--text-primary);
+            font-weight: 400;
+            letter-spacing: var(--tracking-tight);
+            margin-bottom: var(--space-8);
+            text-transform: lowercase;
+        }
+
+        .section-desc {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: var(--space-10);
+            line-height: var(--leading-loose);
+        }
+
+        /* ── TICK NAV ── */
+
+        .tick-nav {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0;
+            z-index: 90;
+        }
+
+        .tick-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            text-decoration: none;
+            padding: 3px 0;
+            position: relative;
+        }
+
+        .tick-label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.04em;
+            text-transform: lowercase;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(4px);
+            transition: opacity 120ms linear, transform 120ms linear;
+            pointer-events: none;
+            padding-right: 8px;
+        }
+
+        .tick-nav a:hover .tick-label,
+        .tick-nav a.active .tick-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .tick-mark {
+            width: 8px;
+            height: 1px;
+            background: var(--text-ghost);
+            transition: width 100ms linear, background 100ms linear;
+            flex-shrink: 0;
+        }
+
+        .tick-nav a:hover .tick-mark {
+            width: 14px;
+            background: var(--text-secondary);
+        }
+
+        .tick-nav a.active .tick-mark {
+            width: 16px;
+            background: var(--accent);
+        }
+
+        .tick-nav .tick-divider {
+            width: 1px;
+            height: 6px;
+            margin: 2px 0;
+            margin-left: auto;
+        }
+
+        /* ── ORIGIN BAR ── */
+
+        .origin-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) 0;
+            margin-bottom: var(--space-8);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        .origin-bar a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0,255,170,0.3);
+            transition: border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .origin-bar a:hover {
+            border-color: var(--accent);
+        }
+
+        .origin-bar .info-btn {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid var(--border-default);
+            background: transparent;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color var(--duration-fast) var(--ease-snap),
+                        color var(--duration-fast) var(--ease-snap);
+            flex-shrink: 0;
+        }
+
+        .origin-bar .info-btn:hover,
+        .origin-bar .info-btn.active {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .info-tooltip {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 360px;
+            padding: var(--space-4);
+            background: var(--ground-surface);
+            border: 1px solid var(--border-default);
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            line-height: var(--leading-loose);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: opacity var(--duration-fast) var(--ease-snap),
+                        transform var(--duration-fast) var(--ease-snap),
+                        visibility var(--duration-fast) var(--ease-snap);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .info-btn.active .info-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .info-tooltip p + p {
+            margin-top: var(--space-2);
+            letter-spacing: var(--tracking-wide);
+            margin-bottom: var(--space-4);
+        }
+
+        /* ── HERO ── */
+
+        .hero {
+            padding: var(--space-16) 0;
+            border-bottom: 1px solid var(--border-default);
+            margin-bottom: var(--space-16);
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: var(--text-display);
+            font-weight: 300;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: var(--space-6);
+        }
+
+        .hero-sub {
+            font-size: var(--text-md);
+            color: var(--text-tertiary);
+            font-style: italic;
+            font-weight: 300;
+            margin-bottom: var(--space-12);
+        }
+
+        .hero-principles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2) var(--space-6);
+        }
+
+        .hero-principles span {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .hero-principles span::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            margin-right: var(--space-2);
+            vertical-align: middle;
+        }
+
+        /* ── SEGMENTED CONTROL ── */
+
+        .seg-control {
+            display: inline-flex;
+            border: 1px solid var(--border-default);
+            margin-bottom: var(--space-16);
+        }
+
+        .seg-control button {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            font-weight: 300;
+            color: var(--text-tertiary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: var(--space-2) var(--space-4);
+            transition: color var(--duration-fast) var(--ease-snap),
+                        background var(--duration-fast) var(--ease-snap);
+        }
+
+        .seg-control button:not(:last-child) {
+            border-right: 1px solid var(--border-default);
+        }
+
+        .seg-control button:hover {
+            color: var(--text-secondary);
+            background: var(--ground-raised);
+        }
+
+        .seg-control button.active {
+            color: var(--accent);
+            background: var(--ground-surface);
+        }
+
+        /* ── VIEW CONTAINERS ── */
+
+        .view { display: none; }
+        .view.visible { display: block; }
+
+        /* ── ACCENT ROW ── */
+
+        .accent-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--space-3);
+        }
+
+        .accent-chip {
+            padding: var(--space-5) var(--space-3);
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .accent-chip:hover { border-color: var(--border-strong); }
+
+        .accent-chip .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 0;
+            margin: 0 auto var(--space-2);
+        }
+
+        .accent-chip .name {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            font-weight: 300;
+            display: block;
+            margin-bottom: var(--space-1);
+        }
+
+        .accent-chip .hex {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        .accent-chip .character {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            margin-top: var(--space-1);
+        }
+
+        /* ── TYPOGRAPHY SPECIMENS ── */
+
+        .type-specimen {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-8);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .type-specimen:last-child { border-bottom: none; }
+
+        .type-meta {
+            width: 120px;
+            flex-shrink: 0;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .type-sample {
+            color: var(--text-default);
+            text-transform: lowercase;
+        }
+
+        /* ── EDITORIAL SCALE ── */
+
+        .editorial-stack {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+
+        .editorial-item {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-6);
+            padding: var(--space-3) 0;
+        }
+
+        .editorial-label {
+            width: 80px;
+            flex-shrink: 0;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .editorial-size {
+            width: 50px;
+            flex-shrink: 0;
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            text-align: right;
+        }
+
+        /* ── SPACING VIS ── */
+
+        .space-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-2) 0;
+        }
+
+        .space-label {
+            width: 80px;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .space-bar {
+            height: 16px;
+            background: var(--accent);
+            opacity: 0.3;
+        }
+
+        .space-value {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        /* ── GEOMETRY CANVAS ── */
+
+        .geometry-canvas {
+            width: 100%;
+            aspect-ratio: 3 / 1;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+        }
+
+        /* ── MOTION DEMOS ── */
+
+        .motion-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .motion-row:last-child { border-bottom: none; }
+
+        .motion-label {
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+        .motion-label .name {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .motion-label .val {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        .motion-track {
+            flex: 1;
+            height: 32px;
+            background: var(--ground-raised);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .motion-dot {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            transform: translateY(-50%);
+        }
+
+        /* ── INTERACTION STATES ── */
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--space-4);
+        }
+
+        .state-card {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            background: var(--ground-base);
+        }
+
+        .state-card .shape {
+            width: 48px;
+            height: 48px;
+            border: var(--stroke-default) solid var(--stroke-primary);
+            display: grid;
+            place-items: center;
+        }
+
+        .state-card .label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .state-default .shape { }
+        .state-hover .shape { border-color: var(--text-secondary); background: var(--overlay-ghost); }
+        .state-active .shape { transform: scale(0.98); border-color: var(--accent); }
+        .state-disabled .shape { opacity: 0.5; border-style: dashed; }
+        .state-focus .shape { box-shadow: 0 0 0 2px rgba(0, 255, 170, 0.4); }
+
+        /* ── ANTI-PATTERNS ── */
+
+        .anti-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .anti-card {
+            padding: var(--space-5);
+            background: var(--ground-base);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .anti-card .anti-label {
+            font-size: var(--text-xs);
+            color: #ff0066;
+            font-weight: 300;
+            margin-bottom: var(--space-3);
+        }
+
+        .anti-card .anti-demo {
+            height: 48px;
+            display: grid;
+            place-items: center;
+            margin-bottom: var(--space-3);
+        }
+
+        .anti-card .anti-instead {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .anti-card .anti-instead span { color: var(--accent); }
+
+        /* ── VARIATION GRID (STRUCTURAL PATTERN) ── */
+
+        .demo-variation-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+        }
+
+        .demo-cell {
+            aspect-ratio: 1;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-cell canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .demo-cell .cell-label {
+            position: absolute;
+            bottom: var(--space-2);
+            left: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        /* ── CHAPTER CONTRACT ── */
+
+        .contract-block {
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            padding: var(--space-6);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: var(--leading-loose);
+        }
+
+        .contract-block .keyword { color: var(--accent); }
+        .contract-block .type { color: var(--text-tertiary); }
+        .contract-block .comment { color: var(--text-ghost); }
+
+        /* ── FORM FACTORS ── */
+
+        .form-factors {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-4);
+        }
+
+        .form-factor {
+            background: var(--ground-base);
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-4);
+        }
+
+        .form-factor .ff-title {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-bottom: var(--space-3);
+        }
+
+        .form-factor .ff-grid {
+            display: grid;
+            gap: 2px;
+            margin-bottom: var(--space-3);
+        }
+
+        .form-factor .ff-cell {
+            background: var(--ground-raised);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .form-factor .ff-desc {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        /* ── QUALITY / DEV RHYTHM ── */
+
+        .rhythm-list {
+            counter-reset: step;
+        }
+
+        .rhythm-step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .rhythm-step:last-child { border-bottom: none; }
+
+        .rhythm-step::before {
+            counter-increment: step;
+            content: counter(step, decimal-leading-zero);
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            flex-shrink: 0;
+            width: 24px;
+            padding-top: 2px;
+        }
+
+        .rhythm-step .step-text {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .rhythm-step .step-text em {
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        /* ── GROUND ELEVATION DEMO ── */
+
+        .elevation-demo {
+            display: flex;
+            gap: 0;
+            height: 120px;
+        }
+
+        .elevation-demo .layer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: var(--space-3);
+        }
+
+        .elevation-demo .layer-name {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .elevation-demo .layer-hex {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        /* ── NAMED COLORS ── */
+
+        .named-row {
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        .named-chip {
+            flex: 1;
+            padding: var(--space-5) var(--space-4);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .named-chip .n-name {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-bottom: var(--space-1);
+        }
+
+        .named-chip .n-origin {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        /* ═══════════════════════════════════════
+           PART II: COMPONENT KIT
+           ═══════════════════════════════════════ */
+
+        .part-divider {
+            margin: var(--space-16) 0;
+            padding: var(--space-12) 0;
+            border-top: 2px solid var(--border-default);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .part-divider .part-label {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            font-weight: 300;
+            margin-bottom: var(--space-2);
+        }
+
+        .part-divider .part-title {
+            font-size: var(--text-subhead);
+            font-weight: 300;
+            color: var(--text-primary);
+            text-transform: lowercase;
+            margin-bottom: var(--space-2);
+        }
+
+        .part-divider .part-desc {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        /* Component sections */
+        .component {
+            margin-bottom: var(--space-16);
+        }
+
+        .component-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+            margin-bottom: var(--space-2);
+        }
+
+        .component-name {
+            font-size: var(--text-lg);
+            color: var(--text-primary);
+            font-weight: 400;
+            text-transform: lowercase;
+            margin-bottom: var(--space-2);
+        }
+
+        .component-desc {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            max-width: 600px;
+        }
+
+        .component-demo {
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            padding: var(--space-8);
+            margin-bottom: var(--space-4);
+        }
+
+        .component-code {
+            background: var(--ground-raised);
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-5);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            overflow-x: auto;
+            line-height: var(--leading-loose);
+            display: none;
+        }
+
+        .component-code.open { display: block; }
+
+        .code-toggle {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            font-weight: 300;
+            background: none;
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-1) var(--space-3);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: color var(--duration-fast) var(--ease-snap),
+                        border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .code-toggle:hover {
+            color: var(--accent);
+            border-color: var(--border-default);
+        }
+
+        .separator {
+            border: none;
+            border-top: 1px solid var(--border-subtle);
+            margin: var(--space-16) 0;
+        }
+
+        .demo-row {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        /* ── CM COMPONENTS ── */
+
+        .cm-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            overflow: hidden;
+        }
+
+        .cm-stage canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cm-stage .cm-info {
+            position: absolute;
+            top: var(--space-4);
+            left: var(--space-4);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            font-weight: 300;
+            pointer-events: none;
+        }
+
+        .cm-card {
+            background: var(--ground-surface);
+            border: 1px solid var(--border-subtle);
+            padding: var(--space-5);
+            transition: border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-card:hover { border-color: var(--border-default); }
+
+        .cm-card .cm-card-label {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+            margin-bottom: var(--space-3);
+        }
+
+        .cm-card .cm-card-value {
+            font-size: var(--text-xl);
+            color: var(--text-primary);
+            font-weight: 300;
+        }
+
+        .cm-card .cm-card-meta {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+            margin-top: var(--space-2);
+        }
+
+        .cm-variation-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+        }
+
+        .cm-variation-cell {
+            aspect-ratio: 1;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cm-variation-cell .cm-cell-label {
+            position: absolute;
+            bottom: var(--space-2);
+            left: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .cm-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .cm-nav .cm-nav-title {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-right: auto;
+        }
+
+        .cm-nav .cm-nav-btn {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            background: none;
+            border: 1px solid var(--border-default);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            transition: color var(--duration-fast) var(--ease-snap),
+                        border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-nav .cm-nav-btn:hover {
+            color: var(--accent);
+            border-color: var(--border-strong);
+        }
+
+        .cm-nav .cm-nav-counter {
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        .cm-data-row {
+            display: flex;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .cm-data-row:last-child { border-bottom: none; }
+
+        .cm-data-row .cm-data-key {
+            width: 120px;
+            flex-shrink: 0;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+
+        .cm-data-row .cm-data-val {
+            font-size: var(--text-sm);
+            color: var(--text-default);
+        }
+
+        .cm-data-row .cm-data-unit {
+            margin-left: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-ghost);
+        }
+
+        .cm-pill {
+            display: inline-block;
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            font-weight: 300;
+            border: 1px solid var(--border-default);
+            padding: var(--space-1) var(--space-3);
+        }
+
+        .cm-pill--accent {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cm-btn {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            font-weight: 300;
+            padding: var(--space-2) var(--space-5);
+            border: 1px solid var(--border-default);
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color var(--duration-fast) var(--ease-snap),
+                        border-color var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+
+        .cm-btn:active { transform: scale(0.98); }
+
+        .cm-btn--accent {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cm-btn--accent:hover {
+            background: var(--accent);
+            color: var(--ground-void);
+        }
+
+        .cm-progress {
+            height: 4px;
+            background: var(--ground-raised);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cm-progress .cm-progress-fill {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            background: var(--accent);
+            transition: width var(--duration-slow) var(--ease-snap);
+        }
+
+        .cm-tooltip-host {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cm-tooltip {
+            position: absolute;
+            bottom: calc(100% + var(--space-2));
+            left: 0;
+            background: var(--ground-modal);
+            border: 1px solid var(--border-default);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-tooltip-host:hover .cm-tooltip { opacity: 1; }
+
+        .cm-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-dim);
+            display: grid;
+            place-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-base) var(--ease-snap);
+        }
+
+        .cm-modal-backdrop.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .cm-modal {
+            background: var(--ground-raised);
+            border: 1px solid var(--border-default);
+            padding: var(--space-8);
+            max-width: 480px;
+            width: 90%;
+        }
+
+        .cm-modal .cm-modal-title {
+            font-size: var(--text-lg);
+            color: var(--text-primary);
+            font-weight: 400;
+            text-transform: lowercase;
+            margin-bottom: var(--space-4);
+        }
+
+        .cm-modal .cm-modal-body {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            line-height: var(--leading-loose);
+        }
+
+        .cm-modal .cm-modal-actions {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: flex-end;
+        }
+
+        .cm-chapter-viewer {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cm-chapter-viewer .cm-chapter-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: var(--space-4);
+        }
+
+        .cm-chapter-viewer .cm-chapter-title {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-right: auto;
+        }
+
+        .cm-chapter-viewer .cm-chapter-dots {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .cm-chapter-viewer .cm-chapter-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-ghost);
+            cursor: pointer;
+            transition: background var(--duration-fast) var(--ease-snap);
+        }
+
+        .cm-chapter-viewer .cm-chapter-dot.active { background: var(--accent); }
+        .cm-chapter-viewer .cm-chapter-dot:hover { background: var(--text-tertiary); }
+
+        .cm-axis-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .cm-axis-label .cm-axis-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .cm-axis-label .cm-axis-text {
+            font-weight: 300;
+            flex-shrink: 0;
+        }
+
+        /* ── RESPONSIVE ── */
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: var(--text-headline); }
+            .accent-row { grid-template-columns: repeat(3, 1fr); }
+            .states-grid { grid-template-columns: repeat(3, 1fr); }
+            .demo-variation-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-factors { grid-template-columns: repeat(2, 1fr); }
+            .named-row { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- ═══ ORIGIN BAR ═══ -->
+    <div class="origin-bar">
+        <span>visual language from</span>
+        <a href="https://mantascc.github.io/100days" target="_blank">mantascc.github.io/100days</a>
+        <button class="info-btn" onclick="this.classList.toggle('active')" aria-label="About this document">
+            ?
+            <div class="info-tooltip">
+                <p>extracted from a 100-day creative coding project — generative art, data viz, and interaction design through single-file html sketches.</p>
+                <p>a consistent aesthetic emerged: dark grounds, monospace type, single accents, geometric primitives, physics-driven motion. this page formalizes that into <em style="color: var(--text-primary);">clear channel</em> — tokens, rules, patterns, and components.</p>
+                <p>the page itself is rendered using the system it describes.</p>
+            </div>
+        </button>
+    </div>
+
+    <!-- ═══ HERO ═══ -->
+    <div class="hero">
+        <div class="hero-title">Clear<br>Channel</div>
+        <div class="hero-sub">computational aesthetics — like watching something think</div>
+        <div class="hero-desc" style="font-size: var(--text-sm); color: var(--text-tertiary); font-weight: 300; max-width: 520px; line-height: var(--leading-loose); margin-bottom: var(--space-6);">working with data as raw material. low-level primitives that carry complexity without decorating it. every element earns its presence by transmitting meaning. the aesthetic is a byproduct of function — what remains when noise is removed.</div>
+        <canvas id="heroField" style="width: 100%; height: 40px; margin-bottom: var(--space-12); -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);"></canvas>
+        <div class="hero-principles">
+            <span>data as material</span>
+            <span>hypnotic by default</span>
+            <span>quiet systems over loud interfaces</span>
+            <span>visible logic, emergent complexity</span>
+            <span>reduction as polish</span>
+            <span>physics over easing</span>
+        </div>
+    </div>
+
+    <!-- ═══ SEGMENTED CONTROL ═══ -->
+    <nav class="seg-control">
+        <button class="active" data-view="language" onclick="switchView('language')">language</button>
+        <button data-view="encoding" onclick="switchView('encoding')">encoding</button>
+        <button data-view="components" onclick="switchView('components')">components</button>
+    </nav>
+
+    <!-- ═══ VIEW: LANGUAGE ═══ -->
+    <div class="view visible" id="view-language">
+
+
+    <!-- ═══ 01 GROUND LAYERS ═══ -->
+    <section id="ground">
+        <div class="section-label">01</div>
+        <div class="section-title">ground layers</div>
+        <div class="section-desc">
+            elevation through value, not shadow. each layer is a discrete step darker-to-lighter. the void is the canvas. surfaces float by being lighter, never by casting shadows.
+        </div>
+
+        <div class="elevation-demo">
+            <div class="layer" style="background: var(--ground-void);">
+                <div class="layer-name">void</div>
+                <div class="layer-hex">#0a0a0a</div>
+            </div>
+            <div class="layer" style="background: var(--ground-base);">
+                <div class="layer-name">base</div>
+                <div class="layer-hex">#0f0f0f</div>
+            </div>
+            <div class="layer" style="background: var(--ground-raised);">
+                <div class="layer-name">raised</div>
+                <div class="layer-hex">#141414</div>
+            </div>
+            <div class="layer" style="background: var(--ground-surface);">
+                <div class="layer-name">surface</div>
+                <div class="layer-hex">#1a1a1a</div>
+            </div>
+            <div class="layer" style="background: var(--ground-float);">
+                <div class="layer-name">float</div>
+                <div class="layer-hex">#202232</div>
+            </div>
+            <div class="layer" style="background: var(--ground-modal);">
+                <div class="layer-name">modal</div>
+                <div class="layer-hex">#242424</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 02 TEXT HIERARCHY ═══ -->
+    <section id="text">
+        <div class="section-label">02</div>
+        <div class="section-title">text hierarchy</div>
+        <div class="section-desc">
+            five levels of visibility. primary for titles, ghost for structural marks you shouldn't consciously read.
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <div style="display: flex; align-items: center; gap: var(--space-6);">
+                <span style="width: 100px; font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">primary</span>
+                <span style="color: var(--text-primary); font-size: var(--text-lg);">essential information</span>
+                <span style="font-size: var(--text-xs); color: var(--text-ghost);">#ffffff</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-6);">
+                <span style="width: 100px; font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">default</span>
+                <span style="color: var(--text-default); font-size: var(--text-lg);">body text reads here</span>
+                <span style="font-size: var(--text-xs); color: var(--text-ghost);">#f5f5f7</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-6);">
+                <span style="width: 100px; font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">secondary</span>
+                <span style="color: var(--text-secondary); font-size: var(--text-lg);">labels and metadata</span>
+                <span style="font-size: var(--text-xs); color: var(--text-ghost);">#a8aab8</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-6);">
+                <span style="width: 100px; font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">tertiary</span>
+                <span style="color: var(--text-tertiary); font-size: var(--text-lg);">hints and disabled</span>
+                <span style="font-size: var(--text-xs); color: var(--text-ghost);">#666666</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-6);">
+                <span style="width: 100px; font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">ghost</span>
+                <span style="color: var(--text-ghost); font-size: var(--text-lg);">structural marks</span>
+                <span style="font-size: var(--text-xs); color: var(--text-ghost);">#333333</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 03 ACCENT COLORS ═══ -->
+    <section id="accent">
+        <div class="section-label">03</div>
+        <div class="section-title">spectral singles</div>
+        <div class="section-desc">
+            pick one per project. high contrast, intentional. the accent is a scalpel, not a paintbrush — it marks the one thing worth noticing. click to preview.
+        </div>
+
+        <div class="accent-row" style="margin-bottom: var(--space-8);">
+            <div class="accent-chip" onclick="setAccent('#00ffaa')">
+                <div class="dot" style="background: #00ffaa;"></div>
+                <span class="name">cyan</span>
+                <span class="hex">#00ffaa</span>
+                <div class="character">terminal, growth</div>
+            </div>
+            <div class="accent-chip" onclick="setAccent('#ff0066')">
+                <div class="dot" style="background: #ff0066;"></div>
+                <span class="name">magenta</span>
+                <span class="hex">#ff0066</span>
+                <div class="character">error, alert</div>
+            </div>
+            <div class="accent-chip" onclick="setAccent('#00a8ff')">
+                <div class="dot" style="background: #00a8ff;"></div>
+                <span class="name">blue</span>
+                <span class="hex">#00a8ff</span>
+                <div class="character">action, primary</div>
+            </div>
+            <div class="accent-chip" onclick="setAccent('#00ff88')">
+                <div class="dot" style="background: #00ff88;"></div>
+                <span class="name">green</span>
+                <span class="hex">#00ff88</span>
+                <div class="character">success, trim</div>
+            </div>
+            <div class="accent-chip" onclick="setAccent('#ffaa00')">
+                <div class="dot" style="background: #ffaa00;"></div>
+                <span class="name">amber</span>
+                <span class="hex">#ffaa00</span>
+                <div class="character">warning, warmth</div>
+            </div>
+            <div class="accent-chip" onclick="setAccent('#ff0000')">
+                <div class="dot" style="background: #ff0000;"></div>
+                <span class="name">red</span>
+                <span class="hex">#ff0000</span>
+                <div class="character">rare emphasis</div>
+            </div>
+        </div>
+
+        <div class="section-label" style="margin-top: var(--space-8);">named colors</div>
+        <div class="section-desc">colors with provenance — recurring identity across projects.</div>
+        <div class="named-row">
+            <div class="named-chip" style="border-left: 3px solid var(--cph-yellow);">
+                <div class="n-name">cph-yellow</div>
+                <div class="n-origin">copenhagen — oscilloscope warmth</div>
+            </div>
+            <div class="named-chip" style="border-left: 3px solid var(--ube-violet);">
+                <div class="n-name">ube-violet</div>
+                <div class="n-origin">ube kaizen — muted purple</div>
+            </div>
+            <div class="named-chip" style="border-left: 3px solid var(--ube-lavender);">
+                <div class="n-name">ube-lavender</div>
+                <div class="n-origin">ube kaizen — desaturated lilac</div>
+            </div>
+            <div class="named-chip" style="border-left: 3px solid var(--ube-terra);">
+                <div class="n-name">ube-terra</div>
+                <div class="n-origin">ube kaizen — warm terra cotta</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 04 TYPE SCALE ═══ -->
+    <section id="type-scale">
+        <div class="section-label">04</div>
+        <div class="section-title">type scale</div>
+        <div class="section-desc">
+            monospace only. discrete sizes, not a fluid scale. all lowercase or all uppercase — never mixed. labels get uppercase + wide tracking.
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">xs / 10px</div>
+            <div class="type-sample" style="font-size: var(--text-xs); font-weight: 300;">timestamps and labels</div>
+        </div>
+        <div class="type-specimen">
+            <div class="type-meta">sm / 11px</div>
+            <div class="type-sample" style="font-size: var(--text-sm);">secondary information</div>
+        </div>
+        <div class="type-specimen">
+            <div class="type-meta">base / 13px</div>
+            <div class="type-sample" style="font-size: var(--text-base);">body text — the default reading size</div>
+        </div>
+        <div class="type-specimen">
+            <div class="type-meta">md / 14px</div>
+            <div class="type-sample" style="font-size: var(--text-md);">primary content</div>
+        </div>
+        <div class="type-specimen">
+            <div class="type-meta">lg / 16px</div>
+            <div class="type-sample" style="font-size: var(--text-lg);">headings</div>
+        </div>
+        <div class="type-specimen">
+            <div class="type-meta">xl / 20px</div>
+            <div class="type-sample" style="font-size: var(--text-xl);">titles</div>
+        </div>
+    </section>
+
+    <!-- ═══ 05 EDITORIAL SCALE ═══ -->
+    <section id="editorial">
+        <div class="section-label">05</div>
+        <div class="section-title">editorial scale</div>
+        <div class="section-desc">
+            extended scale for content-heavy contexts — articles, covers, hero moments. the system scale handles interfaces; this handles publishing.
+        </div>
+
+        <div class="editorial-stack">
+            <div class="editorial-item">
+                <div class="editorial-label">caption</div>
+                <div class="editorial-size">11</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">metadata and attribution</div>
+            </div>
+            <div class="editorial-item">
+                <div class="editorial-label">body</div>
+                <div class="editorial-size">16</div>
+                <div style="font-size: 16px; color: var(--text-default);">the reading line</div>
+            </div>
+            <div class="editorial-item">
+                <div class="editorial-label">lead</div>
+                <div class="editorial-size">20</div>
+                <div style="font-size: 20px; color: var(--text-default); font-weight: 300;">intro paragraph weight</div>
+            </div>
+            <div class="editorial-item">
+                <div class="editorial-label">subhead</div>
+                <div class="editorial-size">28</div>
+                <div style="font-size: 28px; color: var(--text-primary); font-weight: 300;">section entry</div>
+            </div>
+            <div class="editorial-item">
+                <div class="editorial-label">headline</div>
+                <div class="editorial-size">48</div>
+                <div style="font-size: 48px; color: var(--text-primary); font-weight: 300; line-height: 1.1;">article title</div>
+            </div>
+            <div class="editorial-item" style="overflow: hidden;">
+                <div class="editorial-label">display</div>
+                <div class="editorial-size">80</div>
+                <div style="font-size: 80px; color: var(--text-primary); font-weight: 300; line-height: 1;">hero</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 06 SPACING ═══ -->
+    <section id="spacing">
+        <div class="section-label">06</div>
+        <div class="section-title">spacing</div>
+        <div class="section-desc">
+            4px base unit. multiples only. generous negative space — elements float rather than stack densely.
+        </div>
+        <div id="spacing-vis"></div>
+    </section>
+
+    <!-- ═══ 07 GEOMETRY ═══ -->
+    <section id="geometry">
+        <div class="section-label">07</div>
+        <div class="section-title">geometry</div>
+        <div class="section-desc">
+            primitives only — circles, lines, rectangles, points. no organic curves unless algorithmically generated. no fills unless essential — let density create form.
+        </div>
+
+        <canvas class="geometry-canvas" id="geometryCanvas"></canvas>
+
+        <div style="display: flex; gap: var(--space-8); margin-top: var(--space-6);">
+            <div>
+                <div class="section-label">stroke</div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div style="width: 40px; height: 1px; background: var(--stroke-primary);"></div>
+                    <span style="font-size: var(--text-xs); color: var(--text-ghost);">thin / 1px</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div style="width: 40px; height: 2px; background: var(--stroke-primary);"></div>
+                    <span style="font-size: var(--text-xs); color: var(--text-ghost);">default / 2px</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+                    <div style="width: 40px; height: 3px; background: var(--stroke-primary);"></div>
+                    <span style="font-size: var(--text-xs); color: var(--text-ghost);">heavy / 3px</span>
+                </div>
+            </div>
+            <div>
+                <div class="section-label">grid</div>
+                <div style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-2);">
+                    8px base (4px fine work)<br>
+                    underlying logic, rarely visible<br>
+                    when shown: 5-10% opacity max
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 08 MOTION ═══ -->
+    <section id="motion">
+        <div class="section-label">08</div>
+        <div class="section-title">motion</div>
+        <div class="section-desc">
+            physics over easing. linear interpolation, not theatrical entrances. things breathe, never bounce. instant feedback on interaction. click the tracks below.
+        </div>
+
+        <div id="motion-demos"></div>
+
+        <div style="margin-top: var(--space-8); font-size: var(--text-xs); color: var(--text-tertiary); display: flex; flex-direction: column; gap: var(--space-2);">
+            <div><span style="color: var(--accent);">rule</span> — binary state changes (on/off, visible/hidden)</div>
+            <div><span style="color: var(--accent);">rule</span> — ghost trails: 12-15fps intentional stutter</div>
+            <div><span style="color: var(--accent);">rule</span> — use euler/verlet for gravity, springs, inertia</div>
+            <div><span style="color: var(--accent);">rule</span> — 60fps target, degrade gracefully</div>
+        </div>
+    </section>
+
+    <!-- ═══ 09 INTERACTION STATES ═══ -->
+    <section id="states">
+        <div class="section-label">09</div>
+        <div class="section-title">interaction states</div>
+        <div class="section-desc">
+            cursor as subtle actor, not protagonist. click initiates, then step back. hover reveals, doesn't shout.
+        </div>
+
+        <div class="states-grid">
+            <div class="state-card state-default">
+                <div class="shape"></div>
+                <div class="label">default</div>
+            </div>
+            <div class="state-card state-hover">
+                <div class="shape"></div>
+                <div class="label">hover</div>
+            </div>
+            <div class="state-card state-active">
+                <div class="shape"></div>
+                <div class="label">active</div>
+            </div>
+            <div class="state-card state-disabled">
+                <div class="shape"></div>
+                <div class="label">disabled</div>
+            </div>
+            <div class="state-card state-focus">
+                <div class="shape"></div>
+                <div class="label">focus</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 10 ANTI-PATTERNS ═══ -->
+    <section id="anti">
+        <div class="section-label">10</div>
+        <div class="section-title">anti-patterns</div>
+        <div class="section-desc">never use these. if you're reaching for one, you're adding instead of reducing.</div>
+
+        <div class="anti-grid">
+            <div class="anti-card">
+                <div class="anti-label">gradient</div>
+                <div class="anti-demo">
+                    <div style="width: 80px; height: 32px; background: linear-gradient(90deg, #333, #666); opacity: 0.4;"></div>
+                </div>
+                <div class="anti-instead"><span>instead:</span> flat ground layers</div>
+            </div>
+            <div class="anti-card">
+                <div class="anti-label">drop shadow</div>
+                <div class="anti-demo">
+                    <div style="width: 48px; height: 48px; background: #333; box-shadow: 0 4px 12px rgba(0,0,0,0.5); opacity: 0.4;"></div>
+                </div>
+                <div class="anti-instead"><span>instead:</span> border + ground shift</div>
+            </div>
+            <div class="anti-card">
+                <div class="anti-label">rounded > 4px</div>
+                <div class="anti-demo">
+                    <div style="width: 48px; height: 48px; border: 2px solid #666; border-radius: 16px; opacity: 0.4;"></div>
+                </div>
+                <div class="anti-instead"><span>instead:</span> sharp or 2px max</div>
+            </div>
+            <div class="anti-card">
+                <div class="anti-label">easing theatrics</div>
+                <div class="anti-demo">
+                    <div style="font-size: var(--text-xs); color: #666; opacity: 0.4;">ease-in-out-bounce</div>
+                </div>
+                <div class="anti-instead"><span>instead:</span> linear or physics</div>
+            </div>
+            <div class="anti-card">
+                <div class="anti-label">multi-accent</div>
+                <div class="anti-demo">
+                    <div style="display: flex; gap: 4px;">
+                        <div style="width: 12px; height: 12px; background: #00ffaa; opacity: 0.4;"></div>
+                        <div style="width: 12px; height: 12px; background: #ff0066; opacity: 0.4;"></div>
+                        <div style="width: 12px; height: 12px; background: #00a8ff; opacity: 0.4;"></div>
+                    </div>
+                </div>
+                <div class="anti-instead"><span>instead:</span> one spectral single</div>
+            </div>
+            <div class="anti-card">
+                <div class="anti-label">mixed case</div>
+                <div class="anti-demo">
+                    <div style="font-size: var(--text-sm); color: #666; opacity: 0.4;">Mixed Case Label</div>
+                </div>
+                <div class="anti-instead"><span>instead:</span> all lower or all upper</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 11 VARIATION GRID ═══ -->
+    <section id="variation-grid">
+        <div class="section-label">11</div>
+        <div class="section-title">variation grid</div>
+        <div class="section-desc">
+            fix the scaffold. vary one axis. show all results at once. simultaneous display produces taxonomy — sequential iteration produces search. the grid is the thinking tool.
+        </div>
+
+        <div class="demo-variation-grid" id="variationGrid"></div>
+
+        <div style="margin-top: var(--space-6); font-size: var(--text-xs); color: var(--text-tertiary);">
+            <span style="color: var(--accent);">scaffold:</span> circle on grid &nbsp;&nbsp;
+            <span style="color: var(--accent);">axis:</span> noise function
+        </div>
+    </section>
+
+    <!-- ═══ 12 CHAPTER CONTRACT ═══ -->
+    <section id="chapter-contract">
+        <div class="section-label">12</div>
+        <div class="section-title">chapter contract</div>
+        <div class="section-desc">
+            every variation unit exposes the same interface. the loader never knows what a chapter draws — it only calls setup, builds the dom, and runs the loop.
+        </div>
+
+        <div class="contract-block">
+            <pre><span class="comment">// chapter interface</span>
+{
+  <span class="keyword">labels</span>:  <span class="type">string[]</span>                           <span class="comment">// what each variant is called</span>
+  <span class="keyword">drawFns</span>: <span class="type">Array&lt;(cv, t) =&gt; void&gt;</span>             <span class="comment">// one draw function per cell</span>
+  <span class="keyword">dt</span>:      <span class="type">number</span>                             <span class="comment">// 0 = static; &gt;0 = animated</span>
+  <span class="keyword">setup</span>:   <span class="type">(id: string) =&gt; {canvas, ctx, W, H}</span> <span class="comment">// canvas initializer</span>
+}
+
+<span class="comment">// the loader doesn't know what you draw</span>
+<span class="comment">// it only knows: setup -> build dom -> run loop</span></pre>
+        </div>
+
+        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-8);">
+            <div>
+                <div class="section-label">plain object</div>
+                <div style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-2);">one-off chapter, no config needed</div>
+            </div>
+            <div>
+                <div class="section-label">factory function</div>
+                <div style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-2);">needs external input (theme, dataset)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 13 FORM FACTORS ═══ -->
+    <section id="form-factors">
+        <div class="section-label">13</div>
+        <div class="section-title">form factors</div>
+        <div class="section-desc">
+            the contract stays the same. only the grid css changes.
+        </div>
+
+        <div class="form-factors">
+            <div class="form-factor">
+                <div class="ff-title">8 cells / 4x2</div>
+                <div class="ff-grid" style="grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 24px);">
+                    <div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div>
+                    <div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div>
+                </div>
+                <div class="ff-desc">standard — maps an axis</div>
+            </div>
+            <div class="form-factor">
+                <div class="ff-title">n cells / 1 row</div>
+                <div class="ff-grid" style="grid-template-columns: repeat(3, 1fr); grid-template-rows: 24px;">
+                    <div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div>
+                </div>
+                <div class="ff-desc">side-by-side (2-4)</div>
+            </div>
+            <div class="form-factor">
+                <div class="ff-title">auto-grid</div>
+                <div class="ff-grid" style="grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 16px);">
+                    <div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div>
+                    <div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div>
+                    <div class="ff-cell"></div><div class="ff-cell"></div><div class="ff-cell"></div>
+                </div>
+                <div class="ff-desc">n determined by data</div>
+            </div>
+            <div class="form-factor">
+                <div class="ff-title">single cell</div>
+                <div class="ff-grid" style="grid-template-columns: 1fr; grid-template-rows: 48px;">
+                    <div class="ff-cell"></div>
+                </div>
+                <div class="ff-desc">cycles variants over time</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 14 DEVELOPMENT RHYTHM ═══ -->
+    <section id="rhythm">
+        <div class="section-label">14</div>
+        <div class="section-title">development rhythm</div>
+        <div class="section-desc">
+            polish = reduction, not addition. works on first try, no tutorial needed.
+        </div>
+
+        <div class="rhythm-list">
+            <div class="rhythm-step"><div class="step-text">wait for <em>idea crystallization</em></div></div>
+            <div class="rhythm-step"><div class="step-text">create seed .md — concept + constraints</div></div>
+            <div class="rhythm-step"><div class="step-text">reference this style seed</div></div>
+            <div class="rhythm-step"><div class="step-text">build <em>minimum viable sketch</em></div></div>
+            <div class="rhythm-step"><div class="step-text">iterate on core mechanic</div></div>
+            <div class="rhythm-step"><div class="step-text"><em>strip unnecessary elements</em></div></div>
+            <div class="rhythm-step"><div class="step-text">polish = reduction, not addition</div></div>
+            <div class="rhythm-step"><div class="step-text">opens instantly, behavior self-evident</div></div>
+        </div>
+
+        <div style="margin-top: var(--space-10); display: flex; gap: var(--space-8);">
+            <div>
+                <div class="section-label">quality markers</div>
+                <div style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-2); line-height: 2;">
+                    opens instantly · behavior self-evident · visually quiet but informationally dense · leaves space for interpretation · 60fps target · &lt;50kb · no external assets
+                </div>
+            </div>
+            <div>
+                <div class="section-label">influences</div>
+                <div style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-2); line-height: 2;">
+                    bauhaus · cybernetics · vector displays · technical drawing · casey reas · vera molnar · early demoscene · oscilloscope · terminal interfaces
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    </div><!-- /view-language -->
+
+    <!-- ═══ VIEW: ENCODING ═══ -->
+    <div class="view" id="view-encoding">
+
+    <!-- ═══ E01 GLYPH RAMPS ═══ -->
+    <section id="e-glyphs">
+        <div class="section-label">01</div>
+        <div class="section-title">glyph ramps</div>
+        <div class="section-desc">
+            character density as continuous tone. a value [0,1] maps to a glyph index. the ramp is the palette — each vocabulary carries a different texture.
+        </div>
+
+        <div id="glyphRamps" style="display: flex; flex-direction: column; gap: var(--space-6);"></div>
+
+        <div style="margin-top: var(--space-8);">
+            <div class="section-label">live mapping</div>
+            <div style="display: flex; align-items: center; gap: var(--space-4); margin-top: var(--space-3);">
+                <input type="range" id="glyphSlider" min="0" max="1" step="0.01" value="0.5" style="flex: 1; accent-color: var(--accent);">
+                <div id="glyphOut" style="font-family: var(--font-mono); font-size: 32px; color: var(--text-primary); width: 48px; text-align: center;">○</div>
+                <div id="glyphVal" style="font-size: var(--text-xs); color: var(--text-tertiary); width: 36px;">0.50</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ E02 VALUE → PROPERTY ═══ -->
+    <section id="e-mappings">
+        <div class="section-label">02</div>
+        <div class="section-title">value → property</div>
+        <div class="section-desc">
+            six primitive encodings. each maps a normalized value to a single visual channel. one value, one property — never overload a channel.
+        </div>
+
+        <div id="encodingStrips" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4);"></div>
+    </section>
+
+    <!-- ═══ E03 THRESHOLD VS CONTINUOUS ═══ -->
+    <section id="e-threshold">
+        <div class="section-label">03</div>
+        <div class="section-title">threshold vs continuous</div>
+        <div class="section-desc">
+            two mapping modes. continuous: value flows through. threshold: value snaps to on/off at a cut point. piecewise: multiple thresholds create bands. same data, three reads.
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-top: var(--space-4);">
+            <div>
+                <div class="section-label">continuous</div>
+                <canvas id="mapContinuous" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+            </div>
+            <div>
+                <div class="section-label">threshold</div>
+                <canvas id="mapThreshold" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+            </div>
+            <div>
+                <div class="section-label">piecewise</div>
+                <canvas id="mapPiecewise" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ E04 SIGNAL BINDING ═══ -->
+    <section id="e-signal">
+        <div class="section-label">04</div>
+        <div class="section-title">signal binding</div>
+        <div class="section-desc">
+            live inputs (audio fft, camera, mouse, sensors) wire to visual parameters through named bindings. multiplexing: one signal drives multiple outputs. demultiplexing: one output is driven by band-split inputs.
+        </div>
+
+        <div style="margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2);">
+            <div style="display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs);">
+                <span style="color: var(--text-tertiary); width: 60px; font-weight: 300;">bass</span>
+                <span style="color: var(--text-ghost);">→</span>
+                <span style="color: var(--text-secondary);">speed</span>
+                <div id="sigBass" style="flex: 1; height: 3px; background: var(--ground-surface); overflow: hidden;"><div style="height: 100%; background: var(--accent); width: 0%; transition: width 60ms linear;"></div></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs);">
+                <span style="color: var(--text-tertiary); width: 60px; font-weight: 300;">mids</span>
+                <span style="color: var(--text-ghost);">→</span>
+                <span style="color: var(--text-secondary);">density</span>
+                <div id="sigMids" style="flex: 1; height: 3px; background: var(--ground-surface); overflow: hidden;"><div style="height: 100%; background: var(--accent); width: 0%; transition: width 60ms linear;"></div></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs);">
+                <span style="color: var(--text-tertiary); width: 60px; font-weight: 300;">treble</span>
+                <span style="color: var(--text-ghost);">→</span>
+                <span style="color: var(--text-secondary);">brightness</span>
+                <div id="sigTreble" style="flex: 1; height: 3px; background: var(--ground-surface); overflow: hidden;"><div style="height: 100%; background: var(--accent); width: 0%; transition: width 60ms linear;"></div></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs);">
+                <span style="color: var(--text-tertiary); width: 60px; font-weight: 300;">amp</span>
+                <span style="color: var(--text-ghost);">→</span>
+                <span style="color: var(--text-secondary);">alpha</span>
+                <div id="sigAmp" style="flex: 1; height: 3px; background: var(--ground-surface); overflow: hidden;"><div style="height: 100%; background: var(--accent); width: 0%; transition: width 60ms linear;"></div></div>
+            </div>
+        </div>
+
+        <div style="margin-top: var(--space-6);">
+            <div class="section-label">live demo — move mouse to simulate signal</div>
+            <canvas id="signalField" style="width: 100%; height: 120px; margin-top: var(--space-2); cursor: crosshair;"></canvas>
+        </div>
+    </section>
+
+    <!-- ═══ E05 FIELD RENDERING ═══ -->
+    <section id="e-field">
+        <div class="section-label">05</div>
+        <div class="section-title">field rendering</div>
+        <div class="section-desc">
+            spatial functions as data sources. sin, cos, atan2, noise — evaluated per cell, rendered through a glyph ramp. the function is the dataset. the grid is the viewport.
+        </div>
+
+        <div id="asciiField" style="font-family: var(--font-mono); font-size: 11px; line-height: 1.1; color: var(--accent); white-space: pre; overflow: hidden; height: 200px; margin-top: var(--space-4); cursor: crosshair;"></div>
+    </section>
+
+    <!-- ═══ E06 TIME ENCODING ═══ -->
+    <section id="e-time">
+        <div class="section-label">06</div>
+        <div class="section-title">time encoding</div>
+        <div class="section-desc">
+            temporal data becomes spatial through three patterns: grid (time × category), trail (position + decay), accumulation (value builds over frames).
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-top: var(--space-4);">
+            <div>
+                <div class="section-label">grid — day × agent</div>
+                <canvas id="timeGrid" style="width: 100%; height: 120px; margin-top: var(--space-2);"></canvas>
+            </div>
+            <div>
+                <div class="section-label">trail — position + decay</div>
+                <canvas id="timeTrail" style="width: 100%; height: 120px; margin-top: var(--space-2);"></canvas>
+            </div>
+            <div>
+                <div class="section-label">accumulation — value over frames</div>
+                <canvas id="timeAccum" style="width: 100%; height: 120px; margin-top: var(--space-2);"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ E07 RELATION ENCODING ═══ -->
+    <section id="e-relation">
+        <div class="section-label">07</div>
+        <div class="section-title">relation encoding</div>
+        <div class="section-desc">
+            connections between entities. force-directed layout lets topology become geometry. node = entity, edge = relation, distance = similarity. the physics finds the form.
+        </div>
+
+        <canvas id="forceGraph" style="width: 100%; height: 200px; margin-top: var(--space-4);"></canvas>
+    </section>
+
+    <!-- ═══ E08 VIZ GRAMMAR ═══ -->
+    <section id="e-grammar">
+        <div class="section-label">08</div>
+        <div class="section-title">viz grammar</div>
+        <div class="section-desc">
+            six analytical goals, each with a natural chart form. the goal picks the chart — not the other way around.
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-top: var(--space-4);">
+            <div>
+                <div class="section-label">compare</div>
+                <canvas id="vizCompare" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+                <div style="font-size: var(--text-xs); color: var(--text-ghost); margin-top: var(--space-1); font-weight: 300;">bar, grouped bar, diverging</div>
+            </div>
+            <div>
+                <div class="section-label">distribute</div>
+                <canvas id="vizDistribute" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+                <div style="font-size: var(--text-xs); color: var(--text-ghost); margin-top: var(--space-1); font-weight: 300;">histogram, box plot, strip</div>
+            </div>
+            <div>
+                <div class="section-label">trend</div>
+                <canvas id="vizTrend" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+                <div style="font-size: var(--text-xs); color: var(--text-ghost); margin-top: var(--space-1); font-weight: 300;">line, area, multi-series</div>
+            </div>
+            <div>
+                <div class="section-label">compose</div>
+                <canvas id="vizCompose" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+                <div style="font-size: var(--text-xs); color: var(--text-ghost); margin-top: var(--space-1); font-weight: 300;">donut, stacked bar, treemap</div>
+            </div>
+            <div>
+                <div class="section-label">relate</div>
+                <canvas id="vizRelate" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+                <div style="font-size: var(--text-xs); color: var(--text-ghost); margin-top: var(--space-1); font-weight: 300;">scatter, bubble, network</div>
+            </div>
+            <div>
+                <div class="section-label">locate</div>
+                <canvas id="vizLocate" style="width: 100%; height: 80px; margin-top: var(--space-2);"></canvas>
+                <div style="font-size: var(--text-xs); color: var(--text-ghost); margin-top: var(--space-1); font-weight: 300;">dot map, heatmap, proximity</div>
+            </div>
+        </div>
+    </section>
+
+    </div><!-- /view-encoding -->
+
+    <!-- ═══ VIEW: COMPONENTS ═══ -->
+    <div class="view" id="view-components">
+
+
+    <!-- ═══ C01 STAGE ═══ -->
+    <div class="component" id="c-stage">
+        <div class="component-label">component 01</div>
+        <div class="component-name">stage</div>
+        <div class="component-desc">the canvas container. 80vmin square by default, with hi-dpi scaling and an info label.</div>
+        <div class="component-demo">
+            <div class="cm-stage" style="max-width: 400px; aspect-ratio: 1;">
+                <canvas id="stageDemo"></canvas>
+                <div class="cm-info">particle field</div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-stage"&gt;
+  &lt;canvas id="canvas"&gt;&lt;/canvas&gt;
+  &lt;div class="cm-info"&gt;sketch name&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C02 CARD ═══ -->
+    <div class="component" id="c-card">
+        <div class="component-label">component 02</div>
+        <div class="component-name">card</div>
+        <div class="component-desc">data display surface. label + value + optional meta. surface-level ground with subtle border.</div>
+        <div class="component-demo">
+            <div class="demo-row">
+                <div class="cm-card" style="min-width: 160px;">
+                    <div class="cm-card-label">particles</div>
+                    <div class="cm-card-value">2,048</div>
+                    <div class="cm-card-meta">active</div>
+                </div>
+                <div class="cm-card" style="min-width: 160px;">
+                    <div class="cm-card-label">framerate</div>
+                    <div class="cm-card-value">60<span style="font-size: var(--text-sm); color: var(--text-tertiary);">fps</span></div>
+                    <div class="cm-card-meta">target met</div>
+                </div>
+                <div class="cm-card" style="min-width: 160px;">
+                    <div class="cm-card-label">entropy</div>
+                    <div class="cm-card-value" style="color: var(--accent);">0.847</div>
+                    <div class="cm-card-meta">rising</div>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-card"&gt;
+  &lt;div class="cm-card-label"&gt;label&lt;/div&gt;
+  &lt;div class="cm-card-value"&gt;value&lt;/div&gt;
+  &lt;div class="cm-card-meta"&gt;meta&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C03 VARIATION GRID ═══ -->
+    <div class="component" id="c-vgrid">
+        <div class="component-label">component 03</div>
+        <div class="component-name">variation grid</div>
+        <div class="component-desc">the core structural pattern. fix scaffold, vary one axis, show all at once. 4x2 default.</div>
+        <div class="component-demo">
+            <div class="cm-variation-grid" id="miniGrid"></div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-variation-grid"&gt;
+  &lt;div class="cm-variation-cell"&gt;
+    &lt;canvas id="c1"&gt;&lt;/canvas&gt;
+    &lt;div class="cm-cell-label"&gt;variant a&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;!-- repeat for each cell --&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C04 NAV BAR ═══ -->
+    <div class="component" id="c-nav">
+        <div class="component-label">component 04</div>
+        <div class="component-name">navigation</div>
+        <div class="component-desc">chapter navigation with prev/next and counter. hash-based for bookmarkable state.</div>
+        <div class="component-demo">
+            <div class="cm-nav">
+                <div class="cm-nav-title">noise functions</div>
+                <div class="cm-nav-counter">03 / 08</div>
+                <button class="cm-nav-btn">&larr;</button>
+                <button class="cm-nav-btn">&rarr;</button>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-nav"&gt;
+  &lt;div class="cm-nav-title"&gt;chapter title&lt;/div&gt;
+  &lt;div class="cm-nav-counter"&gt;01 / 08&lt;/div&gt;
+  &lt;button class="cm-nav-btn"&gt;&amp;larr;&lt;/button&gt;
+  &lt;button class="cm-nav-btn"&gt;&amp;rarr;&lt;/button&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C05 DATA ROW ═══ -->
+    <div class="component" id="c-data">
+        <div class="component-label">component 05</div>
+        <div class="component-name">data row</div>
+        <div class="component-desc">key-value display for parameters, stats, metadata.</div>
+        <div class="component-demo">
+            <div class="cm-data-row">
+                <div class="cm-data-key">algorithm</div>
+                <div class="cm-data-val">perlin noise</div>
+            </div>
+            <div class="cm-data-row">
+                <div class="cm-data-key">frequency</div>
+                <div class="cm-data-val">4.0<span class="cm-data-unit">hz</span></div>
+            </div>
+            <div class="cm-data-row">
+                <div class="cm-data-key">octaves</div>
+                <div class="cm-data-val">6</div>
+            </div>
+            <div class="cm-data-row">
+                <div class="cm-data-key">seed</div>
+                <div class="cm-data-val" style="color: var(--accent);">0x7f3a</div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-data-row"&gt;
+  &lt;div class="cm-data-key"&gt;key&lt;/div&gt;
+  &lt;div class="cm-data-val"&gt;value&lt;span class="cm-data-unit"&gt;unit&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C06 PILLS ═══ -->
+    <div class="component" id="c-pill">
+        <div class="component-label">component 06</div>
+        <div class="component-name">pill / tag</div>
+        <div class="component-desc">classification markers. default or accent variant.</div>
+        <div class="component-demo">
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                <span class="cm-pill">static</span>
+                <span class="cm-pill">animated</span>
+                <span class="cm-pill cm-pill--accent">active</span>
+                <span class="cm-pill">8 cells</span>
+                <span class="cm-pill">canvas</span>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;span class="cm-pill"&gt;label&lt;/span&gt;
+&lt;span class="cm-pill cm-pill--accent"&gt;accent&lt;/span&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C07 BUTTONS ═══ -->
+    <div class="component" id="c-btn">
+        <div class="component-label">component 07</div>
+        <div class="component-name">button</div>
+        <div class="component-desc">minimal action triggers. scale(0.98) on active, never bounce.</div>
+        <div class="component-demo">
+            <div style="display: flex; gap: var(--space-4);">
+                <button class="cm-btn">default</button>
+                <button class="cm-btn cm-btn--accent">accent</button>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;button class="cm-btn"&gt;default&lt;/button&gt;
+&lt;button class="cm-btn cm-btn--accent"&gt;accent&lt;/button&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C08 PROGRESS ═══ -->
+    <div class="component" id="c-progress">
+        <div class="component-label">component 08</div>
+        <div class="component-name">progress</div>
+        <div class="component-desc">linear fill indicator. 4px tall. linear transition, not eased.</div>
+        <div class="component-demo">
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-1);">
+                        <span style="font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">loading</span>
+                        <span style="font-size: var(--text-xs); color: var(--text-ghost);">73%</span>
+                    </div>
+                    <div class="cm-progress">
+                        <div class="cm-progress-fill" style="width: 73%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-1);">
+                        <span style="font-size: var(--text-xs); color: var(--text-tertiary); font-weight: 300;">processing</span>
+                        <span style="font-size: var(--text-xs); color: var(--text-ghost);">100%</span>
+                    </div>
+                    <div class="cm-progress">
+                        <div class="cm-progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-progress"&gt;
+  &lt;div class="cm-progress-fill" style="width: 73%;"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C09 TOOLTIP ═══ -->
+    <div class="component" id="c-tooltip">
+        <div class="component-label">component 09</div>
+        <div class="component-name">tooltip</div>
+        <div class="component-desc">hover reveal. appears instantly (duration-fast), no theatrical entrance.</div>
+        <div class="component-demo" style="padding-top: var(--space-12);">
+            <div class="cm-tooltip-host">
+                <span style="border-bottom: 1px dashed var(--text-ghost); color: var(--text-secondary); font-size: var(--text-sm); cursor: default;">hover this element</span>
+                <div class="cm-tooltip">perlin noise — ken perlin, 1983</div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-tooltip-host"&gt;
+  &lt;span&gt;trigger element&lt;/span&gt;
+  &lt;div class="cm-tooltip"&gt;tooltip content&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C10 MODAL ═══ -->
+    <div class="component" id="c-modal">
+        <div class="component-label">component 10</div>
+        <div class="component-name">modal</div>
+        <div class="component-desc">overlay surface for focused interaction. dim backdrop, raised ground.</div>
+        <div class="component-demo">
+            <button class="cm-btn" onclick="document.getElementById('demoModal').classList.add('open')">open modal</button>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-modal-backdrop"&gt;
+  &lt;div class="cm-modal"&gt;
+    &lt;div class="cm-modal-title"&gt;title&lt;/div&gt;
+    &lt;div class="cm-modal-body"&gt;content&lt;/div&gt;
+    &lt;div class="cm-modal-actions"&gt;
+      &lt;button class="cm-btn"&gt;cancel&lt;/button&gt;
+      &lt;button class="cm-btn cm-btn--accent"&gt;confirm&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C11 CHAPTER VIEWER ═══ -->
+    <div class="component" id="c-chapter">
+        <div class="component-label">component 11</div>
+        <div class="component-name">chapter viewer</div>
+        <div class="component-desc">navigation pattern for multi-chapter variation grids. dot indicators show position.</div>
+        <div class="component-demo">
+            <div class="cm-chapter-viewer">
+                <div class="cm-chapter-nav">
+                    <div class="cm-chapter-title" id="chapterTitle">perlin noise</div>
+                    <div class="cm-chapter-dots">
+                        <div class="cm-chapter-dot active" data-ch="0"></div>
+                        <div class="cm-chapter-dot" data-ch="1"></div>
+                        <div class="cm-chapter-dot" data-ch="2"></div>
+                        <div class="cm-chapter-dot" data-ch="3"></div>
+                        <div class="cm-chapter-dot" data-ch="4"></div>
+                    </div>
+                    <button class="cm-nav-btn" id="chPrev">&larr;</button>
+                    <button class="cm-nav-btn" id="chNext">&rarr;</button>
+                </div>
+                <div id="chapterContent" style="padding: var(--space-5); background: var(--ground-raised); min-height: 80px; display: grid; place-items: center;">
+                    <span style="font-size: var(--text-xs); color: var(--text-ghost); font-weight: 300;">chapter content renders here</span>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-chapter-viewer"&gt;
+  &lt;div class="cm-chapter-nav"&gt;
+    &lt;div class="cm-chapter-title"&gt;title&lt;/div&gt;
+    &lt;div class="cm-chapter-dots"&gt;
+      &lt;div class="cm-chapter-dot active"&gt;&lt;/div&gt;
+      &lt;!-- ... --&gt;
+    &lt;/div&gt;
+    &lt;button class="cm-nav-btn"&gt;&amp;larr;&lt;/button&gt;
+    &lt;button class="cm-nav-btn"&gt;&amp;rarr;&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div id="content"&gt;&lt;!-- chapter grid --&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C12 AXIS LABEL ═══ -->
+    <div class="component" id="c-axis">
+        <div class="component-label">component 12</div>
+        <div class="component-name">axis label</div>
+        <div class="component-desc">marks the varied dimension. line extends to fill available space.</div>
+        <div class="component-demo">
+            <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+                <div class="cm-axis-label">
+                    <div class="cm-axis-text">frequency</div>
+                    <div class="cm-axis-line"></div>
+                    <div class="cm-axis-text" style="color: var(--text-ghost);">0.1 -> 10.0 hz</div>
+                </div>
+                <div class="cm-axis-label">
+                    <div class="cm-axis-text">noise type</div>
+                    <div class="cm-axis-line"></div>
+                    <div class="cm-axis-text" style="color: var(--accent);">axis of variation</div>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">&lt;div class="cm-axis-label"&gt;
+  &lt;div class="cm-axis-text"&gt;label&lt;/div&gt;
+  &lt;div class="cm-axis-line"&gt;&lt;/div&gt;
+  &lt;div class="cm-axis-text"&gt;range&lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <hr class="separator">
+
+    <!-- ═══ C13 CC-FIELD ═══ -->
+    <div class="component" id="c-field">
+        <div class="component-label">component 13</div>
+        <div class="component-name">cc-field</div>
+        <div class="component-desc">canvas ascii field — loading, thinking, and progress animations. six modes, five glyph ramps, fully configurable. gpu-composited, sub-0.1ms per frame.</div>
+        <div class="component-demo">
+            <div style="display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-start;">
+                <div>
+                    <div style="font-size: var(--text-xs); color: var(--text-ghost); font-weight: 300; margin-bottom: 4px;">think</div>
+                    <canvas id="ccf-think" width="200" height="80"></canvas>
+                </div>
+                <div>
+                    <div style="font-size: var(--text-xs); color: var(--text-ghost); font-weight: 300; margin-bottom: 4px;">breathe</div>
+                    <canvas id="ccf-breathe" width="200" height="80"></canvas>
+                </div>
+                <div>
+                    <div style="font-size: var(--text-xs); color: var(--text-ghost); font-weight: 300; margin-bottom: 4px;">progress</div>
+                    <canvas id="ccf-progress" width="200" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        <button class="code-toggle" onclick="toggleCode(this)">view source</button>
+        <pre class="component-code">const field = new CCField(canvas, {
+  mode: 'think',        // think | breathe | rain | scan | ripple | progress
+  ramp: 'circles',      // circles | blocks | braille | wave | crystal
+  accent: '#00ffaa',
+  fontSize: 11,
+  speed: 1,
+  density: 1
+});
+field.start();
+field.setProgress(0.7); // progress mode
+field.setMode('rain');  // switch live</pre>
+    </div>
+
+    </div><!-- /view-components -->
+
+</div>
+
+<!-- ═══ MODAL (lives outside page flow) ═══ -->
+<div class="cm-modal-backdrop" id="demoModal" onclick="if(event.target===this) this.classList.remove('open')">
+    <div class="cm-modal">
+        <div class="cm-modal-title">confirm action</div>
+        <div class="cm-modal-body">this overlay uses the dim backdrop at 85% opacity. the modal surface sits at ground-raised. no drop shadows — elevation through value only.</div>
+        <div class="cm-modal-actions">
+            <button class="cm-btn" onclick="document.getElementById('demoModal').classList.remove('open')">cancel</button>
+            <button class="cm-btn cm-btn--accent" onclick="document.getElementById('demoModal').classList.remove('open')">confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TICK NAV ═══ -->
+<nav class="tick-nav" id="tickNav"></nav>
+
+<script>
+'use strict';
+
+// ── VIEW SWITCHER ──
+let currentView = 'language';
+
+function switchView(name) {
+    currentView = name;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('visible'));
+    document.getElementById('view-' + name).classList.add('visible');
+    document.querySelectorAll('.seg-control button').forEach(b => {
+        b.classList.toggle('active', b.dataset.view === name);
+    });
+    window.scrollTo(0, 0);
+    buildTickNav();
+}
+
+// ── TICK NAV BUILD + SCROLL TRACKING ──
+let tickLinks = [];
+
+function buildTickNav() {
+    const nav = document.getElementById('tickNav');
+    nav.innerHTML = '';
+    tickLinks = [];
+
+    const activeView = document.getElementById('view-' + currentView);
+    const sections = activeView.querySelectorAll('section[id], .component[id]');
+
+    sections.forEach(sec => {
+        const label = sec.querySelector('.section-label, .component-label');
+        const title = sec.querySelector('.section-title, .component-name');
+        if (!label || !title) return;
+
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        a.innerHTML = `<span class="tick-label">${label.textContent} ${title.textContent}</span><span class="tick-mark"></span>`;
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        nav.appendChild(a);
+        tickLinks.push({ el: a, section: sec });
+    });
+
+    onScroll();
+}
+
+let ticking = false;
+function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function() {
+        const scrollY = window.scrollY + window.innerHeight * 0.3;
+        let activeIdx = 0;
+        tickLinks.forEach(function(item, i) {
+            if (item.section.offsetTop <= scrollY) activeIdx = i;
+        });
+        tickLinks.forEach(function(item, i) {
+            item.el.classList.toggle('active', i === activeIdx);
+        });
+        ticking = false;
+    });
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+buildTickNav();
+
+// ── INFO TOOLTIP DISMISS ──
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.info-btn')) {
+        document.querySelectorAll('.info-btn.active').forEach(function(b) { b.classList.remove('active'); });
+    }
+});
+
+// ── ACCENT SWITCHER ──
+function setAccent(hex) {
+    document.documentElement.style.setProperty('--accent', hex);
+}
+
+// ── CODE TOGGLE ──
+function toggleCode(btn) {
+    const code = btn.nextElementSibling;
+    code.classList.toggle('open');
+    btn.textContent = code.classList.contains('open') ? 'hide source' : 'view source';
+}
+
+// ── SPACING VIS ──
+(function() {
+    const container = document.getElementById('spacing-vis');
+    const tokens = [
+        ['space-1', 4], ['space-2', 8], ['space-3', 12], ['space-4', 16],
+        ['space-5', 20], ['space-6', 24], ['space-8', 32], ['space-10', 40],
+        ['space-12', 48], ['space-16', 64]
+    ];
+    tokens.forEach(([name, val]) => {
+        const row = document.createElement('div');
+        row.className = 'space-row';
+        row.innerHTML = `
+            <div class="space-label">${name}</div>
+            <div class="space-bar" style="width: ${val * 3}px;"></div>
+            <div class="space-value">${val}px</div>
+        `;
+        container.appendChild(row);
+    });
+})();
+
+// ── GEOMETRY CANVAS ──
+(function() {
+    const canvas = document.getElementById('geometryCanvas');
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const W = rect.width;
+    const H = rect.height;
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+    ctx.fillStyle = '#0f0f0f';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 8) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 8) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    const cx = W / 2;
+    const cy = H / 2;
+    const unit = H * 0.3;
+
+    // Points
+    ctx.fillStyle = '#ffffff';
+    const points = [];
+    for (let i = 0; i < 12; i++) {
+        const x = cx - unit * 2 + (i / 11) * unit * 0.8;
+        const y = cy + Math.sin(i * 0.8) * unit * 0.3;
+        points.push([x, y]);
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Lines connecting points
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    points.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+    ctx.stroke();
+
+    // Circles
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, unit * 0.4, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, unit * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Rectangle
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx + unit * 0.6, cy - unit * 0.3, unit * 0.5, unit * 0.6);
+
+    // Accent mark
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + unit * 1.4, cy - unit * 0.4);
+    ctx.lineTo(cx + unit * 1.4, cy + unit * 0.4);
+    ctx.stroke();
+
+    // Cross marks
+    const crossSize = 4;
+    [[cx - unit, cy - unit * 0.2], [cx + unit * 0.3, cy - unit * 0.5], [cx + unit, cy + unit * 0.3]].forEach(([x, y]) => {
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x - crossSize, y); ctx.lineTo(x + crossSize, y);
+        ctx.moveTo(x, y - crossSize); ctx.lineTo(x, y + crossSize);
+        ctx.stroke();
+    });
+
+    // Labels
+    ctx.fillStyle = '#666666';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('CIRCLE', cx + unit * 0.4 + 4, cy - unit * 0.6 + 4);
+    ctx.fillText('RECT', cx + unit * 0.6, cy - unit * 0.3 - 6);
+    ctx.fillText('POINTS', cx - unit * 2, cy + unit * 0.3 + 16);
+    ctx.fillText('LINE', cx - unit * 1.2, cy + unit * 0.3 + 16);
+    ctx.fillText('ACCENT', cx + unit * 1.4 + 8, cy);
+})();
+
+// ── MOTION DEMOS ──
+(function() {
+    const container = document.getElementById('motion-demos');
+    const timings = [
+        { name: 'instant', ms: 0, desc: 'value changes' },
+        { name: 'fast', ms: 100, desc: 'hover, reveals' },
+        { name: 'base', ms: 150, desc: 'state changes' },
+        { name: 'slow', ms: 300, desc: 'panel transitions' },
+        { name: 'drift', ms: 800, desc: 'ghost trails' }
+    ];
+
+    timings.forEach(t => {
+        const row = document.createElement('div');
+        row.className = 'motion-row';
+        row.innerHTML = `
+            <div class="motion-label">
+                <div class="name">${t.name}</div>
+                <div class="val">${t.ms}ms — ${t.desc}</div>
+            </div>
+            <div class="motion-track">
+                <div class="motion-dot" style="transition: left ${t.ms}ms linear;"></div>
+            </div>
+        `;
+        container.appendChild(row);
+
+        const track = row.querySelector('.motion-track');
+        const dot = row.querySelector('.motion-dot');
+        let atEnd = false;
+
+        track.addEventListener('click', () => {
+            atEnd = !atEnd;
+            dot.style.left = atEnd ? 'calc(100% - 12px)' : '0px';
+        });
+    });
+})();
+
+// ── VARIATION GRID DEMO (Part I) ──
+(function() {
+    const grid = document.getElementById('variationGrid');
+    const labels = ['perlin', 'simplex', 'worley', 'value', 'fbm', 'ridged', 'turbulence', 'domain warp'];
+
+    function hash(x, y, seed) {
+        let h = seed;
+        h ^= x * 374761393;
+        h ^= y * 668265263;
+        h = (h ^ (h >> 13)) * 1274126177;
+        return ((h ^ (h >> 16)) & 0xffff) / 0xffff;
+    }
+
+    function smoothNoise(x, y, seed, freq) {
+        const ix = Math.floor(x * freq);
+        const iy = Math.floor(y * freq);
+        const fx = (x * freq) - ix;
+        const fy = (y * freq) - iy;
+        const a = hash(ix, iy, seed);
+        const b = hash(ix + 1, iy, seed);
+        const c = hash(ix, iy + 1, seed);
+        const d = hash(ix + 1, iy + 1, seed);
+        const sx = fx * fx * (3 - 2 * fx);
+        const sy = fy * fy * (3 - 2 * fy);
+        return a + sx * (b - a) + sy * (c - a) + sx * sy * (a - b - c + d);
+    }
+
+    const noiseFns = [
+        (x, y) => smoothNoise(x, y, 1, 4),
+        (x, y) => smoothNoise(x, y, 2, 6),
+        (x, y) => { const d = smoothNoise(x, y, 3, 8); return d < 0.5 ? 0 : 1; },
+        (x, y) => hash(Math.floor(x * 5), Math.floor(y * 5), 4),
+        (x, y) => {
+            let v = 0, a = 1, f = 3;
+            for (let i = 0; i < 4; i++) { v += smoothNoise(x, y, 5 + i, f) * a; a *= 0.5; f *= 2; }
+            return v / 1.875;
+        },
+        (x, y) => Math.abs(smoothNoise(x, y, 6, 5) * 2 - 1),
+        (x, y) => {
+            let v = 0, a = 1, f = 3;
+            for (let i = 0; i < 4; i++) { v += Math.abs(smoothNoise(x, y, 7 + i, f) * 2 - 1) * a; a *= 0.5; f *= 2; }
+            return v / 1.875;
+        },
+        (x, y) => {
+            const dx = smoothNoise(x, y, 8, 3) * 0.2;
+            const dy = smoothNoise(x, y, 9, 3) * 0.2;
+            return smoothNoise(x + dx, y + dy, 10, 5);
+        }
+    ];
+
+    labels.forEach((label, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'demo-cell';
+        cell.innerHTML = `<canvas id="vc${i}"></canvas><div class="cell-label">${label}</div>`;
+        grid.appendChild(cell);
+    });
+
+    requestAnimationFrame(() => {
+        labels.forEach((_, i) => {
+            const canvas = document.getElementById(`vc${i}`);
+            const cell = canvas.parentElement;
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            const w = cell.offsetWidth;
+            const h = cell.offsetHeight;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            const step = 4;
+            for (let x = 0; x < w; x += step) {
+                for (let y = 0; y < h; y += step) {
+                    const v = noiseFns[i](x / w, y / h);
+                    const a = Math.max(0, Math.min(1, v));
+                    ctx.fillStyle = `rgba(255,255,255,${a * 0.15})`;
+                    ctx.fillRect(x, y, step, step);
+                }
+            }
+
+            ctx.strokeStyle = accent;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.4;
+            ctx.beginPath();
+            for (let x = 0; x < w; x += 2) {
+                const v = noiseFns[i](x / w, 0.5);
+                const y = h * 0.3 + v * h * 0.4;
+                x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        });
+    });
+})();
+
+// ── STAGE DEMO (Part II) ──
+(function() {
+    const canvas = document.getElementById('stageDemo');
+    if (!canvas) return;
+    const stage = canvas.parentElement;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+    function resize() {
+        const r = stage.getBoundingClientRect();
+        canvas.width = r.width * dpr;
+        canvas.height = r.height * dpr;
+        ctx.scale(dpr, dpr);
+    }
+    resize();
+
+    const particles = [];
+    const W = stage.clientWidth;
+    const H = stage.clientHeight;
+    for (let i = 0; i < 60; i++) {
+        particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5
+        });
+    }
+
+    function animate() {
+        ctx.fillStyle = '#0f0f0f';
+        ctx.fillRect(0, 0, W, H);
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > W) p.vx *= -1;
+            if (p.y < 0 || p.y > H) p.vy *= -1;
+        });
+
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const d = Math.sqrt(dx * dx + dy * dy);
+                if (d < 80) {
+                    ctx.strokeStyle = `rgba(255,255,255,${(1 - d / 80) * 0.15})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        particles.forEach(p => {
+            ctx.fillStyle = accent;
+            ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
+        });
+
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+
+// ── MINI VARIATION GRID (Part II) ──
+(function() {
+    const grid = document.getElementById('miniGrid');
+    const labels = ['linear', 'quadratic', 'sine', 'step', 'bounce', 'decay', 'pulse', 'noise'];
+
+    labels.forEach((label, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cm-variation-cell';
+        const cv = document.createElement('canvas');
+        cv.id = `mg${i}`;
+        cell.appendChild(cv);
+        const lbl = document.createElement('div');
+        lbl.className = 'cm-cell-label';
+        lbl.textContent = label;
+        cell.appendChild(lbl);
+        grid.appendChild(cell);
+    });
+
+    requestAnimationFrame(() => {
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        labels.forEach((_, i) => {
+            const cv = document.getElementById(`mg${i}`);
+            const cell = cv.parentElement;
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            const w = cell.offsetWidth;
+            const h = cell.offsetHeight;
+            cv.width = w * dpr;
+            cv.height = h * dpr;
+            cv.style.width = w + 'px';
+            cv.style.height = h + 'px';
+            const ctx = cv.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const fns = [
+                t => t,
+                t => t * t,
+                t => (Math.sin(t * Math.PI * 2) + 1) / 2,
+                t => t < 0.5 ? 0 : 1,
+                t => Math.abs(Math.sin(t * Math.PI * 3)) * (1 - t),
+                t => Math.exp(-t * 4),
+                t => t % 0.25 < 0.125 ? 1 : 0,
+                t => (Math.sin(t * 17) * Math.cos(t * 13) + 1) / 2
+            ];
+
+            ctx.strokeStyle = accent;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.6;
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const y = h * 0.15 + (1 - fns[i](t)) * h * 0.6;
+                x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        });
+    });
+})();
+
+// ── CHAPTER VIEWER DEMO ──
+(function() {
+    const chapters = ['perlin noise', 'simplex', 'worley', 'fbm', 'domain warp'];
+    let current = 0;
+    const dots = document.querySelectorAll('.cm-chapter-dot');
+    const title = document.getElementById('chapterTitle');
+
+    function update() {
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        title.textContent = chapters[current];
+    }
+
+    dots.forEach(d => d.addEventListener('click', () => {
+        current = parseInt(d.dataset.ch);
+        update();
+    }));
+
+    document.getElementById('chPrev').addEventListener('click', () => {
+        current = (current - 1 + chapters.length) % chapters.length;
+        update();
+    });
+
+    document.getElementById('chNext').addEventListener('click', () => {
+        current = (current + 1) % chapters.length;
+        update();
+    });
+})();
+
+// ══════════════════════════════════════════════
+// ENCODING VIEW DEMOS
+// ══════════════════════════════════════════════
+
+// ── E01: GLYPH RAMPS ──
+(function() {
+    const container = document.getElementById('glyphRamps');
+    if (!container) return;
+
+    const ramps = [
+        { name: 'circles',   chars: [' ','·','∙','∘','○','◌','◎','⊙','●'] },
+        { name: 'ripple',    chars: ['·','∙','∶','∴','∷','≡','∞','∫','∬','⊠','█'] },
+        { name: 'wave',      chars: ['·','∿','∾','≈','≋','∰','∯','∮','∲','∳','⊛'] },
+        { name: 'rain',      chars: [' ','˙','∣','∤','⋮','⋰','⋱','∥','⫿','║','╬'] },
+        { name: 'breath',    chars: [' ','∘','○','◌','◎','⊙','⊚','⊛','●','◉','⦿'] },
+        { name: 'crystal',   chars: [' ','∙','∶','∵','∴','∷','⁖','⁘','⁙','⊹','✳','❊'] },
+        { name: 'blocks',    chars: [' ','░','▒','▓','█'] },
+        { name: 'braille',   chars: [' ','⠁','⠃','⠇','⡇','⣇','⣧','⣷','⣿'] },
+    ];
+
+    ramps.forEach(r => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display: flex; align-items: center; gap: var(--space-4);';
+        const label = document.createElement('span');
+        label.style.cssText = 'font-size: var(--text-xs); color: var(--text-tertiary); width: 60px; font-weight: 300; flex-shrink: 0;';
+        label.textContent = r.name;
+        const chars = document.createElement('span');
+        chars.style.cssText = 'font-size: 16px; color: var(--text-primary); letter-spacing: 0.4em;';
+        chars.textContent = r.chars.join('');
+        const count = document.createElement('span');
+        count.style.cssText = 'font-size: var(--text-xs); color: var(--text-ghost); font-weight: 300;';
+        count.textContent = r.chars.length + ' levels';
+        row.appendChild(label);
+        row.appendChild(chars);
+        row.appendChild(count);
+        container.appendChild(row);
+    });
+
+    // Slider
+    const slider = document.getElementById('glyphSlider');
+    const out = document.getElementById('glyphOut');
+    const val = document.getElementById('glyphVal');
+    const defaultRamp = ramps[0].chars;
+    slider.addEventListener('input', () => {
+        const v = parseFloat(slider.value);
+        const idx = Math.min(Math.floor(v * defaultRamp.length), defaultRamp.length - 1);
+        out.textContent = defaultRamp[idx];
+        val.textContent = v.toFixed(2);
+    });
+})();
+
+// ── E02: VALUE → PROPERTY STRIPS ──
+(function() {
+    const container = document.getElementById('encodingStrips');
+    if (!container) return;
+
+    const properties = [
+        { name: 'opacity', render: (ctx, w, h, accent) => {
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                ctx.fillStyle = accent;
+                ctx.globalAlpha = t;
+                ctx.fillRect(x, 0, 1, h);
+            }
+            ctx.globalAlpha = 1;
+        }},
+        { name: 'density', render: (ctx, w, h, accent) => {
+            ctx.fillStyle = accent;
+            for (let x = 0; x < w; x += 3) {
+                const t = x / w;
+                const count = Math.floor(t * 8) + 1;
+                for (let i = 0; i < count; i++) {
+                    const y = (i / count) * h;
+                    ctx.globalAlpha = 0.7;
+                    ctx.fillRect(x, y + 1, 2, Math.max(1, h / count - 2));
+                }
+            }
+            ctx.globalAlpha = 1;
+        }},
+        { name: 'position', render: (ctx, w, h, accent) => {
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
+            ctx.fillStyle = accent;
+            for (let i = 0; i < 20; i++) {
+                const t = i / 19;
+                const x = t * w;
+                const y = h/2 - (t * h * 0.8 - h * 0.1);
+                ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill();
+            }
+        }},
+        { name: 'size', render: (ctx, w, h, accent) => {
+            ctx.fillStyle = accent;
+            ctx.globalAlpha = 0.6;
+            for (let i = 0; i < 10; i++) {
+                const t = (i + 1) / 10;
+                const x = (i / 9) * (w - 20) + 10;
+                const r = t * h * 0.35;
+                ctx.beginPath(); ctx.arc(x, h/2, r, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }},
+        { name: 'stroke', render: (ctx, w, h, accent) => {
+            ctx.strokeStyle = accent;
+            for (let i = 0; i < 8; i++) {
+                const t = (i + 1) / 8;
+                const x = (i / 7) * (w - 20) + 10;
+                ctx.lineWidth = t * 6;
+                ctx.globalAlpha = 0.7;
+                ctx.beginPath(); ctx.moveTo(x, h * 0.2); ctx.lineTo(x, h * 0.8); ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+        }},
+        { name: 'speed', render: (ctx, w, h, accent) => {
+            ctx.strokeStyle = accent;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.6;
+            for (let i = 0; i < 6; i++) {
+                const t = (i + 1) / 6;
+                const x = (i / 5) * (w - 20) + 10;
+                const len = t * h * 0.6;
+                ctx.beginPath();
+                ctx.moveTo(x, h/2);
+                ctx.lineTo(x + len * 0.3, h/2 - len * 0.5);
+                ctx.stroke();
+                // arrowhead
+                ctx.fillStyle = accent;
+                ctx.beginPath();
+                ctx.moveTo(x + len * 0.3, h/2 - len * 0.5);
+                ctx.lineTo(x + len * 0.3 - 3, h/2 - len * 0.5 + 5);
+                ctx.lineTo(x + len * 0.3 + 3, h/2 - len * 0.5 + 5);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }}
+    ];
+
+    properties.forEach(prop => {
+        const cell = document.createElement('div');
+        const label = document.createElement('div');
+        label.className = 'section-label';
+        label.textContent = prop.name;
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'width: 100%; height: 48px; margin-top: var(--space-2);';
+        cell.appendChild(label);
+        cell.appendChild(canvas);
+        container.appendChild(cell);
+
+        requestAnimationFrame(() => {
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            prop.render(ctx, rect.width, rect.height, accent);
+        });
+    });
+})();
+
+// ── E03: THRESHOLD VS CONTINUOUS ──
+(function() {
+    function setupCanvas(id) {
+        const canvas = document.getElementById(id);
+        if (!canvas) return null;
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, w: rect.width, h: rect.height };
+    }
+
+    requestAnimationFrame(() => {
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+        // Continuous
+        const c = setupCanvas('mapContinuous');
+        if (c) {
+            for (let x = 0; x < c.w; x++) {
+                const t = x / c.w;
+                const v = (Math.sin(t * Math.PI * 3) + 1) / 2;
+                c.ctx.fillStyle = accent;
+                c.ctx.globalAlpha = v;
+                c.ctx.fillRect(x, 0, 1, c.h);
+            }
+            c.ctx.globalAlpha = 1;
+            // curve overlay
+            c.ctx.strokeStyle = '#ffffff';
+            c.ctx.lineWidth = 1;
+            c.ctx.globalAlpha = 0.3;
+            c.ctx.beginPath();
+            for (let x = 0; x < c.w; x++) {
+                const t = x / c.w;
+                const v = (Math.sin(t * Math.PI * 3) + 1) / 2;
+                const y = c.h - v * c.h;
+                x === 0 ? c.ctx.moveTo(x, y) : c.ctx.lineTo(x, y);
+            }
+            c.ctx.stroke();
+            c.ctx.globalAlpha = 1;
+        }
+
+        // Threshold
+        const th = setupCanvas('mapThreshold');
+        if (th) {
+            for (let x = 0; x < th.w; x++) {
+                const t = x / th.w;
+                const v = (Math.sin(t * Math.PI * 3) + 1) / 2;
+                const on = v >= 0.5;
+                th.ctx.fillStyle = accent;
+                th.ctx.globalAlpha = on ? 0.9 : 0.05;
+                th.ctx.fillRect(x, 0, 1, th.h);
+            }
+            th.ctx.globalAlpha = 1;
+            // threshold line
+            th.ctx.strokeStyle = '#ffffff';
+            th.ctx.lineWidth = 1;
+            th.ctx.globalAlpha = 0.2;
+            th.ctx.setLineDash([2, 4]);
+            th.ctx.beginPath(); th.ctx.moveTo(0, th.h / 2); th.ctx.lineTo(th.w, th.h / 2); th.ctx.stroke();
+            th.ctx.setLineDash([]);
+            th.ctx.globalAlpha = 1;
+        }
+
+        // Piecewise
+        const pw = setupCanvas('mapPiecewise');
+        if (pw) {
+            for (let x = 0; x < pw.w; x++) {
+                const t = x / pw.w;
+                const v = (Math.sin(t * Math.PI * 3) + 1) / 2;
+                let band;
+                if (v < 0.33) band = 0.1;
+                else if (v < 0.66) band = 0.5;
+                else band = 0.9;
+                pw.ctx.fillStyle = accent;
+                pw.ctx.globalAlpha = band;
+                pw.ctx.fillRect(x, 0, 1, pw.h);
+            }
+            pw.ctx.globalAlpha = 1;
+            // band lines
+            pw.ctx.strokeStyle = '#ffffff';
+            pw.ctx.lineWidth = 1;
+            pw.ctx.globalAlpha = 0.15;
+            pw.ctx.setLineDash([2, 4]);
+            [0.33, 0.66].forEach(v => {
+                const y = pw.h - v * pw.h;
+                pw.ctx.beginPath(); pw.ctx.moveTo(0, y); pw.ctx.lineTo(pw.w, y); pw.ctx.stroke();
+            });
+            pw.ctx.setLineDash([]);
+            pw.ctx.globalAlpha = 1;
+        }
+    });
+})();
+
+// ── E04: SIGNAL BINDING ──
+(function() {
+    const field = document.getElementById('signalField');
+    if (!field) return;
+
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    let mouseX = 0.5, mouseY = 0.5;
+    const ramp = [' ','·','∙','∘','○','◌','◎','⊙','●'];
+
+    function initField() {
+        const rect = field.getBoundingClientRect();
+        field.width = rect.width * dpr;
+        field.height = rect.height * dpr;
+        const ctx = field.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, w: rect.width, h: rect.height };
+    }
+
+    let fc = null;
+    requestAnimationFrame(() => { fc = initField(); });
+
+    field.addEventListener('mousemove', e => {
+        const rect = field.getBoundingClientRect();
+        mouseX = (e.clientX - rect.left) / rect.width;
+        mouseY = (e.clientY - rect.top) / rect.height;
+    });
+
+    // Simulated signal levels
+    const bars = ['sigBass', 'sigMids', 'sigTreble', 'sigAmp'];
+
+    let t = 0;
+    function animate() {
+        if (!fc) { requestAnimationFrame(animate); return; }
+        t += 0.02;
+
+        // Derive signals from mouse
+        const bass = mouseX;
+        const mids = mouseY;
+        const treble = (Math.sin(t * 3) + 1) / 2 * mouseX;
+        const amp = (bass + mids + treble) / 3;
+        const signals = [bass, mids, treble, amp];
+
+        // Update bars
+        bars.forEach((id, i) => {
+            const el = document.getElementById(id);
+            if (el) el.firstElementChild.style.width = (signals[i] * 100) + '%';
+        });
+
+        // Draw ASCII field
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+        fc.ctx.fillStyle = '#0f0f0f';
+        fc.ctx.fillRect(0, 0, fc.w, fc.h);
+        fc.ctx.font = '10px JetBrains Mono, monospace';
+        fc.ctx.fillStyle = accent;
+
+        const cols = Math.floor(fc.w / 8);
+        const rows = Math.floor(fc.h / 12);
+        const speed = 0.02 + bass * 0.08;
+        const density = 0.13 + mids * 0.15;
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const nx = c / cols;
+                const ny = r / rows;
+                const v = (Math.sin(nx * density * 40 + t * speed * 50) + Math.cos(ny * density * 30 - t * speed * 30) + 2) / 4;
+                const idx = Math.min(Math.floor(v * ramp.length), ramp.length - 1);
+                fc.ctx.globalAlpha = amp * 0.8 + 0.2;
+                fc.ctx.fillText(ramp[idx], c * 8, r * 12 + 10);
+            }
+        }
+        fc.ctx.globalAlpha = 1;
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+
+// ── E05: ASCII FIELD ──
+(function() {
+    const el = document.getElementById('asciiField');
+    if (!el) return;
+
+    const ramp = [' ','·','∙','∘','○','◌','◎','⊙','●'];
+    let mx = 0.5, my = 0.5;
+
+    el.addEventListener('mousemove', e => {
+        const rect = el.getBoundingClientRect();
+        mx = (e.clientX - rect.left) / rect.width;
+        my = (e.clientY - rect.top) / rect.height;
+    });
+
+    let t = 0;
+    function draw() {
+        t += 0.015;
+        const cols = Math.floor(el.clientWidth / 7.5);
+        const rows = Math.floor(el.clientHeight / 13);
+        let out = '';
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const nx = c / cols;
+                const ny = r / rows;
+                const dx = nx - mx;
+                const dy = ny - my;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const wave = Math.sin(nx * 12 + t * 2) * Math.cos(ny * 10 - t * 1.5);
+                const ripple = Math.sin(dist * 20 - t * 4) * Math.exp(-dist * 3);
+                const v = (wave + ripple + 2) / 4;
+                const idx = Math.min(Math.floor(Math.max(0, Math.min(1, v)) * ramp.length), ramp.length - 1);
+                out += ramp[idx];
+            }
+            out += '\n';
+        }
+        el.textContent = out;
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+// ── E06: TIME ENCODING ──
+(function() {
+    function setup(id) {
+        const canvas = document.getElementById(id);
+        if (!canvas) return null;
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, w: rect.width, h: rect.height };
+    }
+
+    requestAnimationFrame(() => {
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+        // Grid: time × category heatmap
+        const g = setup('timeGrid');
+        if (g) {
+            const cols = 30, rows = 6;
+            const cw = g.w / cols, ch = g.h / rows;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const v = Math.sin(c * 0.3 + r * 1.2) * 0.5 + 0.5;
+                    g.ctx.fillStyle = accent;
+                    g.ctx.globalAlpha = v * 0.8 + 0.05;
+                    g.ctx.fillRect(c * cw + 0.5, r * ch + 0.5, cw - 1, ch - 1);
+                }
+            }
+            g.ctx.globalAlpha = 1;
+        }
+
+        // Trail: decaying positions
+        const tr = setup('timeTrail');
+        if (tr) {
+            tr.ctx.fillStyle = accent;
+            const steps = 40;
+            for (let i = 0; i < steps; i++) {
+                const t = i / steps;
+                const x = t * tr.w;
+                const y = tr.h / 2 + Math.sin(t * Math.PI * 4) * tr.h * 0.3;
+                const age = 1 - t;
+                tr.ctx.globalAlpha = age * 0.8;
+                const r = 1 + age * 3;
+                tr.ctx.beginPath(); tr.ctx.arc(x, y, r, 0, Math.PI * 2); tr.ctx.fill();
+            }
+            // newest point
+            tr.ctx.globalAlpha = 1;
+            tr.ctx.fillStyle = '#ffffff';
+            const lastX = tr.w;
+            const lastY = tr.h / 2 + Math.sin(Math.PI * 4) * tr.h * 0.3;
+            tr.ctx.beginPath(); tr.ctx.arc(lastX - 2, lastY, 3, 0, Math.PI * 2); tr.ctx.fill();
+            tr.ctx.globalAlpha = 1;
+        }
+
+        // Accumulation: stacking value
+        const ac = setup('timeAccum');
+        if (ac) {
+            ac.ctx.fillStyle = accent;
+            let cumulative = 0;
+            const bars = 30;
+            const bw = ac.w / bars;
+            for (let i = 0; i < bars; i++) {
+                cumulative += Math.random() * 0.3 + 0.1;
+                const h = Math.min(cumulative / 6, 1) * ac.h * 0.9;
+                ac.ctx.globalAlpha = 0.5;
+                ac.ctx.fillRect(i * bw + 1, ac.h - h, bw - 2, h);
+            }
+            // cumulative line
+            ac.ctx.strokeStyle = '#ffffff';
+            ac.ctx.lineWidth = 1;
+            ac.ctx.globalAlpha = 0.4;
+            cumulative = 0;
+            ac.ctx.beginPath();
+            for (let i = 0; i < bars; i++) {
+                cumulative += Math.random() * 0.3 + 0.1;
+                const h = Math.min(cumulative / 6, 1) * ac.h * 0.9;
+                const x = i * bw + bw / 2;
+                const y = ac.h - h;
+                i === 0 ? ac.ctx.moveTo(x, y) : ac.ctx.lineTo(x, y);
+            }
+            ac.ctx.stroke();
+            ac.ctx.globalAlpha = 1;
+        }
+    });
+})();
+
+// ── E07: FORCE GRAPH ──
+(function() {
+    const canvas = document.getElementById('forceGraph');
+    if (!canvas) return;
+
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    let W, H;
+
+    function resize() {
+        const rect = canvas.getBoundingClientRect();
+        W = rect.width; H = rect.height;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return ctx;
+    }
+
+    let ctx = resize();
+
+    // Generate nodes and edges
+    const N = 18;
+    const nodes = [];
+    for (let i = 0; i < N; i++) {
+        nodes.push({
+            x: W * 0.2 + Math.random() * W * 0.6,
+            y: H * 0.2 + Math.random() * H * 0.6,
+            vx: 0, vy: 0,
+            r: 3 + Math.random() * 4
+        });
+    }
+
+    const edges = [];
+    for (let i = 0; i < N; i++) {
+        const count = 1 + Math.floor(Math.random() * 2);
+        for (let c = 0; c < count; c++) {
+            const j = Math.floor(Math.random() * N);
+            if (j !== i) edges.push([i, j]);
+        }
+    }
+
+    function tick() {
+        // Repulsion
+        for (let i = 0; i < N; i++) {
+            for (let j = i + 1; j < N; j++) {
+                const dx = nodes[i].x - nodes[j].x;
+                const dy = nodes[i].y - nodes[j].y;
+                const d = Math.sqrt(dx * dx + dy * dy) || 1;
+                const f = 800 / (d * d);
+                nodes[i].vx += (dx / d) * f;
+                nodes[i].vy += (dy / d) * f;
+                nodes[j].vx -= (dx / d) * f;
+                nodes[j].vy -= (dy / d) * f;
+            }
+        }
+
+        // Attraction along edges
+        edges.forEach(([i, j]) => {
+            const dx = nodes[j].x - nodes[i].x;
+            const dy = nodes[j].y - nodes[i].y;
+            const d = Math.sqrt(dx * dx + dy * dy) || 1;
+            const f = (d - 60) * 0.01;
+            nodes[i].vx += (dx / d) * f;
+            nodes[i].vy += (dy / d) * f;
+            nodes[j].vx -= (dx / d) * f;
+            nodes[j].vy -= (dy / d) * f;
+        });
+
+        // Center gravity
+        nodes.forEach(n => {
+            n.vx += (W / 2 - n.x) * 0.001;
+            n.vy += (H / 2 - n.y) * 0.001;
+            n.vx *= 0.9;
+            n.vy *= 0.9;
+            n.x += n.vx;
+            n.y += n.vy;
+            n.x = Math.max(10, Math.min(W - 10, n.x));
+            n.y = Math.max(10, Math.min(H - 10, n.y));
+        });
+    }
+
+    function draw() {
+        tick();
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+        ctx.fillStyle = '#0f0f0f';
+        ctx.fillRect(0, 0, W, H);
+
+        // Edges
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        edges.forEach(([i, j]) => {
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+        });
+
+        // Nodes
+        nodes.forEach(n => {
+            ctx.fillStyle = accent;
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+
+// ── E08: VIZ GRAMMAR ──
+(function() {
+    function setup(id) {
+        const canvas = document.getElementById(id);
+        if (!canvas) return null;
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, w: rect.width, h: rect.height };
+    }
+
+    requestAnimationFrame(() => {
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+        // Compare: bar chart
+        const c1 = setup('vizCompare');
+        if (c1) {
+            const vals = [0.6, 0.85, 0.4, 0.7, 0.55, 0.9, 0.35];
+            const bw = c1.w / vals.length;
+            c1.ctx.fillStyle = accent;
+            vals.forEach((v, i) => {
+                c1.ctx.globalAlpha = 0.6;
+                c1.ctx.fillRect(i * bw + 2, c1.h - v * c1.h * 0.85, bw - 4, v * c1.h * 0.85);
+            });
+            c1.ctx.globalAlpha = 1;
+        }
+
+        // Distribute: histogram
+        const c2 = setup('vizDistribute');
+        if (c2) {
+            const vals = [2, 5, 8, 14, 18, 15, 10, 6, 3, 1];
+            const maxV = 18;
+            const bw = c2.w / vals.length;
+            c2.ctx.fillStyle = accent;
+            c2.ctx.globalAlpha = 0.6;
+            vals.forEach((v, i) => {
+                const h = (v / maxV) * c2.h * 0.85;
+                c2.ctx.fillRect(i * bw, c2.h - h, bw - 1, h);
+            });
+            c2.ctx.globalAlpha = 1;
+        }
+
+        // Trend: line chart
+        const c3 = setup('vizTrend');
+        if (c3) {
+            c3.ctx.strokeStyle = accent;
+            c3.ctx.lineWidth = 1.5;
+            c3.ctx.globalAlpha = 0.7;
+            c3.ctx.beginPath();
+            for (let i = 0; i < 30; i++) {
+                const x = (i / 29) * c3.w;
+                const y = c3.h * 0.8 - (Math.sin(i * 0.3) * 0.3 + i / 30 * 0.5) * c3.h * 0.7;
+                i === 0 ? c3.ctx.moveTo(x, y) : c3.ctx.lineTo(x, y);
+            }
+            c3.ctx.stroke();
+            c3.ctx.globalAlpha = 1;
+        }
+
+        // Compose: stacked bars
+        const c4 = setup('vizCompose');
+        if (c4) {
+            const data = [[0.3,0.2,0.5],[0.4,0.3,0.3],[0.2,0.5,0.3],[0.35,0.25,0.4],[0.45,0.15,0.4]];
+            const bw = c4.w / data.length;
+            data.forEach((segs, i) => {
+                let y = c4.h;
+                segs.forEach((s, si) => {
+                    const h = s * c4.h * 0.85;
+                    y -= h;
+                    c4.ctx.fillStyle = accent;
+                    c4.ctx.globalAlpha = 0.3 + si * 0.25;
+                    c4.ctx.fillRect(i * bw + 2, y, bw - 4, h - 1);
+                });
+            });
+            c4.ctx.globalAlpha = 1;
+        }
+
+        // Relate: scatter
+        const c5 = setup('vizRelate');
+        if (c5) {
+            c5.ctx.fillStyle = accent;
+            c5.ctx.globalAlpha = 0.5;
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * c5.w;
+                const y = c5.h - (x / c5.w * 0.6 + (Math.random() - 0.5) * 0.4) * c5.h;
+                const r = 2 + Math.random() * 4;
+                c5.ctx.beginPath(); c5.ctx.arc(x, y, r, 0, Math.PI * 2); c5.ctx.fill();
+            }
+            c5.ctx.globalAlpha = 1;
+        }
+
+        // Locate: dot map
+        const c6 = setup('vizLocate');
+        if (c6) {
+            c6.ctx.fillStyle = accent;
+            // Clustered dots
+            const clusters = [[0.3, 0.4], [0.7, 0.3], [0.5, 0.7]];
+            clusters.forEach(([cx, cy]) => {
+                for (let i = 0; i < 12; i++) {
+                    const x = cx * c6.w + (Math.random() - 0.5) * c6.w * 0.2;
+                    const y = cy * c6.h + (Math.random() - 0.5) * c6.h * 0.3;
+                    c6.ctx.globalAlpha = 0.4 + Math.random() * 0.3;
+                    c6.ctx.beginPath(); c6.ctx.arc(x, y, 2, 0, Math.PI * 2); c6.ctx.fill();
+                }
+            });
+            c6.ctx.globalAlpha = 1;
+        }
+    });
+})();
+
+// ══════════════════════════════════════════════
+// CCField — canvas ASCII field component
+// ══════════════════════════════════════════════
+
+class CCField {
+    static RAMPS = {
+        circles:  [' ','·','∙','∘','○','◌','◎','⊙','●'],
+        blocks:   [' ','░','▒','▓','█'],
+        braille:  [' ','⠁','⠃','⠇','⡇','⣇','⣧','⣷','⣿'],
+        wave:     [' ','∿','∾','≈','≋','∰','∯','∮','⊛'],
+        crystal:  [' ','∙','∶','∵','∴','∷','⁖','⁘','⁙','✳'],
+    };
+
+    constructor(canvas, opts = {}) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.mode = opts.mode || 'think';
+        this.ramp = CCField.RAMPS[opts.ramp || 'circles'];
+        this.accent = opts.accent || getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00ffaa';
+        this.fontSize = opts.fontSize || 11;
+        this.speed = opts.speed || 1;
+        this.density = opts.density || 1;
+        this.opacity = opts.opacity || 0.8;
+        this.progress = opts.progress || 0;
+        this.t = Math.random() * 10;
+        this.mx = 0.5;
+        this.my = 0.5;
+        this.running = false;
+        this.raf = null;
+        this.drops = [];
+        this._initDrops();
+
+        this._onMouse = (e) => {
+            const r = this.canvas.getBoundingClientRect();
+            this.mx = (e.clientX - r.left) / r.width;
+            this.my = (e.clientY - r.top) / r.height;
+        };
+        this.canvas.addEventListener('mousemove', this._onMouse);
+    }
+
+    _initDrops() {
+        const cols = Math.floor(this.canvas.width / (this.fontSize * 0.65));
+        this.drops = [];
+        for (let i = 0; i < cols * 0.4; i++) {
+            this.drops.push({ x: Math.random(), y: Math.random(), speed: 0.3 + Math.random() * 0.7, len: 2 + Math.floor(Math.random() * 6) });
+        }
+    }
+
+    _glyph(v) {
+        return this.ramp[Math.min(Math.floor(Math.max(0, Math.min(1, v)) * this.ramp.length), this.ramp.length - 1)];
+    }
+
+    _think(nx, ny) { const d = this.density; return (Math.sin(nx * 12 * d + this.t * 2) * Math.cos(ny * 10 * d - this.t * 1.5) + 1) / 2; }
+    _breathe(nx, ny) { const dist = Math.sqrt((nx - 0.5) ** 2 + (ny - 0.5) ** 2); const pulse = (Math.sin(this.t * 2) + 1) / 2; return Math.max(0, Math.sin(dist * 12 * this.density - this.t * 3) * (1 - dist * 1.5) * pulse); }
+    _rain(nx, ny) { let v = 0; for (const d of this.drops) { const dx = Math.abs(nx - d.x); if (dx > 0.03) continue; const dy = ny - d.y; if (dy > 0 || dy < -d.len * 0.05) continue; v = Math.max(v, (1 + dy / (d.len * 0.05)) * (1 - dx / 0.03)); } return v; }
+    _scan(nx, ny) { const sweep = (this.t * 0.5) % 1; return Math.max(0, 1 - Math.abs(nx - sweep) * 6) * ((Math.sin(ny * 20 * this.density + nx * 15) + 1) / 2); }
+    _ripple(nx, ny) { const dx = nx - this.mx, dy = ny - this.my, dist = Math.sqrt(dx * dx + dy * dy); const f = Math.exp(-dist * 3); return (Math.sin(dist * 20 * this.density - this.t * 4) * f + 1) / 2 * f; }
+    _progress(nx, ny) { if (nx > this.progress) return 0; const edge = Math.abs(nx - this.progress) < 0.05; const n = (Math.sin(nx * 15 * this.density + this.t * 2) * Math.cos(ny * 12 - this.t) + 1) / 2; return edge ? n * 0.9 + 0.1 : n * 0.5 + 0.3; }
+
+    _getValue(nx, ny) {
+        switch (this.mode) {
+            case 'think': return this._think(nx, ny);
+            case 'breathe': return this._breathe(nx, ny);
+            case 'rain': return this._rain(nx, ny);
+            case 'scan': return this._scan(nx, ny);
+            case 'ripple': return this._ripple(nx, ny);
+            case 'progress': return this._progress(nx, ny);
+            default: return this._think(nx, ny);
+        }
+    }
+
+    _tick() {
+        this.t += 0.02 * this.speed;
+        if (this.mode === 'rain') for (const d of this.drops) { d.y += d.speed * 0.015 * this.speed; if (d.y > 1.1) { d.y = -0.1; d.x = Math.random(); d.speed = 0.3 + Math.random() * 0.7; } }
+    }
+
+    _draw() {
+        const W = this.canvas.width, H = this.canvas.height, ctx = this.ctx;
+        const charW = this.fontSize * 0.65, charH = this.fontSize * 1.15;
+        const cols = Math.floor(W / charW), rows = Math.floor(H / charH);
+        ctx.clearRect(0, 0, W, H);
+        ctx.font = `${this.fontSize}px JetBrains Mono, monospace`;
+        ctx.fillStyle = this.accent;
+        ctx.textBaseline = 'top';
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const v = this._getValue(c / cols, r / rows);
+                const ch = this._glyph(v);
+                if (ch === ' ') continue;
+                ctx.globalAlpha = v * this.opacity;
+                ctx.fillText(ch, c * charW, r * charH);
+            }
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    _loop() { if (!this.running) return; this._tick(); this._draw(); this.raf = requestAnimationFrame(() => this._loop()); }
+    start() { if (this.running) return; this.running = true; this._loop(); }
+    stop() { this.running = false; if (this.raf) cancelAnimationFrame(this.raf); }
+    setProgress(v) { this.progress = Math.max(0, Math.min(1, v)); }
+    setMode(mode) { this.mode = mode; if (mode === 'rain') this._initDrops(); }
+    destroy() { this.stop(); this.canvas.removeEventListener('mousemove', this._onMouse); }
+}
+
+// ── HERO FIELD ──
+(function() {
+    const canvas = document.getElementById('heroField');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    const field = new CCField(canvas, { mode: 'think', ramp: 'braille', fontSize: 11, speed: 0.6, opacity: 0.5 });
+    field.start();
+})();
+
+// ── C13: CC-FIELD DEMOS ──
+(function() {
+    ['think', 'breathe', 'progress'].forEach(mode => {
+        const canvas = document.getElementById('ccf-' + mode);
+        if (!canvas) return;
+        const field = new CCField(canvas, { mode, fontSize: 10 });
+        if (mode === 'progress') {
+            let dir = 1;
+            const origTick = field._tick.bind(field);
+            field._tick = function() { origTick(); field.progress += 0.003 * dir; if (field.progress >= 1) dir = -1; if (field.progress <= 0) dir = 1; };
+        }
+        field.start();
+    });
+})();
+</script>
+
+</body>
+</html>
