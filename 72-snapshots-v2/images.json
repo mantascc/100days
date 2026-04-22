@@ -1,0 +1,730 @@
+[
+  {
+    "file": "1.webp",
+    "title": "Lundtoftegade",
+    "date": "2025",
+    "lat": 55.692501001057295,
+    "lng": 12.538599301160618,
+    "originalLocation": "Lundtoftegade"
+  },
+  {
+    "file": "2.webp",
+    "title": "Slurp",
+    "date": "2025",
+    "lat": 55.68391166893225,
+    "lng": 12.585238733095206,
+    "originalLocation": "Slurp"
+  },
+  {
+    "file": "3.webp",
+    "title": "Glums",
+    "date": "2025",
+    "lat": 0,
+    "lng": 0,
+    "originalLocation": "Glums"
+  },
+  {
+    "file": "4.webp",
+    "title": "Glums",
+    "date": "2025",
+    "lat": 0,
+    "lng": 0,
+    "originalLocation": "Glums"
+  },
+  {
+    "file": "5.webp",
+    "title": "Nørrebrogade",
+    "date": "2025",
+    "lat": 55.695977578834366,
+    "lng": 12.546352862617894,
+    "originalLocation": "Nørrebrogade"
+  },
+  {
+    "file": "6.webp",
+    "title": "Hej",
+    "date": "2025",
+    "lat": 0,
+    "lng": 0,
+    "originalLocation": "Hej"
+  },
+  {
+    "file": "7.webp",
+    "title": "Hej",
+    "date": "2025",
+    "lat": 0,
+    "lng": 0,
+    "originalLocation": "Hej"
+  },
+  {
+    "file": "8.webp",
+    "title": "Mayhem",
+    "date": "2025",
+    "lat": 55.70761191008196,
+    "lng": 12.553568503593718,
+    "originalLocation": "Mayhem"
+  },
+  {
+    "file": "9.webp",
+    "title": "Union Market",
+    "date": "2025",
+    "lat": 38.9086101,
+    "lng": -76.9974046,
+    "originalLocation": "Union Market"
+  },
+  {
+    "file": "10.webp",
+    "title": "Harris Teeter",
+    "date": "2025",
+    "lat": 38.905772672989755,
+    "lng": -77.00562611385763,
+    "originalLocation": "Harris Teeter"
+  },
+  {
+    "file": "11.webp",
+    "title": "Lufthavnen",
+    "date": "2025",
+    "lat": 55.6309113,
+    "lng": 12.6492236,
+    "originalLocation": "Lufthavnen"
+  },
+  {
+    "file": "12.webp",
+    "title": "DC",
+    "date": "2025",
+    "lat": 38.90349717481655,
+    "lng": -77.03195319860922,
+    "originalLocation": "DC"
+  },
+  {
+    "file": "13.webp",
+    "title": "Shady grave",
+    "date": "2025",
+    "lat": 38.90920125171914,
+    "lng": -77.0439649912213,
+    "originalLocation": "Shady grave"
+  },
+  {
+    "file": "14.webp",
+    "title": "Rådhus",
+    "date": "2025",
+    "lat": 55.67585761731471,
+    "lng": 12.568994790072804,
+    "originalLocation": "Rådhus"
+  },
+  {
+    "file": "15.webp",
+    "title": "Enghave plads",
+    "date": "2025",
+    "lat": 55.667227,
+    "lng": 12.5467948,
+    "originalLocation": "Enghave plads"
+  },
+  {
+    "file": "16.webp",
+    "title": "Hey house",
+    "date": "2025",
+    "lat": 55.67882187429775,
+    "lng": 12.579699836700208,
+    "originalLocation": "Hey house"
+  },
+  {
+    "file": "17.webp",
+    "title": "Vendersgade",
+    "date": "2025",
+    "lat": 55.6839928,
+    "lng": 12.5679305,
+    "originalLocation": "Vendersgade"
+  },
+  {
+    "file": "18.webp",
+    "title": "Nørrebrogade",
+    "date": "2025",
+    "lat": 55.691074068299606,
+    "lng": 12.55363254063097,
+    "originalLocation": "Nørrebrogade"
+  },
+  {
+    "file": "19.webp",
+    "title": "Møntergade",
+    "date": "2025",
+    "lat": 55.6816626,
+    "lng": 12.5792738,
+    "originalLocation": "Møntergade"
+  },
+  {
+    "file": "20.webp",
+    "title": "Nørrebrogade",
+    "date": "2025",
+    "lat": 55.68808809489911,
+    "lng": 12.560106740670527,
+    "originalLocation": "Nørrebrogade"
+  },
+  {
+    "file": "21.webp",
+    "title": "Ørstedparken",
+    "date": "2025",
+    "lat": 55.6853,
+    "lng": 12.5744,
+    "originalLocation": "Ørstedparken"
+  },
+  {
+    "file": "22.webp",
+    "title": "Larsbjørnsstræde",
+    "date": "2025",
+    "lat": 55.6787943,
+    "lng": 12.5690234,
+    "originalLocation": "Larsbjørnsstræde"
+  },
+  {
+    "file": "23.webp",
+    "title": "Larsbjørnsstræde",
+    "date": "2025",
+    "lat": 55.6787943,
+    "lng": 12.5690234,
+    "originalLocation": "Larsbjørnsstræde"
+  },
+  {
+    "file": "24.webp",
+    "title": "Rådhus",
+    "date": "2025",
+    "lat": 55.67585761731471,
+    "lng": 12.568994790072804,
+    "originalLocation": "Rådhus"
+  },
+  {
+    "file": "25.webp",
+    "title": "Kødbyen",
+    "date": "2025",
+    "lat": 55.6676775,
+    "lng": 12.5595333,
+    "originalLocation": "Kødbyen"
+  },
+  {
+    "file": "26.webp",
+    "title": "El Camino Real",
+    "date": "2025",
+    "lat": 36.6268252,
+    "lng": -121.5864632,
+    "originalLocation": "El Camino Real"
+  },
+  {
+    "file": "27.webp",
+    "title": "Vilnius",
+    "date": "2025",
+    "lat": 54.68593495497447,
+    "lng": 25.292987239867013,
+    "originalLocation": "Vilnius"
+  },
+  {
+    "file": "28.webp",
+    "title": "Kaunas",
+    "date": "2025",
+    "lat": 54.89762290701766,
+    "lng": 23.907406746060637,
+    "originalLocation": "Kaunas"
+  },
+  {
+    "file": "29.webp",
+    "title": "Anyksciai",
+    "date": "2025",
+    "lat": 55.5257935,
+    "lng": 25.1061247,
+    "originalLocation": "Anyksciai"
+  },
+  {
+    "file": "30.webp",
+    "title": "Christiania",
+    "date": "2025",
+    "lat": 55.675737,
+    "lng": 12.6075707,
+    "originalLocation": "Christiania"
+  },
+  {
+    "file": "31.webp",
+    "title": "Studiestræde",
+    "date": "2025",
+    "lat": 55.6781129,
+    "lng": 12.5681797,
+    "originalLocation": "Studiestræde"
+  },
+  {
+    "file": "32.webp",
+    "title": "Nørrebro st",
+    "date": "2025",
+    "lat": 55.7006228,
+    "lng": 12.5386648,
+    "originalLocation": "Nørrebro st"
+  },
+  {
+    "file": "33.webp",
+    "title": "Studiestræde",
+    "date": "2025",
+    "lat": 55.6781129,
+    "lng": 12.5681797,
+    "originalLocation": "Studiestræde"
+  },
+  {
+    "file": "34.webp",
+    "title": "Pilestræde",
+    "date": "2025",
+    "lat": 55.6818075,
+    "lng": 12.5777928,
+    "originalLocation": "Pilestræde"
+  },
+  {
+    "file": "35.webp",
+    "title": "Holmbladsgade",
+    "date": "2025",
+    "lat": 55.6642982,
+    "lng": 12.6025965,
+    "originalLocation": "Holmbladsgade"
+  },
+  {
+    "file": "36.webp",
+    "title": "Frederikssundsvej",
+    "date": "2025",
+    "lat": 55.7043095,
+    "lng": 12.5271131,
+    "originalLocation": "Frederikssundsvej"
+  },
+  {
+    "file": "37.webp",
+    "title": "Sjællandsgade",
+    "date": "2025",
+    "lat": 55.6940748,
+    "lng": 12.5536373,
+    "originalLocation": "Sjællandsgade"
+  },
+  {
+    "file": "38.webp",
+    "title": "Store Kongensgade",
+    "date": "2025",
+    "lat": 55.6826164,
+    "lng": 12.5862968,
+    "originalLocation": "Store Kongensgade"
+  },
+  {
+    "file": "39.webp",
+    "title": "Trianglen",
+    "date": "2025",
+    "lat": 55.6992513,
+    "lng": 12.575555,
+    "originalLocation": "Trianglen"
+  },
+  {
+    "file": "40.webp",
+    "title": "Østerbrogade",
+    "date": "2025",
+    "lat": 55.7047523,
+    "lng": 12.5775049,
+    "originalLocation": "Østerbrogade"
+  },
+  {
+    "file": "41.webp",
+    "title": "Nørrebrogade",
+    "date": "2025",
+    "lat": 55.690479276309496,
+    "lng": 12.55476403288544,
+    "originalLocation": "Nørrebrogade"
+  },
+  {
+    "file": "42.webp",
+    "title": "Svanemøllen",
+    "date": "2025",
+    "lat": 55.7155342,
+    "lng": 12.5788253,
+    "originalLocation": "Svanemøllen"
+  },
+  {
+    "file": "43.webp",
+    "title": "Vesterport",
+    "date": "2025",
+    "lat": 55.675817,
+    "lng": 12.56241,
+    "originalLocation": "Vesterport"
+  },
+  {
+    "file": "44.webp",
+    "title": "Vesterport",
+    "date": "2025",
+    "lat": 55.675817,
+    "lng": 12.56241,
+    "originalLocation": "Vesterport"
+  },
+  {
+    "file": "45.webp",
+    "title": "Vesterbrogade",
+    "date": "2025",
+    "lat": 55.6702345,
+    "lng": 12.539744,
+    "originalLocation": "Vesterbrogade"
+  },
+  {
+    "file": "46.webp",
+    "title": "Istedgade",
+    "date": "2025",
+    "lat": 55.6691025,
+    "lng": 12.5530487,
+    "originalLocation": "Istedgade"
+  },
+  {
+    "file": "47.webp",
+    "title": "Vesterbrogade",
+    "date": "2025",
+    "lat": 55.6702345,
+    "lng": 12.539744,
+    "originalLocation": "Vesterbrogade"
+  },
+  {
+    "file": "48.webp",
+    "title": "Dogpatch",
+    "date": "2025",
+    "lat": 37.7606977,
+    "lng": -122.3892016,
+    "originalLocation": "Dogpatch"
+  },
+  {
+    "file": "49.webp",
+    "title": "Alhambravej",
+    "date": "2025",
+    "lat": 55.6746643,
+    "lng": 12.5445034,
+    "originalLocation": "Alhambravej"
+  },
+  {
+    "file": "50.webp",
+    "title": "Nina bangs plads",
+    "date": "2025",
+    "lat": 55.6818637,
+    "lng": 12.5777042,
+    "originalLocation": "Nina bangs plads"
+  },
+  {
+    "file": "51.webp",
+    "title": "2617 Broadway",
+    "date": "2025",
+    "lat": 40.796522047073005,
+    "lng": -73.97068381064045,
+    "originalLocation": "2617 Broadway"
+  },
+  {
+    "file": "52.webp",
+    "title": "Amsterdam Ave",
+    "date": "2025",
+    "lat": 40.79562809740024,
+    "lng": -73.9708262166794,
+    "originalLocation": "Amsterdam Ave"
+  },
+  {
+    "file": "53.webp",
+    "title": "Columbus Ave",
+    "date": "2025",
+    "lat": 40.77648140669087,
+    "lng": -73.97949819458807,
+    "originalLocation": "Columbus Ave"
+  },
+  {
+    "file": "54.webp",
+    "title": "Jamestown",
+    "date": "2025",
+    "lat": 42.09618546365298,
+    "lng": -79.23874309171418,
+    "originalLocation": "Jamestown"
+  },
+  {
+    "file": "55.webp",
+    "title": "Lighthouse point",
+    "date": "2025",
+    "lat": 42.22747720363893,
+    "lng": -79.48773697207817,
+    "originalLocation": "Lighthouse point"
+  },
+  {
+    "file": "56.webp",
+    "title": "Gerry Rodeo",
+    "date": "2025",
+    "lat": 42.190019340815724,
+    "lng": -79.25228879222215,
+    "originalLocation": "Gerry Rodeo"
+  },
+  {
+    "file": "57.webp",
+    "title": "15 E 7th St",
+    "date": "2025",
+    "lat": 40.7287612,
+    "lng": -73.9897021,
+    "originalLocation": "15 E 7th St"
+  },
+  {
+    "file": "58.webp",
+    "title": "Downing st",
+    "date": "2025",
+    "lat": 40.72905306771666,
+    "lng": -74.00468255903112,
+    "originalLocation": "Downing st"
+  },
+  {
+    "file": "59.webp",
+    "title": "6th Ave",
+    "date": "2025",
+    "lat": 40.7334503,
+    "lng": -73.9996808,
+    "originalLocation": "6th Ave"
+  },
+  {
+    "file": "60.webp",
+    "title": "Houston st",
+    "date": "2025",
+    "lat": 40.7285993,
+    "lng": -74.0053077,
+    "originalLocation": "Houston st"
+  },
+  {
+    "file": "61.webp",
+    "title": "Ludlow St",
+    "date": "2025",
+    "lat": 40.7218238,
+    "lng": -73.9874632,
+    "originalLocation": "Ludlow St"
+  },
+  {
+    "file": "62.webp",
+    "title": "Varick St",
+    "date": "2025",
+    "lat": 40.7260815,
+    "lng": -74.0057956,
+    "originalLocation": "Varick St"
+  },
+  {
+    "file": "63.webp",
+    "title": "Greenland air space",
+    "date": "2025",
+    "lat": 76.5299466,
+    "lng": -68.7145636,
+    "originalLocation": "Greenland air space"
+  },
+  {
+    "file": "64.webp",
+    "title": "Klareboderne",
+    "date": "2025",
+    "lat": 55.6809821,
+    "lng": 12.578391,
+    "originalLocation": "Klareboderne"
+  },
+  {
+    "file": "65.webp",
+    "title": "Otto Busses Vej",
+    "date": "2025",
+    "lat": 55.6608476,
+    "lng": 12.5448726,
+    "originalLocation": "Otto Busses Vej"
+  },
+  {
+    "file": "66.webp",
+    "title": "Norrebro St",
+    "date": "2025",
+    "lat": 55.68763204395428,
+    "lng": 12.561372476489964,
+    "originalLocation": "Norrebro St"
+  },
+  {
+    "file": "67.webp",
+    "title": "Svitrigailos g. 5",
+    "date": "2025",
+    "lat": 54.67977808789642,
+    "lng": 25.26645172838869,
+    "originalLocation": "Svitrigailos g. 5"
+  },
+  {
+    "file": "68.webp",
+    "title": "Föreningsgatan 5",
+    "date": "2025",
+    "lat": 55.596722692597766,
+    "lng": 13.002492944637515,
+    "originalLocation": "Föreningsgatan 5"
+  },
+  {
+    "file": "69.webp",
+    "title": "Rådhuspladsen",
+    "date": "2026",
+    "lat": 55.67585761731471,
+    "lng": 12.568994790072804,
+    "originalLocation": "Rådhuspladsen"
+  },
+  {
+    "file": "70.webp",
+    "title": "Vesterport",
+    "date": "2026",
+    "lat": 55.675442010216535,
+    "lng": 12.562359910961261,
+    "originalLocation": "Vesterport"
+  },
+  {
+    "file": "71.webp",
+    "title": "Enghavevej",
+    "date": "2026",
+    "lat": 55.66973058671223,
+    "lng": 12.5455322290864,
+    "originalLocation": "Enghavevej"
+  },
+  {
+    "file": "72.webp",
+    "title": "Kebabistan",
+    "date": "2026",
+    "lat": 55.66778420715226,
+    "lng": 12.5486501384633,
+    "originalLocation": "Kebabistan"
+  },
+  {
+    "file": "73.webp",
+    "title": "Atlas",
+    "date": "2026",
+    "lat": 55.66574922325351,
+    "lng": 12.533915453728023,
+    "originalLocation": "Ny Calsberg Vej"
+  },
+  {
+    "file": "74.webp",
+    "title": "Fotex",
+    "date": "2026",
+    "lat": 55.67358098102546,
+    "lng": 12.551307608673085,
+    "originalLocation": "Tullinsgade"
+  },
+  {
+    "file": "75.webp",
+    "title": "Standford Theater",
+    "date": "2026",
+    "lat": 37.445063270107255,
+    "lng": -122.162485470103,
+    "originalLocation": "University ave"
+  },
+  {
+    "file": "76.webp",
+    "title": "Caltrain",
+    "date": "2026",
+    "lat": 37.44351206013253,
+    "lng": -122.16527115316995,
+    "originalLocation": "Palo Alto st"
+  },
+  {
+    "file": "77.webp",
+    "title": "Cowper st",
+    "date": "2026",
+    "lat": 37.44711391596339,
+    "lng": -122.15728756427133,
+    "originalLocation": "Cowper st"
+  },
+  {
+    "file": "78.webp",
+    "title": "Cleaners",
+    "date": "2026",
+    "lat": 37.44709101803972,
+    "lng": -122.1584889371752,
+    "originalLocation": "Hamilton Ave"
+  },
+  {
+    "file": "79.webp",
+    "title": "Wells Fargo",
+    "date": "2026",
+    "lat": 37.34195,
+    "lng": -121.9103306,
+    "originalLocation": "Wells Fargo"
+  },
+  {
+    "file": "80.webp",
+    "title": "San Mateo",
+    "date": "2026",
+    "lat": 37.56513911314956,
+    "lng": -122.31924338594669,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "81.webp",
+    "title": "San Mateo",
+    "date": "2026",
+    "lat": 37.55661716375382,
+    "lng": -122.30888256629856,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "82.webp",
+    "title": "San Mateo",
+    "date": "2026",
+    "lat": 37.55661716375382,
+    "lng": -122.30888256629856,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "83.webp",
+    "title": "No Parking in the Driveway",
+    "date": "2026",
+    "lat": 37.541094,
+    "lng": -122.301911,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "84.webp",
+    "title": "Fox Theatre",
+    "date": "2026",
+    "lat": 37.486553,
+    "lng": -122.230264,
+    "originalLocation": "Broadway, Redwood City"
+  },
+  {
+    "file": "85.webp",
+    "title": "Fish With You",
+    "date": "2026",
+    "lat": 37.566861,
+    "lng": -122.323892,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "86.webp",
+    "title": "Biscuit Bitch",
+    "date": "2026",
+    "lat": 47.610483,
+    "lng": -122.341706,
+    "originalLocation": "Seattle"
+  },
+  {
+    "file": "87.webp",
+    "title": "Central Computers",
+    "date": "2026",
+    "lat": 37.54244659681789,
+    "lng": -122.30317147523148,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "88.webp",
+    "title": "Las Palmas Salsa Bar",
+    "date": "2026",
+    "lat": 37.564771811207585,
+    "lng": -122.32339315298805,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "89.webp",
+    "title": "Body Central Massage Spa",
+    "date": "2026",
+    "lat": 37.54164669564742,
+    "lng": -122.302275389999,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "90.webp",
+    "title": "Video Only",
+    "date": "2026",
+    "lat": 37.55484036517328,
+    "lng": -122.3021398682495,
+    "originalLocation": "San Mateo"
+  },
+  {
+    "file": "91.webp",
+    "title": "Good Thing Cafe & Supplies",
+    "date": "2026",
+    "lat": 37.57832363090585,
+    "lng": -122.34881260156455,
+    "originalLocation": "Burlingame"
+  }
+]

@@ -353,5 +353,10 @@
     "id": "71-index-100days",
     "path": "100days/71-index-100days",
     "description": "Index \u2014 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags"
+  },
+  {
+    "id": "72-snapshots-v2",
+    "path": "100days/72-snapshots-v2",
+    "description": "Snapshots v2 \u2014 photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos \u2192 settling \u2192 locked) and chaotic bursty image loading"
   }
 ]
