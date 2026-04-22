@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>snapshots — clear channel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --ground-modal: #242424;
+
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --border-strong: #3a3d52;
+
+      --accent: #00ffaa;
+
+      --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, monospace;
+
+      --text-xs: 10px;
+      --text-sm: 11px;
+      --text-base: 13px;
+      --text-md: 14px;
+      --text-lg: 16px;
+      --text-xl: 20px;
+      --text-subhead: 28px;
+      --text-headline: 48px;
+
+      --tracking-tight: -0.02em;
+      --tracking-wide: 0.08em;
+      --leading-base: 1.5;
+      --leading-loose: 1.75;
+
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+
+      --duration-fast: 100ms;
+      --duration-base: 150ms;
+      --duration-slow: 300ms;
+      --ease-snap: linear;
+      --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: var(--text-base);
+      line-height: var(--leading-base);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      margin: 0 auto;
+      padding: var(--space-12) var(--space-8) var(--space-16);
+    }
+
+    /* ── ORIGIN BAR ── */
+    .origin-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      margin-bottom: var(--space-10);
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .origin-bar .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(0,255,170,0.6);
+    }
+
+    .origin-bar .sep {
+      color: var(--text-ghost);
+    }
+
+    /* ── TITLE ── */
+    .title {
+      font-size: var(--text-headline);
+      font-weight: 300;
+      color: var(--text-primary);
+      letter-spacing: var(--tracking-tight);
+      text-transform: lowercase;
+      margin: var(--space-10) 0 var(--space-4);
+      line-height: 1.1;
+    }
+
+    .title .typed-cursor {
+      color: var(--accent);
+      font-weight: 300;
+    }
+
+    .subtitle {
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+      margin-bottom: var(--space-16);
+    }
+
+    /* ── YEAR SECTION ── */
+    .year-section {
+      margin-bottom: var(--space-16);
+      padding-bottom: var(--space-12);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .year-section:last-child { border-bottom: none; }
+
+    .year-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .year-caption {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    .year-label {
+      font-size: var(--text-subhead);
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    .year-count {
+      font-size: var(--text-xs);
+      color: var(--text-ghost);
+      letter-spacing: var(--tracking-wide);
+      margin-left: auto;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      gap: var(--space-3);
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    @media (min-width: 600px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (min-width: 1200px) {
+      .grid { grid-template-columns: repeat(6, 1fr); }
+    }
+
+    .tile {
+      position: relative;
+      cursor: pointer;
+      background: var(--ground-base);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      transition: border-color var(--duration-base) var(--ease-snap);
+    }
+
+    .tile:hover {
+      border-color: var(--border-strong);
+    }
+
+    .tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      opacity: 0;
+      transition: opacity 320ms var(--ease-out);
+    }
+
+    .tile.loaded img {
+      opacity: 1;
+    }
+
+    /* ── ASCII LOADER ── */
+    .tile-skeleton {
+      position: absolute;
+      inset: 0;
+      background: var(--ground-base);
+      overflow: hidden;
+      transition: opacity 320ms var(--ease-out);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tile.loaded .tile-skeleton {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tile-ascii {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.25;
+      letter-spacing: 0.12em;
+      white-space: pre;
+      color: var(--text-ghost);
+      user-select: none;
+    }
+
+    .tile-ascii span {
+      display: inline-block;
+    }
+
+    /* Loading label inside tile */
+    .tile-loading-label {
+      position: absolute;
+      bottom: var(--space-2);
+      left: var(--space-2);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-ghost);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+      z-index: 2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tile.loaded .tile-loading-label {
+      display: none;
+    }
+
+    .tile-index {
+      position: absolute;
+      top: var(--space-2);
+      left: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-ghost);
+      letter-spacing: var(--tracking-wide);
+      font-variant-numeric: tabular-nums;
+      mix-blend-mode: difference;
+      z-index: 2;
+    }
+
+    .tile-caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: var(--space-3) var(--space-3);
+      background: linear-gradient(to top, rgba(10,10,10,0.92), rgba(10,10,10,0));
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity var(--duration-base) var(--ease-snap),
+                  transform var(--duration-base) var(--ease-snap);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .tile:hover .tile-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tile-caption .sep {
+      color: var(--text-ghost);
+      margin: 0 var(--space-1);
+    }
+
+    /* ── POPOVER ── */
+    .map-popover-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: var(--space-8);
+    }
+
+    .map-popover-overlay.active {
+      display: flex;
+    }
+
+    .map-popover-card {
+      background: var(--ground-modal);
+      border: 1px solid var(--border-default);
+      width: min(1100px, 100%);
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .map-popover-title {
+      font-size: var(--text-lg);
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: var(--tracking-tight);
+      text-transform: lowercase;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .map-popover-title .date {
+      color: var(--text-tertiary);
+      font-size: var(--text-xs);
+      letter-spacing: var(--tracking-wide);
+      margin-left: var(--space-3);
+    }
+
+    .map-popover-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+      cursor: pointer;
+      padding: var(--space-1) var(--space-2);
+      transition: color var(--duration-fast) var(--ease-snap);
+    }
+
+    .nav-btn:hover {
+      color: var(--accent);
+    }
+
+    .map-popover-close {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      font-family: var(--font-mono);
+      font-size: var(--text-lg);
+      cursor: pointer;
+      padding: 0 var(--space-2);
+      line-height: 1;
+      transition: color var(--duration-fast) var(--ease-snap);
+    }
+
+    .map-popover-close:hover {
+      color: var(--text-primary);
+    }
+
+    .map-popover-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .map-popover-image {
+      background: var(--ground-void);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      min-height: 400px;
+    }
+
+    .map-popover-image img {
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    .map-popover-map {
+      background: var(--ground-base);
+      min-height: 400px;
+    }
+
+    .map-popover-footer {
+      padding: var(--space-3) var(--space-6);
+      border-top: 1px solid var(--border-default);
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+      display: flex;
+      justify-content: space-between;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .no-coords {
+      color: var(--text-ghost);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      font-size: var(--text-xs);
+      letter-spacing: var(--tracking-wide);
+      text-transform: lowercase;
+    }
+
+    /* Leaflet dark tweaks */
+    .leaflet-container {
+      background: var(--ground-base) !important;
+    }
+
+    @media (max-width: 720px) {
+      .map-popover-content {
+        grid-template-columns: 1fr;
+      }
+      .title { font-size: var(--text-subhead); }
+
+      .map-popover-overlay {
+        padding: var(--space-2);
+      }
+      .map-popover-header {
+        padding: var(--space-3) var(--space-4);
+        gap: var(--space-2);
+      }
+      .map-popover-title {
+        font-size: var(--text-base);
+      }
+      .map-popover-title .date {
+        margin-left: var(--space-2);
+      }
+      .map-popover-nav {
+        gap: var(--space-2);
+      }
+      .nav-btn {
+        padding: var(--space-1);
+        font-size: var(--text-sm);
+      }
+      .nav-btn .nav-label {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="origin-bar">
+      <span class="dot"></span>
+      <span id="origin-meta">snapshots<span class="sep"> · </span><span id="origin-count">—</span><span class="sep"> · </span><span id="origin-range">—</span></span>
+    </div>
+
+    <h1 class="title"><span id="typed-text"></span></h1>
+    <div class="subtitle">field notes · cataloged by year</div>
+
+    <div class="content" id="content"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    new Typed('#typed-text', {
+      strings: ['simulation snapshots'],
+      typeSpeed: 50,
+      showCursor: true,
+      cursorChar: '_',
+      autoInsertCss: true,
+    });
+
+    let currentMapInstance = null;
+    let globalImages = [];
+
+    function pad(n, w) { return String(n).padStart(w, '0'); }
+
+    function fmtCoord(lat, lng) {
+      if (!lat || !lng) return '';
+      return `${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+    }
+
+    function createMapPopover(image) {
+      const currentIndex = globalImages.findIndex(img => img.file === image.file);
+      const prevIndex = (currentIndex - 1 + globalImages.length) % globalImages.length;
+      const nextIndex = (currentIndex + 1) % globalImages.length;
+      const prevImage = globalImages[prevIndex];
+      const nextImage = globalImages[nextIndex];
+
+      let overlay = document.getElementById('map-popover-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'map-popover-overlay';
+        overlay.className = 'map-popover-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      const title = (image.title || image.originalLocation || 'untitled').toLowerCase();
+      const coordStr = fmtCoord(image.lat, image.lng);
+      const indexStr = pad(currentIndex + 1, 3) + ' / ' + pad(globalImages.length, 3);
+
+      overlay.innerHTML = `
+        <div class="map-popover-card">
+          <div class="map-popover-header">
+            <h3 class="map-popover-title">
+              ${title}
+              ${image.date ? `<span class="date">${image.date}</span>` : ''}
+            </h3>
+            <div class="map-popover-nav">
+              <button class="nav-btn" data-nav="prev">←<span class="nav-label"> prev</span></button>
+              <button class="nav-btn" data-nav="next"><span class="nav-label">next </span>→</button>
+              <button class="map-popover-close" aria-label="close">×</button>
+            </div>
+          </div>
+          <div class="map-popover-content">
+            <div class="map-popover-image">
+              <img src="images/${image.file}" alt="${title}" />
+            </div>
+            <div id="mini-map" class="map-popover-map"></div>
+          </div>
+          <div class="map-popover-footer">
+            <span>${indexStr}</span>
+            <span>${coordStr || 'no location data'}</span>
+          </div>
+        </div>
+      `;
+
+      overlay.classList.add('active');
+
+      document.onkeydown = function (e) {
+        if (e.key === 'Escape') closeMapPopover();
+        if (e.key === 'ArrowLeft') createMapPopover(prevImage);
+        if (e.key === 'ArrowRight') createMapPopover(nextImage);
+      };
+
+      if (image.lat && image.lng) {
+        setTimeout(() => {
+          if (currentMapInstance) {
+            currentMapInstance.remove();
+            currentMapInstance = null;
+          }
+          currentMapInstance = L.map('mini-map', {
+            center: [image.lat, image.lng],
+            zoom: 13,
+            zoomControl: true,
+            dragging: true,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false
+          });
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            maxZoom: 19
+          }).addTo(currentMapInstance);
+          const icon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div style="background-color: #00ffaa; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #0a0a0a; box-shadow: 0 0 12px rgba(0,255,170,0.8);"></div>',
+            iconSize: [10, 10],
+            iconAnchor: [5, 5]
+          });
+          L.marker([image.lat, image.lng], { icon }).addTo(currentMapInstance);
+        }, 100);
+      } else {
+        setTimeout(() => {
+          const mapDiv = document.getElementById('mini-map');
+          if (mapDiv) {
+            mapDiv.innerHTML = '<div class="no-coords">no location data</div>';
+          }
+        }, 100);
+      }
+
+      overlay.querySelector('[data-nav="prev"]').addEventListener('click', () => createMapPopover(prevImage));
+      overlay.querySelector('[data-nav="next"]').addEventListener('click', () => createMapPopover(nextImage));
+      overlay.querySelector('.map-popover-close').addEventListener('click', closeMapPopover);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeMapPopover();
+      });
+    }
+
+    function closeMapPopover() {
+      const overlay = document.getElementById('map-popover-overlay');
+      if (overlay) {
+        overlay.classList.remove('active');
+        if (currentMapInstance) {
+          currentMapInstance.remove();
+          currentMapInstance = null;
+        }
+        document.onkeydown = null;
+      }
+    }
+
+    fetch('images.json')
+      .then(response => response.json())
+      .then(images => {
+        const hidden = ['3.webp', '6.webp'];
+        globalImages = images.slice().reverse().filter(img => !hidden.includes(img.file));
+
+        const content = document.getElementById('content');
+        content.innerHTML = '';
+
+        const groups = {};
+        globalImages.forEach(image => {
+          const year = image.date || 'unknown';
+          if (!groups[year]) groups[year] = [];
+          groups[year].push(image);
+        });
+
+        const years = Object.keys(groups).sort((a, b) => b - a);
+
+        // Origin bar meta
+        document.getElementById('origin-count').textContent = `${globalImages.length} captures`;
+        document.getElementById('origin-range').textContent = years.length > 1
+          ? `${years[years.length - 1]}–${years[0]}`
+          : years[0];
+
+        // ASCII loader glyph sets (from 100days/55-ascii-loading)
+        const CHAOS    = '!@#$%^&*+=-~<>|/?\\;:';
+        const SETTLING = '░▒▓▪▫';
+        const LOCKED   = '·';
+        const ASCII_COLS = 10;
+        const ASCII_ROWS = 5;
+
+        const tileRegistry = [];
+
+        let globalIdx = 0;
+        years.forEach(year => {
+          const section = document.createElement('section');
+          section.className = 'year-section';
+          section.id = `year-${year}`;
+
+          const header = document.createElement('div');
+          header.className = 'year-header';
+          header.innerHTML = `
+            <span class="year-caption">YEAR</span>
+            <span class="year-label">${year}</span>
+            <span class="year-count">${pad(groups[year].length, 2)} captures</span>
+          `;
+          section.appendChild(header);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+
+          groups[year].forEach(image => {
+            globalIdx++;
+            const title = (image.title || image.originalLocation || '').toLowerCase();
+            const coord = fmtCoord(image.lat, image.lng);
+            const idxStr = pad(globalIdx, 3);
+
+            const div = document.createElement('div');
+            div.className = 'tile';
+            div.innerHTML = `
+              <div class="tile-skeleton">
+                <pre class="tile-ascii"></pre>
+              </div>
+              <span class="tile-index">${idxStr}</span>
+              <span class="tile-loading-label">recv</span>
+              <img data-src="images/${image.file}" alt="${title}">
+              <div class="tile-caption">
+                ${title}${coord ? `<span class="sep">·</span>${coord}` : ''}
+              </div>
+            `;
+            div.addEventListener('click', () => {
+              if (div.classList.contains('loaded')) createMapPopover(image);
+            });
+            grid.appendChild(div);
+
+            // Build ASCII grid cells + per-cell thresholds
+            const asciiEl = div.querySelector('.tile-ascii');
+            const cells = [];
+            const thresholds = new Float32Array(ASCII_COLS * ASCII_ROWS);
+            for (let r = 0; r < ASCII_ROWS; r++) {
+              for (let c = 0; c < ASCII_COLS; c++) {
+                const s = document.createElement('span');
+                s.textContent = CHAOS[Math.floor(Math.random() * CHAOS.length)];
+                asciiEl.appendChild(s);
+                cells.push(s);
+                thresholds[r * ASCII_COLS + c] = Math.random();
+              }
+              if (r < ASCII_ROWS - 1) asciiEl.appendChild(document.createTextNode('\n'));
+            }
+
+            tileRegistry.push({
+              el: div,
+              image,
+              cells,
+              thresholds,
+              progress: 0,
+              loaded: false,
+            });
+          });
+
+          section.appendChild(grid);
+          content.appendChild(section);
+        });
+
+        // Chaotic load order — full shuffle, no positional bias
+        const loadOrder = tileRegistry
+          .map(t => ({ t, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map(x => x.t);
+
+        // Bursty timing: clump some together, space others out
+        loadOrder.forEach((entry, i) => {
+          const burst = Math.floor(i / 6);
+          const delay = burst * 90 + Math.random() * 260;
+
+          setTimeout(() => {
+            const img = entry.el.querySelector('img');
+            const preload = new Image();
+            preload.onload = () => {
+              img.src = preload.src;
+              entry.loaded = true;
+              entry.el.classList.add('loaded');
+            };
+            preload.onerror = () => {
+              entry.loaded = true;
+              entry.el.classList.add('loaded');
+            };
+            preload.src = `images/${entry.image.file}`;
+          }, delay);
+        });
+
+        // Shared ASCII tick — drives chaos→settling→locked for all tiles at once
+        const TICK_MS = 80;
+        const CHAOS_COLOR    = '#2a2a2a';
+        const SETTLING_COLOR = '#4a4a4a';
+        const LOCKED_COLOR   = '#666666';
+
+        function tickAscii() {
+          for (const entry of tileRegistry) {
+            if (entry.loaded) continue;
+            // Progress drifts forward each tick, with randomness per tile
+            entry.progress = Math.min(1, entry.progress + 0.015 + Math.random() * 0.02);
+            const p = entry.progress;
+            for (let i = 0; i < entry.cells.length; i++) {
+              const cell = entry.cells[i];
+              const th = entry.thresholds[i];
+              if (p >= th) {
+                cell.textContent = LOCKED;
+                cell.style.color = LOCKED_COLOR;
+              } else {
+                const local = p / th;
+                if (local > 0.72) {
+                  cell.textContent = SETTLING[Math.floor(Math.random() * SETTLING.length)];
+                  cell.style.color = SETTLING_COLOR;
+                } else {
+                  cell.textContent = CHAOS[Math.floor(Math.random() * CHAOS.length)];
+                  cell.style.color = CHAOS_COLOR;
+                }
+              }
+            }
+          }
+        }
+        setInterval(tickAscii, TICK_MS);
+      });
+  </script>
+</body>
+</html>
