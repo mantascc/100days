@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>armature · soft-island ideas</title>
+<style>
+  /* light palette (default) */
+  :root, :root[data-theme="light"] {
+    --bg: #c4c8c2;
+    --screen: #dadcd8;
+    --elev1: #f2f2f0;
+    --elev2: #ffffff;
+    --stroke: #a8aba6;
+    --muted: #5d6058;
+    --fg: #2a2c28;
+    --accent:    #cc785c;
+    --ambient-1: #7a8ea6;
+    --ambient-2: #8aa18a;
+    --ambient-3: #c9a268;
+  }
+
+  /* dark palette — applies via OS preference unless overridden */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1f221e;
+      --screen: #2a2d28;
+      --elev1: #353833;
+      --elev2: #45483f;
+      --stroke: #5d6058;
+      --muted: #9aa094;
+      --fg: #e8e6dd;
+      --accent:    #d68866;
+      --ambient-1: #8a9eb4;
+      --ambient-2: #9ab298;
+      --ambient-3: #d4a878;
+    }
+  }
+
+  /* explicit dark override (wins over media query) */
+  :root[data-theme="dark"] {
+    --bg: #1f221e;
+    --screen: #2a2d28;
+    --elev1: #353833;
+    --elev2: #45483f;
+    --stroke: #5d6058;
+    --muted: #9aa094;
+    --fg: #e8e6dd;
+    --accent:    #d68866;
+    --ambient-1: #8a9eb4;
+    --ambient-2: #9ab298;
+    --ambient-3: #d4a878;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    margin: 0;
+    min-height: 100vh;
+    font: 11px/1.4 ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px 96px;
+    box-sizing: border-box;
+  }
+  .takes { width: 480px; position: relative; }
+  .take {
+    margin: 0;
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .take--active { display: flex; }
+  figcaption {
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    font-size: 10px;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--screen);
+    opacity: 0;
+    animation: take-in 0.6s ease-out forwards;
+  }
+  @keyframes take-in { from { opacity: 0; } to { opacity: 1; } }
+
+  /* theme toggle (fixed top-right) */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: var(--elev1);
+    border: 1px solid var(--stroke);
+    border-radius: 4px;
+    color: var(--fg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 10;
+  }
+  .theme-toggle:hover { background: var(--elev2); }
+  .theme-toggle svg { width: 14px; height: 14px; display: block; }
+  .theme-toggle .sun { display: none; }
+  .theme-toggle .moon { display: block; }
+  :root[data-theme="dark"] .theme-toggle .sun { display: block; }
+  :root[data-theme="dark"] .theme-toggle .moon { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .moon { display: none; }
+  }
+
+  /* breadcrumb */
+  .breadcrumb {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    padding: 6px 10px;
+    background: var(--elev1);
+    border: 1px solid var(--stroke);
+    border-radius: 4px;
+    z-index: 10;
+  }
+  .breadcrumb:hover { background: var(--elev2); color: var(--fg); }
+
+  /* floating control bar */
+  .controls {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: stretch;
+    background: var(--elev1);
+    border: 1px solid var(--stroke);
+    border-radius: 4px;
+    overflow: hidden;
+    height: 36px;
+    user-select: none;
+    z-index: 10;
+  }
+  .control {
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--stroke);
+    color: var(--fg);
+    font: inherit;
+    font-size: 14px;
+    padding: 0 14px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .control:last-child { border-right: none; border-left: 1px solid var(--stroke); }
+  .control:hover:not(:disabled) { background: var(--elev2); }
+  .control:disabled { color: var(--muted); cursor: default; }
+  .indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 18px;
+  }
+  .label {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    min-width: 90px;
+    text-align: center;
+  }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 6px; height: 6px; background: var(--muted); opacity: 0.4; }
+  .dot.active { background: var(--accent); opacity: 1; }
+
+  /* ============================================================
+     ANIMATIONS
+     ============================================================ */
+
+  /* streaming text rows — chat bubbles, code lines.
+     each row uses an inline animation-delay for stagger. */
+  .stream-row, .code-line {
+    opacity: 0;
+    animation: stream-row 8s linear infinite;
+  }
+  @keyframes stream-row {
+    0%        { opacity: 0; transform: translateY(-2px); }
+    4%        { opacity: 1; transform: translateY(0); }
+    88%       { opacity: 1; }
+    96%, 100% { opacity: 0; }
+  }
+
+  /* T1 — agent workspace: 6px outer padding, 6px inter-panel gaps
+     `backwards` fill-mode applies 0% keyframe values during the 0.8s delay,
+     so the scene opens in the full-screen-chat state (artifact hidden). */
+  .chat-panel {
+    animation: chat-resize 9s ease-in-out 0.8s infinite backwards;
+  }
+  @keyframes chat-resize {
+    0%, 14%   { width: 398px; }
+    30%, 68%  { width: 248px; }
+    84%, 100% { width: 398px; }
+  }
+
+  .artifact-panel {
+    animation: artifact-slide 9s ease-in-out 0.8s infinite backwards;
+  }
+  @keyframes artifact-slide {
+    0%, 14%   { transform: translateX(150px); opacity: 0; }
+    30%, 68%  { transform: translateX(0);     opacity: 1; }
+    84%, 100% { transform: translateX(150px); opacity: 0; }
+  }
+
+  /* chat content shifts to stay centered as the chat panel resizes
+     panel width: 398 ↔ 248 (Δ=150); shift content by half (~75) to keep centered */
+  .chat-content {
+    animation: chat-content-shift 9s ease-in-out 0.8s infinite backwards;
+  }
+  @keyframes chat-content-shift {
+    0%, 14%   { transform: translateX(75px); }
+    30%, 68%  { transform: translateX(0); }
+    84%, 100% { transform: translateX(75px); }
+  }
+
+  /* a small accent dot on the agent message — pulses just before artifact appears */
+  .artifact-trigger {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    animation: artifact-trigger 9s ease-in-out 0.8s infinite backwards;
+  }
+  @keyframes artifact-trigger {
+    0%, 14%   { opacity: 0; transform: scale(1); }
+    22%       { opacity: 1; transform: scale(1.6); }
+    28%       { opacity: 1; transform: scale(1); }
+    68%       { opacity: 1; transform: scale(1); }
+    78%       { opacity: 0; }
+    100%      { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<a class="breadcrumb" href="../index.html">← 100 days</a>
+
+<button class="theme-toggle" id="theme-toggle" aria-label="toggle theme">
+  <svg class="moon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M 11.5 2.5 a 6 6 0 1 0 2 9 a 5 5 0 0 1 -2 -9 z" />
+  </svg>
+  <svg class="sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+    <circle cx="8" cy="8" r="3" fill="currentColor" stroke="none" />
+    <line x1="8" y1="1.5" x2="8" y2="3" />
+    <line x1="8" y1="13" x2="8" y2="14.5" />
+    <line x1="1.5" y1="8" x2="3" y2="8" />
+    <line x1="13" y1="8" x2="14.5" y2="8" />
+    <line x1="3.3" y1="3.3" x2="4.3" y2="4.3" />
+    <line x1="11.7" y1="11.7" x2="12.7" y2="12.7" />
+    <line x1="3.3" y1="12.7" x2="4.3" y2="11.7" />
+    <line x1="11.7" y1="4.3" x2="12.7" y2="3.3" />
+  </svg>
+</button>
+
+<div class="takes">
+
+  <!-- ============================================================
+       T1 — AGENT WORKSPACE: opening an artifact
+       6px outer padding + 6px gaps · full-screen chat → artifact slides in
+       ============================================================ -->
+  <figure class="take take--active">
+    <svg viewBox="0 0 480 360" width="480" height="360">
+      <defs>
+        <filter id="si-shadow-l1" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.10" />
+        </filter>
+      </defs>
+
+      <!-- top bar -->
+      <rect x="6" y="6" width="468" height="32" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l1)" />
+      <line x1="18" y1="22" x2="62" y2="22" stroke="var(--fg)" stroke-width="2" />
+      <line x1="66" y1="22" x2="94" y2="22" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="430" cy="22" r="3" fill="var(--muted)" />
+      <circle cx="444" cy="22" r="3" fill="var(--muted)" />
+      <circle cx="460" cy="22" r="6" fill="var(--ambient-2)" />
+
+      <!-- left nav -->
+      <rect x="6" y="44" width="64" height="310" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l1)" />
+      <line x1="16" y1="64" x2="38" y2="64" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="20" cy="88" r="3" fill="var(--muted)" />
+      <line x1="28" y1="88" x2="54" y2="88" stroke="var(--muted)" stroke-width="2" />
+      <!-- selected item -->
+      <rect x="10" y="104" width="56" height="20" rx="4" fill="var(--elev2)" />
+      <circle cx="20" cy="114" r="3" fill="var(--accent)" />
+      <line x1="28" y1="114" x2="52" y2="114" stroke="var(--accent)" stroke-width="2" />
+      <circle cx="20" cy="136" r="3" fill="var(--muted)" />
+      <line x1="28" y1="136" x2="50" y2="136" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="20" cy="160" r="3" fill="var(--muted)" />
+      <line x1="28" y1="160" x2="58" y2="160" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="20" cy="184" r="3" fill="var(--muted)" />
+      <line x1="28" y1="184" x2="54" y2="184" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="20" cy="208" r="3" fill="var(--muted)" />
+      <line x1="28" y1="208" x2="52" y2="208" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- chat panel — width animates between 398 (full-screen) and 248 (artifact open) -->
+      <rect class="chat-panel" x="76" y="44" width="398" height="310" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l1)" />
+
+      <!-- chat content — shifts horizontally to stay centered as the panel resizes -->
+      <g class="chat-content">
+      <line x1="88" y1="64" x2="148" y2="64" stroke="var(--fg)" stroke-width="2" />
+      <line x1="152" y1="64" x2="188" y2="64" stroke="var(--muted)" stroke-width="2" />
+      <line x1="88" y1="80" x2="312" y2="80" stroke="var(--stroke)" stroke-width="1" />
+
+      <!-- agent msg 1 -->
+      <rect x="88" y="94" width="216" height="24" rx="4" fill="var(--elev2)" />
+      <line x1="96" y1="106" x2="150" y2="106" stroke="var(--muted)" stroke-width="2" />
+      <line x1="154" y1="106" x2="210" y2="106" stroke="var(--muted)" stroke-width="2" />
+      <line x1="214" y1="106" x2="266" y2="106" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- agent msg 2 (streaming) -->
+      <rect x="88" y="146" width="224" height="100" rx="4" fill="var(--elev2)" />
+      <g class="stream-row" style="animation-delay: 0s">
+        <line x1="96" y1="168" x2="150" y2="168" stroke="var(--muted)" stroke-width="2" />
+        <line x1="154" y1="168" x2="190" y2="168" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 0.4s">
+        <line x1="96" y1="182" x2="150" y2="182" stroke="var(--muted)" stroke-width="2" />
+        <line x1="154" y1="182" x2="210" y2="182" stroke="var(--muted)" stroke-width="2" />
+        <line x1="214" y1="182" x2="258" y2="182" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 0.8s">
+        <line x1="96" y1="196" x2="130" y2="196" stroke="var(--muted)" stroke-width="2" />
+        <line x1="134" y1="196" x2="210" y2="196" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 1.2s">
+        <line x1="96" y1="210" x2="150" y2="210" stroke="var(--muted)" stroke-width="2" />
+        <line x1="154" y1="210" x2="202" y2="210" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 1.6s">
+        <line x1="96" y1="224" x2="130" y2="224" stroke="var(--muted)" stroke-width="2" />
+        <line x1="134" y1="224" x2="170" y2="224" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <!-- artifact trigger: a tiny accent dot on the agent bubble that pulses
+           just as the artifact slides in (the agent "produced" something) -->
+      <circle class="artifact-trigger" cx="302" cy="160" r="3" fill="var(--accent)" />
+
+      <!-- input -->
+      <rect x="88" y="312" width="224" height="24" rx="4" fill="var(--elev2)" />
+      <line x1="100" y1="324" x2="148" y2="324" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="304" cy="324" r="4" fill="var(--accent)" />
+      </g>
+
+      <!-- artifact panel — slides in from the right when opened -->
+      <g class="artifact-panel">
+        <rect x="330" y="44" width="144" height="310" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l1)" />
+
+        <!-- title -->
+        <line x1="342" y1="64" x2="390" y2="64" stroke="var(--fg)" stroke-width="2" />
+        <line x1="394" y1="64" x2="418" y2="64" stroke="var(--fg)" stroke-width="2" />
+        <line x1="342" y1="80" x2="462" y2="80" stroke="var(--stroke)" stroke-width="1" />
+
+        <!-- chart 1: comparison (section header + grouped bars) -->
+        <line x1="342" y1="96" x2="374" y2="96" stroke="var(--fg)" stroke-width="2" />
+        <!-- legend dots -->
+        <circle cx="390" cy="96" r="2" fill="var(--ambient-1)" />
+        <circle cx="400" cy="96" r="2" fill="var(--muted)" />
+
+        <!-- grouped bar pairs (baseline at y=164) -->
+        <rect x="356" y="140" width="6" height="24" rx="1" fill="var(--ambient-1)" />
+        <rect x="364" y="134" width="6" height="30" rx="1" fill="var(--muted)" />
+        <rect x="378" y="124" width="6" height="40" rx="1" fill="var(--ambient-1)" />
+        <rect x="386" y="119" width="6" height="45" rx="1" fill="var(--muted)" />
+        <rect x="400" y="132" width="6" height="32" rx="1" fill="var(--ambient-1)" />
+        <rect x="408" y="126" width="6" height="38" rx="1" fill="var(--muted)" />
+        <rect x="422" y="112" width="6" height="52" rx="1" fill="var(--ambient-1)" />
+        <rect x="430" y="116" width="6" height="48" rx="1" fill="var(--muted)" />
+        <!-- chart baseline -->
+        <line x1="346" y1="164" x2="458" y2="164" stroke="var(--stroke)" stroke-width="1" />
+
+        <!-- section break -->
+        <rect x="342" y="178" width="32" height="3" rx="1.5" fill="var(--ambient-3)" />
+
+        <!-- chart 2: scatter (section header + plot) -->
+        <line x1="342" y1="192" x2="378" y2="192" stroke="var(--fg)" stroke-width="2" />
+
+        <!-- scatter axes -->
+        <line x1="350" y1="204" x2="350" y2="264" stroke="var(--stroke)" stroke-width="1" />
+        <line x1="350" y1="264" x2="458" y2="264" stroke="var(--stroke)" stroke-width="1" />
+
+        <!-- scatter points (positive correlation, ambient-2 marks "good values") -->
+        <circle cx="356" cy="258" r="2" fill="var(--muted)" />
+        <circle cx="366" cy="250" r="2" fill="var(--muted)" />
+        <circle cx="374" cy="244" r="3" fill="var(--muted)" />
+        <circle cx="382" cy="238" r="2" fill="var(--ambient-2)" />
+        <circle cx="390" cy="232" r="2" fill="var(--muted)" />
+        <circle cx="398" cy="226" r="2" fill="var(--ambient-2)" />
+        <circle cx="406" cy="222" r="2" fill="var(--muted)" />
+        <circle cx="414" cy="216" r="3" fill="var(--ambient-2)" />
+        <circle cx="422" cy="220" r="2" fill="var(--muted)" />
+        <circle cx="430" cy="210" r="2" fill="var(--ambient-2)" />
+        <circle cx="436" cy="206" r="2" fill="var(--muted)" />
+
+        <!-- section break -->
+        <rect x="342" y="278" width="32" height="3" rx="1.5" fill="var(--ambient-2)" />
+
+        <!-- summary text -->
+        <line x1="342" y1="292" x2="442" y2="292" stroke="var(--muted)" stroke-width="2" />
+        <line x1="342" y1="304" x2="426" y2="304" stroke="var(--muted)" stroke-width="2" />
+        <line x1="342" y1="316" x2="406" y2="316" stroke="var(--muted)" stroke-width="2" />
+      </g>
+    </svg>
+    <figcaption>t1 — agent workspace · opening an artifact (6px gaps)</figcaption>
+  </figure>
+
+  <!-- ============================================================
+       T2 — CODE WORKSPACE: list · code · agent
+       6px outer padding + 6px gaps · matches t1 style
+       ============================================================ -->
+  <figure class="take">
+    <svg viewBox="0 0 480 360" width="480" height="360">
+      <defs>
+        <filter id="si-shadow-l2" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.10" />
+        </filter>
+      </defs>
+
+      <!-- top bar -->
+      <rect x="6" y="6" width="468" height="32" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l2)" />
+      <line x1="18" y1="22" x2="62" y2="22" stroke="var(--fg)" stroke-width="2" />
+      <line x1="66" y1="22" x2="110" y2="22" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="430" cy="22" r="3" fill="var(--muted)" />
+      <circle cx="444" cy="22" r="3" fill="var(--muted)" />
+      <circle cx="460" cy="22" r="6" fill="var(--ambient-2)" />
+
+      <!-- left list (file tree) -->
+      <rect x="6" y="44" width="100" height="310" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l2)" />
+      <line x1="18" y1="64" x2="54" y2="64" stroke="var(--fg)" stroke-width="2" />
+      <line x1="18" y1="80" x2="94" y2="80" stroke="var(--stroke)" stroke-width="1" />
+      <line x1="22" y1="96" x2="62" y2="96" stroke="var(--muted)" stroke-width="2" />
+      <line x1="30" y1="112" x2="74" y2="112" stroke="var(--muted)" stroke-width="2" />
+      <line x1="38" y1="128" x2="70" y2="128" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- selected file -->
+      <rect x="10" y="136" width="92" height="16" rx="4" fill="var(--elev2)" />
+      <line x1="38" y1="144" x2="86" y2="144" stroke="var(--accent)" stroke-width="2" />
+
+      <line x1="30" y1="160" x2="66" y2="160" stroke="var(--muted)" stroke-width="2" />
+      <line x1="22" y1="176" x2="58" y2="176" stroke="var(--muted)" stroke-width="2" />
+      <line x1="30" y1="192" x2="78" y2="192" stroke="var(--muted)" stroke-width="2" />
+      <line x1="38" y1="208" x2="74" y2="208" stroke="var(--muted)" stroke-width="2" />
+      <line x1="30" y1="224" x2="70" y2="224" stroke="var(--muted)" stroke-width="2" />
+      <line x1="22" y1="240" x2="66" y2="240" stroke="var(--muted)" stroke-width="2" />
+      <line x1="30" y1="256" x2="86" y2="256" stroke="var(--muted)" stroke-width="2" />
+      <line x1="38" y1="272" x2="70" y2="272" stroke="var(--muted)" stroke-width="2" />
+      <line x1="22" y1="288" x2="58" y2="288" stroke="var(--muted)" stroke-width="2" />
+      <line x1="30" y1="304" x2="74" y2="304" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- center code editor -->
+      <rect x="112" y="44" width="212" height="310" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l2)" />
+
+      <!-- tabs -->
+      <rect x="124" y="56" width="76" height="20" rx="4" fill="var(--elev2)" />
+      <line x1="134" y1="66" x2="178" y2="66" stroke="var(--fg)" stroke-width="2" />
+      <line x1="208" y1="66" x2="240" y2="66" stroke="var(--muted)" stroke-width="2" />
+      <line x1="250" y1="66" x2="284" y2="66" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- code lines -->
+      <g class="code-line" style="animation-delay: 0s">
+        <line x1="124" y1="96" x2="148" y2="96" stroke="var(--muted)" stroke-width="2" />
+        <line x1="152" y1="96" x2="196" y2="96" stroke="var(--muted)" stroke-width="2" />
+        <line x1="200" y1="96" x2="220" y2="96" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 0.2s">
+        <line x1="134" y1="112" x2="184" y2="112" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 0.4s">
+        <line x1="134" y1="128" x2="160" y2="128" stroke="var(--muted)" stroke-width="2" />
+        <line x1="164" y1="128" x2="204" y2="128" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 0.6s">
+        <line x1="144" y1="144" x2="188" y2="144" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 0.8s">
+        <line x1="144" y1="160" x2="228" y2="160" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 1.0s">
+        <line x1="134" y1="176" x2="156" y2="176" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 1.2s">
+        <line x1="124" y1="192" x2="148" y2="192" stroke="var(--muted)" stroke-width="2" />
+        <line x1="152" y1="192" x2="188" y2="192" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 1.4s">
+        <line x1="134" y1="208" x2="168" y2="208" stroke="var(--muted)" stroke-width="2" />
+        <line x1="172" y1="208" x2="208" y2="208" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 1.6s">
+        <line x1="144" y1="224" x2="204" y2="224" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 1.8s">
+        <line x1="144" y1="240" x2="188" y2="240" stroke="var(--muted)" stroke-width="2" />
+        <line x1="192" y1="240" x2="236" y2="240" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 2.0s">
+        <line x1="134" y1="256" x2="156" y2="256" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="code-line" style="animation-delay: 2.2s">
+        <line x1="124" y1="272" x2="148" y2="272" stroke="var(--muted)" stroke-width="2" />
+      </g>
+
+      <!-- editor footer indicators -->
+      <line x1="124" y1="292" x2="312" y2="292" stroke="var(--stroke)" stroke-width="1" />
+      <line x1="124" y1="308" x2="148" y2="308" stroke="var(--ambient-2)" stroke-width="2" />
+      <line x1="152" y1="308" x2="208" y2="308" stroke="var(--muted)" stroke-width="2" />
+      <line x1="124" y1="320" x2="188" y2="320" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- right agent -->
+      <rect x="330" y="44" width="144" height="310" rx="8" fill="var(--elev1)" filter="url(#si-shadow-l2)" />
+      <circle cx="344" cy="64" r="5" fill="var(--ambient-1)" />
+      <line x1="354" y1="64" x2="398" y2="64" stroke="var(--fg)" stroke-width="2" />
+      <line x1="402" y1="64" x2="430" y2="64" stroke="var(--muted)" stroke-width="2" />
+      <line x1="342" y1="80" x2="462" y2="80" stroke="var(--stroke)" stroke-width="1" />
+
+      <!-- agent msg 1 -->
+      <rect x="342" y="96" width="120" height="36" rx="4" fill="var(--elev2)" />
+      <line x1="350" y1="106" x2="402" y2="106" stroke="var(--muted)" stroke-width="2" />
+      <line x1="350" y1="118" x2="422" y2="118" stroke="var(--muted)" stroke-width="2" />
+      <line x1="350" y1="126" x2="414" y2="126" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- user msg (right-aligned) -->
+      <rect x="370" y="144" width="92" height="24" rx="4" fill="var(--elev2)" />
+      <line x1="378" y1="156" x2="414" y2="156" stroke="var(--muted)" stroke-width="2" />
+      <line x1="418" y1="156" x2="454" y2="156" stroke="var(--muted)" stroke-width="2" />
+
+      <!-- agent msg 2 (streaming) -->
+      <rect x="342" y="180" width="120" height="80" rx="4" fill="var(--elev2)" />
+      <g class="stream-row" style="animation-delay: 0.2s">
+        <line x1="350" y1="194" x2="402" y2="194" stroke="var(--muted)" stroke-width="2" />
+        <line x1="406" y1="194" x2="442" y2="194" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 0.6s">
+        <line x1="350" y1="208" x2="390" y2="208" stroke="var(--muted)" stroke-width="2" />
+        <line x1="394" y1="208" x2="426" y2="208" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 1.0s">
+        <line x1="350" y1="222" x2="402" y2="222" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 1.4s">
+        <line x1="350" y1="236" x2="418" y2="236" stroke="var(--muted)" stroke-width="2" />
+        <line x1="422" y1="236" x2="450" y2="236" stroke="var(--muted)" stroke-width="2" />
+      </g>
+      <g class="stream-row" style="animation-delay: 1.8s">
+        <line x1="350" y1="250" x2="406" y2="250" stroke="var(--muted)" stroke-width="2" />
+      </g>
+
+      <!-- input -->
+      <rect x="342" y="300" width="120" height="24" rx="4" fill="var(--elev2)" />
+      <line x1="350" y1="312" x2="390" y2="312" stroke="var(--muted)" stroke-width="2" />
+      <circle cx="454" cy="312" r="4" fill="var(--accent)" />
+    </svg>
+    <figcaption>t2 — code workspace · file list, code editor, agent assistant</figcaption>
+  </figure>
+
+</div>
+
+<nav class="controls" aria-label="take navigation">
+  <button class="control" id="prev" aria-label="previous take">←</button>
+  <div class="indicator">
+    <div class="dots" id="dots"></div>
+    <div class="label" id="label">t1 / 2</div>
+  </div>
+  <button class="control" id="next" aria-label="next take">→</button>
+</nav>
+
+<script>
+  const takes = [...document.querySelectorAll('.take')];
+  const dotsEl = document.getElementById('dots');
+  const labelEl = document.getElementById('label');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  takes.forEach(() => {
+    const d = document.createElement('span');
+    d.className = 'dot';
+    dotsEl.appendChild(d);
+  });
+
+  let active = 0;
+  function show(i) {
+    active = (i + takes.length) % takes.length;
+    takes.forEach((s, idx) => s.classList.toggle('take--active', idx === active));
+    [...dotsEl.children].forEach((d, idx) => d.classList.toggle('active', idx === active));
+    labelEl.textContent = `t${active + 1} / ${takes.length}`;
+    prevBtn.disabled = active === 0;
+    nextBtn.disabled = active === takes.length - 1;
+  }
+
+  prevBtn.addEventListener('click', () => show(active - 1));
+  nextBtn.addEventListener('click', () => show(active + 1));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  show(active - 1);
+    if (e.key === 'ArrowRight') show(active + 1);
+  });
+
+  show(0);
+
+  // theme toggle — persists in localStorage, falls back to OS preference
+  const themeToggle = document.getElementById('theme-toggle');
+  const root = document.documentElement;
+
+  function applyTheme(theme) {
+    if (theme) root.setAttribute('data-theme', theme);
+    else root.removeAttribute('data-theme');
+  }
+
+  const stored = localStorage.getItem('armature-theme');
+  if (stored) applyTheme(stored);
+
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme');
+    const osDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // determine effective current theme
+    const effective = current || (osDark ? 'dark' : 'light');
+    const next = effective === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem('armature-theme', next);
+  });
+</script>
+
+</body>
+</html>

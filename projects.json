@@ -358,5 +358,10 @@
     "id": "72-snapshots-v2",
     "path": "100days/72-snapshots-v2",
     "description": "Snapshots v2 \u2014 photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos \u2192 settling \u2192 locked) and chaotic bursty image loading"
+  },
+  {
+    "id": "73-svg-layouts",
+    "path": "100days/73-svg-layouts",
+    "description": "SVG Layouts \u2014 schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations"
   }
 ]
