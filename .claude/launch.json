@@ -54,6 +54,18 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8803", "--directory", "daily-sketch/sketch-terminal-cli"],
       "port": 8803
+    },
+    {
+      "name": "74-particles",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8821", "--directory", "/Users/mantas/Desktop/min7is/100days/74-particles"],
+      "port": 8821
+    },
+    {
+      "name": "sketch-eixample-tiles",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8820", "--directory", "/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-eixample-tiles"],
+      "port": 8820
     }
   ]
 }

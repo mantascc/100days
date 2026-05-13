@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>74-particles</title>
+<style>
+  :root {
+    --bg-0: #14110d;
+    --acc: #7b5ea8;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg-0);
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+  #ctrl {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(20, 17, 13, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.72);
+    font: 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    user-select: none;
+    z-index: 10;
+  }
+  #ctrl button {
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 120ms, background 120ms;
+  }
+  #ctrl button:hover { opacity: 1; background: rgba(255, 255, 255, 0.06); }
+  #ctrl button:focus-visible { outline: 1px solid rgba(255, 255, 255, 0.4); outline-offset: 1px; }
+  #label {
+    min-width: 64px;
+    text-align: center;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<nav id="ctrl" aria-label="Variant">
+  <button id="prev" aria-label="Previous variant">‹</button>
+  <span id="label">drift</span>
+  <button id="next" aria-label="Next variant">›</button>
+</nav>
+<script>
+(() => {
+  const cvs = document.getElementById('c');
+  const ctx = cvs.getContext('2d');
+
+  // Pre-bake the dot bloom into a sprite once, then drawImage it scaled per
+  // frame. ctx.filter='blur(...)' is the single biggest cost in this sketch
+  // — it forces a new compositing layer per call, and stacked passes mean 4
+  // layers per dot per frame. Baking once kills all of that: per-frame cost
+  // drops to a transform + a single drawImage per dot, which the GPU handles
+  // trivially. The multi-stop radial gradient mimics the saturation profile
+  // of the original stacked gaussians — flat core, soft mid-falloff, long
+  // faint tail — so the visual barely changes.
+  const SPRITE_SIZE = 96;
+  const makeSprite = (hex) => {
+    const s = document.createElement('canvas');
+    s.width = s.height = SPRITE_SIZE;
+    const sx = s.getContext('2d');
+    const c = SPRITE_SIZE / 2;
+    const grad = sx.createRadialGradient(c, c, 0, c, c, c);
+    grad.addColorStop(0.00, hex);
+    grad.addColorStop(0.08, hex);
+    grad.addColorStop(0.22, hex + 'b3'); // ~70%
+    grad.addColorStop(0.45, hex + '4d'); // ~30%
+    grad.addColorStop(0.72, hex + '14'); // ~8%
+    grad.addColorStop(1.00, hex + '00');
+    sx.fillStyle = grad;
+    sx.fillRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+    return s;
+  };
+
+  // Named variants. Each one is a coherent rebalance of the same system —
+  // density, palette, motion speed, collision thresh, pause length, push
+  // strength, and bloom size — that together produce a distinct feel without
+  // changing the underlying mechanic.
+  // `canvasFilter` is a CSS filter applied to the canvas element. For `meta`
+  // it's a high `contrast()` that sharpens the sprite's soft alpha gradient
+  // into a hard threshold. Paired with `composite: 'lighter'`, overlapping
+  // sprite alphas sum first, so the threshold turns the union of two soft
+  // blobs into one fused shape with the classic metaball bridge — same look
+  // as sketches 41/42 without marching squares.
+  const VARIANTS = [
+    // dense, snappy, warmer pause — lots of brief contacts (default)
+    { name: 'swarm',   density: 10, accMove: '#ffffff', accPause: '#d4a85a', collide: 10, pauseMs:  800, push: 10, baseBlur: 4,  driftFrac: 0.22, freqMul: 1.45, canvasFilter: '',             composite: 'source-over' },
+    // slow, sparse, white→ube — the original baseline
+    { name: 'drift',   density: 15, accMove: '#ffffff', accPause: '#7b5ea8', collide: 14, pauseMs: 2000, push: 19, baseBlur: 6,  driftFrac: 0.18, freqMul: 1.00, canvasFilter: '',             composite: 'source-over' },
+    // fast, short pause, big kick — most kinetic
+    { name: 'frantic', density: 13, accMove: '#ffffff', accPause: '#d96a7e', collide: 16, pauseMs:  400, push: 16, baseBlur: 5,  driftFrac: 0.20, freqMul: 1.90, canvasFilter: '',             composite: 'source-over' },
+    // few big blobs that fuse on contact. collide is tuned to fire just as
+    // the fused bridge thins out — so each contact reads as: approach, fuse,
+    // peanut-shape moment, then snap apart with the push impulse
+    { name: 'meta',    density: 63, accMove: '#ffffff', accPause: '#7b5ea8', collide: 32, pauseMs: 1400, push: 38, baseBlur: 42, driftFrac: 0.18, freqMul: 0.65, canvasFilter: 'contrast(9)',  composite: 'lighter' },
+  ];
+
+  // Mutable per-variant state. Each applyVariant() call rebakes the two
+  // sprites, swaps these scalars, and rebuilds the dot array. The animation
+  // loop reads from these bindings rather than constants, so the swap takes
+  // effect on the next frame without restarting rAF.
+  let SPRITE_MOVE, SPRITE_PAUSE;
+  let COLLIDE_THRESH, PAUSE_MS, PUSH_AMOUNT;
+  let BASE_BLUR, DRIFT_FRAC;
+  let COMPOSITE = 'source-over';
+  let dots = [];
+  let currentVariantIdx = 0;
+  // After pause ends, each dot gets a kick directly away from its collision
+  // partner — a quick scoot that decays back to 0 over ~1s. The dot's
+  // underlying sinusoidal position is untouched; the push is a transient
+  // offset applied on top, so the dot smoothly merges back to its natural
+  // trajectory once the offset fades. PUSH_DECAY is the remaining fraction
+  // of the offset after one second (lower = snappier absorption).
+  const PUSH_DECAY = 0.10;
+
+  let W = 0, H = 0, DPR = 1;
+  const resize = () => {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cvs.width  = Math.floor(W * DPR);
+    cvs.height = Math.floor(H * DPR);
+    cvs.style.width  = W + 'px';
+    cvs.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  };
+  window.addEventListener('resize', resize);
+  resize();
+
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  // Each dot rides a chord of three sinusoids per axis. Offset phases and
+  // prime-ish frequencies keep trajectories from looping in lockstep, so the
+  // dots drift, cross, and recompose across the canvas. freqMul scales the
+  // base harmonic rates per variant — higher = faster wander, more contacts.
+  const makeDot = (freqMul) => ({
+    ax: [rand(0.32, 0.55), rand(0.14, 0.26), rand(0.05, 0.10)],
+    ay: [rand(0.32, 0.55), rand(0.14, 0.26), rand(0.05, 0.10)],
+    fx: [rand(0.050, 0.085) * freqMul, rand(0.110, 0.165) * freqMul, rand(0.230, 0.310) * freqMul],
+    fy: [rand(0.045, 0.080) * freqMul, rand(0.120, 0.175) * freqMul, rand(0.245, 0.330) * freqMul],
+    px: [rand(0, Math.PI*2), rand(0, Math.PI*2), rand(0, Math.PI*2)],
+    py: [rand(0, Math.PI*2), rand(0, Math.PI*2), rand(0, Math.PI*2)],
+    cx: Math.random(),
+    cy: Math.random(),
+    prevX: 0, prevY: 0,
+    x: 0, y: 0,
+    blur: 6,
+    stretch: 1,
+    localT: 0,
+    pauseUntil: 0,
+    wasPaused: false,
+    pushDX: 0, pushDY: 0,
+    offX: 0, offY: 0,
+  });
+
+  const labelEl = document.getElementById('label');
+  const applyVariant = (idx) => {
+    const n = VARIANTS.length;
+    currentVariantIdx = ((idx % n) + n) % n;
+    const v = VARIANTS[currentVariantIdx];
+
+    SPRITE_MOVE    = makeSprite(v.accMove);
+    SPRITE_PAUSE   = makeSprite(v.accPause);
+    COLLIDE_THRESH = v.collide;
+    PAUSE_MS       = v.pauseMs;
+    PUSH_AMOUNT    = v.push;
+    BASE_BLUR      = v.baseBlur;
+    DRIFT_FRAC     = v.driftFrac;
+    COMPOSITE      = v.composite || 'source-over';
+    cvs.style.filter = v.canvasFilter || '';
+
+    // Dot count scales with viewport diagonal-ish (sqrt of area). density is
+    // the divisor — smaller density = more dots. Phones floor at 36, 4K caps
+    // at 216 regardless of variant.
+    const N = Math.max(
+      36,
+      Math.min(216, Math.round(Math.sqrt(window.innerWidth * window.innerHeight) / v.density))
+    );
+    dots = Array.from({ length: N }, () => makeDot(v.freqMul));
+
+    // Seed prev positions on the actual curve so the first frame after a
+    // variant swap doesn't spike velocity (and thus blur/stretch) from the
+    // origin.
+    const driftR = Math.min(W, H) * DRIFT_FRAC;
+    const innerW = W - 2 * driftR;
+    const innerH = H - 2 * driftR;
+    for (const d of dots) {
+      const ox =
+        d.ax[0] * Math.sin(d.px[0]) +
+        d.ax[1] * Math.sin(d.px[1]) +
+        d.ax[2] * Math.sin(d.px[2]);
+      const oy =
+        d.ay[0] * Math.cos(d.py[0]) +
+        d.ay[1] * Math.cos(d.py[1]) +
+        d.ay[2] * Math.cos(d.py[2]);
+      const sx = driftR + d.cx * innerW + ox * driftR;
+      const sy = driftR + d.cy * innerH + oy * driftR;
+      d.x = d.prevX = sx;
+      d.y = d.prevY = sy;
+      d.blur = BASE_BLUR;
+    }
+
+    labelEl.textContent = v.name;
+  };
+
+  applyVariant(0);
+
+  document.getElementById('prev').addEventListener('click', () => applyVariant(currentVariantIdx - 1));
+  document.getElementById('next').addEventListener('click', () => applyVariant(currentVariantIdx + 1));
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  applyVariant(currentVariantIdx - 1);
+    if (e.key === 'ArrowRight') applyVariant(currentVariantIdx + 1);
+  });
+
+  const start = performance.now();
+  let last = start;
+
+  const draw = (now) => {
+    const dt = Math.max(0.001, Math.min(0.05, (now - last) / 1000));
+    last = now;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Anchors fill the whole viewport in both axes (not just a square in the
+    // middle), and each dot wanders up to `driftR` from its anchor. Padding
+    // equal to driftR keeps every dot inside the canvas even at its most
+    // extreme drift, while still giving each dot meaningful motion.
+    const driftR = Math.min(W, H) * DRIFT_FRAC;
+    const innerW = W - 2 * driftR;
+    const innerH = H - 2 * driftR;
+
+    // ─── 1. Advance / freeze positions ───────────────────────────────────
+    // Paused dots stay put. On the resume frame, fire the push impulse stored
+    // at collision time and apply a tiny phase nudge so the underlying paths
+    // also diverge (push handles the immediate visible separation, the phase
+    // nudge prevents stuck re-collision on the same trajectory).
+    const offDecay = Math.pow(PUSH_DECAY, dt);
+    for (const d of dots) {
+      const paused = now < d.pauseUntil;
+      if (paused) {
+        d.wasPaused = true;
+        continue;
+      }
+      if (d.wasPaused) {
+        d.offX = d.pushDX * PUSH_AMOUNT;
+        d.offY = d.pushDY * PUSH_AMOUNT;
+        for (let k = 0; k < 3; k++) {
+          d.px[k] += (Math.random() - 0.5) * 0.18;
+          d.py[k] += (Math.random() - 0.5) * 0.18;
+        }
+        d.wasPaused = false;
+      } else {
+        d.offX *= offDecay;
+        d.offY *= offDecay;
+      }
+      d.localT += dt;
+      const lt = d.localT;
+      const ox =
+        d.ax[0] * Math.sin(lt * d.fx[0] * 2 * Math.PI + d.px[0]) +
+        d.ax[1] * Math.sin(lt * d.fx[1] * 2 * Math.PI + d.px[1]) +
+        d.ax[2] * Math.sin(lt * d.fx[2] * 2 * Math.PI + d.px[2]);
+      const oy =
+        d.ay[0] * Math.cos(lt * d.fy[0] * 2 * Math.PI + d.py[0]) +
+        d.ay[1] * Math.cos(lt * d.fy[1] * 2 * Math.PI + d.py[1]) +
+        d.ay[2] * Math.cos(lt * d.fy[2] * 2 * Math.PI + d.py[2]);
+      d.x = driftR + d.cx * innerW + ox * driftR;
+      d.y = driftR + d.cy * innerH + oy * driftR;
+    }
+
+    // ─── 2. Pair collision check ─────────────────────────────────────────
+    // Any pair within COLLIDE_THRESH triggers a pause on both. Skipped if
+    // both are already paused — otherwise they'd refresh their pause every
+    // frame and never resume.
+    const t2 = COLLIDE_THRESH * COLLIDE_THRESH;
+    for (let i = 0; i < dots.length; i++) {
+      for (let j = i + 1; j < dots.length; j++) {
+        const a = dots[i], b = dots[j];
+        if (now < a.pauseUntil && now < b.pauseUntil) continue;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < t2) {
+          a.pauseUntil = now + PAUSE_MS;
+          b.pauseUntil = now + PAUSE_MS;
+          // Stash the unit separation vector for each — fired as an outward
+          // kick when the pause ends. Falls back to a random unit vector if
+          // the dots happen to be perfectly overlapping (rare but div-by-0).
+          const dist = Math.sqrt(d2) || 1;
+          const ux = dx / dist, uy = dy / dist;
+          if (dist > 0.5) {
+            a.pushDX = ux;  a.pushDY = uy;
+            b.pushDX = -ux; b.pushDY = -uy;
+          } else {
+            const rA = Math.random() * Math.PI * 2;
+            a.pushDX = Math.cos(rA);  a.pushDY = Math.sin(rA);
+            b.pushDX = -a.pushDX;     b.pushDY = -a.pushDY;
+          }
+        }
+      }
+    }
+
+    // ─── 3. Render ────────────────────────────────────────────────────────
+    // 'lighter' (additive) on the meta variant lets overlapping sprite alphas
+    // sum, which the CSS contrast() filter then thresholds into fused blobs.
+    ctx.globalCompositeOperation = COMPOSITE;
+    for (const d of dots) {
+      const paused = now < d.pauseUntil;
+      // Final rendered position includes the push offset so the kick is
+      // visible and feeds the velocity calc — the dot's bloom stretches and
+      // puffs along the push direction as it scoots away, then settles back
+      // into normal motion as the offset decays.
+      const rx = d.x + d.offX;
+      const ry = d.y + d.offY;
+      const vx = paused ? 0 : (rx - d.prevX) / dt;
+      const vy = paused ? 0 : (ry - d.prevY) / dt;
+      const speed = Math.hypot(vx, vy);
+      if (!paused) { d.prevX = rx; d.prevY = ry; }
+
+      // Velocity gains kept small so the dots stay compact even at speed —
+      // a touch of breathing on the bloom (max +4px on top of BASE_BLUR) and
+      // a subtle directional hint on the stretch (max ~1.45x along motion),
+      // rather than the long elongated streaks that aggressive gains produced.
+      const blurTarget    = BASE_BLUR + Math.min(speed * 0.020, 4);
+      const stretchTarget = 1 + Math.min(speed * 0.004, 0.45);
+      d.blur    += (blurTarget    - d.blur)    * 0.06;
+      d.stretch += (stretchTarget - d.stretch) * 0.05;
+
+      const angle = paused ? 0 : Math.atan2(vy, vx);
+
+      // Drop the pre-baked sprite at the dot's position. d.blur — which still
+      // eases toward a velocity-driven target — now controls the on-screen
+      // bloom size instead of a real-time filter radius. The stretch scale
+      // gives directional elongation along velocity. Total cost per dot:
+      // one transform + one drawImage, no filter, no overdraw stacking.
+      const r = d.blur * 0.7; // visible bloom radius in CSS px
+      const sprite = paused ? SPRITE_PAUSE : SPRITE_MOVE;
+      ctx.save();
+      ctx.translate(rx, ry);
+      ctx.rotate(angle);
+      ctx.scale(d.stretch, 1 / Math.sqrt(d.stretch));
+      ctx.drawImage(sprite, -r, -r, r * 2, r * 2);
+      ctx.restore();
+    }
+
+    requestAnimationFrame(draw);
+  };
+
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
