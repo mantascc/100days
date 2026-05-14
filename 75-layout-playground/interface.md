@@ -1,123 +1,126 @@
 # Interface
 
-Layout-system playground. Floating components on a dark canvas with macOS-style hairline borders.
+Component reference for the Mintis layout playground. For tokens and principles see [system.md](system.md).
 
 ## Glossary
 
 | Term | Element | Role |
 |---|---|---|
 | **Desktop** | `body` | OS-level background. Gradient (navy → mint). |
-| **Shell** | `.shell` | The app window. Holds the titlebar and all floating components. Rounded, hairline-bordered, drop-shadowed. |
-| **Titlebar** | `.titlebar` | 38px transparent top bar inside the shell. Carries traffic lights and the connection status dot. |
-| **Traffic** | `.traffic__dot` | macOS close/minimise/maximise pills (12px). Cosmetic only. |
-| **Status** | `.status` | Top-right indicator. Green glow dot + hover-revealed "Connected" label. |
-| **Sidebar** | `.sidebar` | Left-floating panel, 240px. Holds nav / folders / account zones. Collapsible to a 46px header rail. |
-| **Window** | `.window` | Right-floating palette, 44px collapsed. Expands to 320px when an icon is activated. Stack stays visible; selected icon is pressed-in. |
-| **Canvas** | `.canvas` | Centred work area between sidebar and window. Transparent container — components inside float independently. |
-| **Input** | `.input` | Composer block. Centered vertically in the canvas. Currently shows a wireframe placeholder rectangle. |
+| **Shell** | `.shell` | The app window. Fixed `#111114` background, hosts the titlebar and all floating components. |
+| **Titlebar** | `.titlebar` | 38px transparent top bar. Traffic lights, centered "Mintis" title, status dot. On mobile: burger replaces traffic lights. |
+| **Traffic** | `.traffic__dot` | macOS close/minimise/maximise pills (12px). Cosmetic. Hidden on mobile. |
+| **Burger** | `.titlebar__burger` | `menu` icon, mobile only. Toggles the sidebar drawer. |
+| **Status** | `.status` | Top-right. Green glow dot + hover-revealed "Connected" label. |
+| **Sidebar** | `.sidebar` | Left-floating panel. Two states: expanded full panel (240px) and collapsed icon-rail island (44×208). Starts collapsed. |
+| **Window** | `.window` | Right-floating tool palette. 44px collapsed, expands in place to 320px. Hidden on mobile. |
+| **Canvas** | `.canvas` | Centered work area. Fluid, capped at 768px, lives in the band between sidebar and window — never overlaps either. |
+| **Input** | `.input` | Composer block, vertically centered in the canvas. Tall single field with a wireframe placeholder. |
+| **Toolbar** | `.canvas__toolbar` | Row above the input: folder selector + two quick-action chips. |
+| **Scrim** | `.scrim` | Mobile-only backdrop behind the sidebar drawer. |
 
 ## Layout
 
 ```
-┌─ desktop (body gradient) ────────────────────────────┐
-│  ┌─ shell (#111114, rounded, hairline) ──────────┐   │
-│  │  ┌─titlebar─────────────────────────────────┐ │   │
-│  │  │ ● ● ●                              ● Connected │ │   │
-│  │  └──────────────────────────────────────────┘ │   │
-│  │ ┌sidebar┐  ┌──── canvas ────┐  ┌window┐       │   │
-│  │ │240px  │  │   (centered)   │  │44px  │       │   │
-│  │ │       │  │                │  │      │       │   │
-│  │ │ nav   │  │  ┌──input───┐  │  │ ◯    │       │   │
-│  │ │ folders│ │  │ wireframe│  │  │ ▢    │       │   │
-│  │ │ ⚙     │  │  └──────────┘  │  │ ▷    │       │   │
-│  │ └───────┘  └────────────────┘  └──────┘       │   │
-│  └────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────┘
+┌─ desktop (body gradient) ─────────────────────────────────┐
+│  ┌─ shell (#111114) ───────────────────────────────────┐  │
+│  │ ┌titlebar────────────────────────────────────────┐  │  │
+│  │ │ ● ● ●               Mintis            ● Connected │  │  │
+│  │ └────────────────────────────────────────────────┘  │  │
+│  │ ┌rail┐    ┌──────── canvas ────────┐      ┌window┐   │  │
+│  │ │ ⤢  │    │  [📁▾] [▭] [▭]          │      │ ◳     │   │  │
+│  │ │ ▦  │    │                        │      │ 📁    │   │  │
+│  │ │ ⌕  │    │   ┌── input ──────┐     │      │ ▭     │   │  │
+│  │ │ ▢  │    │   │  ▭             │     │      │ #     │   │  │
+│  │ │ ⌖  │    │   └───────────────┘     │      │ ▤     │   │  │
+│  │ │ ┌┐ │    └────────────────────────┘      │ ⋮     │   │  │
+│  │ └────┘                                    └───────┘   │  │
+│  └─────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────┘
 ```
 
-Insets inside the shell: titlebar 38px tall, then each floating component anchored at `top: 46px` with a 16px gap to the bottom.
+Components anchor at `top: 46px` (38px titlebar + 8). 16px gap to shell edges.
 
-## Sizing
+## Sidebar
 
-| Component | Default | Collapsed / Expanded |
-|---|---|---|
-| Sidebar | 240 × calc(100% − 62) | 240 × 46 (collapsed) |
-| Window | 44 × 204 | 320 × calc(100% − 62) (expanded) |
-| Canvas | 768 wide, vertically centered | — |
-| Input | 768 wide, ~88 tall | — |
-| Icon-btn | 28 × 28 | — |
-| Lucide icon | 20 default, 16 `.i-sm` | stroke-width: 2 |
+Two distinct states that crossfade-and-resize (never simultaneous).
 
-## Color tokens
+**Expanded** (`.sidebar__full`, 240 × calc(100% − 62))
+- `.sidebar__header` — wireframe label + minimize toggle
+- `.sidebar__body` — three zones separated by 32px gap:
+  - `--nav` — 4 items (dashboard, search, inbox, bell)
+  - `--folders` — `flex: 1`, scrolls; folders with indented `dot` children; one child carries `.is-selected`
+  - `--account` — single settings icon-button, right-aligned
 
-| Token | Value | Use |
-|---|---|---|
-| `--desktop` | `#0c0c0e` | Reserved (currently overridden by body gradient) |
-| `--bg` | `#161618` | Reserved baseline canvas color |
-| `--panel` | `#1f1f22` | Surface of sidebar, window, input |
-| `--hairline` | `rgba(255,255,255,0.06)` | All borders |
-| `--fg` | `#e8e8ea` | Primary text/icons |
-| `--muted` | `#8a8a92` | Secondary text/icons, wireframe rectangles |
-| `--attention` | `#f0b830` | Selected item / pending-state indicator |
-| `--accent` | `#0a84ff` | Primary action (Apple system blue) |
-| `--accent-hover` | `#1e91ff` | Accent hover state |
+**Collapsed** (`.sidebar__rail`, 44 × 208 floating island)
+- `maximize` expand icon at top
+- 4 nav icons (dashboard, search, inbox, notifications)
+- `.sidebar__slot` — dashed empty notification slot holding a 4×4 `--attention` dot
 
-Shell background is currently a fixed darker variant `#111114` (between desktop and bg).
+Only the top `maximize` icon expands the rail; the nav icons are inert. The header `minimize` collapses it.
 
-## Elevation
+## Window
 
-Three-layer subtle shadow on every floating panel:
+Single `.window` element, two layers, row-reverse layout.
 
-```css
-box-shadow:
-  0 1px 0 rgba(255, 255, 255, 0.03) inset, /* top highlight */
-  0 6px 18px rgba(0, 0, 0, 0.28),          /* ambient */
-  0 1px 2px rgba(0, 0, 0, 0.35);           /* contact */
-```
+- `.window__stack` — always-visible 44px icon column (notebook-pen, folder, bookmark, tag, archive + `more-vertical` overflow)
+- `.window__detail` — revealed when expanded; `.window__header` with a 64×8 wireframe title
 
-The shell itself sits one level higher (drop shadow `0 20px 60px`).
+Clicking a stack icon expands the window to 320px and gives that icon a pressed-in state (`.is-active` — dark bg + inset shadow). Clicking the active icon again collapses it. The overflow icon is inert.
 
-## Motion
+## Canvas
 
-- **Ease**: `cubic-bezier(0.4, 0, 0.2, 1)` (var `--ease`). Calm, no overshoot. Clear-channel.
-- **Sidebar collapse**: body fades out (140ms) → resize (280ms, delayed 140ms).
-- **Sidebar expand**: resize (280ms) → body fades in (140ms, delayed 280ms).
-- **Window activate**: resize (280ms) → detail fades in (180ms, delayed 140ms). Stack stays visible.
-- **Window deactivate**: detail fades out (180ms) → resize (280ms). Same pattern reversed.
-- **Hover / active on icons**: 150ms ease.
+- `position: absolute`, `top: 46 / bottom: 16`
+- Band: `left: 272px` (clears sidebar), `right: 76px` (clears window)
+- `width: auto`, `max-width: 768px`, auto margins → centered within the band
+- **Reactive** (desktop, `@media min-width: 769px`, via `:has()`):
+  - `.sidebar.is-collapsed` → `left: 76px`
+  - `.window.is-expanded` → `right: 352px`
+- Vertically centers its children (`justify-content: center`, 16px gap)
+
+### Toolbar
+- `.folder-select` — pill: folder icon + 72×6 wireframe label + chevron-down
+- `.chip` ×2 — pill: 40×6 wireframe label
+- All carry `.float` (lighter elevation shadow)
+
+### Input
+- Tall single field (`min-height: 56px`, 16px padding)
+- `.input__placeholder` — 120×8 wireframe bar, fades on focus / when filled
+- No send button
 
 ## States
 
 | State class | Applied to | Effect |
 |---|---|---|
-| `.is-collapsed` | `.sidebar` | Shrinks to 46px header-only rail; attention dot moves next to label |
-| `.is-expanded` | `.window` | Widens to 320px and reveals `.window__detail` panel |
+| `.is-collapsed` | `.sidebar` | Crossfades to the 44×208 icon-rail island |
+| `.is-open` | `.sidebar` + `.scrim` | Mobile only — slides the sidebar drawer in over the scrim |
+| `.is-expanded` | `.window` | Widens to 320px, reveals `.window__detail` |
 | `.is-active` | `.icon-btn` (in `.window`) | Pressed-in look (dark bg + inset shadow) |
-| `.is-selected` | `.sidebar__item` | Replaces bullet icon with a 4×4 `--attention` dot |
+| `.is-selected` | `.sidebar__item` | Replaces the bullet with a 4×4 `--attention` dot |
+
+## Responsive
+
+Single breakpoint at **768px**.
+
+| | Desktop (`> 768px`) | Mobile (`≤ 768px`) |
+|---|---|---|
+| Shell | Floating, rounded, bordered | Full-bleed, no radius/border |
+| Titlebar | Traffic lights | Burger replaces traffic lights |
+| Sidebar | Collapsible island, in-flow | Off-canvas left drawer, burger-triggered, always shows full panel |
+| Window | Visible, expandable | `display: none` |
+| Canvas | Reactive band between neighbors | Full width, 12px insets |
+| Scrim | — | Backdrop behind the open drawer |
 
 ## Icons
 
-- Library: **Lucide** (CDN script)
-- Stroke width: **2**
-- Default size: **20px**
-- Small variant: **16px** via `.i-sm`
-- Used: `minimize`, `maximize`, `layout-dashboard`, `search`, `inbox`, `bell`, `folder`, `dot`, `settings`, `notebook-pen`, `bookmark`, `tag`, `archive`, `more-vertical`
+- Library: **Lucide** (CDN). Stroke width **2**. Default **20px**, small **16px** via `.i-sm`.
+- Used: `menu`, `minimize`, `maximize`, `layout-dashboard`, `search`, `inbox`, `bell`, `folder`, `dot`, `settings`, `chevron-down`, `notebook-pen`, `bookmark`, `tag`, `archive`, `more-vertical`.
 
-## Typography
+## JavaScript
 
-- Family: **JetBrains Mono** (loaded from Google Fonts)
-- Base: 13px / 1.5 line-height
-- Status label: 11px, 0.04em tracking
-- Anti-aliasing: `-webkit-font-smoothing: antialiased`
+Minimal, inline at end of `<body>`:
+- `lucide.createIcons()` — renders icons
+- Burger ⇄ scrim ⇄ `.sidebar.is-open` — mobile drawer toggle
+- `.window__stack` icon clicks — toggle `.is-expanded` + `.is-active` (overflow excluded)
 
-## Wireframe placeholders
-
-Text content is intentionally abstracted to rectangles so layout decisions aren't biased by copy.
-
-| Element | Width × Height | Opacity |
-|---|---|---|
-| Sidebar label / window title | 64 × 8 | 0.35 |
-| Sidebar item label (top nav) | 80 × 6 | 0.35 (rises to 0.6 on item hover) |
-| Folder child item label | 64 × 5 | 0.25 |
-| Input placeholder | 120 × 8 | 0.35 (fades on focus) |
-| Attention dot | 4 × 4 | 1.0, `--attention` |
+Sidebar collapse/expand and folder-rail expand are handled by inline `onclick` attributes.
