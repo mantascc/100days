@@ -363,5 +363,10 @@
     "id": "73-svg-layouts",
     "path": "100days/73-svg-layouts",
     "description": "SVG Layouts \u2014 schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations"
+  },
+  {
+    "id": "75-layout-playground",
+    "path": "100days/75-layout-playground",
+    "description": "Layout Playground \u2014 a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure"
   }
 ]

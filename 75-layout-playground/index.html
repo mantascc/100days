@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>layout playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" />
+<style>
+  :root {
+    --desktop: #0c0c0e;
+    --bg: #161618;
+    --panel: #1f1f22;
+    --hairline: rgba(255, 255, 255, 0.06);
+    --fg: #e8e8ea;
+    --muted: #8a8a92;
+    --attention: #f0b830;
+    --accent: #0a84ff;
+    --accent-hover: #1e91ff;
+  }
+
+  @keyframes attention-blink {
+    0%, 92%, 96%, 100% { opacity: 1; }
+    94%, 98% { opacity: 0.15; }
+  }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    color: var(--fg);
+    font: 13px/1.5 "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  [data-lucide] {
+    stroke-width: 2;
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+  }
+  [data-lucide].i-sm { width: 16px; height: 16px; }
+
+  body {
+    background: linear-gradient(135deg, #0e1830 0%, #122a32 55%, #143028 100%);
+  }
+
+  body {
+    padding: 24px;
+    box-sizing: border-box;
+  }
+
+  .shell {
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #111114;
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .titlebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background: transparent;
+    z-index: 2;
+    -webkit-app-region: drag;
+  }
+
+  .traffic {
+    display: flex;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+  }
+
+  .traffic__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+  }
+
+  .traffic__dot--close { background: #ff5f57; }
+  .traffic__dot--min   { background: #febc2e; }
+  .traffic__dot--max   { background: #28c840; }
+
+  .status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+  }
+
+  .status__label {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transform: translateX(4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    pointer-events: none;
+  }
+
+  .status:hover .status__label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d058;
+    box-shadow:
+      0 0 6px rgba(52, 208, 88, 0.7),
+      0 0 12px rgba(52, 208, 88, 0.35);
+  }
+
+  .sidebar {
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    top: 46px;
+    left: 16px;
+    width: 240px;
+    height: calc(100% - 62px);
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 6px 18px rgba(0, 0, 0, 0.28),
+      0 1px 2px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    transition:
+      width 0.28s var(--ease) 0.14s,
+      height 0.28s var(--ease) 0.14s;
+  }
+
+  .sidebar.is-collapsed {
+    width: 44px;
+    height: 208px;
+    transition:
+      width 0.28s var(--ease) 0.14s,
+      height 0.28s var(--ease) 0.14s;
+  }
+
+  .sidebar__rail {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    gap: 4px;
+    box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    /* expanding: fade out first */
+    transition: opacity 0.14s var(--ease) 0s;
+  }
+
+  .sidebar.is-collapsed .sidebar__rail {
+    opacity: 1;
+    pointer-events: auto;
+    /* collapsing: fade in after resize */
+    transition: opacity 0.14s var(--ease) 0.42s;
+  }
+
+  .sidebar__slot {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .sidebar__slot::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    background: var(--attention);
+  }
+
+  .sidebar__full {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    /* expanding: fade in after resize */
+    transition: opacity 0.14s var(--ease) 0.42s;
+  }
+
+  .sidebar.is-collapsed .sidebar__full {
+    opacity: 0;
+    pointer-events: none;
+    /* collapsing: fade out first */
+    transition: opacity 0.14s var(--ease) 0s;
+  }
+
+  .sidebar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .sidebar__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 8px;
+    box-sizing: border-box;
+    gap: 32px;
+  }
+
+  .sidebar__zone {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sidebar__zone--folders {
+    flex: 1;
+    overflow-y: auto;
+    gap: 8px;
+  }
+
+  .sidebar__zone--account {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .sidebar__zone--folders::-webkit-scrollbar { width: 0; }
+
+  .sidebar__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .sidebar__item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--fg);
+  }
+
+  .sidebar__item:hover .sidebar__item-label {
+    opacity: 0.6;
+  }
+
+  .sidebar__item:active {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar__item.is-selected {
+    position: relative;
+  }
+
+  .sidebar__item.is-selected > [data-lucide],
+  .sidebar__item.is-selected > svg {
+    visibility: hidden;
+  }
+
+  .sidebar__item.is-selected::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 50%;
+    background: var(--attention);
+  }
+
+  .sidebar__item-label {
+    width: 80px;
+    height: 6px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.35;
+  }
+
+  .sidebar__folder {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sidebar__folder-children {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 20px;
+  }
+
+  .sidebar__folder-children .sidebar__item-label {
+    width: 64px;
+    height: 5px;
+    opacity: 0.25;
+  }
+
+  .sidebar__label {
+    display: block;
+    width: 64px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--muted);
+    opacity: 0.35;
+    transition: opacity 0.18s ease;
+  }
+
+  .input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 6px 18px rgba(0, 0, 0, 0.28),
+      0 1px 2px rgba(0, 0, 0, 0.35);
+  }
+
+  .input__field {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--fg);
+    font: inherit;
+    padding: 0 8px;
+    min-height: 56px;
+  }
+
+  .input__placeholder {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--muted);
+    opacity: 0.35;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  .input__field:focus ~ .input__placeholder,
+  .input__field:not(:placeholder-shown) ~ .input__placeholder {
+    opacity: 0;
+  }
+
+  .canvas {
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    top: 46px;
+    bottom: 16px;
+    /* band between sidebar and window — canvas never overlaps either */
+    left: 272px;   /* 16 + 240 sidebar + 16 gap */
+    right: 76px;   /* 16 + 44 window + 16 gap */
+    width: auto;
+    max-width: 768px;
+    margin-left: auto;
+    margin-right: auto;
+    background: transparent;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    transition:
+      left 0.28s var(--ease),
+      right 0.28s var(--ease);
+  }
+
+  /* desktop: canvas band reacts to sidebar/window state */
+  @media (min-width: 769px) {
+    .shell:has(.sidebar.is-collapsed) .canvas { left: 76px; }
+    .shell:has(.window.is-expanded) .canvas { right: 352px; }
+  }
+
+  .canvas__toolbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .titlebar__title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+  }
+
+  .float {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 4px 12px rgba(0, 0, 0, 0.25),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .folder-select {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 10px;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .folder-select:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--fg);
+  }
+
+  .folder-select__label {
+    width: 72px;
+    height: 6px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.35;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .chip:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .chip__label {
+    width: 40px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--muted);
+    opacity: 0.35;
+  }
+
+  .window {
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    top: 46px;
+    right: 16px;
+    width: 44px;
+    height: 204px;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.03) inset,
+      0 6px 18px rgba(0, 0, 0, 0.28),
+      0 1px 2px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row-reverse;
+    transition:
+      width 0.28s var(--ease),
+      height 0.28s var(--ease);
+  }
+
+  .window.is-expanded {
+    width: 320px;
+    height: calc(100% - 62px);
+  }
+
+  .window__stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    gap: 4px;
+    box-sizing: border-box;
+    width: 44px;
+    flex-shrink: 0;
+  }
+
+  .window__detail {
+    flex: 1;
+    min-width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s var(--ease) 0s;
+  }
+
+  .window.is-expanded .window__detail {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.18s var(--ease) 0.14s;
+  }
+
+  .window__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .window__title {
+    width: 64px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--muted);
+    opacity: 0.35;
+  }
+
+  .window .icon-btn.is-active {
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    color: var(--fg);
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    color: var(--muted);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--fg);
+  }
+
+  .icon-btn.is-active {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--fg);
+  }
+
+  .titlebar__burger { display: none; }
+  .scrim { display: none; }
+
+  /* ── Mobile: canvas stays primary, sidebar becomes a burger drawer ── */
+  @media (max-width: 768px) {
+    body { padding: 0; }
+
+    .shell {
+      border: 0;
+      border-radius: 0;
+    }
+
+    .traffic { display: none; }
+
+    .titlebar { z-index: 11; }
+
+    .titlebar__burger {
+      display: inline-flex;
+      -webkit-app-region: no-drag;
+    }
+
+    /* canvas: full-width, always visible */
+    .canvas {
+      left: 12px;
+      right: 12px;
+      max-width: none;
+    }
+
+    /* sidebar: left slide-in drawer */
+    .sidebar,
+    .sidebar.is-collapsed {
+      width: 280px;
+      max-width: 84vw;
+      height: calc(100% - 62px);
+      z-index: 10;
+      transform: translateX(calc(-100% - 24px));
+      transition: transform 0.28s var(--ease);
+    }
+
+    .sidebar.is-open,
+    .sidebar.is-collapsed.is-open {
+      transform: translateX(0);
+    }
+
+    /* drawer always shows the full panel, never the rail */
+    .sidebar__rail { display: none; }
+    .sidebar__full { opacity: 1; pointer-events: auto; }
+    .sidebar__toggle-close { display: none; }
+
+    /* window folds away on mobile */
+    .window { display: none; }
+
+    /* drawer backdrop */
+    .scrim {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 9;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s var(--ease);
+    }
+
+    .scrim.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="titlebar">
+      <div class="traffic">
+        <span class="traffic__dot traffic__dot--close"></span>
+        <span class="traffic__dot traffic__dot--min"></span>
+        <span class="traffic__dot traffic__dot--max"></span>
+      </div>
+      <button class="icon-btn titlebar__burger" id="burger" aria-label="Menu">
+        <i data-lucide="menu" class="i-sm"></i>
+      </button>
+      <div class="titlebar__title">Mintis</div>
+      <div class="status">
+        <span class="status__label">Connected</span>
+        <span class="status__dot"></span>
+      </div>
+    </div>
+    <aside class="sidebar is-collapsed" id="sidebar">
+      <div class="sidebar__rail">
+        <button class="icon-btn" aria-label="Expand sidebar" onclick="document.getElementById('sidebar').classList.remove('is-collapsed')">
+          <i data-lucide="maximize" class="i-sm"></i>
+        </button>
+        <button class="icon-btn" aria-label="Dashboard"><i data-lucide="layout-dashboard" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Search"><i data-lucide="search" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Inbox"><i data-lucide="inbox" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Notifications"><i data-lucide="bell" class="i-sm"></i></button>
+        <div class="sidebar__slot"></div>
+      </div>
+      <div class="sidebar__full">
+        <div class="sidebar__header">
+          <div class="sidebar__label" aria-label="sidebar"></div>
+          <button class="icon-btn sidebar__toggle-close" aria-label="Collapse sidebar" onclick="document.getElementById('sidebar').classList.add('is-collapsed')">
+            <i data-lucide="minimize" class="i-sm"></i>
+          </button>
+        </div>
+        <div class="sidebar__body">
+          <ul class="sidebar__zone sidebar__zone--nav">
+            <li class="sidebar__item"><i data-lucide="layout-dashboard" class="i-sm"></i><span class="sidebar__item-label"></span></li>
+            <li class="sidebar__item"><i data-lucide="search" class="i-sm"></i><span class="sidebar__item-label"></span></li>
+            <li class="sidebar__item"><i data-lucide="inbox" class="i-sm"></i><span class="sidebar__item-label"></span></li>
+            <li class="sidebar__item"><i data-lucide="bell" class="i-sm"></i><span class="sidebar__item-label"></span></li>
+          </ul>
+          <div class="sidebar__zone sidebar__zone--folders">
+            <div class="sidebar__folder">
+              <div class="sidebar__item"><i data-lucide="folder" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+              <div class="sidebar__folder-children">
+                <div class="sidebar__item"><i data-lucide="dot" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+                <div class="sidebar__item"><i data-lucide="dot" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+                <div class="sidebar__item"><i data-lucide="dot" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+              </div>
+            </div>
+            <div class="sidebar__folder">
+              <div class="sidebar__item"><i data-lucide="folder" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+              <div class="sidebar__folder-children">
+                <div class="sidebar__item"><i data-lucide="dot" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+                <div class="sidebar__item is-selected"><i data-lucide="dot" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+              </div>
+            </div>
+            <div class="sidebar__folder">
+              <div class="sidebar__item"><i data-lucide="folder" class="i-sm"></i><span class="sidebar__item-label"></span></div>
+            </div>
+          </div>
+          <div class="sidebar__zone sidebar__zone--account">
+            <button class="icon-btn" aria-label="Settings">
+              <i data-lucide="settings" class="i-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <section class="canvas" id="canvas">
+      <div class="canvas__toolbar">
+        <button class="folder-select float">
+          <i data-lucide="folder" class="i-sm"></i>
+          <span class="folder-select__label"></span>
+          <i data-lucide="chevron-down" class="i-sm"></i>
+        </button>
+        <div class="chip float"><span class="chip__label"></span></div>
+        <div class="chip float"><span class="chip__label"></span></div>
+      </div>
+      <form class="input" onsubmit="event.preventDefault();">
+        <input class="input__field" type="text" placeholder=" " />
+        <div class="input__placeholder"></div>
+      </form>
+    </section>
+    <aside class="window" id="window">
+      <div class="window__stack">
+        <button class="icon-btn" aria-label="Notebook"><i data-lucide="notebook-pen" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Folder"><i data-lucide="folder" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Bookmark"><i data-lucide="bookmark" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Tag"><i data-lucide="tag" class="i-sm"></i></button>
+        <button class="icon-btn" aria-label="Archive"><i data-lucide="archive" class="i-sm"></i></button>
+        <button class="icon-btn window__overflow" aria-label="More"><i data-lucide="more-vertical" class="i-sm"></i></button>
+      </div>
+      <div class="window__detail">
+        <div class="window__header">
+          <div class="window__title"></div>
+        </div>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    lucide.createIcons();
+
+    const burger = document.getElementById('burger');
+    const scrim = document.getElementById('scrim');
+    const sidebarEl = document.getElementById('sidebar');
+
+    function setDrawer(open) {
+      sidebarEl.classList.toggle('is-open', open);
+      scrim.classList.toggle('is-open', open);
+    }
+    burger.addEventListener('click', () => setDrawer(!sidebarEl.classList.contains('is-open')));
+    scrim.addEventListener('click', () => setDrawer(false));
+
+    const windowEl = document.getElementById('window');
+
+    document.querySelectorAll('.window__stack .icon-btn').forEach(btn => {
+      if (btn.classList.contains('window__overflow')) return;
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('is-active')) {
+          btn.classList.remove('is-active');
+          windowEl.classList.remove('is-expanded');
+          return;
+        }
+        document.querySelectorAll('.window__stack .icon-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        windowEl.classList.add('is-expanded');
+      });
+    });
+  </script>
+</body>
+</html>
