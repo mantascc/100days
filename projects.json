@@ -368,5 +368,10 @@
     "id": "74-particles",
     "path": "100days/74-particles",
     "description": "Particles \u2014 soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold"
+  },
+  {
+    "id": "75-layout-playground",
+    "path": "100days/75-layout-playground",
+    "description": "Layout Playground \u2014 a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure"
   }
 ]
