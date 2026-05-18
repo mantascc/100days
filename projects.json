@@ -373,5 +373,10 @@
     "id": "75-layout-playground",
     "path": "100days/75-layout-playground",
     "description": "Layout Playground \u2014 a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure"
+  },
+  {
+    "id": "76-layout-depth",
+    "path": "100days/76-layout-depth",
+    "description": "Layout Depth \u2014 depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window"
   }
 ]
