@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Days of Creative Coding — sticky banner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&display=swap">
+    <style>
+        :root {
+            --ground-void: #0a0a0a;
+            --ground-base: #0f0f0f;
+            --ground-raised: #141414;
+            --ground-surface: #1a1a1a;
+            --ground-float: #202232;
+            --ground-modal: #242424;
+
+            --text-primary: #ffffff;
+            --text-default: #f5f5f7;
+            --text-secondary: #a8aab8;
+            --text-tertiary: #666666;
+            --text-ghost: #333333;
+
+            --border-subtle: #1a1a1a;
+            --border-default: #2a2a2a;
+            --border-strong: #3a3d52;
+
+            --accent: #7b6fa5;
+
+            --font-mono: "JetBrains Mono", "IBM Plex Mono", "SF Mono", Monaco, "Courier New", monospace;
+            --text-base: 13px;
+            --leading-base: 1.5;
+
+            --space-4: 16px;
+            --space-8: 32px;
+
+            --duration-fast: 100ms;
+            --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+            --banner-h: 200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--ground-void);
+            color: var(--text-default);
+            font-family: var(--font-mono);
+            font-size: var(--text-base);
+            line-height: var(--leading-base);
+        }
+
+        .banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--banner-h);
+            overflow: hidden;
+            background: transparent;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .filter-sheet {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            transition: background 200ms var(--ease-out);
+        }
+
+        .banner[data-filter="blur"] .filter-sheet {
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .banner[data-filter="distort"] .filter-sheet {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: url(#banner-distort);
+            -webkit-backdrop-filter: url(#banner-distort);
+        }
+
+        .banner canvas {
+            position: absolute;
+            inset: 0;
+        }
+
+        .filter-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 1px;
+            background: var(--border-default);
+            border: 1px solid var(--border-default);
+            z-index: 20;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .filter-toggle button {
+            background: var(--ground-void);
+            color: var(--text-tertiary);
+            border: none;
+            padding: 6px 10px;
+            font: inherit;
+            cursor: pointer;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+        }
+
+        .filter-toggle button:hover {
+            color: var(--text-default);
+        }
+
+        .filter-toggle button.active {
+            background: var(--ground-raised);
+            color: var(--accent);
+        }
+
+        .banner-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            color: var(--text-secondary);
+            background: rgba(10,10,10,0.92);
+            padding: 5px 12px;
+            border: 1px solid rgba(123,111,165,0.2);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .scroll-root {
+            padding-top: var(--banner-h);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-8);
+        }
+
+        header {
+            margin-top: 40px;
+            margin-bottom: 64px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .header-cols {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 32px;
+            align-items: start;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .description {
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        .project-list {
+            display: grid;
+            gap: 1px;
+            background-color: var(--border-subtle);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .project-item {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 16px;
+            padding: 12px 16px;
+            background-color: var(--ground-void);
+            transition: background-color var(--duration-fast) var(--ease-out);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .project-item:hover {
+            background-color: var(--ground-raised);
+        }
+
+        .project-id {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .project-desc {
+            color: var(--text-default);
+        }
+
+        .project-item:hover .project-id {
+            color: var(--accent);
+        }
+
+        .clone-link {
+            display: inline-block;
+            margin-top: 16px;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            text-decoration: none;
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        .clone-link:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <filter id="banner-distort" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="2" seed="4" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+    </svg>
+
+    <div class="banner" data-filter="blur">
+        <div class="filter-sheet"></div>
+        <canvas id="banner-field"></canvas>
+        <div class="banner-label">Hello world</div>
+    </div>
+
+    <div class="filter-toggle">
+        <button data-mode="off">off</button>
+        <button data-mode="blur" class="active">blur</button>
+        <button data-mode="distort">distort</button>
+    </div>
+
+    <div class="scroll-root">
+        <div class="container">
+            <header>
+                <div class="header-cols">
+                    <div>
+                        <h1>Hej</h1>
+                        <p class="description">
+                            100 day routine to explore computational aesthetics, data expression, coding concepts. Inspired by <a href="https://www.instagram.com/tiantianxu/" style="color: inherit; text-decoration: underline; text-decoration-color: var(--text-tertiary); opacity: 0.8;">Tiantian Xu</a>
+                        </p>
+                        <a href="https://github.com/mantascc/100days" class="clone-link">github.com/mantascc/100days</a>
+                    </div>
+                </div>
+            </header>
+
+            <div class="project-list">
+
+                <a href="../../76-layout-depth/index.html" class="project-item">
+                    <span class="project-id">76-layout-depth</span>
+                    <span class="project-desc">Layout Depth — depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window</span>
+                </a>
+
+                <a href="../../75-layout-playground/index.html" class="project-item">
+                    <span class="project-id">75-layout-playground</span>
+                    <span class="project-desc">Layout Playground — a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure</span>
+                </a>
+
+                <a href="../../74-particles/index.html" class="project-item">
+                    <span class="project-id">74-particles</span>
+                    <span class="project-desc">Particles — soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold</span>
+                </a>
+
+                <a href="../../73-svg-layouts/index.html" class="project-item">
+                    <span class="project-id">73-svg-layouts</span>
+                    <span class="project-desc">SVG Layouts — schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations</span>
+                </a>
+
+                <a href="../../72-snapshots-v2/index.html" class="project-item">
+                    <span class="project-id">72-snapshots-v2</span>
+                    <span class="project-desc">Snapshots v2 — photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos → settling → locked) and chaotic bursty image loading</span>
+                </a>
+
+                <a href="../../71-index-100days/index.html" class="project-item">
+                    <span class="project-id">71-index-100days</span>
+                    <span class="project-desc">Index — 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags</span>
+                </a>
+
+                <a href="../../70-clear-channel-2/index.html" class="project-item">
+                    <span class="project-id">70-clear-channel-2</span>
+                    <span class="project-desc">Clear Channel — introduction: a design system for computational aesthetics; working with data as raw material</span>
+                </a>
+
+                <a href="../../69-clear-channel/index.html" class="project-item">
+                    <span class="project-id">69-clear-channel</span>
+                    <span class="project-desc">Clear Channel — visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system</span>
+                </a>
+
+                <a href="../../68-moog-phase/index.html" class="project-item">
+                    <span class="project-id">68-moog-phase</span>
+                    <span class="project-desc">Aida 01 — XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner</span>
+                </a>
+
+                <a href="../../67-audio-reactive-ascii/index.html" class="project-item">
+                    <span class="project-id">67-audio-reactive-ascii</span>
+                    <span class="project-desc">Audio Reactive ASCII Field — ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning</span>
+                </a>
+
+                <a href="../../66-ascii-field-gallery/index.html" class="project-item">
+                    <span class="project-id">66-ascii-field-gallery</span>
+                    <span class="project-desc">ASCII Field Gallery — 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp</span>
+                </a>
+
+                <a href="../../65-mode-toggle/index.html" class="project-item">
+                    <span class="project-id">65-mode-toggle</span>
+                    <span class="project-desc">Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations</span>
+                </a>
+
+                <a href="../../64-viz-grouped/index.html" class="project-item">
+                    <span class="project-id">64-viz-grouped</span>
+                    <span class="project-desc">Viz Grouped — reference gallery of visualization types grouped by analytical goal</span>
+                </a>
+
+                <a href="../../63-ube-kaizen/index.html" class="project-item">
+                    <span class="project-id">63-ube-kaizen</span>
+                    <span class="project-desc">Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings</span>
+                </a>
+
+                <a href="../../62-terminal-cli/index.html" class="project-item">
+                    <span class="project-id">62-terminal-cli</span>
+                    <span class="project-desc">Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat</span>
+                </a>
+
+                <a href="../../61-hitl-patterns/index.html" class="project-item">
+                    <span class="project-id">61-hitl-patterns</span>
+                    <span class="project-desc">Human in the Loop — four patterns across a single autonomy axis</span>
+                </a>
+
+                <a href="../../60-agentic-patterns/index.html" class="project-item">
+                    <span class="project-id">60-agentic-patterns</span>
+                    <span class="project-desc">Agentic Patterns — interactive reference for AI agent design patterns</span>
+                </a>
+
+                <a href="../../59-font-explorer/index.html" class="project-item">
+                    <span class="project-id">59-font-explorer</span>
+                    <span class="project-desc">Font Explorer — skill to visualize any font</span>
+                </a>
+
+                <a href="../../58-shapes/index.html" class="project-item">
+                    <span class="project-id">58-shapes</span>
+                    <span class="project-desc">Shapes — geometric explorer with lines, arcs, and curves chapters</span>
+                </a>
+
+                <a href="../../57-color-themes/index.html" class="project-item">
+                    <span class="project-id">57-color-themes</span>
+                    <span class="project-desc">Color Themes — five chapters, three palettes: Peach, Clay, and Aus</span>
+                </a>
+
+                <a href="../../56-constrained-variation/index.html" class="project-item">
+                    <span class="project-id">56-constrained-variation</span>
+                    <span class="project-desc">Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously</span>
+                </a>
+
+                <a href="../../55-ascii-loading/index.html" class="project-item">
+                    <span class="project-id">55-ascii-loading</span>
+                    <span class="project-desc">ASCII Loading — dual-grid crystallization animation with face emergence and progress bar</span>
+                </a>
+
+                <a href="../../54-concept-graph/index.html" class="project-item">
+                    <span class="project-id">54-concept-graph</span>
+                    <span class="project-desc">Interactive force-directed graph visualizing relationships between projects and data concepts</span>
+                </a>
+
+                <a href="../../53-ascii-grid/index.html" class="project-item">
+                    <span class="project-id">53-ascii-grid</span>
+                    <span class="project-desc">ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes</span>
+                </a>
+
+                <a href="../../52-reaction-diffusion/index.html" class="project-item">
+                    <span class="project-id">52-reaction-diffusion</span>
+                    <span class="project-desc">Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls</span>
+                </a>
+
+                <a href="../../51-resonant-lattice/index.html" class="project-item">
+                    <span class="project-id">51-resonant-lattice</span>
+                    <span class="project-desc">Resonant Lattice - Interactive physics grid with mass-spring damper nodes</span>
+                </a>
+
+                <a href="../../50-execution-trace-graph/index.html" class="project-item">
+                    <span class="project-id">50-execution-trace-graph</span>
+                    <span class="project-desc">Execution Trace Graph - AI response visualized as a traversal through a skill graph</span>
+                </a>
+
+                <a href="../../49-grid-trace/index.html" class="project-item">
+                    <span class="project-id">49-grid-trace</span>
+                    <span class="project-desc">Grid Trace - Interactive grid path visualization with Geist Pixel font</span>
+                </a>
+
+                <a href="../../45-gravity-pills/index.html" class="project-item">
+                    <span class="project-id">45-gravity-pills</span>
+                    <span class="project-desc">Gravity pills particle simulation</span>
+                </a>
+
+                <a href="../../42-metaball-grid/index.html" class="project-item">
+                    <span class="project-id">42-metaball-grid</span>
+                    <span class="project-desc">Grid-based metaball effects</span>
+                </a>
+
+                <a href="../../41-metaball/index.html" class="project-item">
+                    <span class="project-id">41-metaball</span>
+                    <span class="project-desc">Metaball physics and animation</span>
+                </a>
+
+                <a href="../../40-cube-grid-rules/index.html" class="project-item">
+                    <span class="project-id">40-cube-grid-rules</span>
+                    <span class="project-desc">Cube grid rules engine</span>
+                </a>
+
+                <a href="../../39-wave-morph/index.html" class="project-item">
+                    <span class="project-id">39-wave-morph</span>
+                    <span class="project-desc">Morphing wave patterns</span>
+                </a>
+
+                <a href="../../38-baltic-pattern/index.html" class="project-item">
+                    <span class="project-id">38-baltic-pattern</span>
+                    <span class="project-desc">Generative Baltic pattern</span>
+                </a>
+
+                <a href="../../36-spinning-globe/index.html" class="project-item">
+                    <span class="project-id">36-spinning-globe</span>
+                    <span class="project-desc">Vite React TypeScript project</span>
+                </a>
+
+                <a href="../../35-flight-path-viz/index.html" class="project-item">
+                    <span class="project-id">35-flight-path-viz</span>
+                    <span class="project-desc">Great circle flight path animation (Leaflet/Turf.js)</span>
+                </a>
+
+                <a href="../../34-particle-text-morph/index.html" class="project-item">
+                    <span class="project-id">34-particle-text-morph</span>
+                    <span class="project-desc">Text morphing with particle transitions</span>
+                </a>
+
+                <a href="../../33-three-body-problem/index.html" class="project-item">
+                    <span class="project-id">33-three-body-problem</span>
+                    <span class="project-desc">Temporal slitscan imaging effect</span>
+                </a>
+
+                <a href="../../32-genart-cards/index.html" class="project-item">
+                    <span class="project-id">32-genart-cards</span>
+                    <span class="project-desc">Chaotic entropy pattern generation</span>
+                </a>
+
+                <a href="../../31-cli-material-palette/index.html" class="project-item">
+                    <span class="project-id">31-cli-material-palette</span>
+                    <span class="project-desc">CLI material color palette</span>
+                </a>
+
+                <a href="../../30-thinking-states/index.html" class="project-item">
+                    <span class="project-id">30-thinking-states</span>
+                    <span class="project-desc">Experimental loading indicators exploring "thinking" metaphors</span>
+                </a>
+
+                <a href="../../29-progress-indicators/index.html" class="project-item">
+                    <span class="project-id">29-progress-indicators</span>
+                    <span class="project-desc">Text generation UI showing thinking states</span>
+                </a>
+
+                <a href="../../28-liquid-glass/index.html" class="project-item">
+                    <span class="project-id">28-liquid-glass</span>
+                    <span class="project-desc">Liquid glass morphism effect</span>
+                </a>
+
+                <a href="../../27-muse/index.html" class="project-item">
+                    <span class="project-id">27-muse</span>
+                    <span class="project-desc">Muse v0 - music/creative tool prototype</span>
+                </a>
+
+                <a href="../../26-widget-dashboard/index.html" class="project-item">
+                    <span class="project-id">26-widget-dashboard</span>
+                    <span class="project-desc">Dynamic widget dashboard layout</span>
+                </a>
+
+                <a href="../../25-spotlight-grid/index.html" class="project-item">
+                    <span class="project-id">25-spotlight-grid</span>
+                    <span class="project-desc">Density and color-controlled particle effect</span>
+                </a>
+
+                <a href="../../24-rock-paper-scissors/index.html" class="project-item">
+                    <span class="project-id">24-rock-paper-scissors</span>
+                    <span class="project-desc">Rock paper scissors game</span>
+                </a>
+
+                <a href="../../23-interactive-typography/index.html" class="project-item">
+                    <span class="project-id">23-interactive-typography</span>
+                    <span class="project-desc">Touch/mouse event handler demo</span>
+                </a>
+
+                <a href="../../22-directed-network/index.html" class="project-item">
+                    <span class="project-id">22-directed-network</span>
+                    <span class="project-desc">Graph network visualization</span>
+                </a>
+
+                <a href="../../21-interaction-heatmap/index.html" class="project-item">
+                    <span class="project-id">21-interaction-heatmap</span>
+                    <span class="project-desc">30-day agent interaction heatmap</span>
+                </a>
+
+                <a href="../../20-schelling-model/index.html" class="project-item">
+                    <span class="project-id">20-schelling-model</span>
+                    <span class="project-desc">Schelling model of segregation simulation</span>
+                </a>
+
+                <a href="../../19-coworker-network/index.html" class="project-item">
+                    <span class="project-id">19-coworker-network</span>
+                    <span class="project-desc">Force-directed graph of coworker interactions (React/D3)</span>
+                </a>
+
+                <a href="../../18-cellular-automaton/index.html" class="project-item">
+                    <span class="project-id">18-cellular-automaton</span>
+                    <span class="project-desc">Conway's Game of Life variant</span>
+                </a>
+
+                <a href="../../17-audio-reactive-network/index.html" class="project-item">
+                    <span class="project-id">17-audio-reactive-network</span>
+                    <span class="project-desc">Text-to-speech with animated typography</span>
+                </a>
+
+                <a href="../../16-hub-spoke-network/index.html" class="project-item">
+                    <span class="project-id">16-hub-spoke-network</span>
+                    <span class="project-desc">Force graph visualization</span>
+                </a>
+
+                <a href="../../15-binary-camera-grid/index.html" class="project-item">
+                    <span class="project-id">15-binary-camera-grid</span>
+                    <span class="project-desc">Interactive 2D grid navigation with zoom</span>
+                </a>
+
+                <a href="../../14-dna-mutations/index.html" class="project-item">
+                    <span class="project-id">14-dna-mutations</span>
+                    <span class="project-desc">Dynamic cluster visualization with signals</span>
+                </a>
+
+                <a href="../../13-image-flow-field/index.html" class="project-item">
+                    <span class="project-id">13-image-flow-field</span>
+                    <span class="project-desc">Wave pattern generation with ripple effects</span>
+                </a>
+
+                <a href="../../12-wind-field/index.html" class="project-item">
+                    <span class="project-id">12-wind-field</span>
+                    <span class="project-desc">Perlin noise wind simulation</span>
+                </a>
+
+                <a href="../../11-brownian-tree/index.html" class="project-item">
+                    <span class="project-id">11-brownian-tree</span>
+                    <span class="project-desc">Interactive message storage system (Node.js/Express)</span>
+                </a>
+
+                <a href="../../10-audio-reactive-agents/index.html" class="project-item">
+                    <span class="project-id">10-audio-reactive-agents</span>
+                    <span class="project-desc">Audio-reactive agents with spatial positioning</span>
+                </a>
+
+                <a href="../../09-planar-graph/index.html" class="project-item">
+                    <span class="project-id">09-planar-graph</span>
+                    <span class="project-desc">Linked agents network visualization</span>
+                </a>
+
+                <a href="../../08-graph-clusters/index.html" class="project-item">
+                    <span class="project-id">08-graph-clusters</span>
+                    <span class="project-desc">Cluster detection with parameter tuning</span>
+                </a>
+
+                <a href="../../07-apophenia/index.html" class="project-item">
+                    <span class="project-id">07-apophenia</span>
+                    <span class="project-desc">Apophenia proximity links on grid</span>
+                </a>
+
+                <a href="../../06-orbital/index.html" class="project-item">
+                    <span class="project-id">06-orbital</span>
+                    <span class="project-desc">Celestial mechanics with orbital planets</span>
+                </a>
+
+                <a href="../../05-fall/index.html" class="project-item">
+                    <span class="project-id">05-fall</span>
+                    <span class="project-desc">Gravity and particle physics with falling objects</span>
+                </a>
+
+                <a href="../../04-random-walk/index.html" class="project-item">
+                    <span class="project-id">04-random-walk</span>
+                    <span class="project-desc">Stochastic random walk patterns on canvas</span>
+                </a>
+
+                <a href="../../03-chaos-agent/index.html" class="project-item">
+                    <span class="project-id">03-chaos-agent</span>
+                    <span class="project-desc">Particle clustering with chaotic agents</span>
+                </a>
+
+                <a href="../../02-vicsek-model/index.html" class="project-item">
+                    <span class="project-id">02-vicsek-model</span>
+                    <span class="project-desc">Vicsek model flocking behavior simulation</span>
+                </a>
+
+                <a href="../../01-entropy/index.html" class="project-item">
+                    <span class="project-id">01-entropy</span>
+                    <span class="project-desc">Interactive entropy visualization with animated particles</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+(function () {
+  const GLYPHS = [' ', '·', '∙', '∘', '○', '◌', '◎', '⊙', '●'];
+  const N = GLYPHS.length - 1;
+
+  const VARIANT = { color: '#7b6fa5', fn: (x, y, t) =>
+    (Math.sin(x*0.1+t) + Math.cos(y*0.12-t*0.7) + Math.sin((x+y)*0.05+t*0.5) + 3) / 6 };
+
+  class Field {
+    constructor(canvas) {
+      this.cv  = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.frame = 0;
+      this.lastT = 0;
+      this.fps = 1000 / 20;
+      this.fontSize = 11;
+
+      this.cv.width  = canvas.parentElement.clientWidth;
+      this.cv.height = canvas.parentElement.clientHeight;
+
+      this.ctx.font = `300 ${this.fontSize}px "IBM Plex Mono"`;
+      this.charW = this.ctx.measureText('·').width;
+      this.charH = this.fontSize * 1.2;
+
+      this.cols = Math.ceil(this.cv.width  / this.charW) + 1;
+      this.rows = Math.ceil(this.cv.height / this.charH) + 1;
+      this.cx = this.cols / 2;
+      this.cy = this.rows / 2;
+
+      this._vals  = new Float32Array(this.cols * this.rows);
+      this._evals = new Float32Array(this.cols * this.rows);
+      this._box   = null;
+
+      const r = parseInt(VARIANT.color.slice(1,3),16);
+      const g = parseInt(VARIANT.color.slice(3,5),16);
+      const b = parseInt(VARIANT.color.slice(5,7),16);
+      this.rgb = `${r},${g},${b}`;
+
+      window.addEventListener('resize', () => this._resize());
+    }
+
+    _resize() {
+      this.cv.width  = this.cv.parentElement.clientWidth;
+      this.cv.height = this.cv.parentElement.clientHeight;
+      this.ctx.font = `300 ${this.fontSize}px "IBM Plex Mono"`;
+      this.cols = Math.ceil(this.cv.width  / this.charW) + 1;
+      this.rows = Math.ceil(this.cv.height / this.charH) + 1;
+      this.cx = this.cols / 2;
+      this.cy = this.rows / 2;
+      this._vals  = new Float32Array(this.cols * this.rows);
+      this._evals = new Float32Array(this.cols * this.rows);
+      this._measureBox();
+    }
+
+    _measureBox() {
+      const label = document.querySelector('.banner-label');
+      if (!label) return;
+      const cv = this.cv.getBoundingClientRect();
+      const lb = label.getBoundingClientRect();
+      this._box = {
+        c0: Math.floor((lb.left  - cv.left) / this.charW),
+        c1: Math.ceil( (lb.right - cv.left) / this.charW),
+        r0: Math.floor((lb.top   - cv.top)  / this.charH),
+        r1: Math.ceil( (lb.bottom- cv.top)  / this.charH),
+      };
+    }
+
+    start() {
+      requestAnimationFrame(() => {
+        this._measureBox();
+        const tick = (t) => {
+          if (t - this.lastT > this.fps) {
+            this.render();
+            this.lastT = t;
+            this.frame++;
+          }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }
+
+    render() {
+      const ctx   = this.ctx;
+      const t     = this.frame * 0.025;
+      const vals  = this._vals;
+      const evals = this._evals;
+      const box   = this._box;
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(0, 0, this.cv.width, this.cv.height);
+      ctx.restore();
+
+      ctx.font = `300 ${this.fontSize}px "IBM Plex Mono"`;
+      ctx.textBaseline = 'top';
+
+      for (let row = 0; row < this.rows; row++) {
+        for (let col = 0; col < this.cols; col++) {
+          vals[row * this.cols + col] = Math.max(0, Math.min(1,
+            VARIANT.fn(col, row, t, this.cx, this.cy)));
+        }
+      }
+
+      for (let row = 0; row < this.rows; row++) {
+        for (let col = 0; col < this.cols; col++) {
+          const idx = row * this.cols + col;
+          if (box && row >= box.r0 && row < box.r1 && col >= box.c0 && col < box.c1) {
+            evals[idx] = -1; continue;
+          }
+          if (box) {
+            const dx = col < box.c0 ? box.c0 - col : col >= box.c1 ? col - box.c1 + 1 : 0;
+            const dy = row < box.r0 ? box.r0 - row : row >= box.r1 ? row - box.r1 + 1 : 0;
+            const dist = Math.max(dx, dy);
+            if (dist > 0 && dist <= 5) {
+              evals[idx] = Math.max(0, 1 - (dist - 1) / 4);
+              continue;
+            }
+          }
+          evals[idx] = 0;
+        }
+      }
+
+      const ALPHAS = [0.2, 0.45, 0.7, 1.0];
+      ctx.fillStyle = `rgb(${this.rgb})`;
+      for (let p = 0; p < 4; p++) {
+        const vMin = p * 0.25;
+        const vMax = vMin + 0.25;
+        ctx.globalAlpha = ALPHAS[p];
+        for (let row = 0; row < this.rows; row++) {
+          for (let col = 0; col < this.cols; col++) {
+            const idx = row * this.cols + col;
+            const prox = evals[idx];
+            if (prox < 0) continue;
+            const v = vals[idx];
+            const dv = v * (1 - prox * 0.88);
+            if (dv < vMin || dv >= vMax) continue;
+            const glyph = GLYPHS[Math.round(dv * N)];
+            if (glyph === ' ') continue;
+            ctx.fillText(glyph, col * this.charW, row * this.charH);
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(() => {
+      new Field(document.getElementById('banner-field')).start();
+    });
+  });
+
+  const banner = document.querySelector('.banner');
+  document.querySelectorAll('.filter-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      banner.dataset.filter = btn.dataset.mode;
+      document.querySelectorAll('.filter-toggle button').forEach(b => {
+        b.classList.toggle('active', b === btn);
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+
+</html>
