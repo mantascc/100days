@@ -1,5 +1,10 @@
 [
   {
+    "id": "78-ascii-sheets-docs",
+    "path": "100days/78-ascii-sheets-docs",
+    "description": "ASCII Sheets — promotional showcase for the ASCII sheet primitive: hero with auto-cycling filters, twelve live use-case tiles (header, modal, toast, divider, drawer, image-reveal, marquee, tooltip, etc.), five-formula gallery, and glyph + palette rails that retheme the hero on click"
+  },
+  {
     "id": "01-entropy",
     "path": "100days/01-entropy",
     "description": "Interactive entropy visualization with animated particles"
