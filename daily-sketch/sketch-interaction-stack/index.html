@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Interaction Stack / 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-1: #111111;
+    --bg-2: #161616;
+    --fg: #e8e8e8;
+    --fg-dim: #8a8a8a;
+    --fg-dimmer: #555555;
+    --line: #222222;
+    --line-bright: #333333;
+    --accent: #d4ff3a;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --serif: 'Fraunces', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.55;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    z-index: 999;
+    mix-blend-mode: overlay;
+  }
+
+  /* ── Layout ─────────────────────────── */
+
+  .frame {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+  }
+
+  /* Top status bar */
+  .statusbar {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+    font-size: 11px;
+    color: var(--fg-dim);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .statusbar .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Hero ─────────────────────────── */
+
+  .hero {
+    padding: 80px 0 120px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .hero-meta {
+    font-size: 11px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .hero-meta span:not(:last-child)::after {
+    content: '/';
+    margin-left: 24px;
+    color: var(--line-bright);
+  }
+
+  h1.title {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(48px, 8vw, 112px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 48px;
+    font-variation-settings: "opsz" 144;
+  }
+
+  h1.title em {
+    font-style: italic;
+    color: var(--accent);
+    font-variation-settings: "opsz" 144;
+  }
+
+  .hero-thesis {
+    max-width: 720px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--fg);
+    border-left: 1px solid var(--accent);
+    padding-left: 24px;
+    margin-bottom: 64px;
+  }
+
+  .hero-thesis em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  /* Schema preview block */
+  .schema-block {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    padding: 24px 28px;
+    max-width: 560px;
+    font-size: 12px;
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .schema-block::before {
+    content: 'stack.schema.json';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--bg);
+    padding: 0 10px;
+    color: var(--fg-dimmer);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .schema-block .k { color: var(--accent); }
+  .schema-block .s { color: var(--fg); }
+  .schema-block .c { color: var(--fg-dimmer); font-style: italic; }
+  .schema-block .p { color: var(--fg-dim); }
+
+  /* ── Section structure ─────────────────────────── */
+
+  .section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 32px;
+    margin-bottom: 64px;
+    align-items: baseline;
+  }
+
+  .section-num {
+    font-size: 11px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.1em;
+  }
+
+  .section-title-wrap h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .section-title-wrap h2 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .section-title-wrap .lede {
+    font-size: 13px;
+    color: var(--fg-dim);
+    max-width: 640px;
+    line-height: 1.7;
+  }
+
+  /* ── Shift diagram ─────────────────────────── */
+
+  .shift {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 32px;
+  }
+
+  .shift-chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .shift-node {
+    border: 1px solid var(--line-bright);
+    padding: 14px 20px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    background: var(--bg-1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .shift-node:hover,
+  .shift-node.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .shift-node[data-era]::before {
+    content: attr(data-era);
+    position: absolute;
+    top: -20px;
+    left: 0;
+    font-size: 9px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.1em;
+  }
+
+  .shift-arrow {
+    color: var(--fg-dimmer);
+    font-family: var(--mono);
+  }
+
+  .shift-detail {
+    margin-top: 48px;
+    padding: 24px 28px;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--fg-dim);
+    min-height: 100px;
+  }
+
+  .shift-detail strong {
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  /* ── Layer cards ─────────────────────────── */
+
+  .layers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 880px) {
+    .layers { grid-template-columns: 1fr; }
+  }
+
+  .layer {
+    background: var(--bg);
+    padding: 36px 32px;
+    position: relative;
+    transition: background 0.2s ease;
+    cursor: pointer;
+  }
+
+  .layer:hover {
+    background: var(--bg-1);
+  }
+
+  .layer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 24px;
+    font-size: 10px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .layer-meta .id {
+    color: var(--accent);
+  }
+
+  .layer-name {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -0.005em;
+    margin-bottom: 8px;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .layer-tagline {
+    font-size: 12px;
+    color: var(--fg-dim);
+    margin-bottom: 24px;
+    font-style: italic;
+    font-family: var(--serif);
+  }
+
+  .layer-desc {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--fg);
+    margin-bottom: 24px;
+  }
+
+  .layer-contracts {
+    border-top: 1px dashed var(--line-bright);
+    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .contract {
+    font-size: 10px;
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--fg-dim);
+    letter-spacing: 0.04em;
+    transition: all 0.15s ease;
+  }
+
+  .layer:hover .contract {
+    border-color: var(--fg-dimmer);
+  }
+
+  /* contract chips all equal — no arbitrary highlight */
+
+  /* ── Comparison table ─────────────────────────── */
+
+  .compare {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 32px;
+  }
+
+  .compare-table {
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .compare-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+  }
+
+  .compare-row:last-child { border-bottom: none; }
+
+  .compare-row.header {
+    background: var(--bg-1);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-dimmer);
+  }
+
+  .compare-cell {
+    padding: 16px 20px;
+    border-right: 1px solid var(--line);
+    line-height: 1.6;
+  }
+
+  .compare-cell:last-child { border-right: none; }
+
+  .compare-cell.label {
+    color: var(--fg-dim);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .compare-cell.old { color: var(--fg-dim); font-style: italic; font-family: var(--serif); font-size: 13px; }
+  .compare-cell.new { color: var(--fg); }
+  .compare-cell.new strong { color: var(--accent); font-weight: 400; }
+
+  @media (max-width: 720px) {
+    .compare-row { grid-template-columns: 1fr; }
+    .compare-cell { border-right: none; border-bottom: 1px solid var(--line); }
+  }
+
+  /* ── Closing ─────────────────────────── */
+
+  .closing {
+    padding: 120px 0 80px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .closing-quote {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    max-width: 900px;
+    margin-bottom: 48px;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .closing-quote em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .closing-sig {
+    font-size: 11px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    max-width: 320px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Footer ─────────────────────────── */
+
+  footer {
+    padding: 32px 0;
+    font-size: 10px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Cursor blink */
+  .blink::after {
+    content: '_';
+    animation: blink 1.1s steps(2) infinite;
+    color: var(--accent);
+    margin-left: 4px;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  /* Index marks on left rail */
+  .rail {
+    position: fixed;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 50;
+    font-size: 9px;
+    color: var(--fg-dimmer);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 1100px) {
+    .rail { display: none; }
+  }
+
+  .rail a {
+    color: var(--fg-dimmer);
+    text-decoration: none;
+    padding: 4px 0;
+    border-left: 1px solid var(--line-bright);
+    padding-left: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .rail a:hover, .rail a.active {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<!-- Left rail navigation -->
+<nav class="rail">
+  <a href="#hero">00 / OPEN</a>
+  <a href="#shift">01 / SHIFT</a>
+  <a href="#stack">02 / STACK</a>
+  <a href="#compare">03 / DELTA</a>
+  <a href="#close">04 / CLOSE</a>
+</nav>
+
+<div class="frame">
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span><span class="dot"></span>INTERACTION STACK / 2026.05</span>
+    <span>BUILD 04.7 / DOC v1.0</span>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-meta reveal">
+      <span>Field Notes</span>
+      <span>Frontend / Agentic UI</span>
+      <span>Replaces: design-essentials@2014</span>
+    </div>
+
+    <h1 class="title reveal">
+      The unit of design<br>
+      moved from <em>library</em><br>
+      to <em>contract</em><span class="blink"></span>
+    </h1>
+
+    <p class="hero-thesis reveal">
+      A decade ago, <em>design essentials</em> meant Bootstrap, Foundation, a grid system, a CSS reset, a sprite of icons. Frameworks that decided for you. Today the substrate is composable, copy-pasted, and increasingly legible to systems that didn't write it. The list below is a snapshot of what replaced the list.
+    </p>
+
+    <div class="schema-block reveal">
+      <span class="c">// what an interaction primitive looks like in 2026</span><br>
+      {<br>
+      &nbsp;&nbsp;<span class="k">"id"</span>: <span class="s">"button.primary"</span>,<br>
+      &nbsp;&nbsp;<span class="k">"behavior"</span>: <span class="s">"radix.button"</span>,&nbsp;&nbsp;<span class="c">// headless contract</span><br>
+      &nbsp;&nbsp;<span class="k">"appearance"</span>: <span class="s">"tailwind.tokens"</span>,&nbsp;<span class="c">// utility substrate</span><br>
+      &nbsp;&nbsp;<span class="k">"distribution"</span>: <span class="s">"shadcn.registry"</span>,&nbsp;<span class="c">// copy, don't install</span><br>
+      &nbsp;&nbsp;<span class="k">"motion"</span>: <span class="s">"motion.spring"</span>,<br>
+      &nbsp;&nbsp;<span class="k">"agent_readable"</span>: <span class="p">true</span><br>
+      }
+    </div>
+  </section>
+
+  <!-- Shift section -->
+  <section class="section" id="shift">
+    <div class="section-head">
+      <div class="section-num">§ 01</div>
+      <div class="section-title-wrap">
+        <h2>The shift in <em>units of abstraction</em></h2>
+        <p class="lede">Each generation of frontend tooling has made the substrate more composable and more legible to systems that didn't author it. The trajectory matters more than any single library on it.</p>
+      </div>
+    </div>
+
+    <div class="shift">
+      <div></div>
+      <div>
+        <div class="shift-chain">
+          <div class="shift-node active" data-era="2010s" data-detail="frameworks">FRAMEWORK</div>
+          <span class="shift-arrow">→</span>
+          <div class="shift-node" data-era="late 2010s" data-detail="components">COMPONENT</div>
+          <span class="shift-arrow">→</span>
+          <div class="shift-node" data-era="early 2020s" data-detail="primitives">PRIMITIVE</div>
+          <span class="shift-arrow">→</span>
+          <div class="shift-node" data-era="2024+" data-detail="vocabularies">VOCABULARY</div>
+        </div>
+
+        <div class="shift-detail" id="shift-detail">
+          <strong>Framework.</strong> Bootstrap, Foundation. A finished product. The button is decided. You inherit a worldview along with the CSS — opinions about grids, breakpoints, typography. Shipping speed in exchange for design surrender.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stack section -->
+  <section class="section" id="stack">
+    <div class="section-head">
+      <div class="section-num">§ 02</div>
+      <div class="section-title-wrap">
+        <h2>The current <em>stack</em></h2>
+        <p class="lede">Nine layers. Each one is a contract, not a product. The interesting question for any new tool is no longer "what does it look like" but "what does it expose."</p>
+      </div>
+    </div>
+
+    <div class="layers">
+
+      <article class="layer">
+        <div class="layer-meta"><span>L01 / BEHAVIOR</span><span class="id">headless</span></div>
+        <div class="layer-name">Headless primitives</div>
+        <div class="layer-tagline">behavior decoupled from appearance</div>
+        <p class="layer-desc">Radix, React Aria, Ark UI, Base UI. The component is a contract — keyboard handling, ARIA, focus management — without a single line of styling. You bring the look. The library brings the correctness.</p>
+        <div class="layer-contracts">
+          <span class="contract">a11y</span>
+          <span class="contract">keyboard</span>
+          <span class="contract">focus</span>
+          <span class="contract">aria</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L02 / DISTRIBUTION</span><span class="id">copy-paste</span></div>
+        <div class="layer-name">Registry over package</div>
+        <div class="layer-tagline">code you own, not code you depend on</div>
+        <p class="layer-desc">shadcn/ui broke the npm install model. Components live inside your repo. You read them, edit them, fork them. The library is a registry of recipes — the contract is "here is good code, take it."</p>
+        <div class="layer-contracts">
+          <span class="contract">ownership</span>
+          <span class="contract">forkable</span>
+          <span class="contract">recipe</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L03 / STYLING</span><span class="id">utility</span></div>
+        <div class="layer-name">Tailwind substrate</div>
+        <div class="layer-tagline">styling as configuration</div>
+        <p class="layer-desc">Utility-first won. CSS-in-JS receded into legacy. Tailwind v4 collapsed config into CSS itself. Most new component systems now assume Tailwind underneath — it became the styling lingua franca by being boring.</p>
+        <div class="layer-contracts">
+          <span class="contract">tokens</span>
+          <span class="contract">atomic</span>
+          <span class="contract">jit</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L04 / MOTION</span><span class="id">spring</span></div>
+        <div class="layer-name">Motion as legibility</div>
+        <div class="layer-tagline">animation that explains state</div>
+        <p class="layer-desc">Motion (née Framer Motion), Motion One, GSAP. Animation stopped being decoration and became a way to make state transitions legible. Spring physics replaced easing curves. Time became a design surface.</p>
+        <div class="layer-contracts">
+          <span class="contract">physics</span>
+          <span class="contract">spring</span>
+          <span class="contract">gesture</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L05 / PATTERN</span><span class="id">single-purpose</span></div>
+        <div class="layer-name">Pattern primitives</div>
+        <div class="layer-tagline">one library, one interaction</div>
+        <p class="layer-desc">Vaul for drawers. cmdk for command palettes. sonner for toasts. react-resizable-panels. Each library does exactly one thing and refuses to do anything else. The Emil Kowalski axis — small, surgical, opinionated about correctness only.</p>
+        <div class="layer-contracts">
+          <span class="contract">surgical</span>
+          <span class="contract">opinionated</span>
+          <span class="contract">composable</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L06 / CANVAS</span><span class="id">spatial</span></div>
+        <div class="layer-name">Beyond the DOM</div>
+        <div class="layer-tagline">when HTML hits the ceiling</div>
+        <p class="layer-desc">tldraw, Excalidraw, Rive, Lottie. Interfaces that aren't pages — infinite canvases, spatial UIs, runtime-animated vector. Where you go when the artifact is a graph topology, an agent trace, or anything DOM was never asked to do.</p>
+        <div class="layer-contracts">
+          <span class="contract">canvas</span>
+          <span class="contract">spatial</span>
+          <span class="contract">runtime-vector</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L07 / 3D</span><span class="id">webgpu</span></div>
+        <div class="layer-name">3D in product surface</div>
+        <div class="layer-tagline">no longer reserved for marketing</div>
+        <p class="layer-desc">React Three Fiber, Theatre.js, Spline. WebGPU shaders showing up in product UI, not just hero sections. The boundary between "interface" and "scene" softens. Still niche, still loud — but no longer optional in some categories.</p>
+        <div class="layer-contracts">
+          <span class="contract">r3f</span>
+          <span class="contract">webgpu</span>
+          <span class="contract">shader</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L08 / GENERATIVE</span><span class="id">ai-native</span></div>
+        <div class="layer-name">Generative UI</div>
+        <div class="layer-tagline">interfaces composed at runtime</div>
+        <p class="layer-desc">Two camps. <em>Reactive:</em> v0, Vercel AI SDK UI, Thesys — intent collapses directly to component. <em>Compositional:</em> A2UI vocabularies, LangGraph state-driven UI — interfaces assembled from a catalog of agent-readable parts.</p>
+        <div class="layer-contracts">
+          <span class="contract">reactive</span>
+          <span class="contract">compositional</span>
+          <span class="contract">a2ui</span>
+          <span class="contract">v0</span>
+        </div>
+      </article>
+
+      <article class="layer">
+        <div class="layer-meta"><span>L09 / SCHEMA</span><span class="id">handoff</span></div>
+        <div class="layer-name">Design tokens as grammar</div>
+        <div class="layer-tagline">the lingua franca of handoff</div>
+        <p class="layer-desc">Style Dictionary. The W3C design tokens spec stabilizing. Tokens became the contract between Figma, code, and increasingly, agents — the smallest unit of design intent that any system can read and write.</p>
+        <div class="layer-contracts">
+          <span class="contract">w3c-tokens</span>
+          <span class="contract">json</span>
+          <span class="contract">agent-readable</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- Delta / comparison section -->
+  <section class="section" id="compare">
+    <div class="section-head">
+      <div class="section-num">§ 03</div>
+      <div class="section-title-wrap">
+        <h2>The <em>delta</em> from then to now</h2>
+        <p class="lede">Reading the old GitHub collection next to today's stack is reading a fossil. Same problem space, different ontology.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div></div>
+      <div class="compare-table">
+
+        <div class="compare-row header">
+          <div class="compare-cell">Axis</div>
+          <div class="compare-cell">2014 essentials</div>
+          <div class="compare-cell">2026 stack</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Unit</div>
+          <div class="compare-cell old">framework</div>
+          <div class="compare-cell new"><strong>contract</strong> &nbsp;/&nbsp; schema</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Distribution</div>
+          <div class="compare-cell old">npm install</div>
+          <div class="compare-cell new"><strong>copy</strong> &nbsp;/&nbsp; registry pull</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Styling</div>
+          <div class="compare-cell old">opinionated bundle</div>
+          <div class="compare-cell new"><strong>utility substrate</strong> &nbsp;/&nbsp; tokens</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Component</div>
+          <div class="compare-cell old">button.btn-primary</div>
+          <div class="compare-cell new"><strong>headless behavior</strong> + your styling</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Motion</div>
+          <div class="compare-cell old">CSS transitions</div>
+          <div class="compare-cell new"><strong>spring physics</strong> &nbsp;/&nbsp; gesture</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Surface</div>
+          <div class="compare-cell old">DOM</div>
+          <div class="compare-cell new">DOM &nbsp;/&nbsp; <strong>canvas</strong> &nbsp;/&nbsp; scene</div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Audience</div>
+          <div class="compare-cell old">human developer</div>
+          <div class="compare-cell new">human + <strong>agent</strong></div>
+        </div>
+
+        <div class="compare-row">
+          <div class="compare-cell label">Composition</div>
+          <div class="compare-cell old">choose a theme</div>
+          <div class="compare-cell new"><strong>declare a vocabulary</strong></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing -->
+  <section class="closing" id="close">
+    <p class="closing-quote reveal">
+      The thing that's essential isn't <em>the button</em>.<br>
+      It's the <em>schema</em> the button is an instance of.
+    </p>
+    <div class="closing-sig">
+      <span>END / DOC</span>
+      <span>v1.0 — 2026.05</span>
+    </div>
+  </section>
+
+  <footer>
+    <span>The Interaction Stack — Field Notes</span>
+    <span>compiled in monospace</span>
+  </footer>
+
+</div>
+
+<script>
+  // ── Shift node interactions ─────────────────────────
+  const shiftDetails = {
+    frameworks: '<strong>Framework.</strong> Bootstrap, Foundation. A finished product. The button is decided. You inherit a worldview along with the CSS — opinions about grids, breakpoints, typography. Shipping speed in exchange for design surrender.',
+    components: '<strong>Component.</strong> Material UI, Ant, Chakra. Still bundled, but more configurable. Theme objects, prop APIs, design tokens beginning to emerge. The library still owns the look — you negotiate within it.',
+    primitives: '<strong>Primitive.</strong> Radix, React Aria, shadcn. The library gives you behavior and accessibility; you write everything visible. The component is a contract you fulfill, not a product you receive.',
+    vocabularies: '<strong>Vocabulary.</strong> A2UI, design token specs, agent-readable component catalogs. The library is now a grammar — a set of legal moves that humans and agents both compose with. The interface is generated, not assembled.'
+  };
+
+  document.querySelectorAll('.shift-node').forEach(node => {
+    node.addEventListener('mouseenter', () => {
+      document.querySelectorAll('.shift-node').forEach(n => n.classList.remove('active'));
+      node.classList.add('active');
+      const key = node.dataset.detail;
+      document.getElementById('shift-detail').innerHTML = shiftDetails[key];
+    });
+  });
+
+  // ── Reveal on scroll ─────────────────────────
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('in');
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ── Rail active state ─────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const railLinks = document.querySelectorAll('.rail a');
+
+  const railIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        railLinks.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => railIO.observe(s));
+</script>
+
+</body>
+</html>
