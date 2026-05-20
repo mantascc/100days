@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>77 · ASCII Sheet Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Inter:wght@400;500;650&display=swap">
+  <style>
+    :root {
+      --banner-h: 188px;
+      --void: #070808;
+      --ink: #f3f2ec;
+      --muted: #9b9c9a;
+      --dim: #666864;
+      --line: rgba(255, 255, 255, 0.12);
+      --line-soft: rgba(255, 255, 255, 0.07);
+      --panel: rgba(13, 14, 14, 0.82);
+      --accent: #7b6fa5;
+      --warm: #d9a35d;
+      --green: #72b783;
+      --cyan: #7caec2;
+      --font-mono: "IBM Plex Mono", "SF Mono", Monaco, "Courier New", monospace;
+      --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background: var(--void);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100%;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 72px 72px,
+        linear-gradient(0deg, rgba(255,255,255,0.026) 1px, transparent 1px) 0 0 / 72px 72px,
+        radial-gradient(circle at 76% 8%, rgba(124,174,194,0.15), transparent 30vw),
+        radial-gradient(circle at 18% 22%, rgba(217,163,93,0.12), transparent 34vw),
+        var(--void);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      padding-top: var(--banner-h);
+    }
+
+    body.sheet-light {
+      --ink: #101212;
+      --muted: #464846;
+      --dim: #6b6e69;
+      --line: rgba(0, 0, 0, 0.14);
+      --line-soft: rgba(0, 0, 0, 0.08);
+      --panel: rgba(246, 244, 236, 0.86);
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px) 0 0 / 72px 72px,
+        linear-gradient(0deg, rgba(0,0,0,0.035) 1px, transparent 1px) 0 0 / 72px 72px,
+        radial-gradient(circle at 78% 12%, rgba(124,174,194,0.2), transparent 30vw),
+        #f2f0e7;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .distort-defs {
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+
+    .banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--banner-h);
+      overflow: hidden;
+      pointer-events: auto;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .filter-sheet {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transition: background 220ms ease, backdrop-filter 220ms ease;
+    }
+
+    .banner[data-filter="off"] .filter-sheet {
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .banner[data-filter="blur"] .filter-sheet {
+      background: rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(var(--sheet-blur, 10px));
+      -webkit-backdrop-filter: blur(var(--sheet-blur, 10px));
+    }
+
+    .banner[data-filter="distort"] .filter-sheet {
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: url(#banner-distort);
+      -webkit-backdrop-filter: url(#banner-distort);
+    }
+
+    body.sheet-light .banner[data-filter="blur"] .filter-sheet {
+      background: rgba(242, 240, 231, 0.42);
+    }
+
+    body.sheet-light .banner[data-filter="distort"] .filter-sheet {
+      background: rgba(242, 240, 231, 0.68);
+    }
+
+    .banner canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .top-controls {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      z-index: 20;
+      max-width: min(470px, calc(100vw - 28px));
+      justify-content: flex-end;
+      font-family: var(--font-mono);
+    }
+
+    .control-group {
+      display: flex;
+      gap: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .top-controls button,
+    .top-controls input {
+      min-height: 30px;
+      border: 0;
+      border-radius: 0;
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .top-controls button {
+      padding: 0 10px;
+      background: rgba(8, 9, 9, 0.9);
+      color: rgba(255, 255, 255, 0.56);
+      cursor: pointer;
+    }
+
+    .top-controls button:hover,
+    .top-controls button.active {
+      color: var(--ink);
+      background: rgba(123, 111, 165, 0.32);
+    }
+
+    .top-controls input {
+      width: 132px;
+      padding: 0 10px;
+      background: rgba(8, 9, 9, 0.9);
+      color: var(--ink);
+      outline: 0;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    body.sheet-light .control-group,
+    body.sheet-light .top-controls button,
+    body.sheet-light .top-controls input {
+      background: rgba(246, 244, 236, 0.8);
+      border-color: rgba(0, 0, 0, 0.13);
+      color: #111;
+    }
+
+    main {
+      position: relative;
+      z-index: 0;
+    }
+
+    .section {
+      min-height: calc(100vh - var(--banner-h));
+      padding: 72px clamp(20px, 5vw, 80px);
+      border-bottom: 1px solid var(--line-soft);
+      display: grid;
+      align-items: center;
+    }
+
+    .section-inner {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: calc(100vh - var(--banner-h));
+      padding-top: 54px;
+      align-items: end;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 430px);
+      gap: clamp(28px, 6vw, 72px);
+      align-items: end;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    h1,
+    h2 {
+      font-weight: 650;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 850px;
+      font-size: clamp(56px, 10vw, 142px);
+      line-height: 0.88;
+    }
+
+    h2 {
+      max-width: 760px;
+      font-size: clamp(34px, 6vw, 82px);
+      line-height: 0.95;
+      margin-bottom: 24px;
+    }
+
+    .lede,
+    .copy {
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 22px);
+      line-height: 1.48;
+      max-width: 680px;
+    }
+
+    .lede {
+      margin-top: 30px;
+    }
+
+    .spec-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      border: 1px solid var(--line-soft);
+      background: var(--line-soft);
+    }
+
+    .spec {
+      min-height: 126px;
+      padding: 18px;
+      background: rgba(8, 9, 9, 0.72);
+      font-family: var(--font-mono);
+    }
+
+    body.sheet-light .spec,
+    body.sheet-light .panel,
+    body.sheet-light .variant-card,
+    body.sheet-light .code-block,
+    body.sheet-light .metric,
+    body.sheet-light .event-card,
+    body.sheet-light .work-tile {
+      background: rgba(246, 244, 236, 0.74);
+    }
+
+    .spec dt {
+      color: var(--dim);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .spec dd {
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .usecase {
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+      gap: clamp(28px, 6vw, 78px);
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: rgba(8, 9, 9, 0.68);
+      border: 1px solid var(--line-soft);
+      overflow: hidden;
+    }
+
+    .editorial-panel {
+      min-height: 520px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .article-preview {
+      padding: 36px 32px;
+    }
+
+    .article-preview h3 {
+      max-width: 520px;
+      font-size: clamp(32px, 5vw, 62px);
+      line-height: 0.96;
+      letter-spacing: 0;
+      margin-bottom: 24px;
+    }
+
+    .article-lines {
+      display: grid;
+      gap: 9px;
+      max-width: 540px;
+    }
+
+    .line {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    body.sheet-light .line {
+      background: rgba(0, 0, 0, 0.13);
+    }
+
+    .article-footer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .article-footer span {
+      min-height: 82px;
+      padding: 14px;
+      border-right: 1px solid var(--line-soft);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .article-footer span:last-child {
+      border-right: 0;
+    }
+
+    .dashboard {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      min-height: 106px;
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      background: rgba(6, 7, 7, 0.78);
+      font-family: var(--font-mono);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--dim);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .metric strong {
+      color: var(--green);
+      font-size: 24px;
+      font-weight: 300;
+    }
+
+    .log-table {
+      border: 1px solid var(--line-soft);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 72px;
+      gap: 14px;
+      padding: 11px 13px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .log-row:last-child {
+      border-bottom: 0;
+    }
+
+    .ok {
+      color: var(--green);
+    }
+
+    .warn {
+      color: var(--warm);
+    }
+
+    .event-panel {
+      min-height: 540px;
+      position: relative;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(0deg, rgba(255,255,255,0.08) 1px, transparent 1px) 0 0 / 36px 36px,
+        rgba(8, 9, 9, 0.78);
+    }
+
+    .event-card {
+      position: absolute;
+      inset: auto 28px 28px 28px;
+      padding: 24px;
+      background: rgba(6, 7, 7, 0.82);
+      border: 1px solid var(--line);
+    }
+
+    .event-card h3 {
+      font-size: clamp(44px, 7vw, 86px);
+      line-height: 0.88;
+      letter-spacing: 0;
+      margin-bottom: 22px;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--warm);
+    }
+
+    .bars {
+      position: absolute;
+      inset: 28px 28px auto 28px;
+      height: 180px;
+      display: flex;
+      align-items: end;
+      gap: 7px;
+    }
+
+    .bars span {
+      flex: 1;
+      min-width: 5px;
+      background: var(--warm);
+      opacity: 0.78;
+      transform-origin: bottom;
+      animation: meter 1.6s ease-in-out infinite;
+      animation-delay: calc(var(--i) * -110ms);
+    }
+
+    @keyframes meter {
+      0%, 100% { transform: scaleY(0.36); }
+      50% { transform: scaleY(1); }
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--line-soft);
+      border: 1px solid var(--line-soft);
+    }
+
+    .work-tile {
+      min-height: 220px;
+      padding: 18px;
+      background: rgba(8, 9, 9, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .work-mark {
+      height: 82px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, transparent 48%, var(--cyan) 49%, var(--cyan) 51%, transparent 52%),
+        linear-gradient(45deg, transparent 48%, rgba(217,163,93,0.75) 49%, rgba(217,163,93,0.75) 51%, transparent 52%);
+    }
+
+    .work-tile span {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .variant-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .variant-card {
+      min-height: 154px;
+      border: 1px solid var(--line-soft);
+      background: rgba(8, 9, 9, 0.7);
+      display: grid;
+      grid-template-rows: 110px auto;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .variant-card canvas {
+      width: 100%;
+      height: 110px;
+      display: block;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .variant-card span {
+      padding: 10px 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--line-soft);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .variant-card:hover,
+    .variant-card.active {
+      border-color: color-mix(in srgb, var(--accent) 70%, white);
+    }
+
+    .playground {
+      align-items: start;
+    }
+
+    .playground-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+      gap: clamp(24px, 5vw, 60px);
+      align-items: start;
+    }
+
+    .code-block {
+      background: rgba(6, 7, 7, 0.78);
+      border: 1px solid var(--line-soft);
+      padding: 18px;
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .code-block code {
+      white-space: pre;
+    }
+
+    .control-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .swatch-button {
+      height: 76px;
+      border: 1px solid var(--line-soft);
+      background: var(--swatch);
+      cursor: pointer;
+    }
+
+    .swatch-button:focus-visible,
+    .variant-card:focus-visible,
+    .top-controls button:focus-visible,
+    .top-controls input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .mode-note {
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.6;
+      margin-top: 20px;
+      max-width: 360px;
+    }
+
+    @media (max-width: 900px) {
+      :root {
+        --banner-h: 154px;
+      }
+
+      body {
+        padding-top: var(--banner-h);
+      }
+
+      .top-controls {
+        left: 10px;
+        right: 10px;
+        top: 10px;
+        justify-content: center;
+      }
+
+      .hero-grid,
+      .usecase,
+      .playground-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .spec-strip,
+      .metric-grid,
+      .variant-grid,
+      .control-matrix {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 48px 18px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .top-controls input {
+        width: 100px;
+      }
+
+      .article-footer,
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .log-row {
+        grid-template-columns: 74px 1fr;
+      }
+
+      .log-row span:last-child {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg class="distort-defs" aria-hidden="true">
+    <defs>
+      <filter id="banner-distort" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence id="noise" type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="2" seed="4" result="noise"/>
+        <feDisplacementMap id="displace" in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="banner" id="banner" data-filter="blur">
+    <div class="filter-sheet"></div>
+    <canvas id="banner-field"></canvas>
+  </div>
+
+  <div class="top-controls" aria-label="ASCII sheet controls">
+    <div class="control-group" data-control="filter">
+      <button type="button" data-filter="off">Off</button>
+      <button type="button" data-filter="blur" class="active">Blur</button>
+      <button type="button" data-filter="distort">Distort</button>
+    </div>
+    <div class="control-group" data-control="formula">
+      <button type="button" data-formula="interference" class="active">Interference</button>
+      <button type="button" data-formula="ripple">Ripple</button>
+      <button type="button" data-formula="flow">Flow</button>
+    </div>
+    <div class="control-group">
+      <input id="label-input" value="SIGNAL LAYER" aria-label="Banner label">
+    </div>
+  </div>
+
+  <main>
+    <section class="section hero" data-case="hero">
+      <div class="section-inner hero-grid">
+        <div>
+          <p class="eyebrow">ASCII Sheet / visual component</p>
+          <h1>One thin layer changes the whole page.</h1>
+          <p class="lede">A fixed banner that filters the page underneath, then floats a live glyph field above it. It can read editorial, operational, musical, or almost invisible.</p>
+        </div>
+        <dl class="spec-strip">
+          <div class="spec">
+            <dt>Layer 01</dt>
+            <dd>backdrop sheet</dd>
+          </div>
+          <div class="spec">
+            <dt>Layer 02</dt>
+            <dd>animated glyphs</dd>
+          </div>
+          <div class="spec">
+            <dt>Layer 03</dt>
+            <dd>label punch-through</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section usecase" data-case="editorial">
+      <div>
+        <p class="kicker">Use case 01 / editorial masthead</p>
+        <h2>A masthead that keeps the article moving underneath it.</h2>
+        <p class="copy">The sheet can be quiet: soft blur, muted glyphs, and a label that behaves like a permanent section marker while long-form content scrolls behind it.</p>
+      </div>
+      <div class="panel editorial-panel">
+        <div class="masthead"><span>Field Notes</span><span>Issue 12</span></div>
+        <div class="article-preview">
+          <h3>Architecture for pages that stay alive while you read.</h3>
+          <div class="article-lines">
+            <span class="line" style="width: 100%"></span>
+            <span class="line" style="width: 92%"></span>
+            <span class="line" style="width: 78%"></span>
+            <span class="line" style="width: 86%"></span>
+            <span class="line" style="width: 54%"></span>
+          </div>
+        </div>
+        <div class="article-footer">
+          <span>Blur sheet<br>10px</span>
+          <span>Glyph ramp<br>soft circles</span>
+          <span>Motion<br>slow interference</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section usecase" data-case="dashboard">
+      <div>
+        <p class="kicker">Use case 02 / product dashboard</p>
+        <h2>A status ribbon for dense operational screens.</h2>
+        <p class="copy">Over logs, metrics, or command centers, the component becomes a legible signal layer: faster flow, terminal glyphs, and a darker filter pass.</p>
+      </div>
+      <div class="panel dashboard">
+        <div class="metric-grid">
+          <div class="metric"><span>Jobs</span><strong>1,284</strong></div>
+          <div class="metric"><span>Latency</span><strong>42ms</strong></div>
+          <div class="metric"><span>Queue</span><strong>08</strong></div>
+        </div>
+        <div class="log-table">
+          <div class="log-row"><span>21:08:11</span><span>stream.ingest normalized payload</span><span class="ok">ok</span></div>
+          <div class="log-row"><span>21:08:17</span><span>worker.pool scaled to 12 replicas</span><span class="ok">ok</span></div>
+          <div class="log-row"><span>21:08:29</span><span>cache.edge warmed launch route</span><span class="warn">watch</span></div>
+          <div class="log-row"><span>21:08:43</span><span>model.router promoted canary</span><span class="ok">ok</span></div>
+          <div class="log-row"><span>21:08:51</span><span>export.bundle wrote config snapshot</span><span class="ok">ok</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section usecase" data-case="event">
+      <div>
+        <p class="kicker">Use case 03 / music and launch pages</p>
+        <h2>A live signal for event pages, releases, and drops.</h2>
+        <p class="copy">With a ripple formula and warm color, the sheet behaves like an audio visualizer without needing audio input. It marks the page as active immediately.</p>
+      </div>
+      <div class="panel event-panel">
+        <div class="bars" aria-hidden="true">
+          <span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span><span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span><span style="--i:12"></span>
+        </div>
+        <div class="event-card">
+          <h3>Night Signal 04</h3>
+          <div class="event-meta"><span>Friday</span><span>Warehouse B</span><span>23:00</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section usecase" data-case="portfolio">
+      <div>
+        <p class="kicker">Use case 04 / portfolio index</p>
+        <h2>The same component can almost disappear.</h2>
+        <p class="copy">A light version turns the banner into a translucent index rail. The glyph field becomes an ambient texture instead of a spectacle.</p>
+      </div>
+      <div class="portfolio-grid">
+        <div class="work-tile"><div class="work-mark"></div><span>Visual systems</span></div>
+        <div class="work-tile"><div class="work-mark"></div><span>Research tools</span></div>
+        <div class="work-tile"><div class="work-mark"></div><span>Editorial interfaces</span></div>
+        <div class="work-tile"><div class="work-mark"></div><span>Prototype labs</span></div>
+      </div>
+    </section>
+
+    <section class="section" data-case="gallery">
+      <div class="section-inner">
+        <p class="kicker">Variant gallery</p>
+        <h2>Presets as product language.</h2>
+        <p class="copy">Each card is a different personality for the same component. Click one to apply it to the fixed banner.</p>
+        <div class="variant-grid" id="variant-grid"></div>
+      </div>
+    </section>
+
+    <section class="section playground" data-case="playground">
+      <div class="section-inner playground-grid">
+        <div>
+          <p class="kicker">Configuration</p>
+          <h2>Small API, large surface area.</h2>
+          <p class="copy">The sketch page treats the component like a promotional site and a playground at once. The current banner state can be serialized as a useful starting point.</p>
+          <p class="mode-note">The top controls override scroll presets until another section comes into focus. The input changes the label box in place.</p>
+        </div>
+        <div>
+          <div class="control-matrix">
+            <button class="swatch-button" type="button" data-swatch="#7b6fa5" style="--swatch:#7b6fa5" aria-label="Ube violet"></button>
+            <button class="swatch-button" type="button" data-swatch="#72b783" style="--swatch:#72b783" aria-label="Signal green"></button>
+            <button class="swatch-button" type="button" data-swatch="#d9a35d" style="--swatch:#d9a35d" aria-label="Warm amber"></button>
+            <button class="swatch-button" type="button" data-swatch="#7caec2" style="--swatch:#7caec2" aria-label="Cool cyan"></button>
+          </div>
+          <pre class="code-block"><code id="config-code"></code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const GLYPH_SETS = {
+      soft: [' ', '·', '∙', '∘', '○', '◌', '◎', '⊙', '●'],
+      terminal: [' ', '.', ':', '-', '=', '+', '*', '#', '@'],
+      math: [' ', '·', '+', '×', '∴', '∵', '◦', '⊙', '●'],
+      minimal: [' ', '·', '+', '*']
+    };
+
+    const formulas = {
+      interference: (x, y, t) =>
+        (Math.sin(x * 0.1 + t) + Math.cos(y * 0.12 - t * 0.7) + Math.sin((x + y) * 0.05 + t * 0.5) + 3) / 6,
+      ripple: (x, y, t, cx, cy) => {
+        const d = Math.hypot(x - cx, y - cy);
+        return (Math.sin(d * 0.38 - t * 1.8) + 1) / 2;
+      },
+      flow: (x, y, t) => {
+        const ax = x + Math.sin(y * 0.16 + t) * 5;
+        const ay = y + Math.cos(x * 0.12 - t * 0.7) * 5;
+        return (Math.sin(ax * 0.13 + t * 0.8) * Math.cos(ay * 0.11 - t) + 1) / 2;
+      },
+      noise: (x, y, t) => {
+        const a = Math.sin(x * 0.17 + Math.sin(y * 0.07 + t) * 2);
+        const b = Math.cos(y * 0.13 - Math.cos(x * 0.05 - t) * 2);
+        return (a + b + 2) / 4;
+      }
+    };
+
+    const cases = {
+      hero: { label: 'SIGNAL LAYER', filter: 'blur', formula: 'interference', glyphSet: 'soft', color: '#7b6fa5', speed: 0.025, fontSize: 11, light: false, blur: 10, distortScale: 14 },
+      editorial: { label: 'FIELD NOTES', filter: 'blur', formula: 'interference', glyphSet: 'soft', color: '#9d91b0', speed: 0.018, fontSize: 10, light: false, blur: 12, distortScale: 10 },
+      dashboard: { label: 'SYSTEM ONLINE', filter: 'distort', formula: 'flow', glyphSet: 'terminal', color: '#72b783', speed: 0.038, fontSize: 11, light: false, blur: 8, distortScale: 18 },
+      event: { label: 'LIVE SIGNAL', filter: 'distort', formula: 'ripple', glyphSet: 'math', color: '#d9a35d', speed: 0.046, fontSize: 13, light: false, blur: 8, distortScale: 22 },
+      portfolio: { label: 'INDEX', filter: 'blur', formula: 'noise', glyphSet: 'minimal', color: '#426f7f', speed: 0.016, fontSize: 10, light: true, blur: 16, distortScale: 7 },
+      gallery: { label: 'PRESET GALLERY', filter: 'off', formula: 'flow', glyphSet: 'soft', color: '#7caec2', speed: 0.028, fontSize: 11, light: false, blur: 10, distortScale: 14 },
+      playground: { label: 'COPY CONFIG', filter: 'blur', formula: 'interference', glyphSet: 'soft', color: '#7b6fa5', speed: 0.026, fontSize: 11, light: false, blur: 10, distortScale: 14 }
+    };
+
+    class AsciiField {
+      constructor(canvas, getConfig, options = {}) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.getConfig = getConfig;
+        this.fps = options.fps || 1000 / 20;
+        this.frame = Math.random() * 1000;
+        this.last = 0;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        const rect = this.canvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.dpr = dpr;
+        this.canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+        this.canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        this.width = rect.width;
+        this.height = rect.height;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.measure();
+      }
+
+      measure() {
+        const cfg = this.getConfig();
+        this.fontSize = cfg.fontSize || 11;
+        this.ctx.font = `300 ${this.fontSize}px "IBM Plex Mono"`;
+        this.charW = Math.max(4, this.ctx.measureText('·').width);
+        this.charH = this.fontSize * 1.22;
+        this.cols = Math.ceil(this.width / this.charW) + 2;
+        this.rows = Math.ceil(this.height / this.charH) + 2;
+        this.cx = this.cols / 2;
+        this.cy = this.rows / 2;
+      }
+
+      tick(now) {
+        if (now - this.last > this.fps) {
+          this.render();
+          this.last = now;
+        }
+        requestAnimationFrame((t) => this.tick(t));
+      }
+
+      start() {
+        requestAnimationFrame((t) => this.tick(t));
+      }
+
+      render() {
+        const cfg = this.getConfig();
+        if (cfg.fontSize !== this.fontSize) this.measure();
+        const ctx = this.ctx;
+        const glyphs = GLYPH_SETS[cfg.glyphSet] || GLYPH_SETS.soft;
+        const fn = formulas[cfg.formula] || formulas.interference;
+        const rgb = hexToRgb(cfg.color);
+        const trail = cfg.light ? 0.22 : 0.35;
+
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = `rgba(0,0,0,${trail})`;
+        ctx.fillRect(0, 0, this.width, this.height);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.font = `300 ${this.fontSize}px "IBM Plex Mono"`;
+        ctx.textBaseline = 'top';
+
+        const t = this.frame * (cfg.speed || 0.025);
+        this.frame += 1;
+        const n = glyphs.length - 1;
+
+        for (let row = 0; row < this.rows; row++) {
+          for (let col = 0; col < this.cols; col++) {
+            const x = col * this.charW;
+            const y = row * this.charH;
+            let v = clamp01(fn(col, row, t, this.cx, this.cy));
+            const glyph = glyphs[Math.round(v * n)];
+            if (glyph === ' ') continue;
+            ctx.globalAlpha = 0.24 + v * 0.76;
+            ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            ctx.fillText(glyph, x, y);
+          }
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    const banner = document.getElementById('banner');
+    const labelInput = document.getElementById('label-input');
+    const noise = document.getElementById('noise');
+    const displace = document.getElementById('displace');
+    const configCode = document.getElementById('config-code');
+    let current = { ...cases.hero };
+
+    function applyConfig(next, source = 'scroll') {
+      current = { ...current, ...next };
+      banner.dataset.filter = current.filter;
+      labelInput.value = current.label;
+      document.body.classList.toggle('sheet-light', Boolean(current.light));
+      document.documentElement.style.setProperty('--accent', current.color);
+      document.documentElement.style.setProperty('--sheet-blur', `${current.blur || 10}px`);
+      noise.setAttribute('baseFrequency', current.formula === 'ripple' ? '0.018 0.018' : '0.012 0.028');
+      displace.setAttribute('scale', current.distortScale || 14);
+      updateActiveControls();
+      updateCode(source);
+    }
+
+    function updateActiveControls() {
+      document.querySelectorAll('[data-filter]').forEach((button) => {
+        button.classList.toggle('active', button.dataset.filter === current.filter);
+      });
+      document.querySelectorAll('[data-formula]').forEach((button) => {
+        button.classList.toggle('active', button.dataset.formula === current.formula);
+      });
+      document.querySelectorAll('.variant-card').forEach((card) => {
+        card.classList.toggle('active', card.dataset.variant === current.variant);
+      });
+    }
+
+    function updateCode(source) {
+      const snapshot = {
+        label: current.label,
+        filter: {
+          mode: current.filter,
+          blurPx: current.blur,
+          distortScale: current.distortScale
+        },
+        texture: {
+          glyphSet: current.glyphSet,
+          fontSize: current.fontSize
+        },
+        animation: {
+          formula: current.formula,
+          color: current.color,
+          speed: current.speed
+        },
+        source
+      };
+      configCode.textContent = `el.config = ${JSON.stringify(snapshot, null, 2)}`;
+    }
+
+    function clamp01(v) {
+      return Math.max(0, Math.min(1, v));
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace('#', '');
+      return {
+        r: parseInt(clean.slice(0, 2), 16),
+        g: parseInt(clean.slice(2, 4), 16),
+        b: parseInt(clean.slice(4, 6), 16)
+      };
+    }
+
+    document.fonts.ready.then(() => {
+      const field = new AsciiField(
+        document.getElementById('banner-field'),
+        () => current
+      );
+      field.start();
+
+      buildVariantGallery();
+      applyConfig(cases.hero);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      const key = visible.target.dataset.case;
+      applyConfig({ ...cases[key], variant: key }, 'scroll');
+    }, { threshold: [0.45, 0.6, 0.75] });
+
+    document.querySelectorAll('[data-case]').forEach((section) => observer.observe(section));
+
+    document.querySelectorAll('[data-filter]').forEach((button) => {
+      button.addEventListener('click', () => applyConfig({ filter: button.dataset.filter }, 'controls'));
+    });
+
+    document.querySelectorAll('[data-formula]').forEach((button) => {
+      button.addEventListener('click', () => applyConfig({ formula: button.dataset.formula }, 'controls'));
+    });
+
+    labelInput.addEventListener('input', () => applyConfig({ label: labelInput.value || ' ' }, 'controls'));
+
+    document.querySelectorAll('[data-swatch]').forEach((button) => {
+      button.addEventListener('click', () => applyConfig({ color: button.dataset.swatch }, 'controls'));
+    });
+
+    function buildVariantGallery() {
+      const presets = [
+        ['editorial', 'Editorial blur'],
+        ['dashboard', 'Operational signal'],
+        ['event', 'Launch ripple'],
+        ['portfolio', 'Light index'],
+        ['gallery', 'Transparent texture'],
+        ['hero', 'Default sheet']
+      ];
+      const grid = document.getElementById('variant-grid');
+      grid.innerHTML = presets.map(([key, name]) => `
+        <button class="variant-card" type="button" data-variant="${key}">
+          <canvas aria-hidden="true"></canvas>
+          <span>${name}</span>
+        </button>
+      `).join('');
+
+      grid.querySelectorAll('.variant-card').forEach((card) => {
+        const cfg = { ...cases[card.dataset.variant] };
+        cfg.fontSize = 10;
+        const preview = new AsciiField(card.querySelector('canvas'), () => cfg, { fps: 1000 / 15 });
+        preview.start();
+        card.addEventListener('click', () => applyConfig({ ...cfg, variant: card.dataset.variant }, 'gallery'));
+      });
+    }
+  </script>
+</body>
+</html>
