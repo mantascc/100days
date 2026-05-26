@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>79 · idle states — ambient</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --space-4: 4px;
+      --space-8: 8px;
+      --space-16: 16px;
+      --space-24: 24px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      overflow: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .subtitle {
+      position: fixed;
+      top: 44px;
+      left: 24px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      z-index: 10;
+      pointer-events: none;
+      font-weight: 300;
+    }
+
+    .dock {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2px;
+      padding: 5px;
+      background: #1c1c1c;
+      border: 1px solid #2e2e2e;
+      border-radius: 999px;
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.7),
+        0 8px 16px rgba(0, 0, 0, 0.55),
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      z-index: 30;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .dock-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      text-decoration: none;
+      color: var(--text-tertiary);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .dock-item:hover {
+      color: var(--text-default);
+    }
+
+    .dock-item.is-active {
+      color: var(--text-primary);
+      background: #262626;
+      box-shadow:
+        inset 0 0 0 1px #353535,
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .dock-num {
+      color: var(--text-ghost);
+      font-weight: 500;
+      font-size: 9px;
+    }
+
+    .dock-item.is-active .dock-num {
+      color: var(--accent);
+    }
+
+    main {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 96px 24px 96px;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 1px;
+      background: var(--border-default);
+      border: 1px solid var(--border-default);
+      width: 100%;
+      max-width: 920px;
+      height: 100%;
+      max-height: 620px;
+    }
+
+    .cell {
+      position: relative;
+      background: var(--ground-base);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cell-header {
+      padding: 16px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      z-index: 2;
+    }
+
+    .cell-index {
+      color: var(--text-tertiary);
+      font-weight: 300;
+    }
+
+    .cell-stage {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cell-stage canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cell-meta {
+      padding: 0 18px 14px;
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      row-gap: 4px;
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--text-tertiary);
+      font-weight: 300;
+      z-index: 2;
+    }
+
+    .cell-meta dt {
+      color: var(--text-ghost);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .cell-meta dd {
+      color: var(--text-secondary);
+    }
+
+    .prompt {
+      font-family: var(--font-mono);
+      font-size: 44px;
+      font-weight: 300;
+      color: var(--text-default);
+      letter-spacing: -0.01em;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .caret {
+      display: inline-block;
+      width: 3px;
+      height: 0.95em;
+      background: var(--text-default);
+      margin-left: 4px;
+      animation: caret-blink 1.1s steps(1, end) infinite;
+    }
+
+    @keyframes caret-blink {
+      0%, 49%   { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .prompt-sub {
+      position: absolute;
+      bottom: 18px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-ghost);
+    }
+
+    .corner {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border: 1px solid var(--text-ghost);
+    }
+    .corner.tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
+    .corner.tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
+    .corner.bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; }
+    .corner.br { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
+
+    /* mobile — single-column scroll, compact typography */
+    @media (max-width: 700px) {
+      html, body {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: auto;
+        min-height: 100%;
+      }
+      header { top: 16px; left: 16px; font-size: 10px; }
+      .subtitle { top: 34px; left: 16px; font-size: 10px; }
+      main {
+        padding: 72px 12px 96px;
+        display: block;
+        height: auto;
+        min-height: 100vh;
+      }
+      .stage {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, minmax(260px, auto));
+        max-height: none;
+        height: auto;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .cell-stage { min-height: 180px; }
+      .prompt { font-size: 32px; }
+      .cell-header { padding: 12px 14px 0; font-size: 9px; letter-spacing: 0.14em; }
+      .cell-meta { padding: 0 14px 12px; font-size: 9px; }
+      .cell-meta { grid-template-columns: 56px 1fr; }
+      .dock {
+        bottom: max(16px, env(safe-area-inset-bottom, 16px));
+        padding: 4px;
+      }
+      .dock-item {
+        padding: 7px 14px;
+        font-size: 9px;
+        letter-spacing: 0.15em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>79 · idle states</header>
+<div class="subtitle">idle as patience · set i · ambient</div>
+
+<main>
+  <div class="stage">
+
+    <div class="cell" data-cell="breath">
+      <div class="cell-header"><span>breath</span><span class="cell-index">01</span></div>
+      <div class="cell-stage">
+        <canvas></canvas>
+      </div>
+      <dl class="cell-meta">
+        <dt>claim</dt><dd>alive, resting</dd>
+        <dt>signal</dt><dd>I exist</dd>
+        <dt>motion</dt><dd>opacity + scale, ~4s sine</dd>
+        <dt>risk</dt><dd>reads as loading spinner</dd>
+      </dl>
+    </div>
+
+    <div class="cell" data-cell="caret">
+      <div class="cell-header"><span>caret</span><span class="cell-index">02</span></div>
+      <div class="cell-stage">
+        <div class="prompt">
+          <span>on idle</span>
+          <span class="caret"></span>
+        </div>
+      </div>
+      <dl class="cell-meta">
+        <dt>claim</dt><dd>typographic patience</dd>
+        <dt>signal</dt><dd>your turn</dd>
+        <dt>motion</dt><dd>vertical bar, ~1.1s blink</dd>
+        <dt>risk</dt><dd>generic if text is bland</dd>
+      </dl>
+    </div>
+
+    <div class="cell" data-cell="drift">
+      <div class="cell-header"><span>drift</span><span class="cell-index">03</span></div>
+      <div class="cell-stage">
+        <canvas></canvas>
+      </div>
+      <dl class="cell-meta">
+        <dt>claim</dt><dd>untethered, present</dd>
+        <dt>signal</dt><dd>nothing pursued</dd>
+        <dt>motion</dt><dd>low-velocity random walk</dd>
+        <dt>risk</dt><dd>reads as aimless</dd>
+      </dl>
+    </div>
+
+    <div class="cell" data-cell="lean">
+      <div class="cell-header"><span>lean-toward</span><span class="cell-index">04</span></div>
+      <div class="cell-stage">
+        <canvas></canvas>
+      </div>
+      <dl class="cell-meta">
+        <dt>claim</dt><dd>ready, not acting</dd>
+        <dt>signal</dt><dd>here for you</dd>
+        <dt>motion</dt><dd>orients to cursor, settles</dd>
+        <dt>risk</dt><dd>borders on interactive</dd>
+      </dl>
+    </div>
+
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+  </div>
+</main>
+
+<nav class="dock" aria-label="set switcher">
+  <a class="dock-item is-active" href="index.html">
+    <span class="dock-num">I</span><span>ambient</span>
+  </a>
+  <a class="dock-item" href="set-b.html">
+    <span class="dock-num">II</span><span>instrumented</span>
+  </a>
+</nav>
+
+<script>
+  const DPR = Math.max(1, window.devicePixelRatio || 1);
+  const ACCENT = '#00a8ff';
+  const FG = '#f5f5f7';
+  const DIM = '#666666';
+  const GHOST = '#333333';
+
+  // Track global cursor in viewport coords.
+  const cursor = { x: -9999, y: -9999, active: false };
+  window.addEventListener('mousemove', (e) => {
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    cursor.active = true;
+  });
+  window.addEventListener('mouseleave', () => { cursor.active = false; });
+  // touch — mirror cursor for lean-toward on mobile
+  function onTouch(e) {
+    if (e.touches && e.touches.length) {
+      cursor.x = e.touches[0].clientX;
+      cursor.y = e.touches[0].clientY;
+      cursor.active = true;
+    }
+  }
+  window.addEventListener('touchstart', onTouch, { passive: true });
+  window.addEventListener('touchmove',  onTouch, { passive: true });
+  window.addEventListener('touchend',   () => { cursor.active = false; }, { passive: true });
+
+  function setupCanvas(canvas) {
+    const fit = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * DPR));
+      canvas.height = Math.max(1, Math.floor(rect.height * DPR));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return canvas.getContext('2d');
+  }
+
+  // ---- 01 breath -------------------------------------------------------
+  (() => {
+    const cv = document.querySelector('[data-cell="breath"] canvas');
+    const ctx = setupCanvas(cv);
+    const t0 = performance.now();
+    function frame(now) {
+      const t = (now - t0) / 1000;
+      const w = cv.width, h = cv.height;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2;
+      // sine breath, ~4s period — 3x smaller, blue pulse inside held ring
+      const phase = (Math.sin((t / 4) * Math.PI * 2 - Math.PI / 2) + 1) / 2; // 0..1
+      const r = (Math.min(w, h) * 0.033) + phase * (Math.min(w, h) * 0.02);
+      const alpha = 0.35 + phase * 0.6;
+      // soft outer ring (held quiet)
+      ctx.strokeStyle = GHOST;
+      ctx.lineWidth = 1 * DPR;
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.min(w, h) * 0.22, 0, Math.PI * 2);
+      ctx.stroke();
+      // breathing disc — accent blue
+      ctx.fillStyle = `rgba(0,168,255,${alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      // faint outer glow
+      const glow = ctx.createRadialGradient(cx, cy, r, cx, cy, r * 3);
+      glow.addColorStop(0, `rgba(0,168,255,${(alpha * 0.4).toFixed(3)})`);
+      glow.addColorStop(1, 'rgba(0,168,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 3, 0, Math.PI * 2);
+      ctx.fill();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  // ---- 02 caret — handled in CSS (.caret blinks via keyframes) --------
+
+  // ---- 03 drift --------------------------------------------------------
+  (() => {
+    const cv = document.querySelector('[data-cell="drift"] canvas');
+    const ctx = setupCanvas(cv);
+    const N = 5;
+    const motes = Array.from({ length: N }, () => ({
+      x: 0.5, y: 0.5, // normalized 0..1
+      vx: (Math.random() - 0.5) * 0.0006,
+      vy: (Math.random() - 0.5) * 0.0006,
+      r: 2 + Math.random() * 2,
+      a: 0.25 + Math.random() * 0.5,
+      seedX: Math.random() * 1000,
+      seedY: Math.random() * 1000,
+    }));
+    // initial positions spread
+    motes.forEach((m, i) => {
+      m.x = 0.2 + (i / (N - 1)) * 0.6 + (Math.random() - 0.5) * 0.1;
+      m.y = 0.3 + Math.random() * 0.4;
+    });
+    let last = performance.now();
+    function frame(now) {
+      const dt = Math.min(64, now - last); last = now;
+      const w = cv.width, h = cv.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // faint field grid (very subtle)
+      ctx.strokeStyle = GHOST;
+      ctx.lineWidth = 1 * DPR;
+      ctx.setLineDash([2 * DPR, 6 * DPR]);
+      ctx.beginPath();
+      ctx.moveTo(w * 0.15, h / 2); ctx.lineTo(w * 0.85, h / 2);
+      ctx.moveTo(w / 2, h * 0.2); ctx.lineTo(w / 2, h * 0.8);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      motes.forEach((m, i) => {
+        // gentle noise-y acceleration
+        m.seedX += dt * 0.0004;
+        m.seedY += dt * 0.0004;
+        const ax = (Math.sin(m.seedX) + Math.sin(m.seedX * 2.3)) * 0.00002;
+        const ay = (Math.cos(m.seedY) + Math.cos(m.seedY * 1.7)) * 0.00002;
+        m.vx += ax; m.vy += ay;
+        // light drag
+        m.vx *= 0.992; m.vy *= 0.992;
+        m.x += m.vx * dt; m.y += m.vy * dt;
+        // soft bounds — wrap with margin
+        if (m.x < 0.1) m.vx += 0.00004;
+        if (m.x > 0.9) m.vx -= 0.00004;
+        if (m.y < 0.15) m.vy += 0.00004;
+        if (m.y > 0.85) m.vy -= 0.00004;
+
+        ctx.fillStyle = `rgba(245,245,247,${m.a.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(m.x * w, m.y * h, m.r * DPR, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  // ---- 04 lean-toward --------------------------------------------------
+  (() => {
+    const cellEl = document.querySelector('[data-cell="lean"]');
+    const cv = cellEl.querySelector('canvas');
+    const ctx = setupCanvas(cv);
+
+    // smoothed orientation, normalized -1..1 each axis
+    let ox = 0, oy = 0;
+    // smoothed energy (how recently/strongly we're attending)
+    let energy = 0;
+
+    function frame(now) {
+      const w = cv.width, h = cv.height;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2;
+      const reach = Math.min(w, h) * 0.16;
+
+      // compute target orientation from cursor relative to this cell
+      const rect = cellEl.getBoundingClientRect();
+      const inCell = cursor.active &&
+        cursor.x >= rect.left && cursor.x <= rect.right &&
+        cursor.y >= rect.top && cursor.y <= rect.bottom;
+
+      let tx = 0, ty = 0, tE = 0;
+      if (cursor.active) {
+        // map cursor (anywhere on screen) to direction from cell center
+        const dx = cursor.x - (rect.left + rect.width / 2);
+        const dy = cursor.y - (rect.top + rect.height / 2);
+        const dist = Math.hypot(dx, dy);
+        const maxDist = Math.hypot(window.innerWidth, window.innerHeight) / 2;
+        const norm = Math.min(1, dist / (maxDist * 0.5));
+        const ang = Math.atan2(dy, dx);
+        tx = Math.cos(ang) * norm;
+        ty = Math.sin(ang) * norm;
+        // energy is higher when cursor is closer
+        tE = inCell ? 1 : Math.max(0, 1 - dist / (maxDist * 0.6));
+      }
+
+      // smooth toward target (settle when no input)
+      const easeOri = 0.06;
+      const easeEng = 0.04;
+      ox += (tx - ox) * easeOri;
+      oy += (ty - oy) * easeOri;
+      energy += (tE - energy) * easeEng;
+
+      // neutral idle micro-sway (when energy is low)
+      const t = now / 1000;
+      const swayX = Math.sin(t * 0.6) * 0.06 * (1 - energy);
+      const swayY = Math.cos(t * 0.5) * 0.06 * (1 - energy);
+      const fx = ox + swayX;
+      const fy = oy + swayY;
+
+      // base ring (neutral home)
+      ctx.strokeStyle = GHOST;
+      ctx.lineWidth = 1 * DPR;
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.min(w, h) * 0.22, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // figure: a small body that leans
+      const bodyR = Math.min(w, h) * 0.07;
+      const leanX = cx + fx * reach;
+      const leanY = cy + fy * reach;
+
+      // tether line from center to figure (gets bolder with energy)
+      ctx.strokeStyle = `rgba(102,102,102,${(0.3 + energy * 0.6).toFixed(2)})`;
+      ctx.lineWidth = 1 * DPR;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(leanX, leanY);
+      ctx.stroke();
+
+      // figure body
+      ctx.fillStyle = FG;
+      ctx.beginPath();
+      ctx.arc(leanX, leanY, bodyR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // gaze dot — small accent point on the leading edge
+      const gazeR = bodyR * 0.28;
+      const ang = Math.atan2(fy, fx) || 0;
+      const mag = Math.hypot(fx, fy);
+      if (mag > 0.001) {
+        ctx.fillStyle = ACCENT;
+        ctx.beginPath();
+        ctx.arc(leanX + Math.cos(ang) * bodyR * 0.55, leanY + Math.sin(ang) * bodyR * 0.55, gazeR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+</script>
+
+</body>
+</html>
