@@ -1,5 +1,10 @@
 [
   {
+    "id": "79-idle-states",
+    "path": "100days/79-idle-states",
+    "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across two pages (ambient + instrumented): breath, caret, drift, lean-toward, hover, orbit, listening bars, elapsed counter; each paired with claim/signal/motion/risk metadata, switched via a floating pill dock"
+  },
+  {
     "id": "78-ascii-sheets-docs",
     "path": "100days/78-ascii-sheets-docs",
     "description": "ASCII Sheets — promotional showcase for the ASCII sheet primitive: hero with auto-cycling filters, twelve live use-case tiles (header, modal, toast, divider, drawer, image-reveal, marquee, tooltip, etc.), five-formula gallery, and glyph + palette rails that retheme the hero on click"
