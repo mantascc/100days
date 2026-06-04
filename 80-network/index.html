@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>80 · network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+
+      --rel-follows:  #6c8cff;
+      --rel-friends:  #4ade80;
+      --rel-mentions: #f5d76e;
+      --rel-blocked:  #ef4444;
+
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: var(--ground-void); color: var(--text-default); font-family: var(--font-mono); overflow: hidden; }
+
+    header {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .meta {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      text-align: right;
+      z-index: 10;
+      pointer-events: none;
+      line-height: 1.6;
+    }
+
+    main { width: 100%; height: 100%; position: relative; }
+    svg { width: 100%; height: 100%; display: block; }
+
+    .node-halo { fill: var(--ground-raised); stroke: var(--border-default); stroke-width: 1; }
+    .node-dot  { fill: var(--text-default); }
+    .node-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: var(--text-secondary);
+      pointer-events: none;
+      letter-spacing: 0.05em;
+    }
+
+    .edge { fill: none; stroke-linecap: round; transition: opacity 240ms ease; }
+    .edge.follows  { stroke: var(--rel-follows);  stroke-width: 1.1; }
+    .edge.friends  { stroke: var(--rel-friends);  stroke-width: 1.8; }
+    .edge.mentions { stroke: var(--rel-mentions); stroke-width: 1;   stroke-dasharray: 1 3; }
+    .edge.blocked  { stroke: var(--rel-blocked);  stroke-width: 1.2; stroke-dasharray: 5 3; }
+    .edge.hidden   { opacity: 0; pointer-events: none; }
+
+    .arrowhead-follows { fill: var(--rel-follows); }
+    .arrowhead-blocked { fill: var(--rel-blocked); }
+
+    .legend {
+      position: fixed;
+      left: 24px;
+      bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 10;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 2px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 160ms ease, background 160ms ease;
+      color: var(--text-secondary);
+      min-width: 200px;
+    }
+    .legend-item:hover { border-color: var(--border-default); background: var(--ground-raised); }
+    .legend-item.off { color: var(--text-ghost); }
+    .legend-item.off .swatch { opacity: 0.25; }
+
+    .swatch { width: 28px; height: 0; flex-shrink: 0; position: relative; }
+    .swatch::before { content: ''; position: absolute; inset: 0; top: -1px; }
+    .swatch.follows::before  { border-top: 1.5px solid var(--rel-follows); }
+    .swatch.friends::before  { border-top: 2.5px solid var(--rel-friends); }
+    .swatch.mentions::before { border-top: 1.5px dotted var(--rel-mentions); }
+    .swatch.blocked::before  { border-top: 1.5px dashed var(--rel-blocked); }
+
+    .legend-label { flex: 1; }
+    .legend-count { color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+    .legend-item.off .legend-count { color: var(--text-ghost); }
+
+    .hint {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      z-index: 10;
+      pointer-events: none;
+      text-align: right;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<header>80 · network</header>
+<div class="meta">
+  <div>force-directed</div>
+  <div>multi-edge curves</div>
+</div>
+
+<main><svg id="graph"></svg></main>
+
+<div class="legend" id="legend"></div>
+<div class="hint">click legend to toggle layer<br>drag a node</div>
+
+<script>
+  // ---------- data ----------
+  const NAMES = ['ada','lin','noa','mio','jun','rae','kit','vex','oro','ash','sol','wen','tov','imi','eli'];
+
+  const REL_TYPES = [
+    { key: 'follows',  label: 'follows',  directed: true,  arrow: true  },
+    { key: 'friends',  label: 'friends',  directed: false, arrow: false },
+    { key: 'mentions', label: 'mentions', directed: true,  arrow: false },
+    { key: 'blocked',  label: 'blocked',  directed: true,  arrow: true  },
+  ];
+
+  let seed = 7;
+  const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const pick = arr => arr[Math.floor(rand() * arr.length)];
+
+  const nodes = NAMES.map((id, i) => ({ id, idx: i }));
+  const rawLinks = [];
+  const addEdge = (type, s, t) => { if (s !== t) rawLinks.push({ source: s, target: t, type }); };
+
+  // follows: ~22 edges, preferential attachment
+  const followCount = NAMES.map(() => 1);
+  for (let k = 0; k < 22; k++) {
+    const s = pick(NAMES);
+    const total = followCount.reduce((a, b) => a + b, 0);
+    let r = rand() * total, t = NAMES[0];
+    for (let i = 0; i < NAMES.length; i++) { r -= followCount[i]; if (r <= 0) { t = NAMES[i]; break; } }
+    addEdge('follows', s, t);
+    followCount[NAMES.indexOf(t)]++;
+  }
+
+  // friends: clusters with intra-cluster bias, a few bridges
+  const clusters = [
+    ['ada','lin','noa','mio'],
+    ['jun','rae','kit','vex'],
+    ['oro','ash','sol'],
+    ['wen','tov','imi','eli'],
+  ];
+  clusters.forEach(c => {
+    for (let i = 0; i < c.length; i++)
+      for (let j = i + 1; j < c.length; j++)
+        if (rand() < 0.65) addEdge('friends', c[i], c[j]);
+  });
+  for (let k = 0; k < 3; k++) addEdge('friends', pick(NAMES), pick(NAMES));
+
+  // mentions: ~18, biased toward 4 hubs
+  const hubs = ['ada','jun','sol','eli'];
+  for (let k = 0; k < 18; k++) addEdge('mentions', pick(NAMES), pick(hubs));
+
+  // blocked: ~6 sparse
+  for (let k = 0; k < 6; k++) addEdge('blocked', pick(NAMES), pick(NAMES));
+
+  // ---------- pair bucketing for multi-edge curving ----------
+  const pairBuckets = new Map();
+  rawLinks.forEach(l => {
+    const a = l.source, b = l.target;
+    const key = a < b ? `${a}|${b}` : `${b}|${a}`;
+    if (!pairBuckets.has(key)) pairBuckets.set(key, []);
+    pairBuckets.get(key).push(l);
+  });
+
+  const seen = new Set();
+  const links = [];
+  pairBuckets.forEach(bucket => {
+    const unique = bucket.filter(l => {
+      const k = `${l.source}>${l.target}|${l.type}`;
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+    const n = unique.length;
+    unique.forEach((l, i) => {
+      l.curveIdx = i - (n - 1) / 2;
+      l.pairSize = n;
+      links.push(l);
+    });
+  });
+
+  // ---------- svg ----------
+  const svg = d3.select('#graph');
+  const width  = () => window.innerWidth;
+  const height = () => window.innerHeight;
+
+  const defs = svg.append('defs');
+  ['follows','blocked'].forEach(type => {
+    defs.append('marker')
+      .attr('id', `arrow-${type}`)
+      .attr('viewBox', '0 -4 8 8')
+      .attr('refX', 8).attr('refY', 0)
+      .attr('markerWidth', 7).attr('markerHeight', 7)
+      .attr('orient', 'auto').attr('markerUnits', 'userSpaceOnUse')
+      .append('path').attr('d', 'M0,-3.5L8,0L0,3.5Z').attr('class', `arrowhead-${type}`);
+  });
+
+  const root = svg.append('g');
+  const linkG = root.append('g').attr('class', 'links');
+  const nodeG = root.append('g').attr('class', 'nodes');
+
+  const linkSel = linkG.selectAll('path')
+    .data(links).join('path')
+    .attr('class', d => `edge ${d.type}`)
+    .attr('marker-end', d => {
+      const rel = REL_TYPES.find(r => r.key === d.type);
+      return rel.arrow ? `url(#arrow-${d.type})` : null;
+    });
+
+  const nodeSel = nodeG.selectAll('g')
+    .data(nodes).join('g').attr('class', 'node')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  nodeSel.append('circle').attr('class', 'node-halo').attr('r', 14);
+  nodeSel.append('circle').attr('class', 'node-dot').attr('r', 2.5);
+  nodeSel.append('text').attr('class', 'node-label').attr('dy', 26).attr('text-anchor', 'middle').text(d => d.id);
+
+  // ---------- simulation ----------
+  const activeTypes = new Set(REL_TYPES.map(r => r.key));
+
+  const linkForce = d3.forceLink(links)
+    .id(d => d.id)
+    .distance(d => d.type === 'friends' ? 70 : 110)
+    .strength(d => activeTypes.has(d.type) ? (d.type === 'friends' ? 0.9 : 0.35) : 0);
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', linkForce)
+    .force('charge', d3.forceManyBody().strength(-260))
+    .force('center', d3.forceCenter(width() / 2, height() / 2))
+    .force('collide', d3.forceCollide(22))
+    .on('tick', tick);
+
+  function tick() {
+    linkSel.attr('d', d => {
+      const sx = d.source.x, sy = d.source.y;
+      const tx = d.target.x, ty = d.target.y;
+      const dx = tx - sx, dy = ty - sy;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const pad = 15;
+      const ux = dx / dist, uy = dy / dist;
+      const sxp = sx + ux * pad, syp = sy + uy * pad;
+      const txp = tx - ux * pad, typ = ty - uy * pad;
+      if (d.pairSize === 1) return `M${sxp},${syp}L${txp},${typ}`;
+      const offset = d.curveIdx * 14;
+      const mx = (sxp + txp) / 2 + (-uy) * offset;
+      const my = (syp + typ) / 2 + ( ux) * offset;
+      return `M${sxp},${syp}Q${mx},${my} ${txp},${typ}`;
+    });
+    nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+  }
+
+  // ---------- legend ----------
+  const legend = d3.select('#legend');
+  const counts = REL_TYPES.map(r => ({ ...r, count: links.filter(l => l.type === r.key).length }));
+
+  const items = legend.selectAll('.legend-item')
+    .data(counts).join('div').attr('class', 'legend-item')
+    .on('click', function(_, d) {
+      const el = d3.select(this);
+      const on = !el.classed('off');
+      el.classed('off', on);
+      if (on) activeTypes.delete(d.key); else activeTypes.add(d.key);
+      updateLayers();
+    });
+
+  items.append('div').attr('class', d => `swatch ${d.key}`);
+  items.append('div').attr('class', 'legend-label').text(d => d.label);
+  items.append('div').attr('class', 'legend-count').text(d => String(d.count).padStart(2, '0'));
+
+  function updateLayers() {
+    linkSel.classed('hidden', d => !activeTypes.has(d.type));
+    linkForce.strength(d => activeTypes.has(d.type) ? (d.type === 'friends' ? 0.9 : 0.35) : 0);
+    sim.alpha(0.6).restart();
+  }
+
+  window.addEventListener('resize', () => {
+    sim.force('center', d3.forceCenter(width() / 2, height() / 2));
+    sim.alpha(0.3).restart();
+  });
+</script>
+
+</body>
+</html>

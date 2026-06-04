@@ -388,5 +388,10 @@
     "id": "77-ascii-sheet-documentation",
     "path": "100days/77-ascii-sheet-documentation",
     "description": "ASCII Sheet Documentation — promotional component showcase for a fixed ASCII texture and backdrop-filter banner, with scroll-reactive use cases, presets, and config snapshot"
+  },
+  {
+    "id": "80-network",
+    "path": "100days/80-network",
+    "description": "Network — D3 force-directed graph with four relationship types (follows, friends, mentions, blocked) encoded by color, width, dash, and arrow; same-pair edges fan out as symmetric quadratic curves and a legend toggles each layer, reheating the simulation so the layout re-settles"
   }
 ]
