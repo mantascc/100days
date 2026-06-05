@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 81 — Lens Wave</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #111;
+  color: #e0e0e0;
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+}
+
+#wrap {
+  width: min(800px, 100%);
+  margin: 0 auto;
+  padding: 48px 0 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Lens wave canvas ── */
+.effect {
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #000;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+}
+
+.label {
+  position: absolute;
+  bottom: 10px;
+  left: 14px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  pointer-events: none;
+}
+
+/* ── Sweater + overlay ── */
+.sweater-container {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #111;
+}
+
+.sweater-container img.base {
+  width: 100%;
+  display: block;
+}
+
+.sweater-container img.overlay {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36%;
+  height: 11.5%;
+  object-fit: contain;
+  top: 34.95%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.sweater-container img.overlay.visible {
+  opacity: 1;
+}
+
+/* ── Controls: floating island ── */
+.controls {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 100px;
+  padding: 5px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  z-index: 100;
+  white-space: nowrap;
+}
+
+#textInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.75);
+  padding: 9px 14px;
+  width: 200px;
+  min-width: 80px;
+}
+
+#textInput::placeholder {
+  color: rgba(255,255,255,0.2);
+}
+
+button {
+  padding: 9px 18px;
+  border-radius: 100px;
+  border: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+button:active { opacity: 0.65; }
+
+#snapBtn {
+  background: #fff;
+  color: #000;
+}
+
+#exportBtn {
+  background: transparent;
+  color: rgba(255,255,255,0.35);
+  font-weight: 500;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+}
+
+#exportBtn:hover {
+  color: rgba(255,255,255,0.65);
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <!-- Live animation -->
+  <div class="effect">
+    <canvas id="gl"></canvas>
+    <span class="label">lens wave — 81</span>
+  </div>
+
+  <!-- Sweater + overlay -->
+  <div class="sweater-container">
+    <img class="base" id="sweaterImg" alt="sweater">
+    <img class="overlay" id="overlay" src="" alt="">
+  </div>
+
+  <!-- Floating controls -->
+  <div class="controls">
+    <input id="textInput" type="text" placeholder="hello world" autocomplete="off">
+    <button id="snapBtn">Snap</button>
+    <button id="exportBtn">
+      Save
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+<script>
+
+const SWEATER_SRC   = 'sweater.png';
+let activeText      = 'hello world';
+const FONT_FAMILY   = "'IBM Plex Mono', monospace";
+const FILL_RATIO    = 0.82;
+const AMP           = 0.022;
+const CA            = 4.5;
+const SPEED         = 0.00052;
+const TILE_H_CSS    = 320;
+const DPR           = window.devicePixelRatio || 1;
+
+// ─── Text texture ─────────────────────────────────────────────────────────────
+const tc  = document.createElement('canvas');
+const ctx = tc.getContext('2d');
+
+function renderText(tw, th) {
+  tc.width  = tw;
+  tc.height = th;
+  ctx.font  = `700 200px ${FONT_FAMILY}`;
+  const pw  = ctx.measureText(activeText).width;
+  const fs  = Math.min(Math.floor(200 * (tw * FILL_RATIO / pw)), Math.floor(th * 0.45));
+  ctx.font         = `700 ${fs}px ${FONT_FAMILY}`;
+  ctx.fillStyle    = '#000';
+  ctx.fillRect(0, 0, tw, th);
+  ctx.fillStyle    = '#fff';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(activeText, tw / 2, th / 2);
+}
+
+// ─── WebGL (preserveDrawingBuffer so toDataURL works at snap time) ────────────
+const canvas = document.getElementById('gl');
+const gl     = canvas.getContext('webgl',              { preserveDrawingBuffer: true })
+            || canvas.getContext('experimental-webgl', { preserveDrawingBuffer: true });
+if (!gl) throw new Error('no WebGL');
+
+const VERT = `
+attribute vec2 a_pos;
+varying   vec2 v_uv;
+void main() {
+  v_uv        = vec2(a_pos.x, -a_pos.y) * 0.5 + 0.5;
+  gl_Position = vec4(a_pos, 0.0, 1.0);
+}`;
+
+const FRAG = `
+precision highp float;
+uniform sampler2D u_tex;
+uniform float     u_time;
+uniform vec2      u_px;
+varying vec2      v_uv;
+
+vec2 warp(vec2 uv, float t) {
+  float a = 0.02200;
+  float dx =
+    sin(uv.y * 11.0  + t * 1.30) * a * 0.50 +
+    sin(uv.y *  6.5  - t * 0.85) * a * 0.28 +
+    sin(uv.y * 21.0  + t * 2.50) * a * 0.12 +
+    sin(uv.x *  7.0  + t * 0.95) * a * 0.22 +
+    sin((uv.x + uv.y) * 5.0 + t * 0.68) * a * 0.10 +
+    sin((uv.x - uv.y) * 8.5 + t * 1.80) * a * 0.06;
+  float dy =
+    sin(uv.x * 10.5  + t * 1.20) * a * 0.50 +
+    sin(uv.x *  4.5  - t * 0.72) * a * 0.28 +
+    sin(uv.y *  9.0  + t * 0.88) * a * 0.18 +
+    sin((uv.x + uv.y) * 6.0 - t * 1.10) * a * 0.10 +
+    sin((uv.x - uv.y) * 4.0 + t * 0.55) * a * 0.06;
+  return uv + vec2(dx, dy);
+}
+
+float samp(vec2 uv) {
+  return texture2D(u_tex, clamp(uv, vec2(0.001), vec2(0.999))).r;
+}
+
+float bloom(vec2 uv) {
+  float rx4  = u_px.x *  4.0; float ry4  = u_px.y *  4.0;
+  float rx9  = u_px.x *  9.0; float ry9  = u_px.y *  9.0;
+  float rx16 = u_px.x * 16.0; float ry16 = u_px.y * 16.0;
+  return
+    (samp(uv+vec2( rx4,0.))+samp(uv+vec2(-rx4,0.))+samp(uv+vec2(0., ry4))+samp(uv+vec2(0.,-ry4))) * 0.072 +
+    (samp(uv+vec2( rx9,0.))+samp(uv+vec2(-rx9,0.))+samp(uv+vec2(0., ry9))+samp(uv+vec2(0.,-ry9))) * 0.038 +
+    (samp(uv+vec2(rx16,0.))+samp(uv+vec2(-rx16,0.))+samp(uv+vec2(0.,ry16))+samp(uv+vec2(0.,-ry16)))* 0.018;
+}
+
+void main() {
+  float t   = u_time;
+  vec2  uv  = v_uv;
+  float cax = u_px.x * 4.5;
+
+  vec2 zUV = (uv - 0.5) * 1.25 + 0.5;
+  float sx = clamp(
+    1.0 - sin(zUV.x * 7.0 + t * 1.10) * 0.38
+        - sin(zUV.x * 2.8 - t * 0.65) * 0.18,
+    0.15, 1.18
+  );
+  float sy = clamp(
+    1.0 - sin(zUV.x * 4.5 + t * 0.85) * 0.28
+        - sin(zUV.y * 3.0 - t * 0.70) * 0.14
+        - sin((zUV.x + zUV.y) * 3.5 + t * 1.30) * 0.10,
+    0.15, 2.00
+  );
+  vec2 scaled = vec2(0.5 + (zUV.x - 0.5) * sx, 0.5 + (zUV.y - 0.5) * sy);
+  vec2 d      = warp(warp(scaled, t), t * 0.62 + 3.7);
+
+  float r  = samp(d + vec2(cax, 0.));
+  float g  = samp(d);
+  float b  = samp(d - vec2(cax, 0.));
+  float gw = bloom(d);
+  vec3 col = vec3(r, g, b) + vec3(0.18, 0.50, 1.00) * gw * 1.2;
+  gl_FragColor = vec4(col, max(max(r, g), b) + gw * 0.65);
+}`;
+
+function mkShader(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+
+const prog = gl.createProgram();
+gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   VERT));
+gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FRAG));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+
+const vbo = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+const posLoc = gl.getAttribLocation(prog, 'a_pos');
+gl.enableVertexAttribArray(posLoc);
+gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+const tex   = gl.createTexture();
+const uTime = gl.getUniformLocation(prog, 'u_time');
+const uPx   = gl.getUniformLocation(prog, 'u_px');
+
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+function init() {
+  const tileW = Math.min(800, window.innerWidth);
+  const W = Math.round(tileW * DPR);
+  const H = Math.round(TILE_H_CSS * DPR);
+
+  canvas.width        = W;
+  canvas.height       = H;
+  canvas.style.height = TILE_H_CSS + 'px';
+
+  renderText(W, H);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tc);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform2f(uPx, 1 / W, 1 / H);
+}
+
+// ─── Render loop ──────────────────────────────────────────────────────────────
+function frame(ts) {
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.uniform1f(uTime, ts * SPEED);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  requestAnimationFrame(frame);
+}
+
+// ─── Snap ─────────────────────────────────────────────────────────────────────
+const overlay   = document.getElementById('overlay');
+const snapBtn   = document.getElementById('snapBtn');
+const exportBtn = document.getElementById('exportBtn');
+const textInput = document.getElementById('textInput');
+
+function refreshTexture() {
+  renderText(canvas.width, canvas.height);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tc);
+}
+
+let textTimer;
+textInput.addEventListener('input', () => {
+  clearTimeout(textTimer);
+  textTimer = setTimeout(() => {
+    activeText = textInput.value.trim() || 'hello world';
+    refreshTexture();
+  }, 120);
+});
+
+snapBtn.addEventListener('click', () => {
+  overlay.src = canvas.toDataURL('image/png');
+  overlay.classList.add('visible');
+});
+
+// ─── Export: composite sweater + snap overlay → download ─────────────────────
+exportBtn.addEventListener('click', () => {
+  const _el = document.querySelector('.sweater-container img.base');
+  const SW  = _el.naturalWidth  || 800;
+  const SH  = _el.naturalHeight || 887;
+
+  const ec  = document.createElement('canvas');
+  ec.width  = SW;
+  ec.height = SH;
+  const ec2 = ec.getContext('2d');
+
+  const hasSnap = overlay.classList.contains('visible') && overlay.src;
+  const snapSrc = hasSnap ? overlay.src : null;
+
+  const sweaterImg = new Image();
+  sweaterImg.onload = () => {
+    ec2.drawImage(sweaterImg, 0, 0, SW, SH);
+
+    const finish = () => {
+      const a = document.createElement('a');
+      a.download = 'snap-export.png';
+      a.href = ec.toDataURL('image/png');
+      a.click();
+    };
+
+    if (snapSrc) {
+      const snapImg = new Image();
+      snapImg.onload = () => {
+        const overlayW = 288, overlayH = 102;
+        const overlayX = (SW - overlayW) / 2;
+        const overlayY = 310;
+        ec2.globalCompositeOperation = 'screen';
+        ec2.drawImage(snapImg, overlayX, overlayY, overlayW, overlayH);
+        finish();
+      };
+      snapImg.src = snapSrc;
+    } else {
+      finish();
+    }
+  };
+  sweaterImg.src = SWEATER_SRC;
+});
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(init, 150);
+});
+
+document.getElementById('sweaterImg').src = SWEATER_SRC;
+init();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
