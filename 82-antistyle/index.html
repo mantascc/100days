@@ -133,6 +133,59 @@
       pointer-events: none;
     }
 
+    .interface-button {
+      position: fixed;
+      right: 12px;
+      bottom: 36px;
+      z-index: 42;
+      padding: 7px 10px;
+      color: #0f0;
+      background: #000;
+      border: 2px outset #0f0;
+      box-shadow: 5px 5px 0 var(--yellow);
+      font: 12px var(--mono);
+      text-transform: lowercase;
+      cursor: pointer;
+    }
+
+    .interface-dialog {
+      width: min(720px, calc(100vw - 26px));
+      max-height: min(720px, calc(100vh - 42px));
+      padding: 0;
+      color: var(--ink);
+      background: #fff;
+      border: 5px solid #000;
+      box-shadow: 12px 12px 0 var(--red);
+    }
+
+    .interface-dialog::backdrop {
+      background:
+        repeating-linear-gradient(90deg, rgba(255,0,0,0.26) 0 1px, transparent 1px 16px),
+        rgba(236,231,220,0.72);
+    }
+
+    .interface-dialog header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px;
+      background: var(--yellow);
+      border-bottom: 3px solid #000;
+      font: 700 13px var(--mono);
+      text-transform: uppercase;
+    }
+
+    .interface-dialog pre {
+      margin: 0;
+      padding: 14px;
+      white-space: pre-wrap;
+      font: 13px/1.45 var(--mono);
+    }
+
     .hud {
       position: fixed;
       top: 12px;
@@ -892,6 +945,15 @@ state: leaking
 toggle: deleted
 smoothness: refused
 dom: on display</pre>
+  <button class="interface-button" id="interfaceBtn" type="button" data-drag-scroll-ignore data-cursor="pointer">interface.md</button>
+
+  <dialog class="interface-dialog" id="interfaceDialog">
+    <header>
+      <span>interface.md / wall text exposed</span>
+      <button type="button" id="closeInterfaceBtn" data-drag-scroll-ignore data-cursor="pointer">close</button>
+    </header>
+    <pre id="interfaceText">loading interface.md...</pre>
+  </dialog>
 
   <header class="hud">
     <span class="label">Gallery 00: Antistyle</span>
@@ -1076,11 +1138,47 @@ dom: on display</pre>
     </div>
   </main>
 
+  <script type="text/plain" id="interfaceFallback"># Day 82: Antistyle Gallery
+
+Museum gallery experience for antistyle as anti-illusion.
+
+The interaction is a horizontal gallery walk. The first active room makes the
+core paradox tangible: the viewer tries to remove style signals, and every
+removal is immediately recorded as a new style decision. The later rooms then
+represent a lineage of refusals: Dada against aura, radical design against good
+taste, punk against polish, web brutalism against the rounded consensus, the
+absorption trap, visible machinery, and the rough mark as evidence of human
+decision.
+
+Interface notes:
+
+- Keep browser mechanisms visible: scrollbars, default links, telemetry, outlines.
+- Show machinery by default. No reveal toggle; the exposed layer is the normal
+  state.
+- Let the gallery be partially tasteful, then interrupt that taste with exposed
+  construction.
+- Add entropy as live annotation drift: crooked labels, visible grids, source
+  rails, and generated wall tags.
+- Horizontal gallery movement supports drag-to-scroll. The default cursor is
+  grab, dragging switches to grabbing, and interactive regions can opt out with
+  `data-drag-scroll-ignore` plus a `data-cursor` value.
+- A floating `interface.md` button opens these notes in a dialog, making the
+  design brief part of the gallery surface.
+- Make the paradox interactive: removing the frame, palette, typography, or
+  explanation must generate a new label or rule.
+- Use the plaque voice as an unreliable institution.
+- Include one live surface where the viewer can make a crude mark.
+- The point is not ugliness. The point is refusing the smooth fiction.</script>
+
   <script>
     const body = document.body;
     const gallery = document.getElementById("gallery");
     const tasteBtn = document.getElementById("tasteBtn");
     const tickerText = document.getElementById("tickerText");
+    const interfaceBtn = document.getElementById("interfaceBtn");
+    const interfaceDialog = document.getElementById("interfaceDialog");
+    const interfaceText = document.getElementById("interfaceText");
+    const closeInterfaceBtn = document.getElementById("closeInterfaceBtn");
     const paintCanvas = document.getElementById("paintCanvas");
     const paintCtx = paintCanvas.getContext("2d");
     const paradoxStage = document.getElementById("paradoxStage");
@@ -1275,9 +1373,38 @@ dom: on display</pre>
       dragMoved = false;
     }
 
+    async function loadInterfaceText() {
+      const fallback = document.getElementById("interfaceFallback").textContent.trim();
+      if (window.location.protocol === "file:") {
+        interfaceText.textContent = fallback;
+        return;
+      }
+
+      try {
+        const response = await window.fetch("interface.md", { cache: "no-store" });
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        interfaceText.textContent = await response.text();
+      } catch (error) {
+        interfaceText.textContent = `${fallback}\n\n[local fetch refused: ${error.message}]`;
+      }
+    }
+
     tasteBtn.addEventListener("click", () => {
       body.classList.toggle("is-bad-taste");
       tasteBtn.textContent = body.classList.contains("is-bad-taste") ? "undo taste" : "bad taste";
+    });
+
+    interfaceBtn.addEventListener("click", async () => {
+      await loadInterfaceText();
+      if (typeof interfaceDialog.showModal === "function") {
+        interfaceDialog.showModal();
+      } else {
+        window.alert(interfaceText.textContent);
+      }
+    });
+
+    closeInterfaceBtn.addEventListener("click", () => {
+      interfaceDialog.close();
     });
 
     document.querySelectorAll("[data-refusal]").forEach((button) => {

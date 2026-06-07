@@ -22,6 +22,8 @@ Interface notes:
 - Horizontal gallery movement supports drag-to-scroll. The default cursor is
   grab, dragging switches to grabbing, and interactive regions can opt out with
   `data-drag-scroll-ignore` plus a `data-cursor` value.
+- A floating `interface.md` button opens these notes in a dialog, making the
+  design brief part of the gallery surface.
 - Make the paradox interactive: removing the frame, palette, typography, or
   explanation must generate a new label or rule.
 - Use the plaque voice as an unreliable institution.
