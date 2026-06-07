@@ -1,0 +1,642 @@
+[
+  {
+    "slug": "82-antistyle",
+    "title": "Antistyle Gallery",
+    "href": "../82-antistyle/",
+    "poster": "assets/posters/82-antistyle.jpg",
+    "video": "assets/videos/82-antistyle.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "81-lens-wave",
+    "title": "Lens Wave",
+    "href": "../81-lens-wave/",
+    "poster": "assets/posters/81-lens-wave.jpg",
+    "video": "assets/videos/81-lens-wave.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "80-network",
+    "title": "Network",
+    "href": "../80-network/",
+    "poster": "assets/posters/80-network.jpg",
+    "video": "assets/videos/80-network.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "79-idle-states",
+    "title": "Idle States",
+    "href": "../79-idle-states/",
+    "poster": "assets/posters/79-idle-states.jpg",
+    "video": "assets/videos/79-idle-states.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "78-ascii-sheets-docs",
+    "title": "Ascii Sheets Docs",
+    "href": "../78-ascii-sheets-docs/",
+    "poster": "assets/posters/78-ascii-sheets-docs.jpg",
+    "video": "assets/videos/78-ascii-sheets-docs.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "77-ascii-sheet-documentation",
+    "title": "Ascii Sheet Documentation",
+    "href": "../77-ascii-sheet-documentation/",
+    "poster": "assets/posters/77-ascii-sheet-documentation.jpg",
+    "video": "assets/videos/77-ascii-sheet-documentation.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "76-layout-depth",
+    "title": "Layout Depth",
+    "href": "../76-layout-depth/",
+    "poster": "assets/posters/76-layout-depth.jpg",
+    "video": "assets/videos/76-layout-depth.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "75-layout-playground",
+    "title": "Layout Playground",
+    "href": "../75-layout-playground/",
+    "poster": "assets/posters/75-layout-playground.jpg",
+    "video": "assets/videos/75-layout-playground.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "74-particles",
+    "title": "Particles",
+    "href": "../74-particles/",
+    "poster": "assets/posters/74-particles.jpg",
+    "video": "assets/videos/74-particles.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "73-svg-layouts",
+    "title": "Svg Layouts",
+    "href": "../73-svg-layouts/",
+    "poster": "assets/posters/73-svg-layouts.jpg",
+    "video": "assets/videos/73-svg-layouts.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "72-snapshots-v2",
+    "title": "Snapshots V2",
+    "href": "../72-snapshots-v2/",
+    "poster": "assets/posters/72-snapshots-v2.jpg",
+    "video": "assets/videos/72-snapshots-v2.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "71-index-100days",
+    "title": "Index 100days",
+    "href": "../71-index-100days/",
+    "poster": "assets/posters/71-index-100days.jpg",
+    "video": "assets/videos/71-index-100days.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "70-clear-channel-2",
+    "title": "Clear Channel 2",
+    "href": "../70-clear-channel-2/",
+    "poster": "assets/posters/70-clear-channel-2.jpg",
+    "video": "assets/videos/70-clear-channel-2.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "69-clear-channel",
+    "title": "Clear Channel",
+    "href": "../69-clear-channel/",
+    "poster": "assets/posters/69-clear-channel.jpg",
+    "video": "assets/videos/69-clear-channel.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "68-moog-phase",
+    "title": "Moog Phase",
+    "href": "../68-moog-phase/",
+    "poster": "assets/posters/68-moog-phase.jpg",
+    "video": "assets/videos/68-moog-phase.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "67-audio-reactive-ascii",
+    "title": "Audio Reactive Ascii",
+    "href": "../67-audio-reactive-ascii/",
+    "poster": "assets/posters/67-audio-reactive-ascii.jpg",
+    "video": "assets/videos/67-audio-reactive-ascii.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "66-ascii-field-gallery",
+    "title": "Ascii Field Gallery",
+    "href": "../66-ascii-field-gallery/",
+    "poster": "assets/posters/66-ascii-field-gallery.jpg",
+    "video": "assets/videos/66-ascii-field-gallery.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "65-mode-toggle",
+    "title": "Mode Toggle",
+    "href": "../65-mode-toggle/",
+    "poster": "assets/posters/65-mode-toggle.jpg",
+    "video": "assets/videos/65-mode-toggle.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "64-viz-grouped",
+    "title": "Viz Grouped",
+    "href": "../64-viz-grouped/",
+    "poster": "assets/posters/64-viz-grouped.jpg",
+    "video": "assets/videos/64-viz-grouped.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "63-ube-kaizen",
+    "title": "Ube Kaizen",
+    "href": "../63-ube-kaizen/",
+    "poster": "assets/posters/63-ube-kaizen.jpg",
+    "video": "assets/videos/63-ube-kaizen.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "63-constellation-map",
+    "title": "Constellation Map",
+    "href": "../63-constellation-map/",
+    "poster": "assets/posters/63-constellation-map.jpg",
+    "video": "assets/videos/63-constellation-map.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "62-terminal-cli",
+    "title": "Terminal Cli",
+    "href": "../62-terminal-cli/",
+    "poster": "assets/posters/62-terminal-cli.jpg",
+    "video": "assets/videos/62-terminal-cli.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "61-hitl-patterns",
+    "title": "Hitl Patterns",
+    "href": "../61-hitl-patterns/",
+    "poster": "assets/posters/61-hitl-patterns.jpg",
+    "video": "assets/videos/61-hitl-patterns.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "60-agentic-patterns",
+    "title": "Agentic Patterns",
+    "href": "../60-agentic-patterns/",
+    "poster": "assets/posters/60-agentic-patterns.jpg",
+    "video": "assets/videos/60-agentic-patterns.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "59-font-explorer",
+    "title": "Font Explorer",
+    "href": "../59-font-explorer/",
+    "poster": "assets/posters/59-font-explorer.jpg",
+    "video": "assets/videos/59-font-explorer.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "58-shapes",
+    "title": "Shapes",
+    "href": "../58-shapes/",
+    "poster": "assets/posters/58-shapes.jpg",
+    "video": "assets/videos/58-shapes.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "57-color-themes",
+    "title": "Color Themes",
+    "href": "../57-color-themes/",
+    "poster": "assets/posters/57-color-themes.jpg",
+    "video": "assets/videos/57-color-themes.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "56-constrained-variation",
+    "title": "Constrained Variation",
+    "href": "../56-constrained-variation/",
+    "poster": "assets/posters/56-constrained-variation.jpg",
+    "video": "assets/videos/56-constrained-variation.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "55-ascii-loading",
+    "title": "Ascii Loading",
+    "href": "../55-ascii-loading/",
+    "poster": "assets/posters/55-ascii-loading.jpg",
+    "video": "assets/videos/55-ascii-loading.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "54-concept-graph",
+    "title": "Concept Graph",
+    "href": "../54-concept-graph/",
+    "poster": "assets/posters/54-concept-graph.jpg",
+    "video": "assets/videos/54-concept-graph.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "53-ascii-grid",
+    "title": "Ascii Grid",
+    "href": "../53-ascii-grid/",
+    "poster": "assets/posters/53-ascii-grid.jpg",
+    "video": "assets/videos/53-ascii-grid.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "52-reaction-diffusion",
+    "title": "Reaction Diffusion",
+    "href": "../52-reaction-diffusion/",
+    "poster": "assets/posters/52-reaction-diffusion.jpg",
+    "video": "assets/videos/52-reaction-diffusion.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "51-resonant-lattice",
+    "title": "Resonant Lattice",
+    "href": "../51-resonant-lattice/",
+    "poster": "assets/posters/51-resonant-lattice.jpg",
+    "video": "assets/videos/51-resonant-lattice.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "50-execution-trace-graph",
+    "title": "Execution Trace Graph",
+    "href": "../50-execution-trace-graph/",
+    "poster": "assets/posters/50-execution-trace-graph.jpg",
+    "video": "assets/videos/50-execution-trace-graph.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "49-grid-trace",
+    "title": "Grid Trace",
+    "href": "../49-grid-trace/",
+    "poster": "assets/posters/49-grid-trace.jpg",
+    "video": "assets/videos/49-grid-trace.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "46-oklch-vs-hsl",
+    "title": "Oklch Vs Hsl",
+    "href": "../46-oklch-vs-hsl/",
+    "poster": "assets/posters/46-oklch-vs-hsl.jpg",
+    "video": "assets/videos/46-oklch-vs-hsl.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "45-gravity-pills",
+    "title": "Gravity Pills",
+    "href": "../45-gravity-pills/",
+    "poster": "assets/posters/45-gravity-pills.jpg",
+    "video": "assets/videos/45-gravity-pills.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "42-metaball-grid",
+    "title": "Metaball Grid",
+    "href": "../42-metaball-grid/",
+    "poster": "assets/posters/42-metaball-grid.jpg",
+    "video": "assets/videos/42-metaball-grid.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "41-metaball",
+    "title": "Metaball",
+    "href": "../41-metaball/",
+    "poster": "assets/posters/41-metaball.jpg",
+    "video": "assets/videos/41-metaball.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "40-cube-grid-rules",
+    "title": "Cube Grid Rules",
+    "href": "../40-cube-grid-rules/",
+    "poster": "assets/posters/40-cube-grid-rules.jpg",
+    "video": "assets/videos/40-cube-grid-rules.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "39-wave-morph",
+    "title": "Wave Morph",
+    "href": "../39-wave-morph/",
+    "poster": "assets/posters/39-wave-morph.jpg",
+    "video": "assets/videos/39-wave-morph.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "38-baltic-pattern",
+    "title": "Baltic Pattern",
+    "href": "../38-baltic-pattern/",
+    "poster": "assets/posters/38-baltic-pattern.jpg",
+    "video": "assets/videos/38-baltic-pattern.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "37-sentiment-analyzer",
+    "title": "Sentiment Analyzer",
+    "href": "../37-sentiment-analyzer/",
+    "poster": "assets/posters/37-sentiment-analyzer.jpg",
+    "video": "assets/videos/37-sentiment-analyzer.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "36-spinning-globe",
+    "title": "Sentiment + Explanations",
+    "href": "../36-spinning-globe/",
+    "poster": "assets/posters/36-spinning-globe.jpg",
+    "video": "assets/videos/36-spinning-globe.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "35-flight-path-viz",
+    "title": "Flight Path Viz",
+    "href": "../35-flight-path-viz/",
+    "poster": "assets/posters/35-flight-path-viz.jpg",
+    "video": "assets/videos/35-flight-path-viz.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "34-particle-text-morph",
+    "title": "Particle Text Morph",
+    "href": "../34-particle-text-morph/",
+    "poster": "assets/posters/34-particle-text-morph.jpg",
+    "video": "assets/videos/34-particle-text-morph.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "33-three-body-problem",
+    "title": "Three-body Problem",
+    "href": "../33-three-body-problem/",
+    "poster": "assets/posters/33-three-body-problem.jpg",
+    "video": "assets/videos/33-three-body-problem.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "32-genart-cards",
+    "title": "Entropy Patterns",
+    "href": "../32-genart-cards/",
+    "poster": "assets/posters/32-genart-cards.jpg",
+    "video": "assets/videos/32-genart-cards.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "31-cli-material-palette",
+    "title": "CLI Material Palette",
+    "href": "../31-cli-material-palette/",
+    "poster": "assets/posters/31-cli-material-palette.jpg",
+    "video": "assets/videos/31-cli-material-palette.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "30-thinking-states",
+    "title": "Thinking States",
+    "href": "../30-thinking-states/",
+    "poster": "assets/posters/30-thinking-states.jpg",
+    "video": "assets/videos/30-thinking-states.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "29-progress-indicators",
+    "title": "100 Progress Indicators",
+    "href": "../29-progress-indicators/",
+    "poster": "assets/posters/29-progress-indicators.jpg",
+    "video": "assets/videos/29-progress-indicators.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "28-liquid-glass",
+    "title": "Liquid Glass",
+    "href": "../28-liquid-glass/",
+    "poster": "assets/posters/28-liquid-glass.jpg",
+    "video": "assets/videos/28-liquid-glass.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "27-muse",
+    "title": "Muse",
+    "href": "../27-muse/",
+    "poster": "assets/posters/27-muse.jpg",
+    "video": "assets/videos/27-muse.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "26-widget-dashboard",
+    "title": "Widget Dashboard",
+    "href": "../26-widget-dashboard/",
+    "poster": "assets/posters/26-widget-dashboard.jpg",
+    "video": "assets/videos/26-widget-dashboard.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "25-spotlight-grid",
+    "title": "Spotlight Grid",
+    "href": "../25-spotlight-grid/",
+    "poster": "assets/posters/25-spotlight-grid.jpg",
+    "video": "assets/videos/25-spotlight-grid.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "24-rock-paper-scissors",
+    "title": "Rock Paper Scissors",
+    "href": "../24-rock-paper-scissors/",
+    "poster": "assets/posters/24-rock-paper-scissors.jpg",
+    "video": "assets/videos/24-rock-paper-scissors.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "23-interactive-typography",
+    "title": "Interactive Typography",
+    "href": "../23-interactive-typography/",
+    "poster": "assets/posters/23-interactive-typography.jpg",
+    "video": "assets/videos/23-interactive-typography.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "22-directed-network",
+    "title": "Directed Network",
+    "href": "../22-directed-network/",
+    "poster": "assets/posters/22-directed-network.jpg",
+    "video": "assets/videos/22-directed-network.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "21-interaction-heatmap",
+    "title": "Interaction Heatmap",
+    "href": "../21-interaction-heatmap/",
+    "poster": "assets/posters/21-interaction-heatmap.jpg",
+    "video": "assets/videos/21-interaction-heatmap.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "20-schelling-model",
+    "title": "Schelling Model",
+    "href": "../20-schelling-model/",
+    "poster": "assets/posters/20-schelling-model.jpg",
+    "video": "assets/videos/20-schelling-model.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "19-coworker-network",
+    "title": "Coworker Network",
+    "href": "../19-coworker-network/",
+    "poster": "assets/posters/19-coworker-network.jpg",
+    "video": "assets/videos/19-coworker-network.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "18-cellular-automaton",
+    "title": "Cellular Automaton",
+    "href": "../18-cellular-automaton/",
+    "poster": "assets/posters/18-cellular-automaton.jpg",
+    "video": "assets/videos/18-cellular-automaton.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "17-audio-reactive-network",
+    "title": "Audio-reactive Network",
+    "href": "../17-audio-reactive-network/",
+    "poster": "assets/posters/17-audio-reactive-network.jpg",
+    "video": "assets/videos/17-audio-reactive-network.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "16-hub-spoke-network",
+    "title": "Hub Spoke Network",
+    "href": "../16-hub-spoke-network/",
+    "poster": "assets/posters/16-hub-spoke-network.jpg",
+    "video": "assets/videos/16-hub-spoke-network.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "15b-binary-camera-grid-v2",
+    "title": "Binary Camera Grid v2",
+    "href": "../15b-binary-camera-grid-v2/",
+    "poster": "assets/posters/15b-binary-camera-grid-v2.jpg",
+    "video": "assets/videos/15b-binary-camera-grid-v2.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "15-binary-camera-grid",
+    "title": "Binary Camera Grid",
+    "href": "../15-binary-camera-grid/",
+    "poster": "assets/posters/15-binary-camera-grid.jpg",
+    "video": "assets/videos/15-binary-camera-grid.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "14-dna-mutations",
+    "title": "DNA Mutations",
+    "href": "../14-dna-mutations/",
+    "poster": "assets/posters/14-dna-mutations.jpg",
+    "video": "assets/videos/14-dna-mutations.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "13-image-flow-field",
+    "title": "Image Flow Field",
+    "href": "../13-image-flow-field/",
+    "poster": "assets/posters/13-image-flow-field.jpg",
+    "video": "assets/videos/13-image-flow-field.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "12-wind-field",
+    "title": "Wind Field",
+    "href": "../12-wind-field/",
+    "poster": "assets/posters/12-wind-field.jpg",
+    "video": "assets/videos/12-wind-field.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "11-brownian-tree",
+    "title": "Ambient Clock",
+    "href": "../11-brownian-tree/",
+    "poster": "assets/posters/11-brownian-tree.jpg",
+    "video": "assets/videos/11-brownian-tree.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "10-audio-reactive-agents",
+    "title": "Audio-reactive Agents",
+    "href": "../10-audio-reactive-agents/",
+    "poster": "assets/posters/10-audio-reactive-agents.jpg",
+    "video": "assets/videos/10-audio-reactive-agents.mp4",
+    "disabled": true
+  },
+  {
+    "slug": "09-planar-graph",
+    "title": "Planar Graph",
+    "href": "../09-planar-graph/",
+    "poster": "assets/posters/09-planar-graph.jpg",
+    "video": "assets/videos/09-planar-graph.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "08-graph-clusters",
+    "title": "Graph Clusters",
+    "href": "../08-graph-clusters/",
+    "poster": "assets/posters/08-graph-clusters.jpg",
+    "video": "assets/videos/08-graph-clusters.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "07-apophenia",
+    "title": "Apophenia",
+    "href": "../07-apophenia/",
+    "poster": "assets/posters/07-apophenia.jpg",
+    "video": "assets/videos/07-apophenia.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "06-orbital",
+    "title": "Orbital",
+    "href": "../06-orbital/",
+    "poster": "assets/posters/06-orbital.jpg",
+    "video": "assets/videos/06-orbital.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "05-fall",
+    "title": "Fall",
+    "href": "../05-fall/",
+    "poster": "assets/posters/05-fall.jpg",
+    "video": "assets/videos/05-fall.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "04-random-walk",
+    "title": "Random Walk",
+    "href": "../04-random-walk/",
+    "poster": "assets/posters/04-random-walk.jpg",
+    "video": "assets/videos/04-random-walk.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "03-chaos-agent",
+    "title": "Chaos Agent",
+    "href": "../03-chaos-agent/",
+    "poster": "assets/posters/03-chaos-agent.jpg",
+    "video": "assets/videos/03-chaos-agent.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "02-vicsek-model",
+    "title": "Vicsek Model",
+    "href": "../02-vicsek-model/",
+    "poster": "assets/posters/02-vicsek-model.jpg",
+    "video": "assets/videos/02-vicsek-model.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "01-entropy",
+    "title": "Entropy",
+    "href": "../01-entropy/",
+    "poster": "assets/posters/01-entropy.jpg",
+    "video": "assets/videos/01-entropy.mp4",
+    "disabled": false
+  }
+]
