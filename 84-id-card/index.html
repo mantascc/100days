@@ -66,9 +66,15 @@
       0 0 0 1px rgba(255,255,255,0.02),
       inset 0 1px 0 rgba(255,255,255,0.04);
     overflow: hidden;
+    touch-action: none;
+    cursor: grab;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(.2,.8,.2,1);
     animation: breathe 7s ease-in-out infinite;
+  }
+
+  .card:active {
+    cursor: grabbing;
   }
 
   @keyframes breathe {
@@ -359,7 +365,7 @@
   </article>
 </div>
 
-<div class="hint">hover · move · the surface is alive</div>
+<div class="hint">hover · drag · the surface is alive</div>
 
 <script>
 /* ---------- Void: distant particles ---------- */
@@ -477,20 +483,45 @@
 (() => {
   const card = document.getElementById('card');
   let rx = 0, ry = 0, tx = 0, ty = 0;
+  let activePointer = null;
 
-  function onMove(e) {
+  function tiltTo(clientX, clientY) {
     const r = card.getBoundingClientRect();
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
-    const dx = (e.clientX - cx) / r.width;
-    const dy = (e.clientY - cy) / r.height;
+    const dx = Math.max(-0.5, Math.min(0.5, (clientX - cx) / r.width));
+    const dy = Math.max(-0.5, Math.min(0.5, (clientY - cy) / r.height));
     tx = dy * -6;   // rotateX
     ty = dx *  8;   // rotateY
-    card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
-    card.style.setProperty('--my', `${((e.clientY - r.top)  / r.height) * 100}%`);
+    card.style.setProperty('--mx', `${Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100))}%`);
+    card.style.setProperty('--my', `${Math.max(0, Math.min(100, ((clientY - r.top)  / r.height) * 100))}%`);
   }
 
-  function onLeave() { tx = 0; ty = 0; }
+  function onPointerDown(e) {
+    activePointer = e.pointerId;
+    card.setPointerCapture?.(e.pointerId);
+    tiltTo(e.clientX, e.clientY);
+  }
+
+  function onPointerMove(e) {
+    if (e.pointerType !== 'mouse' && activePointer !== e.pointerId) return;
+    tiltTo(e.clientX, e.clientY);
+  }
+
+  function onPointerEnd(e) {
+    if (activePointer !== null && activePointer !== e.pointerId) return;
+    activePointer = null;
+    card.releasePointerCapture?.(e.pointerId);
+    tx = 0;
+    ty = 0;
+  }
+
+  function onPointerLeave(e) {
+    if (activePointer === null || e.pointerType === 'mouse') {
+      tx = 0;
+      ty = 0;
+    }
+  }
 
   function raf() {
     rx += (tx - rx) * 0.08;
@@ -499,8 +530,11 @@
     requestAnimationFrame(raf);
   }
 
-  addEventListener('mousemove', onMove);
-  addEventListener('mouseleave', onLeave);
+  card.addEventListener('pointerdown', onPointerDown);
+  card.addEventListener('pointermove', onPointerMove);
+  card.addEventListener('pointerup', onPointerEnd);
+  card.addEventListener('pointercancel', onPointerEnd);
+  card.addEventListener('pointerleave', onPointerLeave);
   raf();
 })();
 
