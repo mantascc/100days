@@ -1,8 +1,8 @@
 [
   {
-    "id": "82-antistyle",
-    "path": "100days/82-antistyle",
-    "description": "Antistyle Gallery \u2014 horizontal museum walk that exposes its own machinery: always-on layout grids, drag-to-scroll rooms, refusal controls that turn disavowal into new style decisions, entropy labels, source rails, and an intentionally interruptive browser dialog"
+    "id": "82-z-axis",
+    "path": "100days/82-z-axis",
+    "description": "Z-Axis \u2014 nine micro-explorations of depth as a UI material (two-state toggle, stacked deck, modal lift, z-scroll, hover grid, pressed state, layer explode, parallax cursor, notification arrival) switched via a floating island controller with prev/next, dot indicators, and arrow-key navigation"
   },
   {
     "id": "79-idle-states",
