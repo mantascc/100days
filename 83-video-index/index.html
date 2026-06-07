@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Video index</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css?v=9">
+</head>
+<body>
+    <header>
+        <h1>100 days · video index</h1>
+        <p class="lede">A Playwright experiment. Each tile is a 3–4 second clip recorded by a headless browser at 720×720. An agent reads the sketch source, picks an interaction worth filming, writes a Playwright scenario, and the harness drives the page and writes the MP4. Greyed-out tiles need a webcam, microphone, or a build step the harness can't provide. <a href="interface.md" id="writeup-link">Read the full writeup →</a></p>
+    </header>
+    <main id="grid"></main>
+
+    <dialog id="writeup" aria-labelledby="writeup-title">
+        <div class="modal-bar">
+            <span class="modal-title" id="writeup-title">interface.md</span>
+            <button class="modal-copy" type="button">Copy markdown</button>
+            <button class="modal-close" type="button" aria-label="Close">×</button>
+        </div>
+        <article class="modal-body"></article>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="script.js?v=9"></script>
+</body>
+</html>
