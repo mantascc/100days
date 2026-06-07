@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-z-axis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #161616;
+      --ground-surface: #1c1c1c;
+      --ground-elevated: #222;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-default: #2a2a2a;
+      --border-subtle: #1a1a1a;
+      --accent: #a48ad4;
+      --accent-dim: #6b5a8f;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-weight: 300;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at center, black 0%, black 50%, transparent 95%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, black 50%, transparent 95%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .meta {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      z-index: 100;
+      pointer-events: none;
+      text-align: right;
+      line-height: 1.8;
+    }
+
+    .meta .name { color: var(--text-default); }
+
+    /* ---- view stage ---- */
+    .stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .view {
+      position: absolute;
+      inset: 0;
+      perspective: 700px;
+      perspective-origin: 50% 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 350ms ease;
+    }
+
+    .view.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ---- shared panel atoms ---- */
+    .panel {
+      position: relative;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      transition: transform 700ms var(--ease),
+                  box-shadow 700ms var(--ease),
+                  border-color 500ms ease,
+                  filter 500ms ease,
+                  background 500ms ease;
+    }
+
+    .panel .head {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .panel .head .tag { color: var(--text-secondary); }
+    .panel .head .id { color: var(--text-ghost); }
+
+    .panel .big {
+      position: absolute;
+      left: 16px;
+      bottom: 14px;
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .panel .big .unit {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.2em;
+      margin-left: 6px;
+      vertical-align: 4px;
+    }
+
+    .panel .sub {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .shadow-low  { box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .shadow-mid  { box-shadow: 0 20px 40px rgba(0,0,0,0.65), 0 6px 14px rgba(0,0,0,0.5); }
+    .shadow-high { box-shadow: 0 80px 100px rgba(0,0,0,0.85), 0 30px 50px rgba(0,0,0,0.7), 0 10px 20px rgba(0,0,0,0.6); }
+
+    /* ============================================== */
+    /* VIEW 01: TWO STATES                            */
+    /* ============================================== */
+    #v-states .panel {
+      width: 280px;
+      height: 180px;
+      transform: translateZ(-100px);
+    }
+    #v-states .panel.near {
+      transform: translateZ(100px);
+      border-color: var(--accent);
+    }
+
+    /* ============================================== */
+    /* VIEW 02: STACKED DECK                          */
+    /* ============================================== */
+    #v-deck .deck {
+      position: relative;
+      transform-style: preserve-3d;
+      width: 300px;
+      height: 200px;
+    }
+    #v-deck .card {
+      position: absolute;
+      inset: 0;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      transition: transform 600ms var(--ease), box-shadow 600ms var(--ease), border-color 500ms ease, opacity 600ms ease;
+    }
+    #v-deck .card.top { border-color: var(--accent); }
+    #v-deck .card .num {
+      position: absolute;
+      left: 16px;
+      top: 14px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--text-tertiary);
+    }
+    #v-deck .card.top .num { color: var(--accent); }
+    #v-deck .card .label {
+      position: absolute;
+      left: 16px;
+      bottom: 14px;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    /* ============================================== */
+    /* VIEW 03: MODAL LIFT                            */
+    /* ============================================== */
+    #v-modal .list {
+      position: relative;
+      width: 380px;
+      transform-style: preserve-3d;
+    }
+    #v-modal .row {
+      position: relative;
+      height: 56px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: transform 600ms var(--ease), filter 500ms ease, border-color 400ms ease, box-shadow 600ms var(--ease), background 400ms ease;
+    }
+    #v-modal .row .k { color: var(--text-tertiary); margin-right: auto; }
+    #v-modal .row .v { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    #v-modal .row.lifted {
+      border-color: var(--accent);
+      background: var(--ground-elevated);
+      transform: translateZ(120px);
+      box-shadow: 0 80px 100px rgba(0,0,0,0.85), 0 30px 50px rgba(0,0,0,0.7);
+    }
+    #v-modal .row.lifted .v { color: var(--accent); }
+    #v-modal .list.has-lift .row:not(.lifted) {
+      transform: translateZ(-80px);
+      filter: blur(1.2px);
+      opacity: 0.5;
+    }
+
+    /* ============================================== */
+    /* VIEW 04: Z-SCROLL                              */
+    /* ============================================== */
+    #v-scroll .tunnel {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      transform-style: preserve-3d;
+    }
+    #v-scroll .slab {
+      position: absolute;
+      inset: 0;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      padding: 20px;
+      transition: opacity 200ms ease, border-color 300ms ease;
+    }
+    #v-scroll .slab.in-focus { border-color: var(--accent); }
+    #v-scroll .slab .ix {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+    #v-scroll .slab.in-focus .ix { color: var(--accent); }
+    #v-scroll .slab h3 {
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-top: 14px;
+    }
+    #v-scroll .slab p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+      line-height: 1.7;
+      margin-top: 14px;
+      max-width: 240px;
+    }
+    #v-scroll .progress {
+      position: absolute;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 1px;
+      background: var(--border-default);
+      z-index: 50;
+    }
+    #v-scroll .progress .fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: var(--accent);
+      width: 0;
+    }
+    #v-scroll .progress .label {
+      position: absolute;
+      top: -22px;
+      left: 0;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+    #v-scroll .progress .label span { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+    /* ============================================== */
+    /* VIEW 05: HOVER GRID                            */
+    /* ============================================== */
+    #v-hover .grid-3d {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-template-rows: repeat(5, 80px);
+      gap: 6px;
+      transform-style: preserve-3d;
+    }
+    #v-hover .tile {
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      transition: transform 350ms var(--ease), border-color 300ms ease, box-shadow 350ms var(--ease), background 300ms ease;
+      position: relative;
+    }
+    #v-hover .tile::after {
+      content: '';
+      position: absolute;
+      inset: auto 14px 14px auto;
+      width: 6px;
+      height: 6px;
+      background: var(--text-ghost);
+      transition: background 300ms ease;
+    }
+    #v-hover .tile.hot::after { background: var(--accent); }
+
+    /* ============================================== */
+    /* VIEW 06: PRESSED                               */
+    /* ============================================== */
+    #v-press .press-stage {
+      position: relative;
+      width: 260px;
+      height: 160px;
+      transform-style: preserve-3d;
+    }
+    #v-press .press-btn {
+      position: absolute;
+      inset: 0;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-default);
+      cursor: pointer;
+      transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), background 180ms ease, border-color 180ms ease;
+      transform: translateZ(40px);
+    }
+    #v-press .press-btn.down {
+      transform: translateZ(-30px);
+      background: var(--ground-base);
+      border-color: var(--border-subtle);
+    }
+    #v-press .press-well {
+      position: absolute;
+      inset: 0;
+      background: #050505;
+      border: 1px solid #111;
+      transform: translateZ(-20px);
+    }
+
+    /* ============================================== */
+    /* VIEW 07: LAYER INSPECTOR                       */
+    /* ============================================== */
+    #v-layers .mock {
+      position: relative;
+      width: 360px;
+      height: 240px;
+      transform-style: preserve-3d;
+      transition: transform 700ms var(--ease);
+    }
+    #v-layers .mock.exploded {
+      transform: rotateX(50deg) rotateZ(-30deg);
+    }
+    #v-layers .layer {
+      position: absolute;
+      inset: 0;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      transition: transform 700ms var(--ease);
+      padding: 14px;
+    }
+    #v-layers .layer .ll {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+    #v-layers .layer.exploded { border-color: var(--accent-dim); }
+    #v-layers .layer.l1 {
+      transform: translateZ(0);
+      background: var(--ground-base);
+    }
+    #v-layers .mock.exploded .layer.l1 { transform: translateZ(0); }
+    #v-layers .mock.exploded .layer.l2 { transform: translateZ(60px); }
+    #v-layers .mock.exploded .layer.l3 { transform: translateZ(120px); }
+    #v-layers .mock.exploded .layer.l4 { transform: translateZ(180px); }
+    #v-layers .layer.l2 .bar {
+      height: 6px; background: var(--text-ghost); width: 60%; margin-top: 4px;
+    }
+    #v-layers .layer.l3 {
+      padding: 40px 14px 14px;
+    }
+    #v-layers .layer.l3 .row {
+      height: 8px; background: var(--text-ghost); margin-bottom: 8px; width: 80%;
+    }
+    #v-layers .layer.l3 .row:nth-child(3) { width: 50%; }
+    #v-layers .layer.l3 .row:nth-child(4) { width: 70%; }
+    #v-layers .layer.l4 {
+      top: 60px; left: 60px; right: 60px; bottom: 60px;
+      background: var(--ground-elevated);
+      border-color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+    }
+
+    /* ============================================== */
+    /* VIEW 08: PARALLAX CURSOR                       */
+    /* ============================================== */
+    #v-parallax .px-scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+    #v-parallax .px {
+      position: absolute;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      transition: transform 200ms ease-out, border-color 300ms ease;
+      padding: 14px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    #v-parallax .px.focal { border-color: var(--accent); color: var(--accent); }
+
+    /* ============================================== */
+    /* VIEW 09: NOTIFICATION                          */
+    /* ============================================== */
+    #v-toast .toast-stage {
+      position: absolute;
+      inset: 0;
+      perspective: 1200px;
+    }
+    #v-toast .toast {
+      position: absolute;
+      top: 32%;
+      left: 50%;
+      width: 320px;
+      margin-left: -160px;
+      background: var(--ground-elevated);
+      border: 1px solid var(--accent);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateZ(-1200px);
+      pointer-events: none;
+      box-shadow: 0 80px 100px rgba(0,0,0,0.85), 0 30px 50px rgba(0,0,0,0.7);
+    }
+    #v-toast .toast.in {
+      animation: toastIn 900ms var(--ease) forwards;
+    }
+    #v-toast .toast.out {
+      animation: toastOut 600ms var(--ease) forwards;
+    }
+    @keyframes toastIn {
+      0%   { opacity: 0; transform: translateZ(-1200px); filter: blur(4px); }
+      60%  { opacity: 1; filter: blur(0); }
+      100% { opacity: 1; transform: translateZ(0); filter: blur(0); }
+    }
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateZ(400px); filter: blur(3px); }
+    }
+    #v-toast .toast .dot {
+      width: 8px; height: 8px; background: var(--accent); flex-shrink: 0;
+    }
+    #v-toast .toast .body {
+      flex: 1;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--text-default);
+    }
+    #v-toast .toast .body small {
+      display: block;
+      color: var(--text-tertiary);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    #v-toast .spawn {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 12px 22px;
+      cursor: pointer;
+    }
+    #v-toast .spawn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ============================================== */
+    /* FLOATING ISLAND                                */
+    /* ============================================== */
+    .island {
+      position: fixed;
+      left: 50%;
+      bottom: 32px;
+      transform: translateX(-50%);
+      background: rgba(20,20,20,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-default);
+      border-radius: 999px;
+      padding: 8px 8px 8px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 200;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .island button {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      cursor: pointer;
+      padding: 8px 12px;
+      font-size: 12px;
+      border-radius: 999px;
+      transition: color 200ms ease, background 200ms ease;
+    }
+
+    .island button:hover { color: var(--accent); }
+
+    .island .label {
+      min-width: 200px;
+      text-align: center;
+      padding: 4px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .island .label .num {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .island .label .name {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-default);
+      transition: opacity 200ms ease;
+    }
+
+    .island .dots {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+
+    .island .dots i {
+      display: block;
+      width: 4px;
+      height: 4px;
+      background: var(--text-ghost);
+      border-radius: 50%;
+      transition: background 250ms ease, transform 250ms ease;
+      cursor: pointer;
+    }
+
+    .island .dots i.active {
+      background: var(--accent);
+      transform: scale(1.4);
+    }
+
+    /* ---- per-view action buttons ---- */
+    .action {
+      position: fixed;
+      left: 50%;
+      bottom: 130px;
+      transform: translateX(-50%);
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 12px 22px;
+      cursor: pointer;
+      transition: border-color 200ms ease, color 200ms ease;
+      z-index: 150;
+    }
+    .action:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>sketch-z-axis</header>
+<div class="meta">
+  <div><span class="name" id="metaName">two states</span></div>
+  <div id="metaNum">01 / 10</div>
+</div>
+
+<div class="grid"></div>
+
+<div class="stage" id="stage">
+
+  <!-- 01: TWO STATES -->
+  <div class="view active" id="v-states">
+    <div class="panel shadow-mid" id="statesPanel">
+      <div class="head"><span class="tag" id="statesTag">far</span><span class="id">// z-axis</span></div>
+      <div class="big"><span id="statesZ">−100</span><span class="unit">PX</span></div>
+      <div class="sub">elevation</div>
+    </div>
+  </div>
+
+  <!-- 02: STACKED DECK -->
+  <div class="view" id="v-deck">
+    <div class="deck" id="deck">
+      <div class="card top"><div class="num">01 / 05</div><div class="label">alpha</div></div>
+      <div class="card"><div class="num">02 / 05</div><div class="label">beta</div></div>
+      <div class="card"><div class="num">03 / 05</div><div class="label">gamma</div></div>
+      <div class="card"><div class="num">04 / 05</div><div class="label">delta</div></div>
+      <div class="card"><div class="num">05 / 05</div><div class="label">epsilon</div></div>
+    </div>
+  </div>
+
+  <!-- 03: MODAL LIFT -->
+  <div class="view" id="v-modal">
+    <div class="list" id="modalList">
+      <div class="row" data-i="0"><span class="k">order_001</span><span class="v">$148.20</span></div>
+      <div class="row" data-i="1"><span class="k">order_002</span><span class="v">$94.50</span></div>
+      <div class="row" data-i="2"><span class="k">order_003</span><span class="v">$312.00</span></div>
+      <div class="row" data-i="3"><span class="k">order_004</span><span class="v">$57.80</span></div>
+      <div class="row" data-i="4"><span class="k">order_005</span><span class="v">$210.40</span></div>
+    </div>
+  </div>
+
+  <!-- 04: Z-SCROLL -->
+  <div class="view" id="v-scroll">
+    <div class="tunnel" id="tunnel">
+      <div class="slab"><div class="ix">section / 01</div><h3>approach</h3><p>scroll tunnels through stacked slabs. y-input becomes z-motion. each slab arrives from depth.</p></div>
+      <div class="slab"><div class="ix">section / 02</div><h3>presence</h3><p>the active slab parks at z=0. siblings recede behind. reading is forward travel.</p></div>
+      <div class="slab"><div class="ix">section / 03</div><h3>passage</h3><p>scrolling further pushes the current slab past the camera. it disappears overhead.</p></div>
+      <div class="slab"><div class="ix">section / 04</div><h3>residue</h3><p>visited slabs are not above — they are behind you, in negative z. memory has direction.</p></div>
+      <div class="slab"><div class="ix">section / 05</div><h3>arrival</h3><p>the last slab. nothing more arrives. the tunnel ends at zero residual depth.</p></div>
+    </div>
+    <div class="progress">
+      <div class="label">slab <span id="scrollIx">01</span> / 05</div>
+      <div class="fill" id="scrollFill"></div>
+    </div>
+  </div>
+
+  <!-- 05: HOVER GRID -->
+  <div class="view" id="v-hover">
+    <div class="grid-3d" id="hoverGrid"></div>
+  </div>
+
+  <!-- 06: PRESSED -->
+  <div class="view" id="v-press">
+    <div class="press-stage">
+      <div class="press-well"></div>
+      <div class="press-btn" id="pressBtn">push</div>
+    </div>
+  </div>
+
+  <!-- 07: LAYER INSPECTOR -->
+  <div class="view" id="v-layers">
+    <div class="mock" id="mock">
+      <div class="layer l1"><div class="ll">/ background</div></div>
+      <div class="layer l2"><div class="ll">/ chrome</div><div class="bar"></div></div>
+      <div class="layer l3"><div class="ll">/ content</div><div class="row"></div><div class="row"></div><div class="row"></div></div>
+      <div class="layer l4">modal</div>
+    </div>
+  </div>
+
+  <!-- 08: PARALLAX CURSOR -->
+  <div class="view" id="v-parallax">
+    <div class="px-scene" id="pxScene">
+      <div class="px" data-d="-300" style="top: 22%; left: 18%;">/ far · z-300</div>
+      <div class="px" data-d="-150" style="top: 70%; left: 22%; width: 140px;">/ mid · z-150</div>
+      <div class="px focal" data-d="0" style="top: 38%; left: 38%; width: 240px; height: 140px;">/ focal · z 0</div>
+      <div class="px" data-d="120" style="top: 18%; right: 16%;">/ near · z+120</div>
+      <div class="px" data-d="220" style="bottom: 22%; right: 14%; width: 160px;">/ close · z+220</div>
+    </div>
+  </div>
+
+  <!-- 09: NOTIFICATION -->
+  <div class="view" id="v-toast">
+    <div class="toast-stage">
+      <div class="toast" id="toast">
+        <div class="dot"></div>
+        <div class="body">build deployed <small>arrived from z-1200</small></div>
+      </div>
+      <button class="spawn" id="spawn">spawn toast</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- per-view action button (shown when needed) -->
+<button class="action" id="action" style="display:none">toggle z</button>
+
+<!-- floating island controller -->
+<div class="island">
+  <div class="dots" id="dots"></div>
+  <button id="prev" aria-label="previous">‹</button>
+  <div class="label" id="islandLabel">
+    <div class="num" id="islandNum">01 / 10</div>
+    <div class="name" id="islandName">two states</div>
+  </div>
+  <button id="next" aria-label="next">›</button>
+</div>
+
+<script>
+  // -------- views --------
+  const VIEWS = [
+    { id: 'v-states',   name: 'two states',    action: 'toggle z', init: initStates },
+    { id: 'v-deck',     name: 'stacked deck',  action: 'cycle',    init: initDeck },
+    { id: 'v-modal',    name: 'modal lift',    action: null,       init: initModal },
+    { id: 'v-scroll',   name: 'z-scroll',      action: null,       init: initScroll },
+    { id: 'v-hover',    name: 'hover grid',    action: null,       init: initHover },
+    { id: 'v-press',    name: 'pressed state', action: null,       init: initPress },
+    { id: 'v-layers',   name: 'layer explode', action: 'explode',  init: initLayers },
+    { id: 'v-parallax', name: 'parallax',      action: null,       init: initParallax },
+    { id: 'v-toast',    name: 'notification',  action: null,       init: initToast },
+  ];
+
+  let current = 0;
+  const action = document.getElementById('action');
+  const actionHandlers = {};
+
+  // build dots
+  const dots = document.getElementById('dots');
+  VIEWS.forEach((v, i) => {
+    const d = document.createElement('i');
+    d.addEventListener('click', () => go(i));
+    dots.appendChild(d);
+  });
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function go(i) {
+    current = (i + VIEWS.length) % VIEWS.length;
+    VIEWS.forEach((v, idx) => {
+      document.getElementById(v.id).classList.toggle('active', idx === current);
+      dots.children[idx].classList.toggle('active', idx === current);
+    });
+    document.getElementById('islandNum').textContent = `${pad(current+1)} / ${pad(VIEWS.length)}`;
+    document.getElementById('islandName').textContent = VIEWS[current].name;
+    document.getElementById('metaNum').textContent = `${pad(current+1)} / ${pad(VIEWS.length)}`;
+    document.getElementById('metaName').textContent = VIEWS[current].name;
+    const a = VIEWS[current].action;
+    if (a) {
+      action.style.display = '';
+      action.textContent = a;
+      action.onclick = actionHandlers[VIEWS[current].id];
+    } else {
+      action.style.display = 'none';
+      action.onclick = null;
+    }
+  }
+
+  document.getElementById('prev').onclick = () => go(current - 1);
+  document.getElementById('next').onclick = () => go(current + 1);
+  document.getElementById('islandLabel').onclick = () => go(current + 1);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') go(current - 1);
+    if (e.key === 'ArrowRight') go(current + 1);
+  });
+
+  // -------- VIEW 01: two states --------
+  function initStates() {
+    const panel = document.getElementById('statesPanel');
+    const z = document.getElementById('statesZ');
+    const tag = document.getElementById('statesTag');
+    let near = false;
+    actionHandlers['v-states'] = () => {
+      near = !near;
+      panel.classList.toggle('near', near);
+      panel.classList.toggle('shadow-mid', !near);
+      panel.classList.toggle('shadow-high', near);
+      z.textContent = near ? '+100' : '−100';
+      tag.textContent = near ? 'near' : 'far';
+    };
+  }
+
+  // -------- VIEW 02: stacked deck --------
+  function initDeck() {
+    const deck = document.getElementById('deck');
+    const cards = [...deck.querySelectorAll('.card')];
+    let order = cards.map((_, i) => i); // index 0 = topmost
+    const Z_STEP = 50;
+    const Y_STEP = 14;
+    function layout() {
+      order.forEach((cardIdx, slot) => {
+        const c = cards[cardIdx];
+        c.style.transform = `translate3d(0, ${slot * Y_STEP}px, ${-slot * Z_STEP}px)`;
+        c.style.opacity = (1 - slot * 0.15).toFixed(2);
+        c.classList.toggle('top', slot === 0);
+        if (slot === 0) c.classList.add('shadow-high');
+        else c.classList.remove('shadow-high');
+      });
+    }
+    layout();
+    actionHandlers['v-deck'] = () => {
+      order.push(order.shift());
+      layout();
+    };
+  }
+
+  // -------- VIEW 03: modal lift --------
+  function initModal() {
+    const list = document.getElementById('modalList');
+    const rows = [...list.querySelectorAll('.row')];
+    let lifted = null;
+    rows.forEach((r) => {
+      r.addEventListener('click', () => {
+        if (lifted === r) {
+          r.classList.remove('lifted');
+          list.classList.remove('has-lift');
+          lifted = null;
+        } else {
+          rows.forEach(x => x.classList.remove('lifted'));
+          r.classList.add('lifted');
+          list.classList.add('has-lift');
+          lifted = r;
+        }
+      });
+    });
+  }
+
+  // -------- VIEW 04: z-scroll --------
+  function initScroll() {
+    const tunnel = document.getElementById('tunnel');
+    const slabs = [...tunnel.querySelectorAll('.slab')];
+    const Z_STEP = 260;
+    let pos = 0; // 0..slabs.length-1
+    const fill = document.getElementById('scrollFill');
+    const ix = document.getElementById('scrollIx');
+    function layout() {
+      slabs.forEach((s, i) => {
+        const dz = (i - pos) * Z_STEP;
+        s.style.transform = `translateZ(${-dz}px)`;
+        const distance = Math.abs(i - pos);
+        s.style.opacity = Math.max(0, 1 - distance * 0.35);
+        s.classList.toggle('in-focus', Math.round(pos) === i);
+      });
+      const pct = (pos / (slabs.length - 1)) * 100;
+      fill.style.width = pct + '%';
+      ix.textContent = pad(Math.round(pos) + 1);
+    }
+    layout();
+    let raf = 0;
+    let target = 0;
+    function tick() {
+      pos += (target - pos) * 0.18;
+      layout();
+      if (Math.abs(target - pos) > 0.001) raf = requestAnimationFrame(tick);
+    }
+    document.getElementById('v-scroll').addEventListener('wheel', (e) => {
+      e.preventDefault();
+      target = Math.max(0, Math.min(slabs.length - 1, target + Math.sign(e.deltaY) * 0.5));
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    }, { passive: false });
+  }
+
+  // -------- VIEW 05: hover grid --------
+  function initHover() {
+    const grid = document.getElementById('hoverGrid');
+    const N = 5;
+    const tiles = [];
+    for (let i = 0; i < N * N; i++) {
+      const t = document.createElement('div');
+      t.className = 'tile';
+      t.dataset.row = Math.floor(i / N);
+      t.dataset.col = i % N;
+      grid.appendChild(t);
+      tiles.push(t);
+    }
+    let hot = null;
+    grid.addEventListener('pointermove', (e) => {
+      const t = e.target.closest('.tile');
+      if (!t || t === hot) return;
+      hot = t;
+      const hr = +t.dataset.row, hc = +t.dataset.col;
+      tiles.forEach(x => {
+        const r = +x.dataset.row, c = +x.dataset.col;
+        const d = Math.hypot(hr - r, hc - c);
+        if (d === 0) {
+          x.style.transform = 'translateZ(80px)';
+          x.style.background = 'var(--ground-elevated)';
+          x.style.borderColor = 'var(--accent)';
+          x.style.boxShadow = '0 40px 60px rgba(0,0,0,0.7), 0 14px 24px rgba(0,0,0,0.5)';
+          x.classList.add('hot');
+        } else {
+          const lift = Math.max(0, 60 - d * 18);
+          x.style.transform = `translateZ(${lift}px)`;
+          x.style.background = 'var(--ground-raised)';
+          x.style.borderColor = 'var(--border-default)';
+          x.style.boxShadow = '';
+          x.classList.remove('hot');
+        }
+      });
+    });
+    grid.addEventListener('pointerleave', () => {
+      hot = null;
+      tiles.forEach(x => {
+        x.style.transform = 'translateZ(0)';
+        x.style.background = '';
+        x.style.borderColor = '';
+        x.style.boxShadow = '';
+        x.classList.remove('hot');
+      });
+    });
+  }
+
+  // -------- VIEW 06: pressed --------
+  function initPress() {
+    const btn = document.getElementById('pressBtn');
+    const down = () => btn.classList.add('down');
+    const up   = () => btn.classList.remove('down');
+    btn.addEventListener('pointerdown', down);
+    btn.addEventListener('pointerup', up);
+    btn.addEventListener('pointerleave', up);
+  }
+
+  // -------- VIEW 07: layer inspector --------
+  function initLayers() {
+    const mock = document.getElementById('mock');
+    const layers = mock.querySelectorAll('.layer');
+    actionHandlers['v-layers'] = () => {
+      mock.classList.toggle('exploded');
+      layers.forEach(l => l.classList.toggle('exploded'));
+    };
+  }
+
+  // -------- VIEW 08: parallax cursor --------
+  function initParallax() {
+    const scene = document.getElementById('pxScene');
+    const items = [...scene.querySelectorAll('.px')];
+    document.getElementById('v-parallax').addEventListener('pointermove', (e) => {
+      const r = scene.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;  // -1..1
+      const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      items.forEach(el => {
+        const d = +el.dataset.d;
+        const factor = d / 300;
+        el.style.transform = `translate3d(${nx * factor * 30}px, ${ny * factor * 30}px, ${d}px)`;
+      });
+    });
+  }
+
+  // -------- VIEW 09: notification --------
+  function initToast() {
+    const toast = document.getElementById('toast');
+    document.getElementById('spawn').addEventListener('click', () => {
+      toast.classList.remove('in', 'out');
+      void toast.offsetWidth;
+      toast.classList.add('in');
+      clearTimeout(window.__toastT);
+      window.__toastT = setTimeout(() => {
+        toast.classList.remove('in');
+        toast.classList.add('out');
+      }, 2400);
+    });
+  }
+
+  // -------- boot --------
+  VIEWS.forEach(v => v.init());
+  go(0);
+</script>
+
+</body>
+</html>
