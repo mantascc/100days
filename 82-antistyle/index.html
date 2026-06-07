@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 82 - Antistyle Gallery</title>
+  <style>
+    :root {
+      --wall: #ece7dc;
+      --wall-dirty: #d3d0c5;
+      --concrete: #8b8f89;
+      --ink: #101010;
+      --ghost: #6e6b64;
+      --blue: #0000ee;
+      --red: #dc1b1b;
+      --yellow: #fee241;
+      --green: #197344;
+      --shadow: rgba(16, 16, 16, 0.24);
+      --mono: "Courier New", Courier, monospace;
+      --serif: Georgia, "Times New Roman", serif;
+      --caption: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #b9bab1;
+      color: var(--ink);
+      font-family: var(--serif);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      cursor: grab;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(0deg, rgba(0,0,0,0.04) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(180deg, #f4f0e7 0 62%, #777b73 62% 100%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 34;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,0,0,0.12) 0 1px, transparent 1px 17px),
+        repeating-linear-gradient(0deg, rgba(0,0,255,0.1) 0 1px, transparent 1px 19px);
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+    }
+
+    body::before {
+      content: "viewport: " attr(data-view) " / scrollX: " attr(data-scroll);
+      position: fixed;
+      left: 8px;
+      bottom: 7px;
+      z-index: 20;
+      font: 11px var(--mono);
+      color: rgba(16,16,16,0.58);
+      background: rgba(254,226,65,0.7);
+      padding: 2px 5px;
+      border: 1px dashed rgba(16,16,16,0.5);
+      pointer-events: none;
+    }
+
+    body.is-drag-scrolling {
+      cursor: grabbing;
+    }
+
+    a {
+      color: var(--blue);
+    }
+
+    button {
+      font-family: var(--mono);
+      font-size: 12px;
+      border: 2px outset #efefef;
+      background: #efefef;
+      color: #000;
+      cursor: pointer;
+    }
+
+    .machine-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      pointer-events: none;
+      opacity: 1;
+    }
+
+    .machine-layer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(220,27,27,0.28) 1px, transparent 1px) 0 0 / 12px 12px,
+        linear-gradient(0deg, rgba(0,0,238,0.22) 1px, transparent 1px) 0 0 / 12px 12px;
+      mix-blend-mode: multiply;
+    }
+
+    .machine-layer::after {
+      content: "fixed overlay / z-index:30 / pointer-events:none / this is not ambience";
+      position: absolute;
+      left: 12px;
+      top: 54px;
+      max-width: 420px;
+      padding: 3px 6px;
+      color: #0f0;
+      background: #000;
+      font: 11px var(--mono);
+    }
+
+    .source-rail {
+      position: fixed;
+      right: 0;
+      top: 86px;
+      z-index: 39;
+      width: 214px;
+      max-width: 38vw;
+      color: #0f0;
+      background: #000;
+      border: 2px solid #0f0;
+      border-right: 0;
+      padding: 8px;
+      font: 11px/1.2 var(--mono);
+      white-space: pre-wrap;
+      pointer-events: none;
+    }
+
+    .hud {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 40;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: start;
+      font-family: var(--mono);
+    }
+
+    .label {
+      display: inline-block;
+      width: fit-content;
+      background: white;
+      color: black;
+      border: 1px solid black;
+      padding: 4px 7px;
+      box-shadow: 3px 3px 0 var(--yellow);
+      font: 12px var(--mono);
+      text-transform: uppercase;
+    }
+
+    .ticker {
+      min-height: 30px;
+      border: 1px solid black;
+      background: #fff;
+      padding: 6px 8px;
+      overflow: hidden;
+      font: 12px var(--mono);
+      white-space: nowrap;
+    }
+
+    .ticker span {
+      display: inline-block;
+      animation: ticker 16s linear infinite;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .gallery {
+      height: 100vh;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: none;
+      scrollbar-color: var(--ink) var(--wall-dirty);
+      scrollbar-width: auto;
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .gallery.is-dragging {
+      cursor: grabbing;
+      scroll-snap-type: none;
+    }
+
+    .gallery.is-dragging * {
+      cursor: grabbing;
+    }
+
+    .gallery a,
+    .gallery button,
+    .gallery input,
+    .gallery select,
+    .gallery textarea,
+    .gallery canvas,
+    .gallery [role="button"],
+    .gallery [data-drag-scroll-ignore] {
+      user-select: auto;
+    }
+
+    .gallery a,
+    .gallery button,
+    .gallery [role="button"],
+    .gallery [data-cursor="pointer"] {
+      cursor: pointer;
+    }
+
+    .gallery [data-cursor="crosshair"] {
+      cursor: crosshair;
+    }
+
+    .gallery [data-cursor="text"] {
+      cursor: text;
+    }
+
+    .track {
+      width: max-content;
+      min-height: 100vh;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(720px, 86vw);
+      align-items: stretch;
+    }
+
+    .room {
+      position: relative;
+      min-height: 100vh;
+      padding: 86px clamp(20px, 5vw, 74px) 74px;
+      border-right: 4px double rgba(16,16,16,0.42);
+      scroll-snap-align: start;
+      background:
+        radial-gradient(circle at 50% 16%, rgba(255,255,255,0.94), transparent 22%),
+        linear-gradient(180deg, rgba(255,255,255,0.54), rgba(0,0,0,0) 32%),
+        var(--wall);
+      transform: translateY(var(--room-y, 0));
+    }
+
+    .room:nth-child(2n) {
+      background:
+        repeating-linear-gradient(90deg, rgba(16,16,16,0.035) 0 1px, transparent 1px 19px),
+        radial-gradient(circle at 50% 14%, rgba(255,255,255,0.88), transparent 23%),
+        #e8e0cf;
+    }
+
+    .room:nth-child(3n) {
+      background:
+        linear-gradient(90deg, transparent 0 47%, rgba(220,27,27,0.22) 47% 48%, transparent 48% 100%),
+        radial-gradient(circle at 50% 13%, rgba(255,255,255,0.9), transparent 24%),
+        #e2e4db;
+    }
+
+    .room::before {
+      content: attr(data-room);
+      position: absolute;
+      top: 46px;
+      right: 22px;
+      font: 11px var(--mono);
+      color: rgba(16,16,16,0.5);
+      background: rgba(255,255,255,0.72);
+      border: 1px dashed rgba(16,16,16,0.38);
+      padding: 2px 5px;
+      transform: rotate(var(--label-r, 0deg));
+    }
+
+    .room::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 28%;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px) 0 0 / 54px 100%,
+        linear-gradient(180deg, #868b82, #555a52);
+      border-top: 3px solid rgba(16,16,16,0.38);
+      z-index: 0;
+    }
+
+    .room > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .entropy-tag {
+      position: absolute;
+      z-index: 4;
+      left: var(--x);
+      top: var(--y);
+      max-width: 250px;
+      padding: 2px 5px;
+      color: var(--fg, #000);
+      background: var(--bg, #fee241);
+      border: 1px solid #000;
+      font: 11px/1.15 var(--mono);
+      transform: rotate(var(--r));
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.18);
+      pointer-events: none;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 24px;
+    }
+
+    .intro h1 {
+      margin: 0;
+      max-width: 760px;
+      font-family: var(--mono);
+      font-size: clamp(44px, 8vw, 116px);
+      line-height: 0.88;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      text-shadow: 6px 0 0 var(--yellow), -3px 4px 0 rgba(220,27,27,0.45);
+    }
+
+    .intro blockquote {
+      align-self: center;
+      max-width: 660px;
+      margin: 0;
+      padding: 16px;
+      font-size: clamp(20px, 2.6vw, 36px);
+      line-height: 1.07;
+      background: rgba(255,255,255,0.68);
+      border-left: 12px solid var(--ink);
+      box-shadow: 10px 10px 0 rgba(0,0,238,0.14);
+    }
+
+    .floor-note {
+      align-self: end;
+      font: 13px/1.45 var(--mono);
+      max-width: 760px;
+      background: rgba(254,226,65,0.78);
+      padding: 10px;
+      border: 1px dashed black;
+    }
+
+    .paradox-room {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.72fr) minmax(360px, 1fr);
+      gap: clamp(22px, 5vw, 70px);
+      align-items: center;
+    }
+
+    .paradox-panel {
+      align-self: stretch;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 16px;
+      max-width: 460px;
+      padding: 16px;
+      background: rgba(255,255,255,0.86);
+      border: 2px solid black;
+      box-shadow: 10px 10px 0 var(--yellow);
+      font-family: var(--mono);
+      outline: 1px dotted rgba(0,0,238,0.78);
+    }
+
+    .paradox-panel h2 {
+      margin: 0;
+      font: 700 clamp(28px, 4vw, 54px)/0.92 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .paradox-panel p {
+      margin: 0;
+      font: 15px/1.35 var(--serif);
+    }
+
+    .refusal-controls {
+      display: grid;
+      gap: 7px;
+      align-content: start;
+    }
+
+    .refusal-controls button {
+      min-height: 34px;
+      text-align: left;
+      padding: 4px 8px;
+    }
+
+    .refusal-controls button::before {
+      content: "[ ] ";
+    }
+
+    .refusal-controls button.is-used::before {
+      content: "[x] ";
+    }
+
+    .paradox-stage {
+      position: relative;
+      min-height: min(62vh, 610px);
+      border: 8px solid var(--ink);
+      background:
+        linear-gradient(90deg, rgba(0,0,238,0.08) 1px, transparent 1px) 0 0 / 34px 34px,
+        #fff;
+      box-shadow: 18px 18px 0 var(--shadow);
+      overflow: hidden;
+      outline: 2px dashed var(--red);
+      outline-offset: 6px;
+    }
+
+    .paradox-object {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(520px, 72%);
+      min-height: 270px;
+      translate: -50% -50%;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      color: white;
+      background:
+        linear-gradient(135deg, var(--red) 0 34%, var(--yellow) 34% 66%, var(--blue) 66% 100%);
+      border: 12px solid black;
+      box-shadow: 16px 16px 0 rgba(0,0,0,0.22);
+      font: 700 clamp(32px, 6vw, 84px)/0.9 Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .paradox-caption {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 18px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid black;
+      background: rgba(255,255,255,0.88);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.12);
+      font: 12px/1.28 var(--mono);
+    }
+
+    .paradox-caption strong {
+      text-transform: uppercase;
+    }
+
+    .absorption-feed {
+      position: absolute;
+      left: 20px;
+      top: 18px;
+      display: grid;
+      gap: 5px;
+      max-width: min(380px, 68%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .absorption-feed span {
+      width: fit-content;
+      padding: 3px 6px;
+      background: var(--yellow);
+      border: 1px dashed black;
+      font: 11px var(--mono);
+      transform: rotate(var(--r));
+    }
+
+    .decision-count {
+      position: absolute;
+      right: 14px;
+      top: 13px;
+      padding: 5px 8px;
+      color: #0f0;
+      background: #000;
+      font: 12px var(--mono);
+    }
+
+    .paradox-stage.no-frame {
+      border-width: 0;
+      outline: 3px dashed var(--red);
+      outline-offset: -12px;
+    }
+
+    .paradox-stage.no-frame .paradox-object {
+      border: 0;
+      box-shadow: none;
+    }
+
+    .paradox-stage.no-color .paradox-object {
+      color: #101010;
+      background: repeating-linear-gradient(45deg, #fff 0 12px, #d8d8d8 12px 13px);
+    }
+
+    .paradox-stage.no-font .paradox-object {
+      font-family: Times, "Times New Roman", serif;
+      font-weight: 400;
+      text-transform: none;
+    }
+
+    .paradox-stage.no-plaque .paradox-caption {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      color: rgba(16,16,16,0.62);
+    }
+
+    .exhibit {
+      height: 100%;
+      display: grid;
+      grid-template-rows: minmax(210px, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+    }
+
+    .work {
+      position: relative;
+      min-height: min(54vh, 560px);
+      border: 8px solid var(--ink);
+      background: white;
+      box-shadow: 18px 18px 0 var(--shadow);
+      overflow: hidden;
+      outline: 2px dashed var(--red);
+      outline-offset: 6px;
+    }
+
+    .work::after {
+      content: "node: .work / bounds visible";
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      z-index: 3;
+      color: #0f0;
+      background: #000;
+      padding: 2px 4px;
+      font: 10px var(--mono);
+    }
+
+    .work[data-kind="anti-aura"] {
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(45deg, transparent 0 48%, black 48% 52%, transparent 52%),
+        linear-gradient(-45deg, transparent 0 48%, black 48% 52%, transparent 52%),
+        white;
+    }
+
+    .work[data-kind="anti-aura"] .price {
+      width: 210px;
+      min-height: 130px;
+      display: grid;
+      place-items: center;
+      rotate: -4deg;
+      background: var(--yellow);
+      border: 2px solid black;
+      font: 700 22px/1 var(--mono);
+      text-align: center;
+      box-shadow: 7px 7px 0 var(--red);
+    }
+
+    .work[data-kind="anti-taste"] {
+      background:
+        repeating-conic-gradient(from 0deg, #f7e23b 0deg 12deg, #ff7ab8 12deg 24deg, #39d6c3 24deg 36deg, #111 36deg 48deg);
+    }
+
+    .totem {
+      position: absolute;
+      inset: 12% 22%;
+      background: white;
+      border: 5px solid black;
+      transform: skew(-8deg) rotate(3deg);
+      display: grid;
+      grid-template-rows: repeat(5, 1fr);
+    }
+
+    .totem i {
+      border-bottom: 4px solid black;
+      background: var(--c);
+    }
+
+    .totem i:last-child {
+      border-bottom: 0;
+    }
+
+    .work[data-kind="punk"] {
+      background: #f3f3ef;
+    }
+
+    .ransom {
+      position: absolute;
+      inset: 8%;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      gap: 7px;
+      transform: rotate(-2deg);
+    }
+
+    .ransom span {
+      display: inline-block;
+      padding: 3px 6px;
+      color: white;
+      background: black;
+      font: 700 clamp(18px, 3.5vw, 48px)/1 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .ransom span:nth-child(2n) {
+      color: black;
+      background: white;
+      border: 1px solid black;
+      transform: translateY(5px) rotate(2deg);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    }
+
+    .ransom span:nth-child(3n) {
+      color: var(--red);
+      background: var(--yellow);
+      transform: rotate(-5deg);
+      font-family: Georgia, serif;
+    }
+
+    .work[data-kind="brutal"] {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 0;
+      background: #dcdcdc;
+      border-style: ridge;
+    }
+
+    .browser-bit {
+      border: 2px solid #808080;
+      padding: 12px;
+      font: 14px var(--mono);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .browser-bit strong {
+      display: block;
+      font-size: clamp(22px, 4vw, 54px);
+      line-height: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .work[data-kind="trap"] {
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px) 0 0 / 18px 18px,
+        #fafafa;
+    }
+
+    .template-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(420px, 72%);
+      min-height: 270px;
+      translate: -50% -50%;
+      padding: 28px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #fff, #f3f3f3);
+      box-shadow: 0 28px 70px rgba(0,0,0,0.22);
+      font: 20px/1.2 var(--serif);
+    }
+
+    .template-card::after {
+      content: "absorbed";
+      position: absolute;
+      right: -18px;
+      bottom: 22px;
+      rotate: -12deg;
+      color: white;
+      background: var(--red);
+      border: 3px solid black;
+      padding: 6px 11px;
+      font: 700 20px var(--mono);
+      text-transform: uppercase;
+    }
+
+    .work[data-kind="machine"] {
+      background: #101010;
+      color: #ece7dc;
+      border-color: #ece7dc;
+    }
+
+    .trace {
+      position: absolute;
+      inset: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #ece7dc;
+    }
+
+    .trace pre,
+    .trace div {
+      margin: 0;
+      padding: 10px;
+      background: #101010;
+      color: #9fffc0;
+      font: 12px/1.28 var(--mono);
+      overflow: hidden;
+    }
+
+    .trace div {
+      color: #ff7a7a;
+    }
+
+    .work[data-kind="paint"] {
+      background: white;
+    }
+
+    .paint-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .paint-tools {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      display: flex;
+      gap: 5px;
+      z-index: 2;
+      font: 11px var(--mono);
+    }
+
+    .plaque {
+      display: grid;
+      grid-template-columns: minmax(140px, 220px) minmax(260px, 1fr);
+      gap: 14px;
+      align-items: start;
+      max-width: 760px;
+      padding: 13px 14px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(16,16,16,0.7);
+      box-shadow: 7px 7px 0 rgba(0,0,0,0.13);
+      outline: 1px dotted rgba(0,0,238,0.78);
+      transform: rotate(var(--plaque-r, 0deg));
+    }
+
+    .plaque h2 {
+      margin: 0;
+      font: 700 18px/1.05 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .plaque p {
+      margin: 0;
+      font: 15px/1.35 var(--serif);
+    }
+
+    .meta {
+      margin-top: 8px;
+      font: 11px var(--mono);
+      color: var(--ghost);
+    }
+
+    .exit-room {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.85fr) minmax(280px, 1fr);
+      gap: clamp(22px, 6vw, 80px);
+      align-items: center;
+    }
+
+    .questions {
+      padding: 18px;
+      background: #fff;
+      border: 2px solid black;
+      box-shadow: 12px 12px 0 var(--yellow);
+      font: clamp(18px, 2.2vw, 31px)/1.12 var(--serif);
+    }
+
+    .questions p {
+      margin: 0 0 18px;
+    }
+
+    .questions p:last-child {
+      margin-bottom: 0;
+    }
+
+    .exit-sign {
+      justify-self: start;
+      align-self: stretch;
+      display: grid;
+      place-items: center;
+      min-height: 300px;
+      width: min(430px, 100%);
+      color: white;
+      background:
+        linear-gradient(90deg, transparent 0 42%, rgba(255,255,255,0.18) 42% 45%, transparent 45%),
+        var(--green);
+      border: 10px solid white;
+      outline: 5px solid var(--green);
+      font: 700 clamp(46px, 8vw, 110px)/0.86 var(--mono);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .plaque,
+    .work * {
+      outline: 1px dotted rgba(0,0,238,0.7);
+    }
+
+    .is-bad-taste .room {
+      filter: saturate(1.5) contrast(1.12);
+    }
+
+    .is-bad-taste .work {
+      border-radius: 17px 0 33px 4px;
+    }
+
+    .is-bad-taste .plaque {
+      transform: rotate(-1.5deg);
+      background: #f8ff6b;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        overflow: auto;
+      }
+
+      .hud {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ticker {
+        grid-column: 1 / -1;
+        order: 4;
+      }
+
+      .gallery {
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-snap-type: y proximity;
+      }
+
+      .track {
+        width: 100%;
+        display: block;
+      }
+
+      .room {
+        min-height: 100svh;
+        padding: 128px 18px 58px;
+        border-right: 0;
+        border-bottom: 4px double rgba(16,16,16,0.42);
+      }
+
+      .plaque,
+      .exit-room,
+      .paradox-room {
+        grid-template-columns: 1fr;
+      }
+
+      .work {
+        min-height: 44vh;
+      }
+
+      .paradox-stage {
+        min-height: 52vh;
+      }
+
+      .paradox-caption {
+        grid-template-columns: 1fr;
+      }
+
+      .trace {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-view="pending" data-scroll="0">
+  <div class="machine-layer" id="machineLayer" aria-hidden="true"></div>
+  <pre class="source-rail" aria-hidden="true">paint: css
+grid: visible
+state: leaking
+toggle: deleted
+smoothness: refused
+dom: on display</pre>
+
+  <header class="hud">
+    <span class="label">Gallery 00: Antistyle</span>
+    <div class="ticker" aria-live="polite"><span id="tickerText">The wall label is part of the wall. The default link remains blue. The refusal is now on display. The wall label is part of the wall. The default link remains blue. The refusal is now on display.</span></div>
+    <button type="button" id="tasteBtn">bad taste</button>
+  </header>
+
+  <main class="gallery" id="gallery">
+    <div class="track">
+      <section class="room intro" data-room="lobby / thesis">
+        <h1>ANTI<br>STYLE</h1>
+        <blockquote>The most honest aesthetic move is to refuse the signals of taste. The refusal is itself a style. There is no outside.</blockquote>
+        <p class="floor-note">Use the scrollbar. The museum refuses the smooth fiction of effortless movement, so it leaves the mechanism where you can see it.</p>
+      </section>
+
+      <section class="room paradox-room" data-room="00 / core paradox">
+        <div class="paradox-panel">
+          <h2>Try to leave style</h2>
+          <p>Every refusal below removes a signal of taste. The museum immediately records the removal as a new signal. The escape route becomes the exhibit.</p>
+          <div class="refusal-controls" aria-label="refuse style controls">
+            <button type="button" data-refusal="frame">refuse the frame</button>
+            <button type="button" data-refusal="color">refuse the palette</button>
+            <button type="button" data-refusal="font">refuse the typography</button>
+            <button type="button" data-refusal="plaque">refuse the explanation</button>
+          </div>
+        </div>
+        <div class="paradox-stage" id="paradoxStage">
+          <div class="absorption-feed" id="absorptionFeed">
+            <span style="--r:-1deg">decision 00: style pretending to be absent</span>
+          </div>
+          <div class="decision-count" id="decisionCount">style count: 1</div>
+          <div class="paradox-object" id="paradoxObject">I refuse</div>
+          <div class="paradox-caption" id="paradoxCaption">
+            <strong>Current label</strong>
+            <span id="paradoxLabel">Unmodified refusal. Already a composition.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="room" data-room="01 / dada">
+        <article class="exhibit">
+          <div class="work" data-kind="anti-aura">
+            <div class="price">AURA<br>REMOVED<br>$0.00</div>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>Dada refuses the aura</h2>
+              <div class="meta">found object / misfiled masterpiece</div>
+            </div>
+            <p>The gallery tries to consecrate the object. The object replies with a price sticker, a bad angle, and a frame that cannot decide whether it is protecting art or proving the trick.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room" data-room="02 / radical design">
+        <article class="exhibit">
+          <div class="work" data-kind="anti-taste">
+            <div class="totem" aria-hidden="true">
+              <i style="--c:#f7e23b"></i>
+              <i style="--c:#ff7ab8"></i>
+              <i style="--c:#39d6c3"></i>
+              <i style="--c:#111"></i>
+              <i style="--c:#ffffff"></i>
+            </div>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>Good taste loses its pass</h2>
+              <div class="meta">Memphis after the museum gift shop</div>
+            </div>
+            <p>A modernist room asks for restraint. This object answers with pattern, glare, and the sort of color that makes a tasteful person reach for institutional gray.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room" data-room="03 / punk">
+        <article class="exhibit">
+          <div class="work" data-kind="punk">
+            <div class="ransom" aria-label="refuse professional polish">
+              <span>Refuse</span><span>the</span><span>polish</span><span>before</span><span>it</span><span>becomes</span><span>a</span><span>uniform</span>
+            </div>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>Punk refuses finish</h2>
+              <div class="meta">ransom-note typography / impatient hands</div>
+            </div>
+            <p>The letters behave like they were assembled before permission arrived. Skill is present, but it does not perform obedience.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room" data-room="04 / web brutalism">
+        <article class="exhibit">
+          <div class="work" data-kind="brutal">
+            <div class="browser-bit" style="--bg:#fff"><strong>HTML</strong><a href="#">default link</a><br><br><button>button</button></div>
+            <div class="browser-bit" style="--bg:#c0c0c0"><strong>CSS</strong>border: ridge;<br>font: inherited;<br>margin: who knows;</div>
+            <div class="browser-bit" style="--bg:#000;color:#0f0"><strong>JS</strong>console.log("awake");<br>throw new TasteError();</div>
+            <div class="browser-bit" style="--bg:#fee241"><strong>PIXEL</strong>Let the concrete be concrete. Let the pixel be a pixel.</div>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>Rounded consensus refused</h2>
+              <div class="meta">browser defaults / no velvet rope</div>
+            </div>
+            <p>The browser already has an aesthetic. Antistyle does not erase it. It lets the inherited parts keep their fingerprints.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room" data-room="05 / trap">
+        <article class="exhibit">
+          <div class="work" data-kind="trap">
+            <div class="template-card">
+              Brutalism Package<br>
+              12 responsive sections<br>
+              handmade roughness<br>
+              polished conversion flow
+            </div>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>The refusal gets sold back</h2>
+              <div class="meta">template / absorption event</div>
+            </div>
+            <p>The moment a refusal becomes legible as a look, it becomes a product category. A frozen refusal is just another style with worse manners.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room" data-room="06 / anti-illusion">
+        <article class="exhibit">
+          <div class="work" data-kind="machine">
+            <div class="trace">
+              <pre>&lt;section class="room"&gt;
+  &lt;div class="work"&gt;
+    illusion
+  &lt;/div&gt;
+&lt;/section&gt;</pre>
+              <div>RENDER STACK<br><br>wall paint: css gradient<br>light cone: radial-gradient<br>authority: plaque<br>spell: broken<br><br>viewer status: awake</div>
+            </div>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>Show the apparatus</h2>
+              <div class="meta">Brechtian interface / visible scaffold</div>
+            </div>
+            <p>The gallery does not ask you to forget the browser. It points at the construction and makes the construction part of the exhibit.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room" data-room="07 / live edge">
+        <article class="exhibit">
+          <div class="work" data-kind="paint">
+            <div class="paint-tools">
+              <button type="button" data-color="#101010">black</button>
+              <button type="button" data-color="#dc1b1b">red</button>
+              <button type="button" data-color="#0000ee">blue</button>
+              <button type="button" id="clearPaint">clear</button>
+            </div>
+            <canvas class="paint-canvas" id="paintCanvas" aria-label="draw a rough mark" data-drag-scroll-ignore data-cursor="crosshair"></canvas>
+          </div>
+          <div class="plaque">
+            <div>
+              <h2>MS Paint is evidence</h2>
+              <div class="meta">rough mark / decision could be wrong</div>
+            </div>
+            <p>In a world where polish is cheap, the rough mark becomes scarce. Draw on the exhibit. The mistake is part of the provenance.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="room exit-room" data-room="exit / open threads">
+        <div class="questions">
+          <p>If antistyle dies on contact with legibility, is it a position or only a moment?</p>
+          <p>When the working moves inside the model, is the visible surface the only honest place left?</p>
+          <p>What is the antistyle of a system with no surface at all?</p>
+        </div>
+        <div class="exit-sign">No<br>Outside</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const body = document.body;
+    const gallery = document.getElementById("gallery");
+    const tasteBtn = document.getElementById("tasteBtn");
+    const tickerText = document.getElementById("tickerText");
+    const paintCanvas = document.getElementById("paintCanvas");
+    const paintCtx = paintCanvas.getContext("2d");
+    const paradoxStage = document.getElementById("paradoxStage");
+    const paradoxLabel = document.getElementById("paradoxLabel");
+    const absorptionFeed = document.getElementById("absorptionFeed");
+    const decisionCount = document.getElementById("decisionCount");
+    let paintColor = "#101010";
+    let painting = false;
+    let isDragScrolling = false;
+    let dragStartX = 0;
+    let dragStartScroll = 0;
+    let dragMoved = false;
+    const usedRefusals = new Set();
+    const dragIgnoreSelector = "button, a, input, select, textarea, canvas, [role='button'], [data-drag-scroll-ignore]";
+
+    const lines = [
+      "The wall label is part of the wall.",
+      "The default link remains blue.",
+      "The refusal is now on display.",
+      "Every subtraction leaves a fingerprint.",
+      "There is no outside. There are only better documented insides.",
+      "A rough edge is only honest while it can still cut the habit.",
+      "The museum voice is trying to hide its own CSS.",
+      "The machinery is not a mode anymore.",
+      "This caption drift is part of the composition."
+    ];
+
+    const entropyLines = [
+      "unapproved wall text",
+      "layout leak",
+      "curator note became UI",
+      "z-index scar",
+      "not responsive, just surviving",
+      "style generated by refusal",
+      "default blue protected",
+      "grid is showing",
+      "do not smooth",
+      "this is a label about labels"
+    ];
+
+    const refusalCopy = {
+      frame: "Frame refused. The missing frame is now the visual system.",
+      color: "Palette refused. Gray becomes a palette with an alibi.",
+      font: "Typography refused. Default serif becomes a typographic position.",
+      plaque: "Explanation refused. Silence enters the wall text."
+    };
+
+    function absorbRefusal(kind, button) {
+      if (usedRefusals.has(kind)) {
+        paradoxLabel.textContent = `${refusalCopy[kind]} Repetition makes the refusal more legible.`;
+        return;
+      }
+
+      usedRefusals.add(kind);
+      button.classList.add("is-used");
+      paradoxStage.classList.add(`no-${kind}`);
+      paradoxLabel.textContent = refusalCopy[kind];
+      decisionCount.textContent = `style count: ${usedRefusals.size + 1}`;
+
+      const tag = document.createElement("span");
+      tag.style.setProperty("--r", `${Math.random() * 6 - 3}deg`);
+      tag.textContent = `decision 0${usedRefusals.size}: ${kind} refusal absorbed`;
+      absorptionFeed.appendChild(tag);
+
+      if (usedRefusals.size === 4) {
+        const finalTag = document.createElement("span");
+        finalTag.style.setProperty("--r", "2deg");
+        finalTag.textContent = "outside attempt failed: complete style generated";
+        absorptionFeed.appendChild(finalTag);
+        paradoxLabel.textContent = "All visible style signals were refused. What remains is a stricter style: absence with documentation.";
+      }
+    }
+
+    function updateTelemetry() {
+      body.dataset.view = `${window.innerWidth}x${window.innerHeight}`;
+      body.dataset.scroll = Math.round(gallery.scrollLeft || window.scrollY);
+    }
+
+    function addEntropyTags() {
+      document.querySelectorAll(".entropy-tag").forEach((tag) => tag.remove());
+      document.querySelectorAll(".room").forEach((room, index) => {
+        room.style.setProperty("--room-y", `${(index % 3 - 1) * 3}px`);
+        room.style.setProperty("--label-r", `${(Math.random() * 5 - 2.5).toFixed(2)}deg`);
+        room.style.setProperty("--plaque-r", `${(Math.random() * 2 - 1).toFixed(2)}deg`);
+
+        const tag = document.createElement("span");
+        tag.className = "entropy-tag";
+        tag.textContent = entropyLines[(index + Math.floor(Math.random() * entropyLines.length)) % entropyLines.length];
+        tag.style.setProperty("--x", `${8 + Math.random() * 70}%`);
+        tag.style.setProperty("--y", `${16 + Math.random() * 58}%`);
+        tag.style.setProperty("--r", `${(Math.random() * 14 - 7).toFixed(2)}deg`);
+        tag.style.setProperty("--bg", index % 2 ? "#fff" : "#fee241");
+        tag.style.setProperty("--fg", index % 4 === 0 ? "#dc1b1b" : "#000");
+        room.appendChild(tag);
+      });
+    }
+
+    function resizePaint() {
+      const rect = paintCanvas.getBoundingClientRect();
+      const old = document.createElement("canvas");
+      old.width = paintCanvas.width;
+      old.height = paintCanvas.height;
+      old.getContext("2d").drawImage(paintCanvas, 0, 0);
+
+      paintCanvas.width = Math.max(1, Math.floor(rect.width * window.devicePixelRatio));
+      paintCanvas.height = Math.max(1, Math.floor(rect.height * window.devicePixelRatio));
+      paintCtx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      paintCtx.lineCap = "square";
+      paintCtx.lineJoin = "miter";
+      paintCtx.lineWidth = 5;
+      paintCtx.fillStyle = "#ffffff";
+      paintCtx.fillRect(0, 0, rect.width, rect.height);
+
+      if (old.width) {
+        paintCtx.drawImage(old, 0, 0, old.width / window.devicePixelRatio, old.height / window.devicePixelRatio);
+      } else {
+        paintCtx.fillStyle = "#101010";
+        paintCtx.font = "16px Courier New";
+        paintCtx.fillText("make a mark", 32, 64);
+      }
+    }
+
+    function point(event) {
+      const rect = paintCanvas.getBoundingClientRect();
+      const touch = event.touches ? event.touches[0] : event;
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+    }
+
+    function startPaint(event) {
+      painting = true;
+      const p = point(event);
+      paintCtx.beginPath();
+      paintCtx.moveTo(p.x, p.y);
+      event.preventDefault();
+    }
+
+    function movePaint(event) {
+      if (!painting) return;
+      const p = point(event);
+      paintCtx.strokeStyle = paintColor;
+      paintCtx.lineTo(p.x, p.y);
+      paintCtx.stroke();
+      event.preventDefault();
+    }
+
+    function stopPaint() {
+      painting = false;
+    }
+
+    function canDragScroll() {
+      const style = window.getComputedStyle(gallery);
+      return style.overflowX !== "hidden" && gallery.scrollWidth > gallery.clientWidth;
+    }
+
+    function startDragScroll(event) {
+      if (!canDragScroll() || event.button !== 0 || event.target.closest(dragIgnoreSelector)) return;
+      isDragScrolling = true;
+      dragMoved = false;
+      dragStartX = event.clientX;
+      dragStartScroll = gallery.scrollLeft;
+      gallery.classList.add("is-dragging");
+      body.classList.add("is-drag-scrolling");
+      gallery.setPointerCapture(event.pointerId);
+    }
+
+    function moveDragScroll(event) {
+      if (!isDragScrolling) return;
+      const dx = event.clientX - dragStartX;
+      if (Math.abs(dx) > 3) dragMoved = true;
+      gallery.scrollLeft = dragStartScroll - dx;
+      updateTelemetry();
+      event.preventDefault();
+    }
+
+    function stopDragScroll(event) {
+      if (!isDragScrolling) return;
+      isDragScrolling = false;
+      gallery.classList.remove("is-dragging");
+      body.classList.remove("is-drag-scrolling");
+      if (gallery.hasPointerCapture(event.pointerId)) {
+        gallery.releasePointerCapture(event.pointerId);
+      }
+    }
+
+    function blockClickAfterDrag(event) {
+      if (!dragMoved) return;
+      event.preventDefault();
+      event.stopPropagation();
+      dragMoved = false;
+    }
+
+    tasteBtn.addEventListener("click", () => {
+      body.classList.toggle("is-bad-taste");
+      tasteBtn.textContent = body.classList.contains("is-bad-taste") ? "undo taste" : "bad taste";
+    });
+
+    document.querySelectorAll("[data-refusal]").forEach((button) => {
+      button.addEventListener("click", () => absorbRefusal(button.dataset.refusal, button));
+    });
+
+    document.querySelectorAll("[data-color]").forEach((button) => {
+      button.addEventListener("click", () => {
+        paintColor = button.dataset.color;
+      });
+    });
+
+    document.getElementById("clearPaint").addEventListener("click", resizePaint);
+    gallery.addEventListener("pointerdown", startDragScroll);
+    gallery.addEventListener("pointermove", moveDragScroll);
+    gallery.addEventListener("pointerup", stopDragScroll);
+    gallery.addEventListener("pointercancel", stopDragScroll);
+    gallery.addEventListener("click", blockClickAfterDrag, true);
+    paintCanvas.addEventListener("mousedown", startPaint);
+    paintCanvas.addEventListener("mousemove", movePaint);
+    window.addEventListener("mouseup", stopPaint);
+    paintCanvas.addEventListener("touchstart", startPaint, { passive: false });
+    paintCanvas.addEventListener("touchmove", movePaint, { passive: false });
+    window.addEventListener("touchend", stopPaint);
+
+    setInterval(() => {
+      const shuffled = lines.slice().sort(() => Math.random() - 0.5);
+      tickerText.textContent = `${shuffled.join("   /   ")}   /   ${shuffled.join("   /   ")}`;
+    }, 5200);
+
+    setInterval(addEntropyTags, 9000);
+
+    window.setTimeout(() => {
+      window.alert("this is not an error I'm just checking on you");
+    }, 10000);
+
+    gallery.addEventListener("scroll", updateTelemetry, { passive: true });
+    window.addEventListener("resize", () => {
+      updateTelemetry();
+      resizePaint();
+    });
+
+    updateTelemetry();
+    addEntropyTags();
+    requestAnimationFrame(resizePaint);
+  </script>
+</body>
+</html>
