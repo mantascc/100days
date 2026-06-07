@@ -26,7 +26,7 @@
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       height: 100%;
       background: var(--ground-void);
@@ -35,6 +35,9 @@
       font-weight: 300;
       overflow: hidden;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      overscroll-behavior: none;
     }
 
     .grid {
@@ -95,12 +98,15 @@
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 350ms ease;
+      visibility: hidden;
+      transition: opacity 350ms ease, visibility 0s linear 350ms;
     }
 
     .view.active {
       opacity: 1;
       pointer-events: auto;
+      visibility: visible;
+      transition: opacity 350ms ease, visibility 0s linear 0s;
     }
 
     /* ---- shared panel atoms ---- */
@@ -170,7 +176,7 @@
     /* VIEW 01: TWO STATES                            */
     /* ============================================== */
     #v-states .panel {
-      width: 280px;
+      width: min(280px, 82vw);
       height: 180px;
       transform: translateZ(-100px);
     }
@@ -185,7 +191,7 @@
     #v-deck .deck {
       position: relative;
       transform-style: preserve-3d;
-      width: 300px;
+      width: min(300px, 85vw);
       height: 200px;
     }
     #v-deck .card {
@@ -219,7 +225,7 @@
     /* ============================================== */
     #v-modal .list {
       position: relative;
-      width: 380px;
+      width: min(380px, 88vw);
       transform-style: preserve-3d;
     }
     #v-modal .row {
@@ -256,8 +262,8 @@
     /* ============================================== */
     #v-scroll .tunnel {
       position: relative;
-      width: 320px;
-      height: 220px;
+      width: min(320px, 86vw);
+      height: 240px;
       transform-style: preserve-3d;
     }
     #v-scroll .slab {
@@ -325,10 +331,11 @@
     /* ============================================== */
     #v-hover .grid-3d {
       display: grid;
-      grid-template-columns: repeat(5, 80px);
-      grid-template-rows: repeat(5, 80px);
+      grid-template-columns: repeat(5, clamp(48px, 14vw, 80px));
+      grid-template-rows: repeat(5, clamp(48px, 14vw, 80px));
       gap: 6px;
       transform-style: preserve-3d;
+      touch-action: none;
     }
     #v-hover .tile {
       background: var(--ground-raised);
@@ -352,7 +359,7 @@
     /* ============================================== */
     #v-press .press-stage {
       position: relative;
-      width: 260px;
+      width: min(260px, 80vw);
       height: 160px;
       transform-style: preserve-3d;
     }
@@ -390,8 +397,8 @@
     /* ============================================== */
     #v-layers .mock {
       position: relative;
-      width: 360px;
-      height: 240px;
+      width: min(360px, 86vw);
+      height: min(240px, 60vw);
       transform-style: preserve-3d;
       transition: transform 700ms var(--ease);
     }
@@ -443,10 +450,10 @@
     /* ============================================== */
     /* VIEW 08: PARALLAX CURSOR                       */
     /* ============================================== */
+    #v-parallax { display: block; }
     #v-parallax .px-scene {
-      position: relative;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      inset: 0;
       transform-style: preserve-3d;
     }
     #v-parallax .px {
@@ -474,8 +481,9 @@
       position: absolute;
       top: 32%;
       left: 50%;
-      width: 320px;
-      margin-left: -160px;
+      width: min(320px, 86vw);
+      transform-origin: center;
+      margin-left: min(-160px, -43vw);
       background: var(--ground-elevated);
       border: 1px solid var(--accent);
       padding: 16px 18px;
@@ -571,13 +579,24 @@
     .island button:hover { color: var(--accent); }
 
     .island .label {
-      min-width: 200px;
+      min-width: min(200px, 46vw);
       text-align: center;
       padding: 4px 14px;
       display: flex;
       flex-direction: column;
       gap: 2px;
       cursor: pointer;
+    }
+
+    .island button {
+      min-width: 36px;
+      min-height: 36px;
+    }
+
+    .island .dots i {
+      padding: 6px;
+      box-sizing: content-box;
+      margin: -6px;
     }
 
     .island .label .num {
@@ -640,6 +659,28 @@
       z-index: 150;
     }
     .action:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ---- mobile tuning ---- */
+    @media (max-width: 640px) {
+      header { font-size: 10px; top: 18px; left: 18px; max-width: 50vw; }
+      .meta { font-size: 9px; top: 18px; right: 18px; }
+      .island { bottom: 20px; padding: 6px; }
+      .island .label { padding: 4px 8px; }
+      .island .label .name { font-size: 11px; }
+      .action { bottom: 110px; padding: 11px 18px; font-size: 9px; }
+    }
+
+    @media (max-width: 380px) {
+      .meta { display: none; }
+    }
+
+    /* parallax view: keep panels inside the viewport on narrow screens */
+    @media (max-width: 520px) {
+      #v-parallax .px { font-size: 9px; padding: 10px; }
+      #v-parallax .px[style*="width: 240px"] { width: 60vw !important; height: auto !important; }
+      #v-parallax .px[style*="width: 160px"] { width: 40vw !important; }
+      #v-parallax .px[style*="width: 140px"] { width: 36vw !important; }
+    }
   </style>
 </head>
 <body>
@@ -907,12 +948,36 @@
       layout();
       if (Math.abs(target - pos) > 0.001) raf = requestAnimationFrame(tick);
     }
-    document.getElementById('v-scroll').addEventListener('wheel', (e) => {
+    const scrollView = document.getElementById('v-scroll');
+    scrollView.addEventListener('wheel', (e) => {
       e.preventDefault();
       target = Math.max(0, Math.min(slabs.length - 1, target + Math.sign(e.deltaY) * 0.5));
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);
     }, { passive: false });
+
+    // touch: vertical swipe drives target
+    let touchStartY = null;
+    let touchStartTarget = 0;
+    scrollView.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+      touchStartTarget = target;
+    }, { passive: true });
+    scrollView.addEventListener('touchmove', (e) => {
+      if (touchStartY === null) return;
+      e.preventDefault();
+      const dy = touchStartY - e.touches[0].clientY;
+      target = Math.max(0, Math.min(slabs.length - 1, touchStartTarget + dy / 80));
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    }, { passive: false });
+    scrollView.addEventListener('touchend', () => {
+      // snap to nearest slab
+      target = Math.round(target);
+      touchStartY = null;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    });
   }
 
   // -------- VIEW 05: hover grid --------
@@ -929,8 +994,7 @@
       tiles.push(t);
     }
     let hot = null;
-    grid.addEventListener('pointermove', (e) => {
-      const t = e.target.closest('.tile');
+    function activate(t) {
       if (!t || t === hot) return;
       hot = t;
       const hr = +t.dataset.row, hc = +t.dataset.col;
@@ -952,8 +1016,8 @@
           x.classList.remove('hot');
         }
       });
-    });
-    grid.addEventListener('pointerleave', () => {
+    }
+    function reset() {
       hot = null;
       tiles.forEach(x => {
         x.style.transform = 'translateZ(0)';
@@ -962,6 +1026,18 @@
         x.style.boxShadow = '';
         x.classList.remove('hot');
       });
+    }
+    // touch + mouse: tap or drag to activate
+    grid.addEventListener('pointerdown', (e) => {
+      activate(e.target.closest('.tile'));
+    });
+    // mouse hover: track without press
+    grid.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' && !e.buttons) return;
+      activate(e.target.closest('.tile'));
+    });
+    grid.addEventListener('pointerleave', (e) => {
+      if (e.pointerType === 'mouse') reset();
     });
   }
 
@@ -989,16 +1065,24 @@
   function initParallax() {
     const scene = document.getElementById('pxScene');
     const items = [...scene.querySelectorAll('.px')];
-    document.getElementById('v-parallax').addEventListener('pointermove', (e) => {
+    const view = document.getElementById('v-parallax');
+    function apply(clientX, clientY) {
       const r = scene.getBoundingClientRect();
-      const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;  // -1..1
-      const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      const nx = ((clientX - r.left) / r.width - 0.5) * 2;
+      const ny = ((clientY - r.top) / r.height - 0.5) * 2;
       items.forEach(el => {
         const d = +el.dataset.d;
         const factor = d / 300;
         el.style.transform = `translate3d(${nx * factor * 30}px, ${ny * factor * 30}px, ${d}px)`;
       });
-    });
+    }
+    view.addEventListener('pointermove', (e) => apply(e.clientX, e.clientY));
+    view.addEventListener('pointerdown', (e) => apply(e.clientX, e.clientY));
+    view.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      apply(t.clientX, t.clientY);
+    }, { passive: false });
   }
 
   // -------- VIEW 09: notification --------
