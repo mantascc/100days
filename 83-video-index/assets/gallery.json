@@ -1,13 +1,5 @@
 [
   {
-    "slug": "82-antistyle",
-    "title": "Antistyle Gallery",
-    "href": "../82-antistyle/",
-    "poster": "assets/posters/82-antistyle.jpg",
-    "video": "assets/videos/82-antistyle.mp4",
-    "disabled": false
-  },
-  {
     "slug": "81-lens-wave",
     "title": "Lens Wave",
     "href": "../81-lens-wave/",
