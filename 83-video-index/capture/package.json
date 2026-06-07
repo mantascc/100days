@@ -1,0 +1,13 @@
+{
+    "name": "video-index-capture",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "capture": "node capture.mjs",
+        "install:browsers": "playwright install chromium"
+    },
+    "devDependencies": {
+        "playwright": "^1.49.0"
+    }
+}

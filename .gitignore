@@ -46,6 +46,13 @@ build/
 *.mov
 *.mp4
 
+# Whitelist gallery clips committed for 83-video-index
+!83-video-index/assets/videos/*.mp4
+
+# Capture pipeline scratch
+83-video-index/capture/.raw/
+83-video-index/capture/node_modules/
+
 # Environment variables
 .env
 .env.local
