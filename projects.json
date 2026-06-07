@@ -1,5 +1,10 @@
 [
   {
+    "id": "82-antistyle",
+    "path": "100days/82-antistyle",
+    "description": "Antistyle Gallery \u2014 horizontal museum walk that exposes its own machinery: always-on layout grids, drag-to-scroll rooms, refusal controls that turn disavowal into new style decisions, entropy labels, source rails, and an intentionally interruptive browser dialog"
+  },
+  {
     "id": "79-idle-states",
     "path": "100days/79-idle-states",
     "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across two pages (ambient + instrumented): breath, caret, drift, lean-toward, hover, orbit, listening bars, elapsed counter; each paired with claim/signal/motion/risk metadata, switched via a floating pill dock"
