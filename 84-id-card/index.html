@@ -16,6 +16,7 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  button { -webkit-tap-highlight-color: transparent; }
 
   html, body {
     height: 100%;
@@ -52,6 +53,427 @@
     perspective: 1600px;
   }
 
+  /* --- trigger: card-shaped tab below the main card --- */
+  .trigger {
+    position: absolute;
+    left: 50%;
+    top: calc(50% + min(360px, 86vw) * 0.72 + 44px);
+    width: min(360px, 86vw);
+    height: 56px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    box-shadow:
+      0 24px 50px -22px rgba(0,0,0,0.85),
+      0 0 0 1px rgba(255,255,255,0.02),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translate(-50%, -50%) translateZ(40px);
+    transform-style: preserve-3d;
+    color: var(--ink);
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    white-space: nowrap;
+    padding: 0;
+    z-index: 4;
+    transition:
+      opacity 0.22s ease,
+      transform 0.32s cubic-bezier(.2,.85,.2,1),
+      color 0.2s ease;
+  }
+  .trigger:hover { color: #fff; }
+  .stage.is-expanded .trigger {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) translateZ(40px) scale(0.94);
+  }
+
+  /* --- dialog: appears separately, then materializes its content --- */
+  .dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(560px, 92vw);
+    height: min(640px, 86svh);
+    border-radius: 16px;
+    background:
+      radial-gradient(120% 120% at 30% 0%, rgba(255,255,255,0.035), transparent 55%),
+      linear-gradient(180deg, #101116 0%, #0a0b0e 100%);
+    border: 1px solid var(--card-edge);
+    box-shadow:
+      0 60px 120px -40px rgba(0,0,0,0.95),
+      0 0 0 1px rgba(255,255,255,0.03),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translate(-50%, -50%) translateZ(60px) scale(0.97);
+    transform-style: preserve-3d;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(22px, 4.5vw, 34px) clamp(22px, 4.5vw, 34px) clamp(18px, 3.5vw, 26px);
+    color: var(--ink);
+    transition:
+      opacity 0.22s ease,
+      transform 0.34s cubic-bezier(.2,.85,.2,1);
+  }
+  .stage.is-expanded .dialog {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateZ(60px) scale(1);
+    pointer-events: auto;
+    transition-delay: 0.2s;
+  }
+
+  /* --- materialize: content blur-resolves with stagger --- */
+  .dialog .dossier-top,
+  .dialog .dossier-body > *,
+  .dialog .dossier-bottom {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translateY(4px);
+    transition:
+      opacity 0.26s ease,
+      filter 0.26s ease,
+      transform 0.26s ease;
+  }
+  .dialog.is-materialized .dossier-top { transition-delay: 0s; }
+  .dialog.is-materialized .dossier-body > *:nth-child(1) { transition-delay: 0.04s; }
+  .dialog.is-materialized .dossier-body > *:nth-child(2) { transition-delay: 0.08s; }
+  .dialog.is-materialized .dossier-body > *:nth-child(3) { transition-delay: 0.12s; }
+  .dialog.is-materialized .dossier-body > *:nth-child(4) { transition-delay: 0.16s; }
+  .dialog.is-materialized .dossier-bottom { transition-delay: 0.20s; }
+  .dialog.is-materialized .dossier-top,
+  .dialog.is-materialized .dossier-body > *,
+  .dialog.is-materialized .dossier-bottom {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+
+  /* scanline sweep — the "writing" pass */
+  .dialog .scanline {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(201,205,212,0.45);
+  }
+  .dialog.is-revealing .scanline {
+    animation: scanline-sweep 0.46s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  @keyframes scanline-sweep {
+    0%   { top: 0;     opacity: 1; }
+    85%  { opacity: 1; }
+    100% { top: 100%;  opacity: 0; }
+  }
+
+  .dossier-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-edge);
+  }
+
+  .dossier-body {
+    flex: 1;
+    padding: 20px 0 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.08) transparent;
+  }
+  .dossier-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  .dossier-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .dossier-body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+  }
+  .dossier-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.18);
+  }
+
+  .headline {
+    font-family: "Iowan Old Style", "Charter", "Palatino", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(26px, 4.4vw, 36px);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .headline em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .lede {
+    font-family: ui-sans-serif, -apple-system, "Inter", system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 44ch;
+  }
+
+  .dossier-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 22px;
+    margin-top: 6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-edge);
+  }
+  .dossier-grid > div { min-width: 0; }
+  .dossier-grid dt {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 4px;
+  }
+  .dossier-grid dd {
+    font-family: ui-sans-serif, -apple-system, "Inter", system-ui, sans-serif;
+    font-size: 12.5px;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .depgraph {
+    margin-top: 4px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-edge);
+  }
+  .depgraph-title {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 10px;
+  }
+
+  /* on-demand load: trigger → loading row → content */
+  .depgraph-trigger {
+    display: inline-block;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: 0;
+    padding: 4px 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: color 0.15s ease, opacity 0.2s ease;
+  }
+  .depgraph-trigger::before {
+    content: '> ';
+    display: inline-block;
+    margin-right: 2px;
+    animation: depgraph-prompt-blink 1.05s steps(2, end) infinite;
+  }
+  .depgraph-trigger:hover { color: var(--ink); }
+  .depgraph-trigger:hover::before { animation-play-state: paused; opacity: 1; }
+  @keyframes depgraph-prompt-blink {
+    50% { opacity: 0; }
+  }
+
+  .depgraph-loading {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .loading-label { flex: 0 0 auto; white-space: nowrap; }
+  .loading-trail {
+    flex: 1;
+    height: 1px;
+    background: var(--card-edge);
+    position: relative;
+    overflow: hidden;
+  }
+  .loading-trail::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 0%;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  .depgraph-content {
+    display: none;
+  }
+
+  .depgraph[data-state="loading"] .depgraph-trigger { display: none; }
+  .depgraph[data-state="loading"] .depgraph-loading { display: flex; }
+  .depgraph[data-state="loading"] .loading-trail::after {
+    animation: depgraph-loading-fill 3s linear forwards;
+  }
+  @keyframes depgraph-loading-fill {
+    from { width: 0%; }
+    to   { width: 100%; }
+  }
+
+  .depgraph[data-state="loaded"] .depgraph-trigger,
+  .depgraph[data-state="loaded"] .depgraph-loading { display: none; }
+  .depgraph[data-state="loaded"] .depgraph-content {
+    display: block;
+    animation: depgraph-materialize 0.5s cubic-bezier(.2,.85,.2,1) forwards;
+  }
+  @keyframes depgraph-materialize {
+    from { opacity: 0; filter: blur(6px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+  }
+  .depgraph svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .depgraph .links path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 0.6;
+    opacity: 0.45;
+  }
+  .depgraph .nodes circle {
+    fill: var(--accent);
+  }
+  .depgraph .nodes circle.ghost {
+    fill: var(--void);
+    stroke: var(--accent);
+    stroke-width: 0.9;
+  }
+  .depgraph text {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .depgraph .label {
+    font-size: 7.2px;
+    fill: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .depgraph .meta {
+    font-size: 6.4px;
+    fill: var(--ink-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* mobile-only text tree fallback */
+  .depgraph-text {
+    display: none;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .depgraph-text .row { display: block; }
+  .depgraph-text .ln { color: var(--accent); opacity: 0.7; }
+  .depgraph-text .nm { color: var(--ink); }
+  .depgraph-text .ar { color: var(--ink-dim); }
+  .depgraph-text .lf { color: var(--ink-soft); }
+
+  .dossier-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    padding-top: 14px;
+    border-top: 1px solid var(--card-edge);
+  }
+  .dossier-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 1px;
+    height: 16px;
+  }
+  .dossier-bars span {
+    display: block;
+    width: 1px;
+    background: var(--ink-soft);
+    opacity: 0.55;
+  }
+
+  .dialog-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: 1px solid var(--card-edge);
+    border-radius: 99px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 11;
+    transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .dialog-close svg {
+    display: block;
+    width: 10px;
+    height: 10px;
+  }
+  .dialog.is-materialized .dialog-close {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0.24s, 0s, 0s;
+  }
+  .dialog-close:hover {
+    border-color: var(--ink-soft);
+    color: var(--ink);
+  }
+
+  /* --- card recession when expanded --- */
+  .stage.is-expanded .card {
+    filter: blur(1.6px);
+    opacity: 0.42;
+    pointer-events: none;
+  }
+  .stage.is-expanded {
+    cursor: default;
+  }
+
   .card {
     position: relative;
     width: min(360px, 86vw);
@@ -66,15 +488,9 @@
       0 0 0 1px rgba(255,255,255,0.02),
       inset 0 1px 0 rgba(255,255,255,0.04);
     overflow: hidden;
-    touch-action: none;
-    cursor: grab;
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(.2,.8,.2,1);
+    transition: filter 0.35s ease, opacity 0.35s ease;
     animation: breathe 7s ease-in-out infinite;
-  }
-
-  .card:active {
-    cursor: grabbing;
   }
 
   @keyframes breathe {
@@ -246,8 +662,16 @@
     }
 
     .card {
-      width: min(calc(100vw - 32px), calc((100svh - 86px) * 0.694), 360px);
+      width: min(calc(100vw - 32px), calc((100svh - 220px) * 0.694), 360px);
       border-radius: 12px;
+    }
+
+    .trigger {
+      width: min(calc(100vw - 32px), calc((100svh - 220px) * 0.694), 360px);
+      top: calc(50% + min(calc(100vw - 32px), calc((100svh - 220px) * 0.694), 360px) * 0.72 + 36px);
+      height: 50px;
+      border-radius: 12px;
+      font-size: 10.5px;
     }
 
     .content {
@@ -302,6 +726,66 @@
       line-height: 1.5;
       letter-spacing: 0.12em;
     }
+
+    /* --- dialog: compact + touch-sized on mobile --- */
+    .dialog {
+      width: min(calc(100vw - 20px), 480px);
+      height: min(calc(100svh - 32px), 86svh);
+      border-radius: 14px;
+      padding: 22px 18px 18px;
+    }
+
+    .dialog-close {
+      top: 10px;
+      right: 10px;
+      width: 38px;
+      height: 38px;
+    }
+
+    .dossier-top {
+      font-size: 8.5px;
+      letter-spacing: 0.24em;
+      padding-bottom: 14px;
+    }
+
+    .dossier-body {
+      padding: 16px 0 14px;
+      gap: 14px;
+    }
+
+    .headline {
+      font-size: clamp(22px, 7vw, 28px);
+      line-height: 1.1;
+    }
+
+    .lede {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dossier-grid {
+      gap: 12px 16px;
+      padding-top: 14px;
+    }
+    .dossier-grid dt {
+      font-size: 8.5px;
+      letter-spacing: 0.22em;
+    }
+    .dossier-grid dd {
+      font-size: 11.5px;
+    }
+
+    .dossier-bottom {
+      font-size: 8.5px;
+      letter-spacing: 0.22em;
+      padding-top: 12px;
+    }
+
+    /* depgraph: SVG is illegible at narrow widths — swap to a text tree */
+    .depgraph svg { display: none; }
+    .depgraph-text { display: block; }
+    .depgraph-title { margin-bottom: 8px; }
+    .depgraph { padding-top: 14px; }
   }
 
   @media (max-width: 360px) {
@@ -330,7 +814,7 @@
 <canvas class="void" id="void"></canvas>
 <div class="grain"></div>
 
-<div class="stage">
+<div class="stage" id="stage">
   <article class="card" id="card" aria-label="Credential: Mantas Lilis, Human Participant, Curiosity Inc.">
     <canvas class="surface" id="surface"></canvas>
     <div class="sheen"></div>
@@ -363,9 +847,81 @@
       </footer>
     </div>
   </article>
-</div>
 
-<div class="hint">hover · drag · the surface is alive</div>
+  <button class="trigger" id="trigger" type="button" aria-expanded="false" aria-controls="dialog">
+    <span>spec-002</span>
+  </button>
+
+  <article class="dialog" id="dialog" aria-hidden="true">
+    <span class="scanline" aria-hidden="true"></span>
+    <header class="dossier-top">
+      <span>spec-002</span>
+    </header>
+    <div class="dossier-body">
+        <h2 class="headline">Pointer input<br/><em>normalization</em><br/>for surface elements</h2>
+        <p class="lede">Normalizes pointer inputs (position, pressure, tilt) to the [0,1] interval and applies the response curve declared on the target surface. Per-surface tolerance windows are read from §2.3. Output is consumed by the compositor and does not propagate beyond the surface boundary.</p>
+        <dl class="dossier-grid">
+          <div><dt>Module</dt><dd>surface.response</dd></div>
+          <div><dt>Version</dt><dd>0.4.1-rc.2</dd></div>
+          <div><dt>Owner</dt><dd>interaction-core</dd></div>
+          <div><dt>Reference</dt><dd>RFC-0084</dd></div>
+        </dl>
+        <section class="depgraph" id="depgraph" data-state="idle">
+          <div class="depgraph-title">Dependency graph</div>
+          <button class="depgraph-trigger" id="depgraphTrigger" type="button">[ Explain ]</button>
+          <div class="depgraph-loading" aria-hidden="true">
+            <span class="loading-label" id="depgraphLabel">Fetching dependencies</span>
+            <span class="loading-trail"></span>
+          </div>
+          <div class="depgraph-content">
+          <div class="depgraph-text" aria-hidden="true"><span class="row"><span class="nm">surface.response</span></span><span class="row"><span class="ln">│</span></span><span class="row"><span class="ln">├─</span> <span class="nm">input.normalize</span>  <span class="ar">→</span>  <span class="lf">pointer.v2</span></span><span class="row"><span class="ln">├─</span> <span class="nm">curve.evaluate</span>   <span class="ar">→</span>  <span class="lf">easings.v1</span></span><span class="row"><span class="ln">└─</span> <span class="nm">tolerance.read</span>   <span class="ar">→</span>  <span class="lf">§2.3</span></span></div>
+          <svg viewBox="0 0 420 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <g class="links">
+              <path d="M 16 90 C 80 90 110 30 180 30"/>
+              <path d="M 16 90 L 180 90"/>
+              <path d="M 16 90 C 80 90 110 150 180 150"/>
+              <path d="M 180 30  L 350 30"/>
+              <path d="M 180 90  L 350 90"/>
+              <path d="M 180 150 L 350 150"/>
+            </g>
+            <g class="nodes">
+              <circle cx="16"  cy="90"  r="3.5"/>
+              <circle cx="180" cy="30"  r="2.8"/>
+              <circle cx="180" cy="90"  r="2.8"/>
+              <circle cx="180" cy="150" r="2.8"/>
+              <circle cx="350" cy="30"  r="3"/>
+              <circle cx="350" cy="90"  r="3"/>
+              <circle cx="350" cy="150" r="3" class="ghost"/>
+            </g>
+            <g class="labels">
+              <text x="26"  y="88"  class="label">surface.response</text>
+              <text x="26"  y="100" class="meta">spec/0.4 · root</text>
+              <text x="188" y="26"  class="label">input.normalize</text>
+              <text x="188" y="38"  class="meta">stage/01 · pure</text>
+              <text x="188" y="86"  class="label">curve.evaluate</text>
+              <text x="188" y="98"  class="meta">stage/02 · pure</text>
+              <text x="188" y="146" class="label">tolerance.read</text>
+              <text x="188" y="158" class="meta">stage/03 · io</text>
+              <text x="358" y="26"  class="label">pointer.v2</text>
+              <text x="358" y="38"  class="meta">M1/U1 · consumed</text>
+              <text x="358" y="86"  class="label">easings.v1</text>
+              <text x="358" y="98"  class="meta">M1/U2 · consumed</text>
+              <text x="358" y="146" class="label">§2.3</text>
+              <text x="358" y="158" class="meta">M3 · reference</text>
+            </g>
+          </svg>
+          </div>
+        </section>
+      </div>
+    <footer class="dossier-bottom">
+      <span>End of spec · §4.7</span>
+      <div class="dossier-bars" id="dossierBars" aria-hidden="true"></div>
+    </footer>
+    <button class="dialog-close" id="dialogClose" type="button" aria-label="Close dossier">
+      <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5 L8.5 8.5 M8.5 1.5 L1.5 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>
+    </button>
+  </article>
+</div>
 
 <script>
 /* ---------- Void: distant particles ---------- */
@@ -385,25 +941,49 @@
 
   function seed() {
     const count = Math.floor((innerWidth * innerHeight) / 6000);
-    stars = Array.from({length: count}, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      z: Math.random() * 0.8 + 0.2,        // depth 0.2 – 1
-      vx: (Math.random() - 0.5) * 0.05 * dpr,
-      vy: (Math.random() - 0.5) * 0.05 * dpr,
-      tw: Math.random() * Math.PI * 2
-    }));
+    stars = Array.from({length: count}, () => {
+      const sat = Math.random() < 0.01;       // ~1% are satellites
+      if (sat) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (1.4 + Math.random() * 1.6) * dpr;  // visibly fast
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          z: 0.85 + Math.random() * 0.15,     // bright
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          tw: Math.random() * Math.PI * 2,
+          sat: true
+        };
+      }
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        z: Math.random() * 0.8 + 0.2,         // depth 0.2 – 1
+        vx: (Math.random() - 0.5) * 0.05 * dpr,
+        vy: (Math.random() - 0.5) * 0.05 * dpr,
+        tw: Math.random() * Math.PI * 2,
+        sat: false
+      };
+    });
   }
 
   function frame(t) {
-    ctx.fillStyle = 'rgba(5,6,8,0.35)';
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);              // full clear — no trails
     for (const s of stars) {
       s.x += s.vx; s.y += s.vy;
       if (s.x < 0) s.x = w; if (s.x > w) s.x = 0;
       if (s.y < 0) s.y = h; if (s.y > h) s.y = 0;
-      const a = (0.25 + 0.55 * s.z) * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
-      const r = (s.z * 1.2) * dpr;
+
+      let a, r;
+      if (s.sat) {
+        a = 0.65 + 0.2 * Math.sin(t * 0.004 + s.tw);  // steady pulse, not the slow twinkle
+        r = 0.9 * dpr;
+      } else {
+        a = (0.25 + 0.55 * s.z) * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
+        r = (s.z * 1.2) * dpr;
+      }
+
       ctx.beginPath();
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(230,235,245,${a.toFixed(3)})`;
@@ -479,54 +1059,42 @@
   requestAnimationFrame(() => { size(); frame(); });
 })();
 
-/* ---------- Card: tilt + sheen follow ---------- */
+/* ---------- Card: sheen follow + recession ---------- */
 (() => {
   const card = document.getElementById('card');
-  let rx = 0, ry = 0, tx = 0, ty = 0;
+  let cz = 0, tz = 0;
   let activePointer = null;
+  let recessed = false;
 
-  function tiltTo(clientX, clientY) {
+  function trackSheen(clientX, clientY) {
+    if (recessed) return;
     const r = card.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    const dx = Math.max(-0.5, Math.min(0.5, (clientX - cx) / r.width));
-    const dy = Math.max(-0.5, Math.min(0.5, (clientY - cy) / r.height));
-    tx = dy * -6;   // rotateX
-    ty = dx *  8;   // rotateY
     card.style.setProperty('--mx', `${Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100))}%`);
     card.style.setProperty('--my', `${Math.max(0, Math.min(100, ((clientY - r.top)  / r.height) * 100))}%`);
   }
 
   function onPointerDown(e) {
+    if (recessed) return;
     activePointer = e.pointerId;
     card.setPointerCapture?.(e.pointerId);
-    tiltTo(e.clientX, e.clientY);
+    trackSheen(e.clientX, e.clientY);
   }
 
   function onPointerMove(e) {
+    if (recessed) return;
     if (e.pointerType !== 'mouse' && activePointer !== e.pointerId) return;
-    tiltTo(e.clientX, e.clientY);
+    trackSheen(e.clientX, e.clientY);
   }
 
   function onPointerEnd(e) {
     if (activePointer !== null && activePointer !== e.pointerId) return;
     activePointer = null;
     card.releasePointerCapture?.(e.pointerId);
-    tx = 0;
-    ty = 0;
-  }
-
-  function onPointerLeave(e) {
-    if (activePointer === null || e.pointerType === 'mouse') {
-      tx = 0;
-      ty = 0;
-    }
   }
 
   function raf() {
-    rx += (tx - rx) * 0.08;
-    ry += (ty - ry) * 0.08;
-    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+    cz += (tz - cz) * 0.16;
+    card.style.transform = `translateZ(${cz.toFixed(2)}px)`;
     requestAnimationFrame(raf);
   }
 
@@ -534,8 +1102,84 @@
   card.addEventListener('pointermove', onPointerMove);
   card.addEventListener('pointerup', onPointerEnd);
   card.addEventListener('pointercancel', onPointerEnd);
-  card.addEventListener('pointerleave', onPointerLeave);
   raf();
+
+  // exposed so the dossier toggle can drive the recession
+  window.__cardRecede = (on) => {
+    recessed = !!on;
+    tz = on ? -120 : 0;
+  };
+})();
+
+/* ---------- Dialog: card recede → frame in → content materializes ---------- */
+(() => {
+  const stage = document.getElementById('stage');
+  const trigger = document.getElementById('trigger');
+  const dialog = document.getElementById('dialog');
+  const closeBtn = document.getElementById('dialogClose');
+  const depgraph = document.getElementById('depgraph');
+  let openTimer = null;
+
+  function setExpanded(state) {
+    clearTimeout(openTimer);
+    stage.classList.toggle('is-expanded', state);
+    trigger.setAttribute('aria-expanded', state ? 'true' : 'false');
+    dialog.setAttribute('aria-hidden', state ? 'false' : 'true');
+    window.__cardRecede?.(state);
+
+    if (state) {
+      // sequence:
+      //   0ms      → card starts receding, trigger fades, dialog frame begins fading in (CSS delay 0.2s)
+      //   ~260ms   → frame is mostly visible — start scanline sweep + content materialize
+      openTimer = setTimeout(() => {
+        dialog.classList.add('is-revealing', 'is-materialized');
+      }, 260);
+    } else {
+      dialog.classList.remove('is-revealing', 'is-materialized');
+      // reset depgraph so next open shows the [Explain] button again
+      window.__resetDepgraph?.();
+    }
+  }
+
+  trigger.addEventListener('click', () => setExpanded(true));
+  closeBtn.addEventListener('click', () => setExpanded(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && stage.classList.contains('is-expanded')) setExpanded(false);
+  });
+})();
+
+/* ---------- Depgraph: on-demand 3s load with cycling status ---------- */
+(() => {
+  const depgraph = document.getElementById('depgraph');
+  if (!depgraph) return;
+  const trigger = document.getElementById('depgraphTrigger');
+  const label   = document.getElementById('depgraphLabel');
+  const states  = ['Fetching dependencies', 'Resolving paths', 'Compiling graph'];
+  let cycleId = null;
+  let loadTimer = null;
+
+  function reset() {
+    clearInterval(cycleId);
+    clearTimeout(loadTimer);
+    depgraph.dataset.state = 'idle';
+    label.textContent = states[0];
+  }
+
+  trigger.addEventListener('click', () => {
+    depgraph.dataset.state = 'loading';
+    let i = 0;
+    label.textContent = states[i];
+    cycleId = setInterval(() => {
+      i = Math.min(i + 1, states.length - 1);
+      label.textContent = states[i];
+    }, 1000);
+    loadTimer = setTimeout(() => {
+      clearInterval(cycleId);
+      depgraph.dataset.state = 'loaded';
+    }, 3000);
+  });
+
+  window.__resetDepgraph = reset;
 })();
 
 /* ---------- Credential details ---------- */
@@ -552,6 +1196,7 @@
   const dd = String(d.getDate()).padStart(2,'0');
   const yy = String(d.getFullYear()).slice(-2);
   document.getElementById('issued').textContent = `${yy}.${mm}.${dd}`;
+  document.getElementById('filed').textContent = `${yy}.${mm}.${dd}`;
 
   // barcode
   const bar = document.getElementById('barcode');
@@ -561,6 +1206,15 @@
     s.style.height = `${6 + Math.random() * 12}px`;
     s.style.opacity = (0.35 + Math.random() * 0.5).toFixed(2);
     bar.appendChild(s);
+  }
+
+  // dossier footer bars — visual rhyme with the card barcode
+  const dbars = document.getElementById('dossierBars');
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.style.height = `${5 + Math.random() * 11}px`;
+    s.style.opacity = (0.35 + Math.random() * 0.5).toFixed(2);
+    dbars.appendChild(s);
   }
 })();
 </script>
