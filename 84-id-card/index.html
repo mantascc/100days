@@ -61,9 +61,7 @@
     width: min(360px, 86vw);
     height: 56px;
     border-radius: 14px;
-    background:
-      radial-gradient(120% 120% at 30% 0%, rgba(255,255,255,0.035), transparent 55%),
-      linear-gradient(180deg, #101116 0%, #0a0b0e 100%);
+    background: var(--card);
     border: 1px solid var(--card-edge);
     box-shadow:
       0 24px 50px -22px rgba(0,0,0,0.85),
@@ -276,6 +274,86 @@
     text-transform: uppercase;
     color: var(--ink-dim);
     margin-bottom: 10px;
+  }
+
+  /* on-demand load: trigger → loading row → content */
+  .depgraph-trigger {
+    display: inline-block;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: 0;
+    padding: 4px 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: color 0.15s ease, opacity 0.2s ease;
+  }
+  .depgraph-trigger::before {
+    content: '> ';
+    display: inline-block;
+    margin-right: 2px;
+    animation: depgraph-prompt-blink 1.05s steps(2, end) infinite;
+  }
+  .depgraph-trigger:hover { color: var(--ink); }
+  .depgraph-trigger:hover::before { animation-play-state: paused; opacity: 1; }
+  @keyframes depgraph-prompt-blink {
+    50% { opacity: 0; }
+  }
+
+  .depgraph-loading {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .loading-label { flex: 0 0 auto; white-space: nowrap; }
+  .loading-trail {
+    flex: 1;
+    height: 1px;
+    background: var(--card-edge);
+    position: relative;
+    overflow: hidden;
+  }
+  .loading-trail::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 0%;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  .depgraph-content {
+    display: none;
+  }
+
+  .depgraph[data-state="loading"] .depgraph-trigger { display: none; }
+  .depgraph[data-state="loading"] .depgraph-loading { display: flex; }
+  .depgraph[data-state="loading"] .loading-trail::after {
+    animation: depgraph-loading-fill 3s linear forwards;
+  }
+  @keyframes depgraph-loading-fill {
+    from { width: 0%; }
+    to   { width: 100%; }
+  }
+
+  .depgraph[data-state="loaded"] .depgraph-trigger,
+  .depgraph[data-state="loaded"] .depgraph-loading { display: none; }
+  .depgraph[data-state="loaded"] .depgraph-content {
+    display: block;
+    animation: depgraph-materialize 0.5s cubic-bezier(.2,.85,.2,1) forwards;
+  }
+  @keyframes depgraph-materialize {
+    from { opacity: 0; filter: blur(6px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
   }
   .depgraph svg {
     width: 100%;
@@ -771,13 +849,13 @@
   </article>
 
   <button class="trigger" id="trigger" type="button" aria-expanded="false" aria-controls="dialog">
-    <span>Dossier</span>
+    <span>spec-002</span>
   </button>
 
   <article class="dialog" id="dialog" aria-hidden="true">
     <span class="scanline" aria-hidden="true"></span>
     <header class="dossier-top">
-      <span>Spec · rev 04</span>
+      <span>spec-002</span>
     </header>
     <div class="dossier-body">
         <h2 class="headline">Pointer input<br/><em>normalization</em><br/>for surface elements</h2>
@@ -788,8 +866,14 @@
           <div><dt>Owner</dt><dd>interaction-core</dd></div>
           <div><dt>Reference</dt><dd>RFC-0084</dd></div>
         </dl>
-        <section class="depgraph">
+        <section class="depgraph" id="depgraph" data-state="idle">
           <div class="depgraph-title">Dependency graph</div>
+          <button class="depgraph-trigger" id="depgraphTrigger" type="button">[ Explain ]</button>
+          <div class="depgraph-loading" aria-hidden="true">
+            <span class="loading-label" id="depgraphLabel">Fetching dependencies</span>
+            <span class="loading-trail"></span>
+          </div>
+          <div class="depgraph-content">
           <div class="depgraph-text" aria-hidden="true"><span class="row"><span class="nm">surface.response</span></span><span class="row"><span class="ln">│</span></span><span class="row"><span class="ln">├─</span> <span class="nm">input.normalize</span>  <span class="ar">→</span>  <span class="lf">pointer.v2</span></span><span class="row"><span class="ln">├─</span> <span class="nm">curve.evaluate</span>   <span class="ar">→</span>  <span class="lf">easings.v1</span></span><span class="row"><span class="ln">└─</span> <span class="nm">tolerance.read</span>   <span class="ar">→</span>  <span class="lf">§2.3</span></span></div>
           <svg viewBox="0 0 420 180" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="links">
@@ -826,6 +910,7 @@
               <text x="358" y="158" class="meta">M3 · reference</text>
             </g>
           </svg>
+          </div>
         </section>
       </div>
     <footer class="dossier-bottom">
@@ -856,25 +941,49 @@
 
   function seed() {
     const count = Math.floor((innerWidth * innerHeight) / 6000);
-    stars = Array.from({length: count}, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      z: Math.random() * 0.8 + 0.2,        // depth 0.2 – 1
-      vx: (Math.random() - 0.5) * 0.05 * dpr,
-      vy: (Math.random() - 0.5) * 0.05 * dpr,
-      tw: Math.random() * Math.PI * 2
-    }));
+    stars = Array.from({length: count}, () => {
+      const sat = Math.random() < 0.01;       // ~1% are satellites
+      if (sat) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (1.4 + Math.random() * 1.6) * dpr;  // visibly fast
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          z: 0.85 + Math.random() * 0.15,     // bright
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          tw: Math.random() * Math.PI * 2,
+          sat: true
+        };
+      }
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        z: Math.random() * 0.8 + 0.2,         // depth 0.2 – 1
+        vx: (Math.random() - 0.5) * 0.05 * dpr,
+        vy: (Math.random() - 0.5) * 0.05 * dpr,
+        tw: Math.random() * Math.PI * 2,
+        sat: false
+      };
+    });
   }
 
   function frame(t) {
-    ctx.fillStyle = 'rgba(5,6,8,0.35)';
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);              // full clear — no trails
     for (const s of stars) {
       s.x += s.vx; s.y += s.vy;
       if (s.x < 0) s.x = w; if (s.x > w) s.x = 0;
       if (s.y < 0) s.y = h; if (s.y > h) s.y = 0;
-      const a = (0.25 + 0.55 * s.z) * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
-      const r = (s.z * 1.2) * dpr;
+
+      let a, r;
+      if (s.sat) {
+        a = 0.65 + 0.2 * Math.sin(t * 0.004 + s.tw);  // steady pulse, not the slow twinkle
+        r = 0.9 * dpr;
+      } else {
+        a = (0.25 + 0.55 * s.z) * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
+        r = (s.z * 1.2) * dpr;
+      }
+
       ctx.beginPath();
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(230,235,245,${a.toFixed(3)})`;
@@ -1008,6 +1117,7 @@
   const trigger = document.getElementById('trigger');
   const dialog = document.getElementById('dialog');
   const closeBtn = document.getElementById('dialogClose');
+  const depgraph = document.getElementById('depgraph');
   let openTimer = null;
 
   function setExpanded(state) {
@@ -1026,6 +1136,8 @@
       }, 260);
     } else {
       dialog.classList.remove('is-revealing', 'is-materialized');
+      // reset depgraph so next open shows the [Explain] button again
+      window.__resetDepgraph?.();
     }
   }
 
@@ -1034,6 +1146,40 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && stage.classList.contains('is-expanded')) setExpanded(false);
   });
+})();
+
+/* ---------- Depgraph: on-demand 3s load with cycling status ---------- */
+(() => {
+  const depgraph = document.getElementById('depgraph');
+  if (!depgraph) return;
+  const trigger = document.getElementById('depgraphTrigger');
+  const label   = document.getElementById('depgraphLabel');
+  const states  = ['Fetching dependencies', 'Resolving paths', 'Compiling graph'];
+  let cycleId = null;
+  let loadTimer = null;
+
+  function reset() {
+    clearInterval(cycleId);
+    clearTimeout(loadTimer);
+    depgraph.dataset.state = 'idle';
+    label.textContent = states[0];
+  }
+
+  trigger.addEventListener('click', () => {
+    depgraph.dataset.state = 'loading';
+    let i = 0;
+    label.textContent = states[i];
+    cycleId = setInterval(() => {
+      i = Math.min(i + 1, states.length - 1);
+      label.textContent = states[i];
+    }, 1000);
+    loadTimer = setTimeout(() => {
+      clearInterval(cycleId);
+      depgraph.dataset.state = 'loaded';
+    }, 3000);
+  });
+
+  window.__resetDepgraph = reset;
 })();
 
 /* ---------- Credential details ---------- */
