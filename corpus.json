@@ -1,0 +1,2864 @@
+{
+  "$schema": "corpus-v1",
+  "generated": "2026-06-12T16:29:04.795Z",
+  "counts": {
+    "days": 84,
+    "with_interface": 79,
+    "with_genome": 65
+  },
+  "notes": {
+    "missing_days": [
+      48
+    ],
+    "day_collisions": [],
+    "unregistered_folders": [],
+    "orphaned_registrations": []
+  },
+  "days": [
+    {
+      "id": "01-entropy",
+      "day": 1,
+      "variant": null,
+      "title": "Entropy",
+      "path": "01-entropy",
+      "description": "Interactive entropy visualization with animated particles",
+      "idea": "Interactive visualization of entropy as a gradient from perfect order to total chaos",
+      "concepts": {
+        "primary": "Statistical / Entropy",
+        "secondary": "Temporal (motion over time)"
+      },
+      "tags": {
+        "conceptual": [
+          "entropy",
+          "order-chaos",
+          "parametric-motion",
+          "interpolation",
+          "deterministic-to-stochastic"
+        ],
+        "technical": [
+          "vanilla-js",
+          "css-animation",
+          "lissajous",
+          "elliptical-orbit",
+          "smooth-transitions"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.885
+      }
+    },
+    {
+      "id": "02-vicsek-model",
+      "day": 2,
+      "variant": null,
+      "title": "Vicsek Model",
+      "path": "02-vicsek-model",
+      "description": "Vicsek model flocking behavior simulation",
+      "idea": "Collective flocking behavior emerges from simple local alignment rules",
+      "concepts": {
+        "primary": "Network (local neighbor interactions)",
+        "secondary": "Statistical (noise as stochasticity), Emergence"
+      },
+      "tags": {
+        "conceptual": [
+          "emergence",
+          "flocking",
+          "swarm-intelligence",
+          "collective-behavior",
+          "self-organization",
+          "agent-based-model",
+          "vicsek-model",
+          "local-to-global"
+        ],
+        "technical": [
+          "canvas",
+          "spatial-hashing",
+          "grid-optimization",
+          "particle-system",
+          "toroidal-boundary"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.825
+      }
+    },
+    {
+      "id": "03-chaos-agent",
+      "day": 3,
+      "variant": null,
+      "title": "Clusters and a Chaos Agent",
+      "path": "03-chaos-agent",
+      "description": "Particle clustering with chaotic agents",
+      "idea": "How a single disruptive agent affects collective clustering behavior",
+      "concepts": {
+        "primary": "Clustering (spatial grouping)",
+        "secondary": "Network (connected components), Statistical (noise injection)"
+      },
+      "tags": {
+        "conceptual": [
+          "clustering",
+          "boids",
+          "disruption",
+          "connected-components",
+          "collective-behavior",
+          "chaos-injection",
+          "network-effects",
+          "emergence"
+        ],
+        "technical": [
+          "canvas",
+          "particle-system",
+          "graph-traversal",
+          "spatial-queries",
+          "reynolds-boids",
+          "toroidal-space"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.747
+      }
+    },
+    {
+      "id": "04-random-walk",
+      "day": 4,
+      "variant": null,
+      "title": "Random Walk",
+      "path": "04-random-walk",
+      "description": "Stochastic random walk patterns on canvas",
+      "idea": "Stochastic patterns emerge from purely random individual motion",
+      "concepts": {
+        "primary": "Statistical (stochastic process, random walk)",
+        "secondary": "Temporal (trails show motion history), Spatial (diffusion patterns)"
+      },
+      "tags": {
+        "conceptual": [
+          "random-walk",
+          "stochastic",
+          "brownian-motion",
+          "diffusion",
+          "statistical-mechanics",
+          "probability",
+          "memoryless-process",
+          "markov-chain"
+        ],
+        "technical": [
+          "canvas",
+          "discrete-lattice",
+          "fixed-timestep",
+          "trail-rendering",
+          "toroidal-topology",
+          "particle-system"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 1
+      }
+    },
+    {
+      "id": "05-fall",
+      "day": 5,
+      "variant": null,
+      "title": "Fall",
+      "path": "05-fall",
+      "description": "Gravity and particle physics with falling objects",
+      "idea": "Biased random walk where gravity interrupts pure randomness",
+      "concepts": {
+        "primary": "Statistical (biased random walk, drift-diffusion)",
+        "secondary": "Temporal (periodic forcing), Spatial (directional flow)"
+      },
+      "tags": {
+        "conceptual": [
+          "biased-random-walk",
+          "drift-diffusion",
+          "gravity",
+          "periodic-forcing",
+          "stochastic-process",
+          "markov-chain",
+          "external-force"
+        ],
+        "technical": [
+          "canvas",
+          "discrete-lattice",
+          "fixed-timestep",
+          "periodic-event",
+          "trail-rendering",
+          "toroidal-topology"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "06-orbital",
+      "day": 6,
+      "variant": null,
+      "title": "Orbital",
+      "path": "06-orbital",
+      "description": "Celestial mechanics with orbital planets",
+      "idea": "Miniature solar systems in a grid—16 unique orbital configurations",
+      "concepts": {
+        "primary": "Spatial (orbital geometry, parametric paths)",
+        "secondary": "Temporal (periodic motion, phase relationships)"
+      },
+      "tags": {
+        "conceptual": [
+          "orbital-mechanics",
+          "elliptical-orbits",
+          "celestial-mechanics",
+          "parametric-motion",
+          "kepler",
+          "grid-composition",
+          "synchronized-chaos"
+        ],
+        "technical": [
+          "canvas",
+          "ellipse-rendering",
+          "rotation-transformation",
+          "parametric-equations",
+          "double-buffering",
+          "pixel-perfect"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.885
+      }
+    },
+    {
+      "id": "07-apophenia",
+      "day": 7,
+      "variant": null,
+      "title": "Apophenia",
+      "path": "07-apophenia",
+      "description": "Apophenia proximity links on grid",
+      "idea": "Perceiving patterns in random motion—proximity links emerge and dissolve",
+      "concepts": {
+        "primary": "Clustering (proximity-based grouping)",
+        "secondary": "Network (dynamic edges), Spatial (distance-based relationships)"
+      },
+      "tags": {
+        "conceptual": [
+          "apophenia",
+          "pattern-perception",
+          "proximity-graph",
+          "dynamic-network",
+          "emergence",
+          "random-motion",
+          "gestalt",
+          "perceptual-grouping"
+        ],
+        "technical": [
+          "canvas",
+          "spatial-queries",
+          "distance-threshold",
+          "particle-system",
+          "parameter-tuning",
+          "modal-ui"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.819
+      }
+    },
+    {
+      "id": "08-graph-clusters",
+      "day": 8,
+      "variant": null,
+      "title": "Graph Clusters",
+      "path": "08-graph-clusters",
+      "description": "Cluster detection with parameter tuning",
+      "idea": "Multiple wandering graph clusters with exact or minimum degree constraints and soft-body repulsion",
+      "concepts": {
+        "primary": "Network (graph theory, degree constraints, connectivity)",
+        "secondary": "Clustering (spatial grouping, soft-body repulsion), Spatial (bounded wandering, position-based forces)"
+      },
+      "tags": {
+        "conceptual": [
+          "graph-theory",
+          "k-regular-graphs",
+          "degree-constraints",
+          "havel-hakimi",
+          "network-topology",
+          "clustering",
+          "soft-bodies",
+          "graph-construction",
+          "discrete-mathematics"
+        ],
+        "technical": [
+          "canvas",
+          "spring-physics",
+          "particle-systems",
+          "graph-algorithms",
+          "computational-geometry",
+          "collision-avoidance"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7949999999999999
+      }
+    },
+    {
+      "id": "09-planar-graph",
+      "day": 9,
+      "variant": null,
+      "title": "Planar Graph Network",
+      "path": "09-planar-graph",
+      "description": "Linked agents network visualization",
+      "idea": "Wandering agents connected by a dynamically-computed planar graph structure with MST backbone and non-crossing extra edges",
+      "concepts": {
+        "primary": "Network (graph connectivity, planarity, MST construction)",
+        "secondary": "Spatial (geometric constraints, intersection testing), Statistical (random walk, Brownian motion)"
+      },
+      "tags": {
+        "conceptual": [
+          "planar-graphs",
+          "minimum-spanning-tree",
+          "kruskal-algorithm",
+          "computational-geometry",
+          "graph-theory",
+          "intersection-testing",
+          "network-topology",
+          "dynamic-graphs"
+        ],
+        "technical": [
+          "canvas",
+          "union-find",
+          "line-intersection",
+          "real-time-computation",
+          "particle-systems",
+          "interactive"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7349999999999999
+      }
+    },
+    {
+      "id": "10-audio-reactive-agents",
+      "day": 10,
+      "variant": null,
+      "title": "Audio-Reactive Agents",
+      "path": "10-audio-reactive-agents",
+      "description": "Audio-reactive agents with spatial positioning",
+      "idea": "Microphone-driven particle swarm where loudness controls movement speed and chaos",
+      "concepts": {
+        "primary": "Audio (real-time signal processing, RMS loudness)",
+        "secondary": "Network (proximity connections, dynamic topology), Spatial (particle positions, boundary constraints)"
+      },
+      "tags": {
+        "conceptual": [
+          "audio-reactive",
+          "real-time",
+          "microphone-input",
+          "swarm-behavior",
+          "emergent-networks",
+          "sonification",
+          "amplitude-mapping",
+          "responsive-design"
+        ],
+        "technical": [
+          "web-audio-api",
+          "canvas",
+          "time-domain-analysis",
+          "device-detection",
+          "particle-system",
+          "real-time-rendering"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7649999999999999
+      }
+    },
+    {
+      "id": "11-brownian-tree",
+      "day": 11,
+      "variant": null,
+      "title": "Ambient Clock",
+      "path": "11-brownian-tree",
+      "description": "Interactive message storage system (Node.js/Express)",
+      "idea": "Fullscreen clock with typing animation overlaid on particle network background",
+      "concepts": {
+        "primary": "Temporal (clock display, typing animation timing)",
+        "secondary": "Network (particle proximity connections), Spatial (particle positions and movement)"
+      },
+      "tags": {
+        "conceptual": [
+          "ambient",
+          "screensaver",
+          "clock",
+          "typewriter-effect",
+          "modular-architecture",
+          "responsive-design",
+          "temporal-display"
+        ],
+        "technical": [
+          "canvas",
+          "particle-system",
+          "proximity-network",
+          "json-data",
+          "timing-animation",
+          "device-detection",
+          "module-pattern"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.831
+      }
+    },
+    {
+      "id": "12-wind-field",
+      "day": 12,
+      "variant": null,
+      "title": "Wind Field",
+      "path": "12-wind-field",
+      "description": "Perlin noise wind simulation",
+      "idea": "Grid of particles displaced by multi-octave Perlin noise forming animated wind-like flows with embedded text",
+      "concepts": {
+        "primary": "Spatial (vector field displacement, grid-based positioning)",
+        "secondary": "Statistical (Perlin noise, fractal processes), Visual (text masking, particle rendering)"
+      },
+      "tags": {
+        "conceptual": [
+          "perlin-noise",
+          "fractal-brownian-motion",
+          "vector-field",
+          "flow-field",
+          "procedural-animation",
+          "noise-functions",
+          "text-masking",
+          "turbulence"
+        ],
+        "technical": [
+          "canvas",
+          "fbm",
+          "permutation-table",
+          "offscreen-canvas",
+          "real-time-control",
+          "gradient-noise"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7349999999999999
+      }
+    },
+    {
+      "id": "13-image-flow-field",
+      "day": 13,
+      "variant": null,
+      "title": "Image Flow Field",
+      "path": "13-image-flow-field",
+      "description": "Wave pattern generation with ripple effects",
+      "idea": "Upload images transformed into flowing particle fields using Perlin noise displacement",
+      "concepts": {
+        "primary": "Visual (image sampling, color representation, particle rendering)",
+        "secondary": "Spatial (vector field displacement, grid-based layout), Statistical (Perlin noise, fractal processes)"
+      },
+      "tags": {
+        "conceptual": [
+          "image-processing",
+          "flow-field",
+          "perlin-noise",
+          "pixel-art",
+          "visual-effects",
+          "image-deconstruction",
+          "particle-representation",
+          "fbm",
+          "responsive-design"
+        ],
+        "technical": [
+          "canvas",
+          "offscreen-canvas",
+          "file-api",
+          "drag-drop",
+          "image-sampling",
+          "typed-arrays",
+          "mobile-optimization"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.873
+      }
+    },
+    {
+      "id": "14-dna-mutations",
+      "day": 14,
+      "variant": null,
+      "title": "Synchronizing Fireflies",
+      "path": "14-dna-mutations",
+      "description": "Dynamic cluster visualization with signals",
+      "idea": "Proximity-based phase synchronization where clustered agents pulse together and drift upward, isolated agents remain dim and sink",
+      "concepts": {
+        "primary": "Temporal (phase oscillators, synchronization dynamics, periodic pulsing)",
+        "secondary": "Clustering (proximity detection, emergent grouping), Spatial (drift forces, velocity-based motion)"
+      },
+      "tags": {
+        "conceptual": [
+          "synchronization",
+          "kuramoto-model",
+          "firefly-algorithm",
+          "emergent-behavior",
+          "phase-coupling",
+          "collective-dynamics",
+          "swarm-intelligence",
+          "self-organization"
+        ],
+        "technical": [
+          "canvas",
+          "particle-system",
+          "oscillators",
+          "proximity-detection",
+          "phase-synchronization",
+          "responsive-design"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.861
+      }
+    },
+    {
+      "id": "15-binary-camera-grid",
+      "day": 15,
+      "variant": null,
+      "title": "Binary Camera Grid",
+      "path": "15-binary-camera-grid",
+      "description": "Interactive 2D grid navigation with zoom",
+      "idea": "Real-time webcam feed converted to binary grid visualization with adjustable threshold and cell size",
+      "concepts": {
+        "primary": "Visual (image processing, luminance, binary representation)",
+        "secondary": "Spatial (grid-based sampling, resolution control)"
+      },
+      "tags": {
+        "conceptual": [
+          "camera-input",
+          "image-processing",
+          "threshold",
+          "binary-image",
+          "luminance",
+          "real-time-video",
+          "grid-sampling",
+          "pixelation",
+          "computer-vision"
+        ],
+        "technical": [
+          "canvas",
+          "webcam-api",
+          "offscreen-canvas",
+          "getusermedia",
+          "image-data",
+          "luma-calculation",
+          "cover-fit"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.885
+      }
+    },
+    {
+      "id": "15b-binary-camera-grid-v2",
+      "day": 15,
+      "variant": "b",
+      "title": "Binary Camera Grid V2",
+      "path": "15b-binary-camera-grid-v2",
+      "description": "Grid camera variant",
+      "idea": "Real-time webcam feed converted to binary grid visualization with adjustable threshold and cell size",
+      "concepts": {
+        "primary": "Visual (image processing, luminance, binary representation)",
+        "secondary": "Spatial (grid-based sampling, resolution control)"
+      },
+      "tags": {
+        "conceptual": [
+          "camera-input",
+          "image-processing",
+          "threshold",
+          "binary-image",
+          "luminance",
+          "real-time-video",
+          "grid-sampling",
+          "pixelation",
+          "computer-vision",
+          "iteration"
+        ],
+        "technical": [
+          "canvas",
+          "webcam-api",
+          "offscreen-canvas",
+          "getusermedia",
+          "image-data",
+          "luma-calculation",
+          "cover-fit"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.885
+      }
+    },
+    {
+      "id": "16-hub-spoke-network",
+      "day": 16,
+      "variant": null,
+      "title": "Hub-Spoke Force Network",
+      "path": "16-hub-spoke-network",
+      "description": "Force graph visualization",
+      "idea": "Force-directed graph with designated hub nodes, shared vs exclusive agent connections, and draggable hub repositioning",
+      "concepts": {
+        "primary": "Network (graph topology, hub-spoke architecture, hierarchical connectivity)",
+        "secondary": "Spatial (force-directed layout, collision physics)"
+      },
+      "tags": {
+        "conceptual": [
+          "force-directed-graph",
+          "hub-spoke",
+          "network-topology",
+          "d3-force",
+          "hierarchical-networks",
+          "graph-validation",
+          "interactive-layout",
+          "physics-simulation"
+        ],
+        "technical": [
+          "d3js",
+          "canvas",
+          "force-simulation",
+          "graph-algorithms",
+          "drag-interaction",
+          "dfs-connectivity",
+          "mobile-responsive"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.8099999999999999
+      }
+    },
+    {
+      "id": "17-audio-reactive-network",
+      "day": 17,
+      "variant": null,
+      "title": "Audio-Reactive Force Network",
+      "path": "17-audio-reactive-network",
+      "description": "Text-to-speech with animated typography",
+      "idea": "Microphone-driven force-directed graph where sound volume dynamically controls link distance and charge strength",
+      "concepts": {
+        "primary": "Audio (microphone input, RMS amplitude, real-time sonification)",
+        "secondary": "Network (graph topology, force-directed layout), Temporal (smooth transitions, EMA filtering)"
+      },
+      "tags": {
+        "conceptual": [
+          "audio-reactive",
+          "sonification",
+          "force-directed-graph",
+          "real-time-audio",
+          "microphone-input",
+          "physics-modulation",
+          "amplitude-mapping",
+          "network-visualization"
+        ],
+        "technical": [
+          "web-audio-api",
+          "d3-force",
+          "canvas",
+          "analyser-node",
+          "rms",
+          "ema-smoothing",
+          "user-permissions"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7949999999999999
+      }
+    },
+    {
+      "id": "18-cellular-automaton",
+      "day": 18,
+      "variant": null,
+      "title": "Custom Cellular Automaton",
+      "path": "18-cellular-automaton",
+      "description": "Conway's Game of Life variant",
+      "idea": "Step-by-step cellular automaton with custom rules: birth on 3 neighbors, death on 5+ neighbors",
+      "concepts": {
+        "primary": "Spatial (cellular grid, Moore neighborhood, local rules)",
+        "secondary": "Temporal (discrete generations, state evolution)"
+      },
+      "tags": {
+        "conceptual": [
+          "cellular-automaton",
+          "grid-systems",
+          "emergence",
+          "discrete-dynamics",
+          "moore-neighborhood",
+          "custom-rules",
+          "step-simulation",
+          "local-computation"
+        ],
+        "technical": [
+          "canvas",
+          "image-data",
+          "double-buffering",
+          "pixel-manipulation",
+          "responsive-ui",
+          "mobile-controls"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.885
+      }
+    },
+    {
+      "id": "19-coworker-network",
+      "day": 19,
+      "variant": null,
+      "title": "Coworker Network (React)",
+      "path": "19-coworker-network",
+      "description": "Force-directed graph of coworker interactions (React/D3)",
+      "idea": "Force-directed graph visualization of coworker relationships built with React and TypeScript",
+      "concepts": {
+        "primary": "Network (coworker relationships, organizational structure)",
+        "secondary": "Spatial (force-directed layout)"
+      },
+      "tags": {
+        "conceptual": [
+          "force-directed-graph",
+          "react",
+          "typescript",
+          "organizational-networks",
+          "component-architecture",
+          "modern-frontend"
+        ],
+        "technical": [
+          "react",
+          "typescript",
+          "vite",
+          "d3-force",
+          "component-based",
+          "build-tools"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7949999999999999
+      }
+    },
+    {
+      "id": "20-schelling-model",
+      "day": 20,
+      "variant": null,
+      "title": "Schelling Segregation Model",
+      "path": "20-schelling-model",
+      "description": "Schelling model of segregation simulation",
+      "idea": "Agent-based simulation demonstrating how individual preference for similarity leads to emergent spatial segregation patterns",
+      "concepts": {
+        "primary": "Spatial (agent positioning, neighborhood analysis, segregation patterns)",
+        "secondary": "Statistical (threshold-based decisions, emergent patterns), Temporal (iterative evolution)"
+      },
+      "tags": {
+        "conceptual": [
+          "agent-based-model",
+          "schelling-model",
+          "emergence",
+          "segregation",
+          "social-simulation",
+          "threshold-dynamics",
+          "spatial-patterns",
+          "tipping-points",
+          "complexity-science"
+        ],
+        "technical": [
+          "canvas",
+          "image-data",
+          "pixel-manipulation",
+          "simulation",
+          "discrete-time",
+          "spatial-algorithms"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "21-interaction-heatmap",
+      "day": 21,
+      "variant": null,
+      "title": "Agent Interaction Heatmap",
+      "path": "21-interaction-heatmap",
+      "description": "30-day agent interaction heatmap",
+      "idea": "Heatmap visualization of agent-user interactions over 30-day period showing success rates and patterns",
+      "concepts": {
+        "primary": "Temporal (time-series data, 30-day window, interaction patterns)",
+        "secondary": "Statistical (success rates, aggregate metrics), Network (agent-user relationships)"
+      },
+      "tags": {
+        "conceptual": [
+          "heatmap",
+          "temporal-visualization",
+          "agent-analytics",
+          "interaction-tracking",
+          "success-metrics",
+          "time-series",
+          "data-dashboard"
+        ],
+        "technical": [
+          "heatmap-visualization",
+          "modular-javascript",
+          "tooltip-ui",
+          "css-grid",
+          "info-panel"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7949999999999999
+      }
+    },
+    {
+      "id": "22-directed-network",
+      "day": 22,
+      "variant": null,
+      "title": "Directed Network Graph",
+      "path": "22-directed-network",
+      "description": "Graph network visualization",
+      "idea": "SVG-based force-directed graph with directional edges, rectangular nodes, and drag interaction",
+      "concepts": {
+        "primary": "Network (directed graph, node relationships, hierarchical flow)",
+        "secondary": "Spatial (force-directed layout, geometric calculations)"
+      },
+      "tags": {
+        "conceptual": [
+          "directed-graph",
+          "force-directed-layout",
+          "d3js",
+          "network-visualization",
+          "rectangular-nodes",
+          "edge-routing",
+          "flowchart-aesthetic",
+          "hierarchical-structure"
+        ],
+        "technical": [
+          "svg",
+          "d3-force",
+          "geometric-intersection",
+          "drag-interaction",
+          "arrow-markers",
+          "text-measurement"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.855
+      }
+    },
+    {
+      "id": "23-interactive-typography",
+      "day": 23,
+      "variant": null,
+      "title": "Interactive Typography",
+      "path": "23-interactive-typography",
+      "description": "Touch/mouse event handler demo",
+      "idea": "\"Hello World\" text where each letter cycles through different fonts on hover and randomizes on click",
+      "concepts": {
+        "primary": "Visual (typography, font variation, text styling)",
+        "secondary": "Temporal (state cycling, interaction response)"
+      },
+      "tags": {
+        "conceptual": [
+          "interactive-typography",
+          "font-variation",
+          "generative-design",
+          "playful-ui",
+          "google-fonts",
+          "per-letter-interaction",
+          "randomization"
+        ],
+        "technical": [
+          "google-fonts-api",
+          "css-transitions",
+          "mouseenter-events",
+          "responsive-typography",
+          "inline-block"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "24-rock-paper-scissors",
+      "day": 24,
+      "variant": null,
+      "title": "Rock Paper Scissors Simulation",
+      "path": "24-rock-paper-scissors",
+      "description": "Rock paper scissors game",
+      "idea": "Agent-based rock-paper-scissors simulation where agents bounce on collision and convert losers until one species dominates",
+      "concepts": {
+        "primary": "Spatial (agent positioning, collision detection, movement physics)",
+        "secondary": "Statistical (population dynamics, competitive exclusion), Temporal (simulation evolution)"
+      },
+      "tags": {
+        "conceptual": [
+          "agent-based-model",
+          "rock-paper-scissors",
+          "competitive-dynamics",
+          "population-ecology",
+          "spatial-simulation",
+          "game-theory",
+          "cyclic-competition",
+          "emergent-winner"
+        ],
+        "technical": [
+          "canvas",
+          "collision-detection",
+          "aabb",
+          "toroidal-space",
+          "image-sprites",
+          "bounce-physics"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.6930000000000001
+      }
+    },
+    {
+      "id": "25-spotlight-grid",
+      "day": 25,
+      "variant": null,
+      "title": "Spotlight Grid",
+      "path": "25-spotlight-grid",
+      "description": "Density and color-controlled particle effect",
+      "idea": "Interactive dot grid where dots near mouse cursor illuminate with adjustable density and color",
+      "concepts": {
+        "primary": "Spatial (grid layout, proximity detection, distance calculation)",
+        "secondary": "Visual (color variation, dynamic styling)"
+      },
+      "tags": {
+        "conceptual": [
+          "interactive-grid",
+          "proximity-detection",
+          "spotlight-effect",
+          "dynamic-styling",
+          "mouse-tracking",
+          "distance-field",
+          "generative-ui"
+        ],
+        "technical": [
+          "css-custom-properties",
+          "dynamic-dom",
+          "distance-calculation",
+          "slider-controls",
+          "hue-manipulation"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.825
+      }
+    },
+    {
+      "id": "26-widget-dashboard",
+      "day": 26,
+      "variant": null,
+      "title": "Dynamic Widget Dashboard",
+      "path": "26-widget-dashboard",
+      "description": "Dynamic widget dashboard layout",
+      "idea": "Drag-and-drop widget dashboard with charts, metrics, moon phase, and agent usage displays",
+      "concepts": {
+        "primary": "Visual (dashboard interface, widget composition, data display)",
+        "secondary": "Temporal (moon phase cycles, agent usage over time), Network (agent interaction data)"
+      },
+      "tags": {
+        "conceptual": [
+          "dashboard",
+          "widgets",
+          "drag-drop",
+          "data-visualization",
+          "modular-ui",
+          "dynamic-layout",
+          "responsive-design",
+          "moon-phase",
+          "analytics"
+        ],
+        "technical": [
+          "drag-api",
+          "dynamic-rendering",
+          "json-data",
+          "modal-overlay",
+          "height-calculation",
+          "widget-system"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.8849999999999999
+      }
+    },
+    {
+      "id": "27-muse",
+      "day": 27,
+      "variant": null,
+      "title": "Muse (Desktop Only)",
+      "path": "27-muse",
+      "description": "Muse v0 - music/creative tool prototype",
+      "idea": "Desktop-only interactive creative tool or playground with fly element",
+      "concepts": {
+        "primary": "Spatial (interaction space, element positioning)",
+        "secondary": "Temporal (animation, responsive behavior)"
+      },
+      "tags": {
+        "conceptual": [
+          "creative-tool",
+          "desktop-only",
+          "interactive-playground",
+          "generative",
+          "mouse-interaction",
+          "artistic-tool"
+        ],
+        "technical": [
+          "external-modules",
+          "device-detection",
+          "mouse-events",
+          "creative-coding"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.855
+      }
+    },
+    {
+      "id": "28-liquid-glass",
+      "day": 28,
+      "variant": null,
+      "title": "Liquid Glass Effect",
+      "path": "28-liquid-glass",
+      "description": "Liquid glass morphism effect",
+      "idea": "Draggable frosted glass pane with liquid distortion filter and customizable backdrop effects",
+      "concepts": {
+        "primary": "Visual (image processing, filter effects, glassmorphism aesthetic)",
+        "secondary": "Spatial (drag interaction, element positioning)"
+      },
+      "tags": {
+        "conceptual": [
+          "glassmorphism",
+          "backdrop-filter",
+          "liquid-effect",
+          "svg-filters",
+          "visual-effects",
+          "interactive-controls",
+          "css-custom-properties",
+          "generative-design"
+        ],
+        "technical": [
+          "svg-filters",
+          "feturbulence",
+          "fedisplacementmap",
+          "backdrop-filter",
+          "drag-interaction",
+          "css-variables",
+          "parameter-export"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 1
+      }
+    },
+    {
+      "id": "29-progress-indicators",
+      "day": 29,
+      "variant": null,
+      "title": "100 Progress Indicators",
+      "path": "29-progress-indicators",
+      "description": "Text generation UI showing thinking states",
+      "idea": "Comprehensive collection of 100 unique loading/progress indicator animations organized by style categories",
+      "concepts": {
+        "primary": "Visual (animation patterns, loading states, motion design)",
+        "secondary": "Temporal (looping animations, timing variations)"
+      },
+      "tags": {
+        "conceptual": [
+          "loading-indicators",
+          "animation-library",
+          "motion-design",
+          "ui-patterns",
+          "visual-feedback",
+          "progress-animation",
+          "design-system",
+          "animation-techniques"
+        ],
+        "technical": [
+          "modular-javascript",
+          "animation-loops",
+          "canvas-animation",
+          "svg-animation",
+          "css-animation",
+          "grid-layout",
+          "hover-states"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.825
+      }
+    },
+    {
+      "id": "30-thinking-states",
+      "day": 30,
+      "variant": null,
+      "title": "Thinking States",
+      "path": "30-thinking-states",
+      "description": "Experimental loading indicators exploring thinking metaphors",
+      "idea": "Experimental iteration exploring \"thinking\" metaphor through animated loading indicators",
+      "concepts": {
+        "primary": "Visual (animation patterns, thinking metaphors)",
+        "secondary": "Temporal (processing states, cognitive timing)"
+      },
+      "tags": {
+        "conceptual": [
+          "thinking-states",
+          "cognitive-metaphors",
+          "loading-indicators",
+          "processing-feedback",
+          "computational-thinking",
+          "animation-library",
+          "experimental-ui"
+        ],
+        "technical": [
+          "vanilla-javascript",
+          "canvas-animation",
+          "animation-groups",
+          "modular-architecture",
+          "pure-functions"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.825
+      }
+    },
+    {
+      "id": "31-cli-material-palette",
+      "day": 31,
+      "variant": null,
+      "title": "CLI Material Palette",
+      "path": "31-cli-material-palette",
+      "description": "CLI material color palette",
+      "idea": "Comprehensive design reference documenting the fundamental visual and interactive materials of command-line interfaces",
+      "concepts": {
+        "primary": "Visual (typography, color systems, symbol vocabularies, spatial layout)",
+        "secondary": "Temporal (animation patterns, progress indicators), Interactive (UI patterns, state feedback)"
+      },
+      "tags": {
+        "conceptual": [
+          "cli-design",
+          "terminal-ui",
+          "design-system",
+          "ansi-codes",
+          "unicode-symbols",
+          "interaction-patterns",
+          "documentation",
+          "design-reference",
+          "typography",
+          "spatial-design"
+        ],
+        "technical": [
+          "bash-commands",
+          "ansi-escape-codes",
+          "unicode",
+          "monospace-grid",
+          "interactive-examples",
+          "design-catalog"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.8400000000000001
+      }
+    },
+    {
+      "id": "32-genart-cards",
+      "day": 32,
+      "variant": null,
+      "title": "Entropy Patterns",
+      "path": "32-genart-cards",
+      "description": "Chaotic entropy pattern generation",
+      "idea": "Visual taxonomy of creative work rhythms mapping cognitive load oscillations and thinking quality across different production modes",
+      "concepts": {
+        "primary": "Temporal (work rhythm oscillation, cognitive load over time, cyclic patterns)",
+        "secondary": "Statistical (pattern classification, mode taxonomy), Visual (curve representation, spatial mapping)"
+      },
+      "tags": {
+        "conceptual": [
+          "creative-work",
+          "cognitive-load",
+          "work-patterns",
+          "entropy",
+          "sustainable-practices",
+          "burnout",
+          "oscillation-patterns",
+          "productivity",
+          "taxonomy",
+          "pattern-recognition"
+        ],
+        "technical": [
+          "d3js",
+          "data-visualization",
+          "curve-rendering",
+          "tabs",
+          "google-fonts",
+          "time-series"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.711
+      }
+    },
+    {
+      "id": "33-three-body-problem",
+      "day": 33,
+      "variant": null,
+      "title": "Slit-Scan Camera",
+      "path": "33-three-body-problem",
+      "description": "Temporal slitscan imaging effect",
+      "idea": "Webcam-based slit-scan photography tool that captures 30-second temporal slices with programmatic color effects and cinematic post-processing",
+      "concepts": {
+        "primary": "Temporal (time-to-space mapping, 30-second capture window, sequential sampling)",
+        "secondary": "Visual (image processing, color effects, slit-scan aesthetic), Spatial (column-based composition, vertical slicing)"
+      },
+      "tags": {
+        "conceptual": [
+          "slit-scan",
+          "temporal-photography",
+          "time-distortion",
+          "webcam-effects",
+          "image-processing",
+          "color-grading",
+          "film-grain",
+          "procedural-effects",
+          "creative-photography"
+        ],
+        "technical": [
+          "webrtc",
+          "canvas",
+          "getusermedia",
+          "image-processing",
+          "hsl-color",
+          "posterization",
+          "vignette",
+          "film-grain",
+          "clipboard-api"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.8999999999999999
+      }
+    },
+    {
+      "id": "34-particle-text-morph",
+      "day": 34,
+      "variant": null,
+      "title": "Particle Text Morph",
+      "path": "34-particle-text-morph",
+      "description": "Text morphing with particle transitions",
+      "idea": "Canvas particle system where text decomposes into particles controlled by stability slider (desktop only)",
+      "concepts": {
+        "primary": "Visual (particle systems, text rendering, morphological effects)",
+        "secondary": "Spatial (particle positions, text formation), Temporal (animation, transition states)"
+      },
+      "tags": {
+        "conceptual": [
+          "particle-system",
+          "text-effects",
+          "morphing",
+          "stability-slider",
+          "generative-typography",
+          "canvas-animation",
+          "desktop-only"
+        ],
+        "technical": [
+          "canvas",
+          "particle-physics",
+          "text-sampling",
+          "responsive-scaling",
+          "performance-optimization"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "35-flight-path-viz",
+      "day": 35,
+      "variant": null,
+      "title": "Flight Path Visualization",
+      "path": "35-flight-path-viz",
+      "description": "Great circle flight path animation (Leaflet/Turf.js)",
+      "idea": "iPad-optimized flight tracking interface showing real-time route optimization with great circle paths and waypoint notifications",
+      "concepts": {
+        "primary": "Spatial (geodesic paths, great circle routes, geographic coordinates)",
+        "secondary": "Temporal (flight progress, estimated times, duration), Network (waypoint connections, route optimization)"
+      },
+      "tags": {
+        "conceptual": [
+          "flight-tracking",
+          "geodesic-paths",
+          "great-circle",
+          "route-optimization",
+          "aviation",
+          "ipad-interface",
+          "real-time-tracking",
+          "waypoints"
+        ],
+        "technical": [
+          "leaflet",
+          "turf-js",
+          "geodesic-math",
+          "responsive-ipad",
+          "progress-animation",
+          "font-awesome"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.9390000000000001
+      }
+    },
+    {
+      "id": "36-spinning-globe",
+      "day": 36,
+      "variant": null,
+      "title": "React/TypeScript Project",
+      "path": "36-spinning-globe",
+      "description": "Vite React TypeScript project",
+      "idea": "Vite-powered React application with TypeScript (specific features not visible in entry HTML)",
+      "concepts": {
+        "primary": "(Determined by application logic in main.tsx)"
+      },
+      "tags": {
+        "conceptual": [
+          "react",
+          "typescript",
+          "vite",
+          "modern-frontend",
+          "component-architecture",
+          "build-tools"
+        ],
+        "technical": [
+          "react",
+          "typescript",
+          "vite",
+          "tsx",
+          "hot-module-replacement"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "37-sentiment-analyzer",
+      "day": 37,
+      "variant": null,
+      "title": "Sentiment Analyzer",
+      "path": "37-sentiment-analyzer",
+      "description": "Real-time text sentiment analysis with industrial visualization (React/TypeScript)",
+      "idea": "Real-time text sentiment analysis with industrial-themed visualization interface",
+      "concepts": {
+        "primary": "Statistical (sentiment scoring, text analysis)",
+        "secondary": "Temporal (debounced input, real-time updates)"
+      },
+      "tags": {
+        "conceptual": [
+          "sentiment-analysis",
+          "nlp",
+          "text-analysis",
+          "real-time-processing",
+          "debounced-input",
+          "industrial-design",
+          "data-visualization"
+        ],
+        "technical": [
+          "react",
+          "typescript",
+          "vite",
+          "sentiment-engine",
+          "debouncing",
+          "component-architecture",
+          "hmr"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "38-baltic-pattern",
+      "day": 38,
+      "variant": null,
+      "title": "Generative Baltic Pattern",
+      "path": "38-baltic-pattern",
+      "description": "Generative Baltic pattern",
+      "idea": "Generative pattern generator creating Baltic folk art inspired geometric designs",
+      "concepts": {
+        "primary": "Visual (geometric patterns, folk art, generative design)",
+        "secondary": "Spatial (pattern tiling, symmetry)"
+      },
+      "tags": {
+        "conceptual": [
+          "generative-art",
+          "folk-patterns",
+          "baltic-art",
+          "geometric-design",
+          "cultural-patterns",
+          "procedural-generation"
+        ],
+        "technical": [
+          "canvas",
+          "pattern-generation",
+          "geometric-algorithms",
+          "cultural-design"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "39-wave-morph",
+      "day": 39,
+      "variant": null,
+      "title": "Wave Morph",
+      "path": "39-wave-morph",
+      "description": "Morphing wave patterns",
+      "idea": "Audio waveform morphing between different wave types (sine, triangle, square, sawtooth) with interactive slider",
+      "concepts": {
+        "primary": "Audio (waveform types, signal processing, audio synthesis)",
+        "secondary": "Temporal (animation cycles, morphing transitions), Visual (waveform rendering)"
+      },
+      "tags": {
+        "conceptual": [
+          "audio-visualization",
+          "waveform-synthesis",
+          "morphing",
+          "signal-processing",
+          "audio-fundamentals",
+          "interactive-controls"
+        ],
+        "technical": [
+          "canvas",
+          "waveform-rendering",
+          "interpolation",
+          "audio-concepts",
+          "animation-loop"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.924
+      }
+    },
+    {
+      "id": "40-cube-grid-rules",
+      "day": 40,
+      "variant": null,
+      "title": "Cube Grid Rules Engine",
+      "path": "40-cube-grid-rules",
+      "description": "Cube grid rules engine",
+      "idea": "3D cube grid governed by customizable cellular automaton-like rules with parameter controls",
+      "concepts": {
+        "primary": "Spatial (3D grid, neighbor detection, cellular rules)",
+        "secondary": "Temporal (evolution steps, update cycles), Statistical (rule application, state transitions)"
+      },
+      "tags": {
+        "conceptual": [
+          "cellular-automata",
+          "3d-simulation",
+          "procedural-rules",
+          "generative-systems",
+          "rule-engine",
+          "algorithmic-art",
+          "computational-art"
+        ],
+        "technical": [
+          "webgl",
+          "three-js",
+          "3d-rendering",
+          "rule-systems",
+          "parameter-control"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7649999999999999
+      }
+    },
+    {
+      "id": "41-metaball",
+      "day": 41,
+      "variant": null,
+      "title": "Metaball",
+      "path": "41-metaball",
+      "description": "Metaball physics and animation",
+      "idea": "Interactive metaball physics simulation with mouse-driven particle attraction",
+      "concepts": {
+        "primary": "Visual (implicit surfaces, smooth blending, organic forms)",
+        "secondary": "Spatial (particle positions, distance fields, surface computation)"
+      },
+      "tags": {
+        "conceptual": [
+          "metaballs",
+          "implicit-surfaces",
+          "organic-shapes",
+          "fluid-dynamics",
+          "blob-rendering",
+          "distance-fields",
+          "computational-geometry"
+        ],
+        "technical": [
+          "canvas",
+          "marching-squares",
+          "distance-fields",
+          "particle-systems",
+          "mouse-interaction"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.933
+      }
+    },
+    {
+      "id": "42-metaball-grid",
+      "day": 42,
+      "variant": null,
+      "title": "Metaball Grid",
+      "path": "42-metaball-grid",
+      "description": "Grid-based metaball effects",
+      "idea": "Grid of multiple metaball sketches with responsive 4-column (desktop) / 2-column (mobile) layout",
+      "concepts": {
+        "primary": "Visual (metaball variations, parameter exploration, design variations)",
+        "secondary": "Spatial (grid layout, responsive design)"
+      },
+      "tags": {
+        "conceptual": [
+          "metaball-gallery",
+          "parameter-exploration",
+          "design-system",
+          "variation-study",
+          "responsive-grid",
+          "algorithmic-variations"
+        ],
+        "technical": [
+          "css-grid",
+          "pagination",
+          "responsive-design",
+          "canvas-array",
+          "parameter-spaces"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7829999999999999
+      }
+    },
+    {
+      "id": "43-style-seed",
+      "day": 43,
+      "variant": null,
+      "title": "Computational Minimalism Style Seed",
+      "path": "43-style-seed",
+      "description": "Sketch project",
+      "idea": "Design system document defining visual language for creative coding sketches",
+      "concepts": {
+        "primary": "Visual (design system, aesthetic framework)",
+        "secondary": "Conceptual (design philosophy, anti-patterns)"
+      },
+      "tags": {
+        "conceptual": [
+          "design-system",
+          "style-guide",
+          "computational-minimalism",
+          "bauhaus",
+          "algorithmic-aesthetics",
+          "reduction",
+          "visual-framework",
+          "design-philosophy"
+        ],
+        "technical": [
+          "css-variables",
+          "monospace",
+          "canvas",
+          "svg",
+          "no-dependencies",
+          "single-file-html"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "empty",
+        "confidence": 0
+      }
+    },
+    {
+      "id": "44-whiff",
+      "day": 44,
+      "variant": null,
+      "title": "Whiff",
+      "path": "44-whiff",
+      "description": "Whiff project",
+      "idea": "Command-line tool that instantly visualizes JSON data as tables, line graphs, or bar charts in the browser",
+      "concepts": {
+        "primary": "Temporal (time-series data, line graphs)",
+        "secondary": "Network (WebSocket communication), Visual (data rendering)"
+      },
+      "tags": {
+        "conceptual": [
+          "data-visualization",
+          "command-line-tools",
+          "real-time-updates",
+          "exploratory-data-analysis",
+          "json-visualization",
+          "developer-tools",
+          "rapid-prototyping"
+        ],
+        "technical": [
+          "websocket",
+          "react",
+          "vite",
+          "node-js",
+          "cli",
+          "svg-rendering",
+          "real-time-data"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.8849999999999999
+      }
+    },
+    {
+      "id": "45-gravity-pills",
+      "day": 45,
+      "variant": null,
+      "title": "Gravity Pills",
+      "path": "45-gravity-pills",
+      "description": "Gravity pills particle simulation",
+      "idea": "Physics simulation of pill-shaped objects with gravity, drag interaction, and collision dynamics",
+      "concepts": {
+        "primary": "Spatial (physics simulation, collision detection, position dynamics)",
+        "secondary": "Temporal (continuous physics updates, drag interactions)"
+      },
+      "tags": {
+        "conceptual": [
+          "physics-simulation",
+          "gravity",
+          "collision-detection",
+          "interactive-objects",
+          "matter-js",
+          "pill-shapes",
+          "drag-interaction"
+        ],
+        "technical": [
+          "matter-js",
+          "physics-engine",
+          "canvas",
+          "drag-events",
+          "collision-physics"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.435
+      }
+    },
+    {
+      "id": "46-oklch-vs-hsl",
+      "day": 46,
+      "variant": null,
+      "title": "OKLCH vs HSL Gradient Comparison",
+      "path": "46-oklch-vs-hsl",
+      "description": "OKLCH vs HSL gradient comparison",
+      "idea": "Side-by-side comparison of color gradients using OKLCH and HSL color spaces",
+      "concepts": {
+        "primary": "Visual (color perception, color space comparison, gradient quality)",
+        "secondary": "Statistical (perceptual uniformity, color metrics)"
+      },
+      "tags": {
+        "conceptual": [
+          "color-science",
+          "oklch",
+          "hsl",
+          "color-spaces",
+          "perceptual-uniformity",
+          "gradient-comparison",
+          "color-theory"
+        ],
+        "technical": [
+          "css-color-spaces",
+          "oklch-color",
+          "gradient-rendering",
+          "color-comparison"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.6749999999999999
+      }
+    },
+    {
+      "id": "47-2gif",
+      "day": 47,
+      "variant": null,
+      "title": "2GIF",
+      "path": "47-2gif",
+      "description": "Sketch project",
+      "idea": "Browser-based tool for converting screen recordings into polished, shareable gifs with styled backgrounds",
+      "concepts": {
+        "primary": "Visual (video processing, image export)",
+        "secondary": "Temporal (timeline editing, trimming)"
+      },
+      "tags": {
+        "conceptual": [
+          "video-processing",
+          "gif-export",
+          "screen-recording",
+          "design-tools",
+          "browser-tool",
+          "asset-creation",
+          "presentation-graphics",
+          "ui-documentation"
+        ],
+        "technical": [
+          "ffmpeg-wasm",
+          "canvas",
+          "video-api",
+          "file-api",
+          "timeline-ui",
+          "drag-drop",
+          "client-side-processing"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.948
+      }
+    },
+    {
+      "id": "49-grid-trace",
+      "day": 49,
+      "variant": null,
+      "title": "Grid Trace",
+      "path": "49-grid-trace",
+      "description": "Grid Trace - Interactive grid path visualization with Geist Pixel font",
+      "idea": "Animated grid with path-tracing effects and typewriter text using Geist Pixel Square font",
+      "concepts": {
+        "primary": "Spatial (grid layout, path-tracing, network visualization)",
+        "secondary": "Temporal (animation paths, typewriter timing), Visual (dot patterns, line drawing)"
+      },
+      "tags": {
+        "conceptual": [
+          "grid-animation",
+          "path-tracing",
+          "network-visualization",
+          "typewriter-effect",
+          "pixel-aesthetic",
+          "retro-digital",
+          "animated-connections"
+        ],
+        "technical": [
+          "canvas",
+          "typed-js",
+          "custom-font",
+          "path-animation",
+          "grid-systems"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.825
+      }
+    },
+    {
+      "id": "50-execution-trace-graph",
+      "day": 50,
+      "variant": null,
+      "title": "Execution Trace Graph",
+      "path": "50-execution-trace-graph",
+      "description": "Execution Trace Graph - AI response visualized as a traversal through a skill graph",
+      "idea": "Visualization of code execution flow as interactive node graph with left panel showing execution context",
+      "concepts": {
+        "primary": "Network (execution graph, call chains, control flow)",
+        "secondary": "Temporal (execution sequence, timing), Visual (code highlighting, graph layout)"
+      },
+      "tags": {
+        "conceptual": [
+          "execution-visualization",
+          "call-graph",
+          "program-analysis",
+          "developer-tools",
+          "code-tracing",
+          "execution-flow",
+          "debugging-visualization"
+        ],
+        "technical": [
+          "graph-visualization",
+          "syntax-highlighting",
+          "two-panel-layout",
+          "execution-analysis"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "51-resonant-lattice",
+      "day": 51,
+      "variant": null,
+      "title": "Resonant Lattice",
+      "path": "51-resonant-lattice",
+      "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes",
+      "idea": "Interactive spring-mass lattice showing energy propagation, resonance, and damping effects",
+      "concepts": {
+        "primary": "Spatial (lattice structure, spring connections, node positions)",
+        "secondary": "Temporal (wave propagation, oscillation), Statistical (energy distribution, damping)"
+      },
+      "tags": {
+        "conceptual": [
+          "spring-mass-system",
+          "wave-propagation",
+          "resonance",
+          "physics-simulation",
+          "lattice-dynamics",
+          "energy-dissipation",
+          "harmonic-motion"
+        ],
+        "technical": [
+          "canvas",
+          "physics-simulation",
+          "spring-forces",
+          "numerical-integration",
+          "real-time-metrics"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.705
+      }
+    },
+    {
+      "id": "52-reaction-diffusion",
+      "day": 52,
+      "variant": null,
+      "title": "Reaction-Diffusion (Gray-Scott)",
+      "path": "52-reaction-diffusion",
+      "description": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls",
+      "idea": "Gray-Scott reaction-diffusion system simulating pattern formation through chemical reactions",
+      "concepts": {
+        "primary": "Spatial (pattern formation, diffusion, reaction zones)",
+        "secondary": "Temporal (pattern evolution, reaction dynamics), Statistical (concentration gradients, equilibrium states)"
+      },
+      "tags": {
+        "conceptual": [
+          "reaction-diffusion",
+          "gray-scott",
+          "pattern-formation",
+          "morphogenesis",
+          "self-organization",
+          "turing-patterns",
+          "chemical-simulation",
+          "emergence"
+        ],
+        "technical": [
+          "canvas",
+          "numerical-simulation",
+          "partial-differential-equations",
+          "grid-computation"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.879
+      }
+    },
+    {
+      "id": "53-ascii-grid",
+      "day": 53,
+      "variant": null,
+      "title": "ASCII Animated Grid (Refined UI)",
+      "path": "53-ascii-grid",
+      "description": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes",
+      "idea": "Character-based animation grid with five distinct modes: ripple, wave, rain, breath, and worm",
+      "concepts": {
+        "primary": "Visual (ASCII art, character animation, text-based graphics)",
+        "secondary": "Temporal (animation loops, character cycling), Spatial (grid layout, pattern movement)"
+      },
+      "tags": {
+        "conceptual": [
+          "ascii-art",
+          "text-animation",
+          "character-graphics",
+          "retro-computing",
+          "terminal-aesthetics",
+          "mode-switching",
+          "procedural-animation"
+        ],
+        "technical": [
+          "pre-element",
+          "monospace",
+          "dom-manipulation",
+          "animation-modes",
+          "keyboard-shortcuts"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.825
+      }
+    },
+    {
+      "id": "54-concept-graph",
+      "day": 54,
+      "variant": null,
+      "title": "Concept Graph Visualization",
+      "path": "54-concept-graph",
+      "description": "Interactive force-directed graph visualizing relationships between projects and data concepts",
+      "idea": "Interactive force-directed graph visualizing relationships between 100 Days projects and their data concepts",
+      "concepts": {
+        "primary": "Network & Graph (force-directed layout, node relationships)",
+        "secondary": "Statistical (concept distribution analysis)"
+      },
+      "tags": {
+        "conceptual": [
+          "meta-visualization",
+          "force-directed-graph",
+          "project-network",
+          "data-concepts",
+          "interactive-visualization",
+          "physics-simulation",
+          "self-documentation",
+          "portfolio-visualization"
+        ],
+        "technical": [
+          "canvas-2d",
+          "force-simulation",
+          "spring-physics",
+          "node-graph",
+          "hover-interaction",
+          "json-data",
+          "metadata-parsing"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.7349999999999999
+      }
+    },
+    {
+      "id": "55-ascii-loading",
+      "day": 55,
+      "variant": null,
+      "title": "ASCII Loading",
+      "path": "55-ascii-loading",
+      "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar",
+      "idea": "Loading screen where two ASCII grids crystallize from noise over 15 seconds",
+      "concepts": {
+        "primary": "Visual (ASCII art, character animation)",
+        "secondary": "Statistical (per-cell stochastic thresholds), Temporal (progress-driven state)"
+      },
+      "tags": {
+        "conceptual": [
+          "ascii-art",
+          "emergence",
+          "noise-to-signal",
+          "crystallization",
+          "loading-states",
+          "terminal-aesthetics",
+          "anticipation"
+        ],
+        "technical": [
+          "vanilla-js",
+          "dom-spans",
+          "pre-element",
+          "threshold-fields",
+          "raf-throttling",
+          "monospace"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.855
+      }
+    },
+    {
+      "id": "56-constrained-variation",
+      "day": 56,
+      "variant": null,
+      "title": "Constrained Variation",
+      "path": "56-constrained-variation",
+      "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously",
+      "idea": "Fix the scaffold, switch the algorithm, compare eight variants simultaneously",
+      "concepts": {
+        "primary": "Visual (generative texture families, glitch/wave/scanline algorithms)",
+        "secondary": "Temporal (shared time accumulator, per-chapter frame pacing)"
+      },
+      "tags": {
+        "conceptual": [
+          "constrained-variation",
+          "possibility-space",
+          "taxonomy-not-search",
+          "creative-method",
+          "constants-as-reference-frame",
+          "glitch",
+          "moire",
+          "ai-collaboration"
+        ],
+        "technical": [
+          "canvas",
+          "es-modules",
+          "dynamic-import",
+          "raf-loop",
+          "hash-routing",
+          "skill-file"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.9089999999999999
+      }
+    },
+    {
+      "id": "57-color-themes",
+      "day": 57,
+      "variant": null,
+      "title": "Color Themes",
+      "path": "57-color-themes",
+      "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities",
+      "idea": "Theme-switchable constrained-variation viewer that remaps a fixed sketch system through multiple palettes",
+      "concepts": {
+        "primary": "Visual (palette systems, color remapping, comparative display)",
+        "secondary": "Statistical (taxonomy, controlled variation), Temporal (animated chapter states)"
+      },
+      "tags": {
+        "conceptual": [
+          "color-themes",
+          "palette-systems",
+          "constrained-variation",
+          "comparative-display",
+          "taxonomy",
+          "visual-identity",
+          "theme-switching",
+          "entropy"
+        ],
+        "technical": [
+          "canvas",
+          "vanilla-js",
+          "theme-registry",
+          "module-architecture",
+          "generative-art",
+          "palette-interpolation"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.885
+      }
+    },
+    {
+      "id": "58-shapes",
+      "day": 58,
+      "variant": null,
+      "title": "Shapes",
+      "path": "58-shapes",
+      "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking",
+      "idea": null,
+      "concepts": null,
+      "tags": null,
+      "has_interface": false,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.849
+      }
+    },
+    {
+      "id": "59-font-explorer",
+      "day": 59,
+      "variant": null,
+      "title": "Font Explorer",
+      "path": "59-font-explorer",
+      "description": "Font Explorer — skill to visualize any font",
+      "idea": null,
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.804
+      }
+    },
+    {
+      "id": "60-agentic-patterns",
+      "day": 60,
+      "variant": null,
+      "title": "Agentic Patterns",
+      "path": "60-agentic-patterns",
+      "description": "Agentic Patterns — interactive reference for AI agent design patterns",
+      "idea": null,
+      "concepts": null,
+      "tags": null,
+      "has_interface": false,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "61-hitl-patterns",
+      "day": 61,
+      "variant": null,
+      "title": "Hitl Patterns",
+      "path": "61-hitl-patterns",
+      "description": "Human in the Loop — four patterns across a single autonomy axis",
+      "idea": null,
+      "concepts": null,
+      "tags": null,
+      "has_interface": false,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "62-terminal-cli",
+      "day": 62,
+      "variant": null,
+      "title": "Terminal REPL",
+      "path": "62-terminal-cli",
+      "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat",
+      "idea": "Fake terminal REPL with typewriter output and a crystallising ascii cat",
+      "concepts": {
+        "primary": "Visual (text rendering, terminal interface)",
+        "secondary": "Temporal (staggered reveal, typewriter timing)"
+      },
+      "tags": {
+        "conceptual": [
+          "terminal",
+          "repl",
+          "skeuomorphism",
+          "typewriter",
+          "crystallisation",
+          "order-from-noise",
+          "micro-interaction"
+        ],
+        "technical": [
+          "vanilla-js",
+          "dom-rendering",
+          "async-await",
+          "requestanimationframe",
+          "css-variables",
+          "ascii-art"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.9450000000000001
+      }
+    },
+    {
+      "id": "63-ube-kaizen",
+      "day": 63,
+      "variant": null,
+      "title": "Ube Kaizen",
+      "path": "63-ube-kaizen",
+      "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings",
+      "idea": "Enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings",
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "64-viz-grouped",
+      "day": 64,
+      "variant": null,
+      "title": "Viz Grouped",
+      "path": "64-viz-grouped",
+      "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal",
+      "idea": "Reference gallery of visualization types grouped by analytical goal (compare, distribute, trend, compose, relate, locate)",
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.8849999999999999
+      }
+    },
+    {
+      "id": "65-mode-toggle",
+      "day": 65,
+      "variant": null,
+      "title": "Mode Toggle",
+      "path": "65-mode-toggle",
+      "description": "Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations",
+      "idea": null,
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "66-ascii-field-gallery",
+      "day": 66,
+      "variant": null,
+      "title": "Ascii Field Gallery",
+      "path": "66-ascii-field-gallery",
+      "description": "ASCII Field Gallery — 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp",
+      "idea": "Gallery of 8 animated ASCII field variants — each a different wave/interference formula rendered with the same dot-density ramp",
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 0.855
+      }
+    },
+    {
+      "id": "67-audio-reactive-ascii",
+      "day": 67,
+      "variant": null,
+      "title": "Audio Reactive Ascii",
+      "path": "67-audio-reactive-ascii",
+      "description": "Audio Reactive ASCII Field — ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning",
+      "idea": "Single ube-purple ASCII wave field, full viewport, driven by microphone input — bass controls speed, mids control density, amplitude controls brightness",
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": {
+        "status": "proposed",
+        "confidence": 1
+      }
+    },
+    {
+      "id": "68-moog-phase",
+      "day": 68,
+      "variant": null,
+      "title": "Moog Phase",
+      "path": "68-moog-phase",
+      "description": "Moog Phase — XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner",
+      "idea": "Phase portrait of a Moog loop — the signal plotted against its delayed self",
+      "concepts": {
+        "primary": "Audio (time-domain signal analysis)",
+        "secondary": "Temporal (delay embedding, trail persistence)"
+      },
+      "tags": {
+        "conceptual": [
+          "phase-space",
+          "delay-embedding",
+          "oscilloscope",
+          "lissajous",
+          "signal-geometry",
+          "audio-visualization",
+          "moog"
+        ],
+        "technical": [
+          "web-audio-api",
+          "analyser-node",
+          "canvas-2d",
+          "trail-fade",
+          "media-element-source",
+          "png-export"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "69-clear-channel",
+      "day": 69,
+      "variant": null,
+      "title": "Clear Channel",
+      "path": "69-clear-channel",
+      "description": "Clear Channel — visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system",
+      "idea": "Visual language reference for the Clear Channel computational aesthetics system — tokens, typography, spacing, motion, and live component examples.",
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "70-clear-channel-2",
+      "day": 70,
+      "variant": null,
+      "title": "Clear Channel — Introduction",
+      "path": "70-clear-channel-2",
+      "description": "Clear Channel — introduction: a design system for computational aesthetics; working with data as raw material",
+      "idea": "Manifesto page for the Clear Channel design system, with live canvas demos",
+      "concepts": {
+        "primary": "Visual (design system, color and type specification)",
+        "secondary": "Emergence (flow field, brownian motion, game of life demos)"
+      },
+      "tags": {
+        "conceptual": [
+          "design-system",
+          "computational-minimalism",
+          "manifesto",
+          "self-documentation",
+          "anti-patterns",
+          "reduction",
+          "data-as-material"
+        ],
+        "technical": [
+          "canvas-2d",
+          "css-variables",
+          "scroll-spy",
+          "flow-field",
+          "game-of-life",
+          "design-tokens"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "71-index-100days",
+      "day": 71,
+      "variant": null,
+      "title": "Index — 100 Days",
+      "path": "71-index-100days",
+      "description": "Index — 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags",
+      "idea": "Landing page for the series — every project gets a live animated ascii glyph",
+      "concepts": {
+        "primary": "Visual (procedural thumbnails, ascii rendering)",
+        "secondary": "Network (the series as a catalogued, themed collection)"
+      },
+      "tags": {
+        "conceptual": [
+          "index",
+          "meta-visualization",
+          "procedural-thumbnails",
+          "ascii-art",
+          "generative-identity",
+          "self-documentation",
+          "portfolio"
+        ],
+        "technical": [
+          "react",
+          "babel-standalone",
+          "canvas-2d",
+          "requestanimationframe",
+          "string-hashing",
+          "single-file"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "72-snapshots-v2",
+      "day": 72,
+      "variant": null,
+      "title": "Snapshots V2",
+      "path": "72-snapshots-v2",
+      "description": "Snapshots v2 — photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos → settling → locked) and chaotic bursty image loading",
+      "idea": "Snapshots gallery reimagined through the Clear Channel design system — year-grouped square tiles with ASCII glyph loaders (chaos → settling → locked) and chaotic, bursty image loading.",
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "73-svg-layouts",
+      "day": 73,
+      "variant": null,
+      "title": "Svg Layouts",
+      "path": "73-svg-layouts",
+      "description": "SVG Layouts — schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations",
+      "idea": null,
+      "concepts": null,
+      "tags": null,
+      "has_interface": false,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "74-particles",
+      "day": 74,
+      "variant": null,
+      "title": "Particles",
+      "path": "74-particles",
+      "description": "Particles — soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold",
+      "idea": "Soft glowing dots drift on sinusoidal paths, pause on contact, then push apart",
+      "concepts": {
+        "primary": "Spatial (sinusoidal drift, pair collisions)",
+        "secondary": "Temporal (pause/resume, decaying impulses)"
+      },
+      "tags": {
+        "conceptual": [
+          "particles",
+          "drift",
+          "collision",
+          "pause-and-push",
+          "metaballs",
+          "variants",
+          "rest-states"
+        ],
+        "technical": [
+          "canvas",
+          "sprite-baking",
+          "radial-gradient",
+          "composite-lighter",
+          "contrast-threshold",
+          "sinusoid-chords"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "75-layout-playground",
+      "day": 75,
+      "variant": null,
+      "title": "Layout Playground",
+      "path": "75-layout-playground",
+      "description": "Layout Playground — a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure",
+      "idea": null,
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "76-layout-depth",
+      "day": 76,
+      "variant": null,
+      "title": "Layout Depth",
+      "path": "76-layout-depth",
+      "description": "Layout Depth — depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window",
+      "idea": "Wireframe app shell where layout depth comes from shadow and contrast, not 3D",
+      "concepts": {
+        "primary": "Spatial (layout, elevation, layered panels)",
+        "secondary": "Visual (shadow tiers, contrast hierarchy)"
+      },
+      "tags": {
+        "conceptual": [
+          "layout",
+          "depth",
+          "elevation",
+          "shadow-hierarchy",
+          "app-shell",
+          "wireframe",
+          "progressive-disclosure"
+        ],
+        "technical": [
+          "css-transitions",
+          "has-selector",
+          "custom-properties",
+          "pointer-capture",
+          "lucide-icons",
+          "responsive"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "77-ascii-sheet-documentation",
+      "day": 77,
+      "variant": null,
+      "title": "Ascii Sheet Documentation",
+      "path": "77-ascii-sheet-documentation",
+      "description": "ASCII Sheet Documentation — promotional component showcase for a fixed ASCII texture and backdrop-filter banner, with scroll-reactive use cases, presets, and config snapshot",
+      "idea": null,
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "78-ascii-sheets-docs",
+      "day": 78,
+      "variant": null,
+      "title": "Ascii Sheets Docs",
+      "path": "78-ascii-sheets-docs",
+      "description": "ASCII Sheets — promotional showcase for the ASCII sheet primitive: hero with auto-cycling filters, twelve live use-case tiles (header, modal, toast, divider, drawer, image-reveal, marquee, tooltip, etc.), five-formula gallery, and glyph + palette rails that retheme the hero on click",
+      "idea": null,
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "79-idle-states",
+      "day": 79,
+      "variant": null,
+      "title": "Idle States",
+      "path": "79-idle-states",
+      "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across two pages (ambient + instrumented): breath, caret, drift, lean-toward, hover, orbit, listening bars, elapsed counter; each paired with claim/signal/motion/risk metadata, switched via a floating pill dock",
+      "idea": "Eight visual interpretations of idle — present without proactive — as a typology",
+      "concepts": {
+        "primary": "Temporal (slow loops, decoupled rhythms, elapsed time)",
+        "secondary": "Visual (motion as state signal)"
+      },
+      "tags": {
+        "conceptual": [
+          "idle-states",
+          "patience",
+          "typology",
+          "ambient-motion",
+          "presence",
+          "attention",
+          "ideation-board"
+        ],
+        "technical": [
+          "canvas",
+          "css-keyframes",
+          "raf",
+          "summed-sines",
+          "pseudo-noise",
+          "dpr-scaling"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "80-network",
+      "day": 80,
+      "variant": null,
+      "title": "Network — Multi-Relationship Graph",
+      "path": "80-network",
+      "description": "Network — D3 force-directed graph with four relationship types (follows, friends, mentions, blocked) encoded by color, width, dash, and arrow; same-pair edges fan out as symmetric quadratic curves and a legend toggles each layer, reheating the simulation so the layout re-settles",
+      "idea": "Force-directed graph where each of four relationship types (follows / friends / mentions / blocked) is encoded as its own visual layer, and multiple relationships between the same pair fan out as offset curves.",
+      "concepts": {
+        "primary": "Network (multi-relational graph, edge encoding, force-directed layout)",
+        "secondary": "Interaction (layer toggling, drag)"
+      },
+      "tags": {
+        "conceptual": [
+          "network-visualization",
+          "multi-relational-graph",
+          "force-directed",
+          "edge-encoding",
+          "layer-toggle",
+          "multi-edge-curving",
+          "d3",
+          "social-graph"
+        ],
+        "technical": [
+          "d3-force",
+          "svg",
+          "quadratic-bezier",
+          "pair-bucketing",
+          "seeded-prng",
+          "arrow-markers",
+          "drag-interaction"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "81-lens-wave",
+      "day": 81,
+      "variant": null,
+      "title": "Lens Wave",
+      "path": "81-lens-wave",
+      "description": "Lens Wave — WebGL fragment shader that warps a live text texture through layered sine displacement, non-uniform lens scaling, chromatic aberration, and a tinted multi-tap bloom; floating control island edits the text, snap freezes a frame onto a sweater mockup, and export composites the full-res PNG",
+      "idea": "Text rendered as a deformable material — warped, color-split, and lit from within. A WebGL fragment shader applies layered sine displacement, non-uniform lens scaling, chromatic aberration, and soft bloom to a Canvas 2D text texture. The result doubles as a product mockup tool: snap a frame, composite it over a garment, export to PNG.",
+      "concepts": {
+        "primary": "Visual (text as deformable material, optics simulation, glow)",
+        "secondary": "Interaction (live text input, snap/export pipeline)"
+      },
+      "tags": {
+        "conceptual": [
+          "text-material",
+          "lens-distortion",
+          "chromatic-aberration",
+          "bloom",
+          "warp",
+          "shader",
+          "product-mockup",
+          "generative-typography"
+        ],
+        "technical": [
+          "webgl",
+          "glsl-es-1",
+          "fragment-shader",
+          "canvas2d",
+          "texture-upload",
+          "additive-blend",
+          "preserveDrawingBuffer",
+          "toDataURL"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "82-z-axis",
+      "day": 82,
+      "variant": null,
+      "title": "Z Axis",
+      "path": "82-z-axis",
+      "description": "Z-Axis — nine micro-explorations of depth as a UI material (two-state toggle, stacked deck, modal lift, z-scroll, hover grid, pressed state, layer explode, parallax cursor, notification arrival) switched via a floating island controller with prev/next, dot indicators, and arrow-key navigation",
+      "idea": null,
+      "concepts": null,
+      "tags": {
+        "conceptual": [],
+        "technical": []
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "83-video-index",
+      "day": 83,
+      "variant": null,
+      "title": "Video index — Playwright-driven gallery",
+      "path": "83-video-index",
+      "description": "Video Index — a grid of every previous sketch as a 3–4 second looping clip, recorded by a headless Chromium running Playwright scenarios that an LLM agent authored from each sketch's source; ffmpeg trims warmup and transcodes to MP4 + poster, mobile gets single-stream centered playback, reduced-motion gets a posters-only fallback",
+      "idea": "An index page where every previous sketch is a 720×720 looping video preview that plays on hover. Each clip is recorded by a headless Chromium that an LLM agent has scripted to interact with the sketch the way a curious viewer would.",
+      "concepts": {
+        "primary": "Workflow / Tooling (browser automation, video capture, agent-authored interaction)",
+        "secondary": "Gallery UI (poster→video swap, lazy video loading, disabled-state styling)"
+      },
+      "tags": {
+        "conceptual": [
+          "playwright",
+          "headless-browser",
+          "video-gallery",
+          "agent-authored",
+          "scenario-as-code",
+          "ffmpeg-pipeline",
+          "lazy-media",
+          "poster-frame",
+          "square-grid"
+        ],
+        "technical": [
+          "playwright-record-video",
+          "chromium-headless-shell",
+          "ffmpeg-crop-scale-pad",
+          "fake-media-stream",
+          "intersection-observer",
+          "file-served-via-local-http",
+          "es-modules"
+        ]
+      },
+      "has_interface": true,
+      "in_projects_json": true,
+      "genome": null
+    },
+    {
+      "id": "84-id-card",
+      "day": 84,
+      "variant": null,
+      "title": "Id Card",
+      "path": "84-id-card",
+      "description": "ID Card — living credential for Mantas Lilis with a distant particle void, animated flow-field surface, mouse-reactive 3D tilt and sheen, randomized serial, generated barcode, and issued date stamp",
+      "idea": null,
+      "concepts": null,
+      "tags": null,
+      "has_interface": false,
+      "in_projects_json": true,
+      "genome": null
+    }
+  ]
+}
