@@ -1,9 +1,9 @@
 {
   "$schema": "corpus-v1",
-  "generated": "2026-06-12T16:29:04.795Z",
+  "generated": "2026-06-12T16:30:51.534Z",
   "counts": {
     "days": 84,
-    "with_interface": 79,
+    "with_interface": 84,
     "with_genome": 65
   },
   "notes": {
@@ -2211,10 +2211,31 @@
       "title": "Shapes",
       "path": "58-shapes",
       "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking",
-      "idea": null,
-      "concepts": null,
-      "tags": null,
-      "has_interface": false,
+      "idea": "A geometric vocabulary built one shape family at a time, eight cells per chapter",
+      "concepts": {
+        "primary": "Spatial (geometric primitives, parametric curves)",
+        "secondary": "Temporal (shared time accumulator driving all animation), Visual (line-on-ground rendering)"
+      },
+      "tags": {
+        "conceptual": [
+          "geometry",
+          "parametric-curves",
+          "torus-knots",
+          "shape-taxonomy",
+          "constrained-variation",
+          "vocabulary-building",
+          "animation-difficulty"
+        ],
+        "technical": [
+          "canvas",
+          "es-modules",
+          "raf-loop",
+          "hash-routing",
+          "3d-projection",
+          "dpr-scaling"
+        ]
+      },
+      "has_interface": true,
       "in_projects_json": true,
       "genome": {
         "status": "proposed",
@@ -2248,10 +2269,31 @@
       "title": "Agentic Patterns",
       "path": "60-agentic-patterns",
       "description": "Agentic Patterns — interactive reference for AI agent design patterns",
-      "idea": null,
-      "concepts": null,
-      "tags": null,
-      "has_interface": false,
+      "idea": "37 agentic AI design patterns, each with a playable scripted UX demo",
+      "concepts": {
+        "primary": "Temporal (scripted event sequences simulating agent runs)",
+        "secondary": "Network (coordination topologies — pipelines, hierarchies, swarms, handoffs)"
+      },
+      "tags": {
+        "conceptual": [
+          "agentic-systems",
+          "design-patterns",
+          "pattern-language",
+          "llm-agents",
+          "orchestration",
+          "memory-architectures",
+          "simulation-as-documentation"
+        ],
+        "technical": [
+          "vanilla-js",
+          "dom-animation",
+          "async-await",
+          "json-dataset",
+          "single-page",
+          "css-custom-properties"
+        ]
+      },
+      "has_interface": true,
       "in_projects_json": true,
       "genome": null
     },
@@ -2259,13 +2301,33 @@
       "id": "61-hitl-patterns",
       "day": 61,
       "variant": null,
-      "title": "Hitl Patterns",
+      "title": "Human-in-the-Loop Patterns",
       "path": "61-hitl-patterns",
       "description": "Human in the Loop — four patterns across a single autonomy axis",
-      "idea": null,
-      "concepts": null,
-      "tags": null,
-      "has_interface": false,
+      "idea": "Four patterns for placing humans in agentic systems, ordered along one autonomy axis",
+      "concepts": {
+        "primary": "Temporal (scripted oversight sequences — gates, interrupts, staged batches, audit trails)",
+        "secondary": "Statistical (confidence thresholds, anomaly detection against run history)"
+      },
+      "tags": {
+        "conceptual": [
+          "human-in-the-loop",
+          "autonomy-spectrum",
+          "approval-gates",
+          "uncertainty-calibration",
+          "oversight",
+          "auditability",
+          "irreversibility"
+        ],
+        "technical": [
+          "vanilla-js",
+          "dom-animation",
+          "async-await",
+          "scripted-demos",
+          "css-custom-properties"
+        ]
+      },
+      "has_interface": true,
       "in_projects_json": true,
       "genome": null
     },
@@ -2550,13 +2612,35 @@
       "id": "73-svg-layouts",
       "day": 73,
       "variant": null,
-      "title": "Svg Layouts",
+      "title": "SVG Layouts",
       "path": "73-svg-layouts",
       "description": "SVG Layouts — schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations",
-      "idea": null,
-      "concepts": null,
-      "tags": null,
-      "has_interface": false,
+      "idea": "Schematic SVG wireframes of agent workspaces, animated entirely with CSS",
+      "concepts": {
+        "primary": "Visual (interface schematics, wireframe rendering)",
+        "secondary": "Temporal (choreographed animation timelines)"
+      },
+      "tags": {
+        "conceptual": [
+          "wireframe",
+          "schematic",
+          "agent-workspace",
+          "layout-systems",
+          "motion-choreography",
+          "lo-fi",
+          "design-exploration"
+        ],
+        "technical": [
+          "inline-svg",
+          "css-keyframes",
+          "css-variables",
+          "carousel",
+          "theme-toggle",
+          "localstorage",
+          "no-canvas"
+        ]
+      },
+      "has_interface": true,
       "in_projects_json": true,
       "genome": null
     },
@@ -2850,13 +2934,36 @@
       "id": "84-id-card",
       "day": 84,
       "variant": null,
-      "title": "Id Card",
+      "title": "ID Card",
       "path": "84-id-card",
       "description": "ID Card — living credential for Mantas Lilis with a distant particle void, animated flow-field surface, mouse-reactive 3D tilt and sheen, randomized serial, generated barcode, and issued date stamp",
-      "idea": null,
-      "concepts": null,
-      "tags": null,
-      "has_interface": false,
+      "idea": "A living credential — flow-field card surface that recedes to reveal its spec",
+      "concepts": {
+        "primary": "Visual (living surface, simulated materiality)",
+        "secondary": "Spatial (Z-axis recession, layered depth)"
+      },
+      "tags": {
+        "conceptual": [
+          "identity",
+          "credential",
+          "living-surface",
+          "materiality",
+          "depth",
+          "dossier",
+          "fictional-spec",
+          "reveal"
+        ],
+        "technical": [
+          "canvas",
+          "flow-field",
+          "translatez",
+          "pointer-capture",
+          "custom-properties",
+          "staggered-transitions",
+          "svg"
+        ]
+      },
+      "has_interface": true,
       "in_projects_json": true,
       "genome": null
     }
