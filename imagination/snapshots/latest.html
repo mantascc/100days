@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Imagination — timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0a0a;--base:#0f0f0f;--raised:#141414;--surface:#1a1a1a;
+    --text:#f5f5f7;--t2:#a8aab8;--t3:#666;--ghost:#262626;
+    --b-sub:#1a1a1a;--b-def:#2a2a2a;--b-strong:#3a3d52;
+    --vein:#00ffaa;--move:#00a8ff;--tension:#ff0066;--source:#ffaa00;--seed:#00ff88;--collision:#ff0000;
+    --mono:'JetBrains Mono','IBM Plex Mono','SF Mono',Monaco,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--void);color:var(--text);font-family:var(--mono);font-size:13px;padding:0 0 60px}
+  header{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:baseline;
+    padding:16px 22px;border-bottom:1px solid var(--b-sub);background:var(--void)}
+  header .title{font-size:11px;text-transform:uppercase;letter-spacing:.14em}
+  header .meta{font-size:10px;color:var(--t3);letter-spacing:.04em}
+  .bar{display:flex;gap:6px;padding:10px 22px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--b-sub)}
+  .bar .grp{display:flex;gap:4px;margin-right:10px}
+  button{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+    background:var(--surface);color:var(--t2);border:1px solid var(--b-def);padding:5px 9px;cursor:pointer}
+  button:hover{border-color:var(--b-strong);color:var(--text)}
+  button.off{opacity:.35}
+  button.act{border-color:var(--b-strong);color:#fff}
+  .lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-right:4px}
+  #scroll{overflow-x:auto;padding:8px 22px}
+  svg{display:block}
+  .axis-num{fill:var(--t3);font-size:9px}
+  .axis-line{stroke:var(--ghost);stroke-width:1}
+  .grpline{fill:var(--t3);font-size:9px;text-transform:uppercase;letter-spacing:.12em}
+  .rowlbl{fill:var(--t2);font-size:10px;text-anchor:end}
+  .rowlbl.brk{fill:#fff;font-weight:700}
+  .cell{shape-rendering:crispEdges}
+  .baseline{stroke:#161616;stroke-width:1}
+  .brkmark{fill:none;stroke:#fff;stroke-width:1;opacity:.7}
+  #tip{position:fixed;pointer-events:none;background:rgba(20,20,20,.97);border:1px solid var(--b-strong);
+    padding:7px 10px;font-size:10px;opacity:0;transition:opacity .08s;z-index:9;line-height:1.5;max-width:260px}
+  #tip .t{color:#fff;margin-bottom:2px}#tip .k{color:var(--t3)}
+  #note{padding:10px 22px;color:var(--t3);font-size:10px;letter-spacing:.03em;line-height:1.7}
+  #note b{color:var(--source)}
+</style></head>
+<body>
+<header><span class="title">Imagination · timeline</span><span class="meta" id="hmeta"></span></header>
+<div class="bar">
+  <span class="lbl">show</span>
+  <span class="grp" id="filters"></span>
+  <span class="lbl">sort</span>
+  <span class="grp" id="sorts">
+    <button data-s="type" class="act">by type</button>
+    <button data-s="first">by first seen</button>
+    <button data-s="reach">by reach</button>
+  </span>
+  <button id="brkBtn" class="act">break signal</button>
+</div>
+<div id="scroll"></div>
+<div id="note"></div>
+<div id="tip"></div>
+<script>
+const D={"meta": {"date": "2026-06-15", "sketches": 84, "entities": 51, "third": 56}, "axis": [{"id": "01-entropy", "n": "01"}, {"id": "02-vicsek-model", "n": "02"}, {"id": "03-chaos-agent", "n": "03"}, {"id": "04-random-walk", "n": "04"}, {"id": "05-fall", "n": "05"}, {"id": "06-orbital", "n": "06"}, {"id": "07-apophenia", "n": "07"}, {"id": "08-graph-clusters", "n": "08"}, {"id": "09-planar-graph", "n": "09"}, {"id": "10-audio-reactive-agents", "n": "10"}, {"id": "11-brownian-tree", "n": "11"}, {"id": "12-wind-field", "n": "12"}, {"id": "13-image-flow-field", "n": "13"}, {"id": "14-dna-mutations", "n": "14"}, {"id": "15-binary-camera-grid", "n": "15"}, {"id": "15b-binary-camera-grid-v2", "n": "15b"}, {"id": "16-hub-spoke-network", "n": "16"}, {"id": "17-audio-reactive-network", "n": "17"}, {"id": "18-cellular-automaton", "n": "18"}, {"id": "19-coworker-network", "n": "19"}, {"id": "20-schelling-model", "n": "20"}, {"id": "21-interaction-heatmap", "n": "21"}, {"id": "22-directed-network", "n": "22"}, {"id": "23-interactive-typography", "n": "23"}, {"id": "24-rock-paper-scissors", "n": "24"}, {"id": "25-spotlight-grid", "n": "25"}, {"id": "26-widget-dashboard", "n": "26"}, {"id": "27-muse", "n": "27"}, {"id": "28-liquid-glass", "n": "28"}, {"id": "29-progress-indicators", "n": "29"}, {"id": "30-thinking-states", "n": "30"}, {"id": "31-cli-material-palette", "n": "31"}, {"id": "32-genart-cards", "n": "32"}, {"id": "33-three-body-problem", "n": "33"}, {"id": "34-particle-text-morph", "n": "34"}, {"id": "35-flight-path-viz", "n": "35"}, {"id": "36-spinning-globe", "n": "36"}, {"id": "37-sentiment-analyzer", "n": "37"}, {"id": "38-baltic-pattern", "n": "38"}, {"id": "39-wave-morph", "n": "39"}, {"id": "40-cube-grid-rules", "n": "40"}, {"id": "41-metaball", "n": "41"}, {"id": "42-metaball-grid", "n": "42"}, {"id": "43-style-seed", "n": "43"}, {"id": "44-whiff", "n": "44"}, {"id": "45-gravity-pills", "n": "45"}, {"id": "46-oklch-vs-hsl", "n": "46"}, {"id": "47-2gif", "n": "47"}, {"id": "49-grid-trace", "n": "49"}, {"id": "50-execution-trace-graph", "n": "50"}, {"id": "51-resonant-lattice", "n": "51"}, {"id": "52-reaction-diffusion", "n": "52"}, {"id": "53-ascii-grid", "n": "53"}, {"id": "54-concept-graph", "n": "54"}, {"id": "55-ascii-loading", "n": "55"}, {"id": "56-constrained-variation", "n": "56"}, {"id": "57-color-themes", "n": "57"}, {"id": "58-shapes", "n": "58"}, {"id": "59-font-explorer", "n": "59"}, {"id": "60-agentic-patterns", "n": "60"}, {"id": "61-hitl-patterns", "n": "61"}, {"id": "62-terminal-cli", "n": "62"}, {"id": "63-ube-kaizen", "n": "63"}, {"id": "64-viz-grouped", "n": "64"}, {"id": "65-mode-toggle", "n": "65"}, {"id": "66-ascii-field-gallery", "n": "66"}, {"id": "67-audio-reactive-ascii", "n": "67"}, {"id": "68-moog-phase", "n": "68"}, {"id": "69-clear-channel", "n": "69"}, {"id": "70-clear-channel-2", "n": "70"}, {"id": "71-index-100days", "n": "71"}, {"id": "72-snapshots-v2", "n": "72"}, {"id": "73-svg-layouts", "n": "73"}, {"id": "74-particles", "n": "74"}, {"id": "75-layout-playground", "n": "75"}, {"id": "76-layout-depth", "n": "76"}, {"id": "77-ascii-sheet-documentation", "n": "77"}, {"id": "78-ascii-sheets-docs", "n": "78"}, {"id": "79-idle-states", "n": "79"}, {"id": "80-network", "n": "80"}, {"id": "81-lens-wave", "n": "81"}, {"id": "82-z-axis", "n": "82"}, {"id": "83-video-index", "n": "83"}, {"id": "84-id-card", "n": "84"}], "rows": [{"id": "veins/grids-as-compositional-frame", "type": "vein", "title": "Grids as compositional frame", "charge": "high", "state": "active", "cols": [0, 5, 11, 12, 14, 15, 18, 25, 26, 40, 42, 48, 52, 55, 57, 65, 70], "first": 0, "last": 70, "reach": 17, "run": {"start": 11, "len": 2}}, {"id": "veins/stochastic-and-noise", "type": "vein", "title": "Stochastic and noise", "charge": "high", "state": "active", "cols": [0, 3, 4, 6, 10, 11, 12, 18, 32, 38, 51], "first": 0, "last": 51, "reach": 11, "run": {"start": 10, "len": 3}}, {"id": "veins/agents-and-particle-systems", "type": "vein", "title": "Agents and particle systems", "charge": "high", "state": "active", "cols": [1, 2, 3, 4, 6, 7, 8, 9, 10, 13, 20, 24, 34, 45, 50, 73], "first": 1, "last": 73, "reach": 16, "run": {"start": 6, "len": 5}}, {"id": "veins/emergence-from-local-rules", "type": "vein", "title": "Emergence from local rules", "charge": "high", "state": "active", "cols": [1, 2, 3, 4, 6, 13, 18, 20, 24, 40, 50, 51, 53], "first": 1, "last": 53, "reach": 13, "run": {"start": 1, "len": 4}}, {"id": "veins/networks-and-graphs", "type": "vein", "title": "Networks and graphs", "charge": "high", "state": "active", "cols": [1, 2, 6, 7, 8, 9, 10, 16, 17, 19, 21, 22, 49, 53, 79], "first": 1, "last": 79, "reach": 15, "run": {"start": 6, "len": 5}}, {"id": "veins/physics-simulation", "type": "vein", "title": "Physics simulation", "charge": "medium", "state": "active", "cols": [5, 7, 8, 24, 33, 41, 42, 45, 50], "first": 5, "last": 50, "reach": 9, "run": {"start": 7, "len": 2}}, {"id": "veins/audio-reactivity", "type": "vein", "title": "Audio reactivity", "charge": "high", "state": "active", "cols": [9, 17, 39, 66, 67], "first": 9, "last": 67, "reach": 5, "run": {"start": 66, "len": 2}}, {"id": "veins/generative-typography-and-text", "type": "vein", "title": "Generative typography and text", "charge": "high", "state": "active", "cols": [10, 11, 23, 34, 48, 58, 80], "first": 10, "last": 80, "reach": 7, "run": {"start": 10, "len": 2}}, {"id": "veins/cellular-automata-and-pattern-formation", "type": "vein", "title": "Cellular automata and pattern formation", "charge": "medium", "state": "active", "cols": [18, 40, 51], "first": 18, "last": 51, "reach": 3, "run": {"start": 18, "len": 1}}, {"id": "veins/design-system-and-reference-sheets", "type": "vein", "title": "Design systems and reference sheets", "charge": "high", "state": "active", "cols": [26, 29, 30, 31, 36, 37, 43, 56, 59, 60, 62, 63, 64, 68, 70, 72, 74, 75, 78, 81, 83], "first": 26, "last": 83, "reach": 21, "run": {"start": 29, "len": 3}}, {"id": "veins/language-and-nlp-interpretability", "type": "vein", "title": "Language and NLP interpretability", "charge": "medium", "state": "active", "cols": [36, 37], "first": 36, "last": 37, "reach": 2, "run": {"start": 36, "len": 2}}, {"id": "veins/ascii-and-text-rendering", "type": "vein", "title": "ASCII and text rendering", "charge": "high", "state": "active", "cols": [52, 54, 61, 65, 66, 70, 71, 76, 77], "first": 52, "last": 77, "reach": 9, "run": {"start": 65, "len": 2}}, {"id": "moves/dom-over-canvas-rendering", "type": "move", "title": "DOM over canvas rendering", "charge": "medium", "state": "active", "cols": [0, 23, 25, 52, 54, 60, 61], "first": 0, "last": 61, "reach": 7, "run": {"start": 60, "len": 2}}, {"id": "moves/parametric-lissajous-orbits", "type": "move", "title": "Parametric Lissajous orbits", "charge": "medium", "state": "active", "cols": [0, 5, 57, 78], "first": 0, "last": 78, "reach": 4, "run": {"start": 0, "len": 1}}, {"id": "moves/toroidal-wrapping", "type": "move", "title": "Toroidal wrapping", "charge": "high", "state": "active", "cols": [1, 2, 3, 4, 6, 10, 13, 24], "first": 1, "last": 24, "reach": 8, "run": {"start": 1, "len": 4}}, {"id": "moves/proximity-link-drawing", "type": "move", "title": "Proximity link drawing", "charge": "high", "state": "active", "cols": [6, 8, 9, 10, 79], "first": 6, "last": 79, "reach": 5, "run": {"start": 8, "len": 3}}, {"id": "moves/offscreen-canvas-downsample", "type": "move", "title": "Offscreen canvas downsample", "charge": "medium", "state": "active", "cols": [11, 12, 14, 15, 33], "first": 11, "last": 33, "reach": 5, "run": {"start": 11, "len": 2}}, {"id": "moves/perlin-fbm-displacement", "type": "move", "title": "Perlin / fBm displacement", "charge": "medium", "state": "active", "cols": [11, 12, 28], "first": 11, "last": 28, "reach": 3, "run": {"start": 11, "len": 2}}, {"id": "moves/d3-force-simulation", "type": "move", "title": "D3 force simulation", "charge": "medium", "state": "active", "cols": [16, 17, 19, 22], "first": 16, "last": 22, "reach": 4, "run": {"start": 16, "len": 2}}, {"id": "moves/imagedata-double-buffer", "type": "move", "title": "ImageData double buffer", "charge": "low", "state": "active", "cols": [18, 20, 51], "first": 18, "last": 51, "reach": 3, "run": {"start": 18, "len": 1}}, {"id": "moves/css-vars-live-controls", "type": "move", "title": "CSS vars as live controls", "charge": "medium", "state": "active", "cols": [25, 26, 28, 43, 56, 61, 68, 81], "first": 25, "last": 81, "reach": 8, "run": {"start": 25, "len": 2}}, {"id": "moves/drag-reorder-collision-packing", "type": "move", "title": "Drag-reorder with collision packing", "charge": "low", "state": "active", "cols": [26], "first": 26, "last": 26, "reach": 1, "run": {"start": 26, "len": 1}}, {"id": "moves/backdrop-filter-svg-distort", "type": "move", "title": "Backdrop-filter SVG distort", "charge": "medium", "state": "active", "cols": [28, 76, 77], "first": 28, "last": 77, "reach": 3, "run": {"start": 76, "len": 2}}, {"id": "moves/geodesic-great-circle-path", "type": "move", "title": "Geodesic great-circle path", "charge": "low", "state": "active", "cols": [35], "first": 35, "last": 35, "reach": 1, "run": {"start": 35, "len": 1}}, {"id": "moves/glyph-density-ramp", "type": "move", "title": "Glyph density ramp", "charge": "medium", "state": "active", "cols": [52, 54, 65, 71, 76, 77], "first": 52, "last": 77, "reach": 6, "run": {"start": 76, "len": 2}}, {"id": "moves/per-cell-threshold-crystallization", "type": "move", "title": "Per-cell threshold crystallization", "charge": "medium", "state": "active", "cols": [54, 61], "first": 54, "last": 61, "reach": 2, "run": {"start": 54, "len": 1}}, {"id": "moves/scripted-await-timeline", "type": "move", "title": "Scripted await timeline", "charge": "low", "state": "active", "cols": [60], "first": 60, "last": 60, "reach": 1, "run": {"start": 60, "len": 1}}, {"id": "moves/typewriter-jitter-output", "type": "move", "title": "Typewriter output with jitter", "charge": "medium", "state": "active", "cols": [61], "first": 61, "last": 61, "reach": 1, "run": {"start": 61, "len": 1}}, {"id": "moves/summed-sines-pseudo-noise", "type": "move", "title": "Summed sines pseudo-noise", "charge": "medium", "state": "active", "cols": [73, 77, 78, 80], "first": 73, "last": 80, "reach": 4, "run": {"start": 77, "len": 2}}, {"id": "moves/agent-authored-playwright-capture", "type": "move", "title": "Agent-authored Playwright capture", "charge": "low", "state": "active", "cols": [82], "first": 82, "last": 82, "reach": 1, "run": {"start": 82, "len": 1}}, {"id": "tensions/randomness-feeling-intentional", "type": "tension", "title": "Randomness feeling intentional", "charge": "high", "state": "active", "cols": [0, 3, 6, 55], "first": 0, "last": 55, "reach": 4, "run": {"start": 0, "len": 1}}, {"id": "tensions/audio-reactive-without-gimmick", "type": "tension", "title": "Audio-reactive without the gimmick", "charge": "medium", "state": "active", "cols": [9, 17, 67], "first": 9, "last": 67, "reach": 3, "run": {"start": 9, "len": 1}}, {"id": "tensions/iteration-vs-original-rules", "type": "tension", "title": "Iteration vs original rules", "charge": "medium", "state": "active", "cols": [15, 18, 30, 69], "first": 15, "last": 69, "reach": 4, "run": {"start": 15, "len": 1}}, {"id": "tensions/desktop-only-vs-responsive", "type": "tension", "title": "Desktop-only vs responsive", "charge": "low", "state": "active", "cols": [27, 34, 35, 36, 37, 82], "first": 27, "last": 82, "reach": 6, "run": {"start": 34, "len": 4}}, {"id": "tensions/showing-mechanism-vs-polish", "type": "tension", "title": "Showing mechanism vs polish", "charge": "medium", "state": "active", "cols": [43, 47, 80], "first": 43, "last": 80, "reach": 3, "run": {"start": 43, "len": 1}}, {"id": "tensions/searching-vs-mapping", "type": "tension", "title": "Searching vs mapping", "charge": "medium", "state": "active", "cols": [55, 56, 64, 78], "first": 55, "last": 78, "reach": 4, "run": {"start": 55, "len": 2}}, {"id": "sources/vicsek-flocking", "type": "source", "title": "Vicsek flocking & Reynolds boids", "charge": "high", "state": "active", "cols": [1, 2, 9], "first": 1, "last": 9, "reach": 3, "run": {"start": 1, "len": 2}}, {"id": "sources/brownian-markov", "type": "source", "title": "Brownian motion & Markov processes", "charge": "high", "state": "active", "cols": [3, 4, 10, 11], "first": 3, "last": 11, "reach": 4, "run": {"start": 3, "len": 2}}, {"id": "sources/graph-theory-algorithms", "type": "source", "title": "Graph theory algorithms", "charge": "medium", "state": "active", "cols": [7, 8, 16], "first": 7, "last": 16, "reach": 3, "run": {"start": 7, "len": 2}}, {"id": "sources/perlin-noise", "type": "source", "title": "Perlin noise", "charge": "medium", "state": "active", "cols": [11, 12], "first": 11, "last": 12, "reach": 2, "run": {"start": 11, "len": 2}}, {"id": "sources/kuramoto-fireflies", "type": "source", "title": "Kuramoto oscillators & firefly sync", "charge": "medium", "state": "active", "cols": [13], "first": 13, "last": 13, "reach": 1, "run": {"start": 13, "len": 1}}, {"id": "sources/schelling-segregation", "type": "source", "title": "Schelling segregation model", "charge": "medium", "state": "active", "cols": [20], "first": 20, "last": 20, "reach": 1, "run": {"start": 20, "len": 1}}, {"id": "sources/bauhaus-early-computer-graphics", "type": "source", "title": "Bauhaus & early computer graphics", "charge": "medium", "state": "active", "cols": [31, 43, 46], "first": 31, "last": 46, "reach": 3, "run": {"start": 31, "len": 1}}, {"id": "sources/slit-scan-2001", "type": "source", "title": "Slit-scan & the 2001 star-gate", "charge": "low", "state": "active", "cols": [33], "first": 33, "last": 33, "reach": 1, "run": {"start": 33, "len": 1}}, {"id": "sources/turing-gray-scott", "type": "source", "title": "Turing patterns & Gray-Scott", "charge": "medium", "state": "active", "cols": [51], "first": 51, "last": 51, "reach": 1, "run": {"start": 51, "len": 1}}, {"id": "seeds/3d-rule-engine", "type": "seed", "title": "3D rule engine", "charge": "low", "state": "dormant", "cols": [40], "first": 40, "last": 40, "reach": 1, "run": {"start": 40, "len": 1}}, {"id": "seeds/whiff-cli-dataviz", "type": "seed", "title": "Whiff \u2014 CLI data-viz tool", "charge": "medium", "state": "dormant", "cols": [44], "first": 44, "last": 44, "reach": 1, "run": {"start": 44, "len": 1}}, {"id": "seeds/2gif-tiered-roadmap", "type": "seed", "title": "2gif tiered roadmap", "charge": "low", "state": "dormant", "cols": [47], "first": 47, "last": 47, "reach": 1, "run": {"start": 47, "len": 1}}, {"id": "seeds/computed-not-curated-thumbnails", "type": "seed", "title": "Computed, not curated, thumbnails", "charge": "medium", "state": "dormant", "cols": [70], "first": 70, "last": 70, "reach": 1, "run": {"start": 70, "len": 1}}, {"id": "seeds/ascii-sheet-web-component", "type": "seed", "title": "ASCII sheet web component", "charge": "medium", "state": "dormant", "cols": [77], "first": 77, "last": 77, "reach": 1, "run": {"start": 77, "len": 1}}, {"id": "seeds/lens-wave-extensions", "type": "seed", "title": "Lens-wave extensions", "charge": "low", "state": "dormant", "cols": [80], "first": 80, "last": 80, "reach": 1, "run": {"start": 80, "len": 1}}], "break_target": "veins/design-system-and-reference-sheets"};
+const COLOR={vein:'#00ffaa',move:'#00a8ff',tension:'#ff0066',source:'#ffaa00',seed:'#00ff88',collision:'#ff0000'};
+const NAME={vein:'veins',move:'moves',tension:'tensions',source:'sources',seed:'seeds',collision:'collisions'};
+const CH={high:1,medium:.7,low:.45}, ST={active:1,dormant:.5,spent:.3};
+const cw=11, rh=15, padL=210, padT=34;
+let active={vein:1,move:1,tension:1,source:1,seed:1,collision:1};
+let sortMode='type', showBreak=true;
+document.getElementById('hmeta').textContent=D.meta.date+'  ·  '+D.meta.entities+' entities across '+D.meta.sketches+' sketches';
+
+// filter buttons
+const fdiv=document.getElementById('filters');
+['vein','move','tension','source','seed','collision'].forEach(t=>{
+  const b=document.createElement('button');b.textContent=NAME[t];b.dataset.t=t;b.classList.add('act');
+  b.style.borderColor=COLOR[t];b.onclick=()=>{active[t]=!active[t];b.classList.toggle('off',!active[t]);render();};
+  fdiv.appendChild(b);
+});
+document.querySelectorAll('#sorts button').forEach(b=>b.onclick=()=>{
+  sortMode=b.dataset.s;document.querySelectorAll('#sorts button').forEach(x=>x.classList.toggle('act',x===b));render();});
+document.getElementById('brkBtn').onclick=function(){showBreak=!showBreak;this.classList.toggle('act',showBreak);render();};
+
+const tip=document.getElementById('tip');
+const svgns='http://www.w3.org/2000/svg';
+function el(n,a){const e=document.createElementNS(svgns,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+function render(){
+  let rows=D.rows.filter(r=>active[r.type]);
+  if(sortMode==='first') rows=rows.slice().sort((a,b)=>(a.first??1e9)-(b.first??1e9));
+  else if(sortMode==='reach') rows=rows.slice().sort((a,b)=>b.reach-a.reach);
+  const grouped = sortMode==='type';
+  const N=D.axis.length, W=padL+N*cw+30;
+  // compute layout rows (with group headers)
+  const lay=[]; let y=padT, lastType=null;
+  rows.forEach(r=>{
+    if(grouped && r.type!==lastType){ lay.push({hdr:r.type,y:y+10}); y+=22; lastType=r.type; }
+    lay.push({row:r,y:y}); y+=rh;
+  });
+  const H=y+20;
+  const scroll=document.getElementById('scroll'); scroll.innerHTML='';
+  const svg=el('svg',{width:W,height:H,viewBox:'0 0 '+W+' '+H}); scroll.appendChild(svg);
+
+  // axis lines + decade numbers
+  let nextDec=0;
+  D.axis.forEach((a,i)=>{
+    const num=parseInt(a.n);
+    if(!isNaN(num) && num>=nextDec){
+      const x=padL+i*cw+cw/2;
+      svg.appendChild(el('line',{class:'axis-line',x1:x,y1:padT-6,x2:x,y2:H-18}));
+      const tx=el('text',{class:'axis-num',x:x,y:padT-10,'text-anchor':'middle'});tx.textContent=num;svg.appendChild(tx);
+      nextDec=Math.floor(num/10)*10+10;
+    }
+  });
+
+  lay.forEach(item=>{
+    if(item.hdr){
+      const tx=el('text',{class:'grpline',x:padL-8,y:item.y,'text-anchor':'end'});
+      tx.textContent=NAME[item.hdr];tx.setAttribute('fill',COLOR[item.hdr]);svg.appendChild(tx);
+      return;
+    }
+    const r=item.row, cy=item.y, op=ST[r.state]??1;
+    const isBrk = showBreak && r.id===D.break_target;
+    // label
+    const tx=el('text',{class:'rowlbl'+(isBrk?' brk':''),x:padL-8,y:cy+rh-4,opacity:op});
+    tx.textContent=r.title;svg.appendChild(tx);
+    // baseline
+    svg.appendChild(el('line',{class:'baseline',x1:padL,y1:cy+rh-5,x2:padL+N*cw,y2:cy+rh-5,opacity:.6}));
+    // cells
+    r.cols.forEach(c=>{
+      const x=padL+c*cw, recent=c>=D.meta.third;
+      const rect=el('rect',{class:'cell',x:x+1,y:cy+2,width:cw-2,height:rh-6,
+        fill:COLOR[r.type],opacity:(CH[r.charge]??.6)*op});
+      rect.addEventListener('mouseenter',e=>{tip.style.opacity=1;
+        tip.innerHTML='<div class="t">'+r.title+'</div><div class="k">'+r.type+' · '+D.axis[c].id+'</div>';});
+      rect.addEventListener('mousemove',e=>{tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px';});
+      rect.addEventListener('mouseleave',()=>tip.style.opacity=0);
+      svg.appendChild(rect);
+      if(isBrk && recent) svg.appendChild(el('rect',{class:'brkmark',x:x+0.5,y:cy+1.5,width:cw-1,height:rh-4}));
+    });
+  });
+
+  // note
+  const bt=D.rows.find(r=>r.id===D.break_target);
+  document.getElementById('note').innerHTML = showBreak && bt
+    ? 'break signal — <b>'+bt.title+'</b> is your strongest pull in the final third of the timeline ('
+      +bt.cols.filter(c=>c>=D.meta.third).length+' recent sketches). the outlined cells mark the streak most worth disrupting.'
+    : 'each row is an entity; each cell a sketch it touched, left→right in making order. gaps are dormancy; clusters are obsession.';
+}
+render();
+window.addEventListener('resize',()=>{});
+</script></body></html>
