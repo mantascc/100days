@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIXAMPLE — generative editions</title>
+<style>
+  :root{
+    --bg:#3a3a6a;        /* indigo field, from the artwork */
+    --panel:#222244;
+    --ink:#efe7d8; --muted:#a7a3c4; --line:#3d3d64;
+    --accent:#f0532a;    /* orange-red */
+    --gold:#f2c63b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#16162c;color:var(--ink);
+    font-family:ui-monospace,"DepartureMono",Menlo,Consolas,monospace}
+  .wrap{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+  aside{background:var(--panel);border-right:1px solid var(--line);
+    padding:22px 20px;display:flex;flex-direction:column;gap:16px;overflow:auto}
+  h1{font-size:15px;letter-spacing:.34em;margin:0;font-weight:700}
+  .sub{font-size:10px;color:var(--muted);letter-spacing:.14em;line-height:1.7;margin-top:6px}
+  label{display:block;font-size:10px;letter-spacing:.18em;color:var(--muted);
+    text-transform:uppercase;margin-bottom:7px}
+  .field{border-top:1px solid var(--line);padding-top:13px}
+  input[type=number]{width:100%;background:#16162c;border:1px solid var(--line);
+    color:var(--ink);font:inherit;padding:9px 10px;border-radius:4px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px}
+  button{flex:1;background:#16162c;border:1px solid var(--line);color:var(--ink);
+    font:inherit;font-size:11px;letter-spacing:.08em;padding:10px;border-radius:4px;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.solid{background:var(--accent);color:#160c06;border-color:var(--accent);font-weight:700}
+  .val{float:right;color:var(--ink)}
+  .seg{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--gold);color:#160c06;font-weight:700}
+  main{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px;gap:16px}
+  .plate{background:#0e0e22;padding:22px;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  #stage{display:grid;gap:0;line-height:0}
+  #stage img{width:100%;height:100%;display:block;image-rendering:auto}
+  .label{font-size:11px;letter-spacing:.24em;color:var(--muted);text-align:center;
+    display:flex;flex-direction:column;gap:5px}
+  .label b{color:var(--ink);letter-spacing:.3em;font-weight:700}
+  .hint{font-size:10px;color:var(--muted);max-width:540px;text-align:center;line-height:1.7}
+  .err{color:var(--accent);font-size:11px;max-width:420px;text-align:center;line-height:1.6}
+  @media print{aside{display:none}.wrap{display:block}main{padding:0}
+    .plate{box-shadow:none;background:#fff}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <div>
+      <h1>EIXAMPLE</h1>
+      <div class="sub">256 GLYPHS · ONE GRID LANGUAGE<br>EDITIONS NUMBERED AS ADDRESSES</div>
+    </div>
+
+    <div class="field">
+      <label>Edition № <span class="val">/ 256</span></label>
+      <input type="number" id="edition" min="1" max="256" value="42">
+      <div class="row" style="margin-top:8px">
+        <button id="prev">◀ prev</button>
+        <button id="next">next ▶</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Block size <span class="val" id="gv">16 × 16</span></label>
+      <input type="range" id="grid" min="4" max="16" value="16">
+      <div class="sub" style="margin-top:6px">4×4 pocket · 8×8 illa (one block) · 16×16 full district</div>
+    </div>
+
+    <div class="field">
+      <label>Rule</label>
+      <div class="seg" id="mode">
+        <button data-m="perm" class="on">Permutation</button>
+        <button data-m="sample">Sampling</button>
+      </div>
+      <div class="sub" id="ruledesc" style="margin-top:6px">Every glyph appears once — a reshuffling of the whole city.</div>
+    </div>
+
+    <div class="field">
+      <label>Orientation</label>
+      <div class="seg" id="rot">
+        <button data-r="0" class="on">Upright</button>
+        <button data-r="1">Allow turns</button>
+      </div>
+    </div>
+
+    <div class="field row">
+      <button id="orig">⌂ original</button>
+      <button id="rand">⟳ random</button>
+    </div>
+    <div class="field row">
+      <button class="solid" id="dl">↓ SVG</button>
+      <button id="prn">⎙ print</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="plate"><div id="stage"></div></div>
+    <div class="label">
+      <b id="addr">CARRER DE L'EIXAMPLE</b>
+      <span id="meta">Nº 042 / 256</span>
+    </div>
+    <div class="hint">The edition № is a deterministic address: the same number always redraws the
+      same arrangement, so a print can be signed, sold, and re-pressed from its number alone.
+      Permutation editions are bijections of the 256-glyph alphabet.</div>
+    <div class="err" id="err"></div>
+  </main>
+</div>
+
+<script>
+/* ---------- deterministic PRNG ---------- */
+function xmur3(str){let h=1779033703^str.length;
+  for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19;}
+  return ()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return (h^=h>>>16)>>>0;};}
+function mulberry32(a){return ()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function rngFor(n){return mulberry32(xmur3('eixample-'+String(n).padStart(3,'0'))());}
+
+/* ---------- the 256-glyph deck (row-major) ---------- */
+const TILES=[];
+for(let r=0;r<16;r++)for(let c=0;c<16;c++)TILES.push(`images/segment_${r}_${c}.png`);
+const ORIGINAL=TILES.map((t,i)=>i); // identity order
+
+/* Fisher–Yates with seeded rng */
+function shuffle(arr,rng){const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ---------- build an edition's index layout ---------- */
+function layout(n,N,mode){
+  if(n===1 && mode==='perm') {           // edition 1 = the original drawing
+    return ORIGINAL.slice(0,N*N);
+  }
+  const rng=rngFor(n);
+  const need=N*N;
+  if(mode==='perm'){
+    return shuffle(ORIGINAL,rng).slice(0,need);
+  } else {                                // sampling: draws with replacement
+    const out=[];for(let i=0;i<need;i++)out.push(Math.floor(rng()*256));return out;
+  }
+}
+function rotations(n,N,allow){
+  if(!allow) return new Array(N*N).fill(0);
+  const rng=rngFor(n*7919+1);            // independent stream
+  return Array.from({length:N*N},()=>Math.floor(rng()*4)*90);
+}
+
+/* ---------- state + render ---------- */
+const $=id=>document.getElementById(id);
+let st={edition:42,N:16,mode:'perm',rot:0};
+
+function render(){
+  st.N=+$('grid').value;
+  const idx=layout(st.edition,st.N,st.mode);
+  const rot=rotations(st.edition,st.N,st.rot);
+  const px=Math.min(640, Math.round(640/st.N)*st.N), cell=px/st.N;
+  const stage=$('stage');
+  stage.style.gridTemplateColumns=`repeat(${st.N},${cell}px)`;
+  stage.style.width=px+'px';stage.style.height=px+'px';
+  stage.innerHTML=idx.map((g,i)=>{
+    const tr=rot[i]?`transform:rotate(${rot[i]}deg)`:'';
+    return `<img src="${TILES[g]}" style="${tr}" alt="" onerror="window.__tileErr&&window.__tileErr()">`;
+  }).join('');
+  $('gv').textContent=`${st.N} × ${st.N}`;
+  $('meta').textContent=`Nº ${String(st.edition).padStart(3,'0')} / 256 · `+
+    (st.mode==='perm'?'permutation':'sampling')+(st.edition===1&&st.mode==='perm'?' · ORIGINAL':'');
+  buildSVG(idx,rot,cell);
+}
+
+/* exported SVG references tiles by relative path (keep file beside images/) */
+let __svg='';
+function buildSVG(idx,rot,cell){
+  const S=st.N*100;const u=100;
+  let body='';
+  idx.forEach((g,i)=>{const x=(i%st.N)*u,y=Math.floor(i/st.N)*u;
+    const tr=rot[i]?` transform="rotate(${rot[i]} ${x+u/2} ${y+u/2})"`:'';
+    body+=`<image href="${TILES[g]}" x="${x}" y="${y}" width="${u}" height="${u}"${tr}/>`;});
+  __svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" `+
+    `width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">${body}</svg>`;
+}
+
+/* ---------- wiring ---------- */
+$('grid').addEventListener('input',render);
+$('edition').addEventListener('input',()=>{st.edition=Math.max(1,Math.min(256,+$('edition').value||1));render();});
+$('prev').onclick=()=>{st.edition=(st.edition+254)%256+1;$('edition').value=st.edition;render();};
+$('next').onclick=()=>{st.edition=st.edition%256+1;$('edition').value=st.edition;render();};
+$('rand').onclick=()=>{st.edition=1+Math.floor(Math.random()*256);$('edition').value=st.edition;render();};
+$('orig').onclick=()=>{st.edition=1;st.mode='perm';$('edition').value=1;
+  document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x.dataset.m==='perm'));render();};
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');st.mode=b.dataset.m;
+  $('ruledesc').textContent=b.dataset.m==='perm'
+    ?'Every glyph appears once — a reshuffling of the whole city.'
+    :'256 draws with replacement — some glyphs recur, some rest.';render();});
+document.querySelectorAll('#rot button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#rot button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');st.rot=+b.dataset.r;render();});
+$('dl').onclick=()=>{const blob=new Blob([__svg],{type:'image/svg+xml'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`eixample-${String(st.edition).padStart(3,'0')}.svg`;a.click();};
+$('prn').onclick=()=>window.print();
+
+let errShown=false;
+window.__tileErr=()=>{if(errShown)return;errShown=true;
+  $('err').textContent='Tiles not found. Keep editions.html in the same folder as the images/ directory.';};
+
+render();
+</script>
+</body>
+</html>
