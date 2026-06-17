@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06 · status &amp; progress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* spinner */
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--border-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* bar */
+    .bar-shell { width: 100%; }
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+    .bar-meta .pct { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .bar-track {
+      height: 4px;
+      background: var(--ground-surface);
+      position: relative;
+      overflow: hidden;
+    }
+    .bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.18s ease;
+    }
+
+    /* steps */
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+    }
+    .step .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-strong);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .step.done .dot { background: var(--accent-success); border-color: var(--accent-success); }
+    .step.active .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,168,255,0.15); }
+    .step.active { color: var(--text-primary); }
+    .step.done { color: var(--text-secondary); }
+    .step-sep {
+      height: 1px;
+      flex: 1;
+      background: var(--border-default);
+    }
+
+    /* heartbeat */
+    .heart {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .heart .ell {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      animation: breathe 1.4s ease-in-out infinite;
+    }
+    .heart .ell:nth-child(2) { animation-delay: 0.18s; }
+    .heart .ell:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes breathe {
+      0%, 100% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* counters */
+    .counter {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .counter .v { color: var(--text-primary); font-size: 14px; letter-spacing: 0.02em; }
+    .counter .u { color: var(--text-tertiary); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+    .counter .delta { color: var(--accent-success); font-size: 10px; }
+
+    .counter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      padding: 4px 0;
+    }
+    .counter-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .counter-cell .label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    /* cost meter */
+    .cost {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+    .cost .dial {
+      flex: 1;
+      height: 6px;
+      background: linear-gradient(90deg,
+        var(--accent-success) 0%,
+        var(--accent-success) 50%,
+        var(--accent-warm) 75%,
+        var(--accent-danger) 100%);
+      position: relative;
+    }
+    .cost .needle {
+      position: absolute;
+      top: -3px; bottom: -3px;
+      width: 2px;
+      background: var(--text-primary);
+      transition: left 0.3s ease;
+    }
+    .cost .amt {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+    .cost .budget {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.15em;
+    }
+
+    /* eta */
+    .eta {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+    }
+    .eta .cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .eta .lbl {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .eta .val {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+    .eta .val.ago { color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">06 · status &amp; progress</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 06 — 7 patterns</div>
+  <div class="title">Status &amp; progress</div>
+  <div class="subtitle">The chrome around work in flight — spinners, bars, steps, counters. Small components that anchor longer streams.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.1</span>
+      <span class="name">Spinner + phase</span>
+      <span class="desc">indeterminate · label rotates</span>
+    </div>
+    <div class="pattern-body">
+      <div class="row" id="p1">
+        <div class="spinner"></div>
+        <span class="phase mute"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.2</span>
+      <span class="name">Progress bar</span>
+      <span class="desc">determinate · % + bytes</span>
+    </div>
+    <div class="pattern-body">
+      <div class="bar-shell" id="p2">
+        <div class="bar-meta"><span class="lbl">downloading model weights</span><span class="pct">0%</span></div>
+        <div class="bar-track"><div class="bar-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.3</span>
+      <span class="name">Step indicator</span>
+      <span class="desc">1/5 → 5/5 · multi-phase</span>
+    </div>
+    <div class="pattern-body">
+      <div class="steps" id="p3"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.4</span>
+      <span class="name">Heartbeat</span>
+      <span class="desc">breathing ellipsis · still alive</span>
+    </div>
+    <div class="pattern-body">
+      <div class="row" id="p4">
+        <span class="mute">still working</span>
+        <span class="heart"><span class="ell"></span><span class="ell"></span><span class="ell"></span></span>
+        <span class="dim" id="p4-since">12s</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.5</span>
+      <span class="name">Token counter</span>
+      <span class="desc">in / out / cached · ticking</span>
+    </div>
+    <div class="pattern-body">
+      <div class="counter-row" id="p5">
+        <div class="counter-cell"><div class="label">input</div><div class="counter"><span class="v" data-k="in">0</span><span class="u">tok</span></div></div>
+        <div class="counter-cell"><div class="label">output</div><div class="counter"><span class="v" data-k="out">0</span><span class="u">tok</span></div></div>
+        <div class="counter-cell"><div class="label">cached</div><div class="counter"><span class="v" data-k="cache">0</span><span class="u">tok</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.6</span>
+      <span class="name">Cost meter</span>
+      <span class="desc">spend vs budget · needle</span>
+    </div>
+    <div class="pattern-body">
+      <div class="cost" id="p6">
+        <span class="amt">$0.00</span>
+        <div class="dial"><div class="needle" style="left:0%;"></div></div>
+        <span class="budget">budget $0.50</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">06.7</span>
+      <span class="name">Elapsed + ETA</span>
+      <span class="desc">three-cell timing display</span>
+    </div>
+    <div class="pattern-body">
+      <div class="eta" id="p7">
+        <div class="cell"><div class="lbl">elapsed</div><div class="val ago" id="elapsed">0.0s</div></div>
+        <div class="cell"><div class="lbl">rate</div><div class="val" id="rate">— t/s</div></div>
+        <div class="cell"><div class="lbl">eta</div><div class="val" id="etaval">—</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 06.1 spinner phases
+  const P1phase = document.querySelector('#p1 .phase');
+  const phases = ['planning', 'reading source', 'drafting reply', 'reviewing draft', 'wrapping up'];
+  loop(async () => {
+    for (const ph of phases) {
+      P1phase.textContent = ph;
+      await sleep(rand(700, 1100));
+    }
+  }, 1000);
+
+  // ---- 06.2 progress bar
+  const P2fill = document.querySelector('#p2 .bar-fill');
+  const P2pct = document.querySelector('#p2 .pct');
+  const P2lbl = document.querySelector('#p2 .lbl');
+  loop(async () => {
+    P2lbl.textContent = 'downloading model weights';
+    let v = 0;
+    while (v < 100) {
+      v = Math.min(100, v + rand(1.4, 4));
+      P2fill.style.width = v + '%';
+      P2pct.textContent = v.toFixed(0) + '%';
+      await sleep(rand(50, 110));
+    }
+    P2lbl.textContent = 'complete · 245 MB';
+    await sleep(1400);
+  }, 800);
+
+  // ---- 06.3 steps
+  const P3 = document.getElementById('p3');
+  const stepLabels = ['parse', 'plan', 'fetch', 'edit', 'verify'];
+  function renderSteps(activeIdx) {
+    P3.innerHTML = stepLabels.map((s, i) => {
+      const cls = i < activeIdx ? 'done' : i === activeIdx ? 'active' : '';
+      return `<div class="step ${cls}"><span class="dot"></span><span>${s}</span></div>${i < stepLabels.length - 1 ? '<div class="step-sep"></div>' : ''}`;
+    }).join('');
+  }
+  loop(async () => {
+    for (let i = 0; i <= stepLabels.length; i++) {
+      renderSteps(i);
+      await sleep(rand(700, 1000));
+    }
+  }, 1200);
+
+  // ---- 06.4 heartbeat counter
+  const P4since = document.getElementById('p4-since');
+  loop(async () => {
+    for (let s = 0; s < 22; s++) {
+      P4since.textContent = s + 's';
+      await sleep(1000);
+    }
+  }, 800);
+
+  // ---- 06.5 token counter
+  const P5 = document.getElementById('p5');
+  const valIn = P5.querySelector('[data-k="in"]');
+  const valOut = P5.querySelector('[data-k="out"]');
+  const valCache = P5.querySelector('[data-k="cache"]');
+  loop(async () => {
+    let i = 0, o = 0, c = 0;
+    const targetIn = 1240, targetOut = 0, targetCache = 880;
+    while (i < targetIn) {
+      i = Math.min(targetIn, i + Math.floor(rand(40, 110)));
+      c = Math.min(targetCache, c + Math.floor(rand(20, 60)));
+      valIn.textContent = i.toLocaleString();
+      valCache.textContent = c.toLocaleString();
+      await sleep(120);
+    }
+    for (let oo = 0; oo < 620; oo += Math.floor(rand(8, 28))) {
+      valOut.textContent = oo.toLocaleString();
+      await sleep(70);
+    }
+    valOut.textContent = '620';
+    await sleep(1400);
+  }, 1200);
+
+  // ---- 06.6 cost meter
+  const P6amt = document.querySelector('#p6 .amt');
+  const P6needle = document.querySelector('#p6 .needle');
+  loop(async () => {
+    let spend = 0;
+    const budget = 0.50;
+    while (spend < budget * 0.78) {
+      spend += rand(0.003, 0.012);
+      P6amt.textContent = '$' + spend.toFixed(3);
+      P6needle.style.left = Math.min(100, spend / budget * 100) + '%';
+      await sleep(rand(110, 220));
+    }
+    await sleep(1400);
+  }, 1200);
+
+  // ---- 06.7 elapsed + ETA
+  const elapsedEl = document.getElementById('elapsed');
+  const rateEl = document.getElementById('rate');
+  const etaEl = document.getElementById('etaval');
+  loop(async () => {
+    const start = performance.now();
+    const total = 1800;
+    let tokens = 0;
+    while (tokens < total) {
+      const dt = (performance.now() - start) / 1000;
+      tokens += Math.floor(rand(10, 28));
+      const rate = tokens / dt;
+      const remain = (total - tokens) / rate;
+      elapsedEl.textContent = dt.toFixed(1) + 's';
+      rateEl.textContent = rate.toFixed(0) + ' t/s';
+      etaEl.textContent = '~' + remain.toFixed(1) + 's';
+      await sleep(110);
+    }
+    elapsedEl.textContent = ((performance.now() - start)/1000).toFixed(1) + 's';
+    etaEl.textContent = 'done';
+    await sleep(1500);
+  }, 1200);
+</script>
+
+</body>
+</html>

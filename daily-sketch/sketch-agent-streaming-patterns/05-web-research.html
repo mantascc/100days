@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05 · web &amp; research</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stream { white-space: pre-wrap; line-height: 1.7; }
+    .cite {
+      display: inline-block;
+      font-size: 10px;
+      color: var(--accent);
+      background: rgba(0, 168, 255, 0.08);
+      padding: 1px 5px;
+      margin: 0 2px;
+      vertical-align: super;
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .cite.on { opacity: 1; transform: scale(1); }
+
+    /* source card */
+    .src-card {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      align-items: flex-start;
+    }
+    .src-card .fav {
+      width: 28px;
+      height: 28px;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      position: relative;
+      overflow: hidden;
+    }
+    .src-card .fav.loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      animation: shimmer 1.2s infinite;
+    }
+    .src-card .fav .glyph {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      font-size: 14px;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .src-card .fav.loaded .glyph { opacity: 1; }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .src-card .meta { display: flex; flex-direction: column; gap: 4px; }
+    .src-card .domain {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .src-card .title {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transition: opacity 0.3s 0.1s;
+    }
+    .src-card .title.on { opacity: 1; }
+    .src-card .snippet {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      opacity: 0;
+      transition: opacity 0.3s 0.25s;
+    }
+    .src-card .snippet.on { opacity: 1; }
+    .src-card .skel {
+      height: 10px;
+      background: var(--ground-surface);
+      margin-bottom: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .src-card .skel::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+      animation: shimmer 1.2s infinite;
+    }
+    .src-card .skel.w70 { width: 70%; }
+    .src-card .skel.w90 { width: 90%; }
+
+    /* url fetch */
+    .fetch {
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      padding: 10px 14px;
+      font-size: 11.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .fetch .row { display: flex; align-items: center; gap: 10px; }
+    .fetch .verb {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--accent-warm);
+    }
+    .fetch .url { color: var(--text-default); flex: 1; word-break: break-all; }
+    .fetch .meta { font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.1em; }
+    .fetch .bar-track {
+      height: 2px;
+      background: var(--ground-surface);
+      position: relative;
+      overflow: hidden;
+    }
+    .fetch .bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.15s linear;
+    }
+    .fetch .status-line {
+      display: flex;
+      gap: 12px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+    }
+    .fetch .status-line .ok { color: var(--accent-success); }
+
+    /* search results */
+    .results { display: flex; flex-direction: column; gap: 10px; }
+    .result {
+      padding: 10px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .result.on { opacity: 1; transform: none; }
+    .result .rnk {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.2em;
+    }
+    .result .rtitle {
+      font-size: 13px;
+      color: var(--text-primary);
+      margin: 4px 0 2px;
+    }
+    .result .rdomain {
+      font-size: 10px;
+      color: var(--accent-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .result .rsnip { font-size: 11px; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">05 · web &amp; research</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 05 — 4 patterns</div>
+  <div class="title">Web &amp; research</div>
+  <div class="subtitle">How retrieval gets shown — citations, source cards, fetch progress, and search results streaming in.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">05.1</span>
+      <span class="name">Inline citation</span>
+      <span class="desc">[1] appears after the claim</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream" id="p1"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">05.2</span>
+      <span class="name">Source card</span>
+      <span class="desc">skeleton → favicon → title → snippet</span>
+    </div>
+    <div class="pattern-body">
+      <div id="p2"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">05.3</span>
+      <span class="name">URL fetch</span>
+      <span class="desc">connect → bytes received → done</span>
+    </div>
+    <div class="pattern-body">
+      <div class="fetch" id="p3">
+        <div class="row"><span class="verb">GET</span><span class="url">https://docs.example.com/api/v3/orders/schema</span></div>
+        <div class="bar-track"><div class="bar-fill"></div></div>
+        <div class="status-line"><span class="phase">connecting…</span><span class="bytes"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">05.4</span>
+      <span class="name">Search results</span>
+      <span class="desc">ranked list · stream in</span>
+    </div>
+    <div class="pattern-body">
+      <div class="results" id="p4"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  async function typeInto(el, txt, speed = [18, 50]) {
+    let buf = '';
+    for (const ch of txt) {
+      buf += ch;
+      el.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(/[ ,.]/.test(ch) ? rand(speed[0] * 2, speed[1] * 2) : rand(speed[0], speed[1]));
+    }
+    el.innerHTML = buf;
+  }
+
+  // ---- 05.1 inline citation
+  const P1 = document.getElementById('p1');
+  loop(async () => {
+    const parts = [
+      { txt: "Postgres uses MVCC for concurrency control" },
+      { cite: '1' },
+      { txt: ", which keeps multiple row versions visible to different transactions" },
+      { cite: '2' },
+      { cite: '3' },
+      { txt: ". VACUUM reclaims space when those versions are no longer needed." },
+    ];
+    P1.innerHTML = '';
+    for (const p of parts) {
+      if (p.txt) {
+        const span = document.createElement('span');
+        P1.appendChild(span);
+        await typeInto(span, p.txt, [12, 32]);
+      } else if (p.cite) {
+        const cite = document.createElement('span');
+        cite.className = 'cite';
+        cite.textContent = '[' + p.cite + ']';
+        P1.appendChild(cite);
+        await sleep(120);
+        cite.classList.add('on');
+        await sleep(280);
+      }
+    }
+  }, 2400);
+
+  // ---- 05.2 source card
+  const P2 = document.getElementById('p2');
+  loop(async () => {
+    P2.innerHTML = `
+      <div class="src-card">
+        <div class="fav loading"><div class="glyph">◆</div></div>
+        <div class="meta">
+          <div class="domain">postgresql.org</div>
+          <div class="skel w90"></div>
+          <div class="skel w70"></div>
+          <div class="title">Chapter 13. Concurrency Control — MVCC</div>
+          <div class="snippet">PostgreSQL uses Multi-Version Concurrency Control (MVCC) to avoid the need for locks during read operations…</div>
+        </div>
+      </div>`;
+    const fav = P2.querySelector('.fav');
+    const title = P2.querySelector('.title');
+    const snippet = P2.querySelector('.snippet');
+    const skels = P2.querySelectorAll('.skel');
+    await sleep(800);
+    fav.classList.remove('loading');
+    fav.classList.add('loaded');
+    skels.forEach(s => s.style.display = 'none');
+    title.classList.add('on');
+    await sleep(220);
+    snippet.classList.add('on');
+  }, 2400);
+
+  // ---- 05.3 url fetch
+  const P3 = document.getElementById('p3');
+  const phase = P3.querySelector('.phase');
+  const bytesEl = P3.querySelector('.bytes');
+  const fill = P3.querySelector('.bar-fill');
+  loop(async () => {
+    phase.textContent = 'connecting…';
+    phase.classList.remove('ok');
+    bytesEl.textContent = '';
+    fill.style.width = '0%';
+    await sleep(450);
+    phase.innerHTML = '<span class="ok">200 OK</span>';
+    await sleep(140);
+    const total = 245;
+    let received = 0;
+    while (received < total) {
+      received = Math.min(total, received + rand(8, 25));
+      fill.style.width = (received / total * 100) + '%';
+      bytesEl.textContent = `${received.toFixed(0)} / ${total} KB`;
+      await sleep(70);
+    }
+    bytesEl.textContent = `${total} KB · 412ms`;
+    await sleep(1600);
+  }, 1200);
+
+  // ---- 05.4 search results
+  const P4 = document.getElementById('p4');
+  const results = [
+    { rnk: 1, title: "MVCC explained — when and why it matters", domain: "blog.acid.dev", snip: "Most engineers learn about MVCC after their first deadlock. Here's what it actually does." },
+    { rnk: 2, title: "VACUUM is not optional — case study", domain: "supabase.com/blog", snip: "We let autovacuum lag for 36 hours. Here's what happened to query latency." },
+    { rnk: 3, title: "PostgreSQL: Concurrency Control", domain: "postgresql.org/docs", snip: "PostgreSQL provides MVCC implementation. Readers and writers do not block each other." },
+    { rnk: 4, title: "Snapshot isolation, in pictures", domain: "fly.io/blog", snip: "Diagrams of how snapshots, tuples, and transaction IDs interact." },
+  ];
+  loop(async () => {
+    P4.innerHTML = results.map(r => `
+      <div class="result">
+        <div class="rnk">${String(r.rnk).padStart(2,'0')}</div>
+        <div class="rtitle">${r.title}</div>
+        <div class="rdomain">${r.domain}</div>
+        <div class="rsnip">${r.snip}</div>
+      </div>`).join('');
+    const items = P4.querySelectorAll('.result');
+    for (const it of items) {
+      it.classList.add('on');
+      await sleep(rand(280, 520));
+    }
+  }, 2200);
+</script>
+
+</body>
+</html>

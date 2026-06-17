@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>12 · memory &amp; state</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* memory chip */
+    .mem {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(0, 168, 255, 0.04);
+      border: 1px solid var(--accent);
+      border-radius: 30px;
+      font-size: 11px;
+      color: var(--text-default);
+      opacity: 0;
+      transform: translateY(4px) scale(0.96);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .mem.on { opacity: 1; transform: none; }
+    .mem .ico {
+      width: 16px; height: 16px;
+      color: var(--accent);
+      font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mem .lbl { color: var(--text-tertiary); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; }
+    .mem .name { color: var(--accent); }
+    .mem .body { color: var(--text-default); }
+    .mem-trail { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .mem-context {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* context loaded */
+    .ctx-card {
+      padding: 12px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+    }
+    .ctx-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      color: var(--text-default);
+    }
+    .ctx-head .lbl { color: var(--text-tertiary); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; }
+    .ctx-head .meta { margin-left: auto; color: var(--text-tertiary); font-size: 10px; font-variant-numeric: tabular-nums; }
+    .ctx-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    .ctx-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 4px 8px;
+      background: var(--ground-base);
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .ctx-row.on { opacity: 1; transform: none; }
+    .ctx-row .path { color: var(--text-default); overflow: hidden; text-overflow: ellipsis; }
+    .ctx-row .tk { color: var(--text-tertiary); font-variant-numeric: tabular-nums; font-size: 10px; }
+
+    /* compression */
+    .compress {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .compress-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      min-height: 24px;
+    }
+    .compress .blk {
+      height: 18px;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      transition: opacity 0.3s, transform 0.4s, width 0.4s, background 0.4s;
+    }
+    .compress .blk.fade { opacity: 0; transform: scale(0.6); }
+    .compress .summary {
+      padding: 10px 14px;
+      background: var(--ground-base);
+      border: 1px dashed var(--accent);
+      font-size: 11px;
+      color: var(--text-default);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .compress .summary.on { opacity: 1; transform: none; }
+    .compress .summary .lbl {
+      color: var(--accent);
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .compress .savings {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-align: right;
+      transition: opacity 0.4s;
+    }
+
+    /* plan */
+    .plan-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .plan-item {
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 6px 12px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 11.5px;
+      color: var(--text-default);
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.3s, transform 0.3s, border-color 0.3s, background 0.3s;
+    }
+    .plan-item.on { opacity: 1; transform: none; }
+    .plan-item .box {
+      width: 14px; height: 14px;
+      border: 1px solid var(--border-strong);
+      background: var(--ground-surface);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+      color: transparent;
+      font-size: 10px;
+    }
+    .plan-item.active { border-color: var(--accent); }
+    .plan-item.active .box {
+      border-color: var(--accent);
+      background: rgba(0, 168, 255, 0.08);
+    }
+    .plan-item.done .box {
+      border-color: var(--accent-success);
+      background: var(--accent-success);
+      color: var(--ground-void);
+    }
+    .plan-item.done .label { color: var(--text-tertiary); text-decoration: line-through; }
+    .plan-item .tag {
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .plan-item.active .tag { color: var(--accent); }
+    .plan-item.done .tag { color: var(--accent-success); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">12 · memory &amp; state</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 12 — 4 patterns</div>
+  <div class="title">Memory &amp; state</div>
+  <div class="subtitle">What the agent remembers and what it's holding right now — saves, loads, summaries, and plans.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">12.1</span>
+      <span class="name">Memory write</span>
+      <span class="desc">small chip · saved fact</span>
+    </div>
+    <div class="pattern-body">
+      <div class="mem-trail" id="p1"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">12.2</span>
+      <span class="name">Context loaded</span>
+      <span class="desc">files · tokens · per source</span>
+    </div>
+    <div class="pattern-body">
+      <div class="ctx-card">
+        <div class="ctx-head">
+          <span class="lbl">context</span>
+          <span><span id="p2-files">0</span> files</span>
+          <span class="meta"><span id="p2-tok">0</span> tokens</span>
+        </div>
+        <div class="ctx-list" id="p2-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">12.3</span>
+      <span class="name">Compression</span>
+      <span class="desc">many messages → one summary</span>
+    </div>
+    <div class="pattern-body">
+      <div class="compress" id="p3">
+        <div class="compress-row" id="p3-row"></div>
+        <div class="summary"><div class="lbl">summary · earlier conversation</div>The user investigated a flaky test in <code>auth.spec.ts</code>. We isolated a race on <code>db.connect()</code>, switched to a per-worker DB, and confirmed green over 200 runs.</div>
+        <div class="savings" id="p3-save">— freed —</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">12.4</span>
+      <span class="name">Plan update</span>
+      <span class="desc">live todo · status flips</span>
+    </div>
+    <div class="pattern-body">
+      <div class="plan-list" id="p4"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 12.1 memory write
+  const P1 = document.getElementById('p1');
+  const memories = [
+    { name: 'editor-pref',     body: 'user prefers VS Code with Vim bindings' },
+    { name: 'test-runner',     body: 'project uses Vitest, not Jest' },
+    { name: 'commit-style',    body: 'commits should follow conventional-commits' },
+  ];
+  loop(async () => {
+    P1.innerHTML = `<div class="mem-context">Logged a few preferences from this session so I don't have to re-ask next time.</div>`;
+    await sleep(600);
+    for (const m of memories) {
+      const el = document.createElement('div');
+      el.className = 'mem';
+      el.innerHTML = `<span class="ico">◆</span><span class="lbl">memory</span><span class="name">${m.name}</span><span class="dim">·</span><span class="body">${m.body}</span>`;
+      P1.appendChild(el);
+      await sleep(40);
+      el.classList.add('on');
+      await sleep(rand(500, 900));
+    }
+    await sleep(2000);
+  }, 1500);
+
+  // ---- 12.2 context loaded
+  const P2list = document.getElementById('p2-list');
+  const P2files = document.getElementById('p2-files');
+  const P2tok = document.getElementById('p2-tok');
+  const ctx = [
+    { p: 'CLAUDE.md',           t: 412 },
+    { p: 'src/server.ts',       t: 1240 },
+    { p: 'src/router/auth.ts',  t: 680 },
+    { p: 'src/db/schema.ts',    t: 920 },
+    { p: 'package.json',        t: 180 },
+    { p: 'README.md',           t: 240 },
+    { p: 'src/lib/cache.ts',    t: 540 },
+    { p: 'tests/auth.test.ts',  t: 320 },
+    { p: 'migrations/0041.sql', t: 88 },
+  ];
+  loop(async () => {
+    P2list.innerHTML = ctx.map(c => `<div class="ctx-row"><span class="path">${c.p}</span><span class="tk">${c.t}</span></div>`).join('');
+    const rows = P2list.querySelectorAll('.ctx-row');
+    let files = 0, tok = 0;
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].classList.add('on');
+      files++; tok += ctx[i].t;
+      P2files.textContent = files;
+      P2tok.textContent = tok.toLocaleString();
+      await sleep(rand(140, 280));
+    }
+    await sleep(1800);
+  }, 1500);
+
+  // ---- 12.3 compression
+  const P3row = document.getElementById('p3-row');
+  const P3summary = document.querySelector('#p3 .summary');
+  const P3save = document.getElementById('p3-save');
+  loop(async () => {
+    P3summary.classList.remove('on');
+    P3save.textContent = '— freed —';
+    P3row.innerHTML = '';
+    const N = 28;
+    const widths = [];
+    for (let i = 0; i < N; i++) {
+      const w = rand(20, 60);
+      widths.push(w);
+      const b = document.createElement('div');
+      b.className = 'blk';
+      b.style.width = w + 'px';
+      P3row.appendChild(b);
+    }
+    await sleep(800);
+    // fade them out
+    const blocks = P3row.querySelectorAll('.blk');
+    for (const b of blocks) {
+      b.classList.add('fade');
+      await sleep(30);
+    }
+    await sleep(400);
+    P3row.style.display = 'none';
+    P3summary.classList.add('on');
+    P3save.textContent = 'freed 3.4k tokens · 28 messages → 1 summary';
+    await sleep(2400);
+    P3row.style.display = 'flex';
+  }, 1500);
+
+  // ---- 12.4 plan
+  const P4 = document.getElementById('p4');
+  const planItems = [
+    'read existing auth middleware',
+    'enumerate token storage points',
+    'add expiry validation',
+    'write tests for expired tokens',
+    'update docs',
+  ];
+  loop(async () => {
+    P4.innerHTML = planItems.map(t => `
+      <div class="plan-item">
+        <span class="box">✓</span>
+        <span class="label">${t}</span>
+        <span class="tag">pending</span>
+      </div>`).join('');
+    const items = P4.querySelectorAll('.plan-item');
+    // reveal one by one
+    for (const it of items) {
+      it.classList.add('on');
+      await sleep(rand(160, 320));
+    }
+    await sleep(500);
+    // progress through them
+    for (const it of items) {
+      it.classList.add('active');
+      it.querySelector('.tag').textContent = 'in progress';
+      await sleep(rand(700, 1100));
+      it.classList.remove('active');
+      it.classList.add('done');
+      it.querySelector('.tag').textContent = 'done';
+      await sleep(rand(180, 360));
+    }
+    await sleep(1600);
+  }, 1400);
+</script>
+
+</body>
+</html>

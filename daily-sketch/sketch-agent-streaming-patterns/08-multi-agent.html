@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>08 · multi-agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .agent-card {
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 11.5px;
+    }
+    .agent-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .agent-bar .glyph {
+      width: 18px; height: 18px;
+      border: 1px solid var(--border-strong);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    .agent-bar .name { color: var(--text-primary); }
+    .agent-bar .task { color: var(--text-tertiary); font-size: 10.5px; margin-left: 4px; }
+    .agent-bar .status { margin-left: auto; }
+    .agent-body {
+      padding: 10px 12px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      min-height: 32px;
+    }
+    .agent-body .line {
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 0.25s, transform 0.25s;
+      display: block;
+      padding: 1px 0;
+    }
+    .agent-body .line.on { opacity: 1; transform: none; }
+    .agent-body .arr { color: var(--text-tertiary); }
+
+    /* sub-agent nested */
+    .nest {
+      margin: 8px 0 4px 6px;
+      padding-left: 10px;
+      border-left: 1px solid var(--border-default);
+    }
+
+    /* fleet grid */
+    .fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .fleet .agent-card { min-height: 110px; display: flex; flex-direction: column; }
+    .fleet .agent-body { flex: 1; font-size: 10.5px; line-height: 1.5; }
+
+    /* handoff */
+    .handoff {
+      display: grid;
+      grid-template-columns: 1fr 32px 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+    .handoff .arrow {
+      align-self: center;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 16px;
+      transition: color 0.3s, transform 0.3s;
+    }
+    .handoff .arrow.on { color: var(--accent); transform: scale(1.2); }
+    .handoff .baton {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent-warm);
+      margin-left: 6px;
+      transition: opacity 0.3s;
+    }
+
+    /* voting */
+    .vote-stack { display: flex; flex-direction: column; gap: 8px; }
+    .vote-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 70px 80px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .vote-row.on { opacity: 1; transform: none; }
+    .vote-row .ord {
+      font-size: 10px; letter-spacing: 0.15em; color: var(--text-tertiary);
+    }
+    .vote-row .perspective { color: var(--text-default); font-size: 11px; }
+    .vote-row .perspective .lens { color: var(--text-tertiary); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .vote-row .conf {
+      font-variant-numeric: tabular-nums;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      text-align: right;
+    }
+    .vote-row .verdict {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 4px 8px;
+      border: 1px solid;
+    }
+    .vote-row .verdict.yes { color: var(--accent-success); border-color: var(--accent-success); }
+    .vote-row .verdict.no  { color: var(--accent-danger);  border-color: var(--accent-danger); }
+    .vote-tally {
+      padding: 10px 14px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11px;
+    }
+    .vote-tally .label { color: var(--text-tertiary); letter-spacing: 0.15em; text-transform: uppercase; font-size: 10px; }
+    .vote-tally .bar {
+      flex: 1;
+      height: 6px;
+      background: var(--ground-surface);
+      position: relative;
+      overflow: hidden;
+    }
+    .vote-tally .bar .fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent-success);
+      width: 0;
+      transition: width 0.4s ease;
+    }
+    .vote-tally .result { color: var(--text-primary); }
+
+    /* judge verdict */
+    .claim {
+      padding: 12px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      border-left: 2px solid var(--accent-warm);
+      font-size: 12px;
+      color: var(--text-default);
+    }
+    .claim .lbl { color: var(--text-tertiary); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 6px; }
+    .verdict-card {
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-default);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .verdict-card.on { opacity: 1; transform: none; }
+    .verdict-card .reason { font-size: 11px; color: var(--text-secondary); line-height: 1.55; }
+    .verdict-card .reason .hdr { color: var(--text-tertiary); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 4px; }
+    .verdict-card .stamp {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border: 1px solid;
+    }
+    .verdict-card.confirmed .stamp { color: var(--accent-success); border-color: var(--accent-success); background: rgba(52,211,153,0.06); }
+    .verdict-card.rejected  .stamp { color: var(--accent-danger);  border-color: var(--accent-danger);  background: rgba(248,113,113,0.06); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">08 · multi-agent</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 08 — 5 patterns</div>
+  <div class="title">Multi-agent</div>
+  <div class="subtitle">When more than one mind is at work — nested delegation, fleets, handoffs, and the patterns that resolve disagreement.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <!-- 08.1 nested sub-agent -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">08.1</span>
+      <span class="name">Nested sub-agent</span>
+      <span class="desc">parent spawns child · indented</span>
+    </div>
+    <div class="pattern-body">
+      <div class="agent-card">
+        <div class="agent-bar">
+          <span class="glyph">A</span>
+          <span class="name">orchestrator</span>
+          <span class="task">refactor auth flow</span>
+          <span class="chip running status"><span class="dot"></span>delegating</span>
+        </div>
+        <div class="agent-body" id="p1-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08.2 fleet grid -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">08.2</span>
+      <span class="name">Agent fleet</span>
+      <span class="desc">N parallel agents · grid</span>
+    </div>
+    <div class="pattern-body">
+      <div class="fleet" id="p2"></div>
+    </div>
+  </div>
+
+  <!-- 08.3 handoff -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">08.3</span>
+      <span class="name">Handoff</span>
+      <span class="desc">baton pass · A → B</span>
+    </div>
+    <div class="pattern-body">
+      <div class="handoff" id="p3">
+        <div class="agent-card">
+          <div class="agent-bar">
+            <span class="glyph">P</span>
+            <span class="name">planner</span>
+            <span class="chip running status" id="p3a-s"><span class="dot"></span>thinking</span>
+          </div>
+          <div class="agent-body" id="p3a-body"></div>
+        </div>
+        <div class="arrow" id="p3-arrow">→</div>
+        <div class="agent-card">
+          <div class="agent-bar">
+            <span class="glyph">E</span>
+            <span class="name">executor</span>
+            <span class="chip pending status" id="p3b-s"><span class="dot"></span>idle</span>
+          </div>
+          <div class="agent-body" id="p3b-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08.4 voting -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">08.4</span>
+      <span class="name">Voting / consensus</span>
+      <span class="desc">N verifiers · perspective-diverse</span>
+    </div>
+    <div class="pattern-body">
+      <div class="vote-stack" id="p4"></div>
+    </div>
+  </div>
+
+  <!-- 08.5 judge verdict -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">08.5</span>
+      <span class="name">Judge verdict</span>
+      <span class="desc">claim → adversarial pass</span>
+    </div>
+    <div class="pattern-body">
+      <div id="p5"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 08.1 nested sub-agent
+  const P1body = document.getElementById('p1-body');
+  loop(async () => {
+    P1body.innerHTML = `
+      <span class="line"><span class="arr">→</span> read src/auth/*</span>
+      <span class="line"><span class="arr">→</span> spawn sub-agent <span class="accent">[security review]</span></span>
+      <div class="nest">
+        <div class="agent-card">
+          <div class="agent-bar">
+            <span class="glyph">S</span>
+            <span class="name">security-review</span>
+            <span class="chip running status sub-s"><span class="dot"></span>analyzing</span>
+          </div>
+          <div class="agent-body" id="p1-sub"></div>
+        </div>
+      </div>
+      <span class="line"><span class="arr">←</span> sub-agent returned 2 findings</span>
+      <span class="line"><span class="arr">→</span> applying patches</span>
+    `;
+    const lines = P1body.querySelectorAll(':scope > .line');
+    const subBody = document.getElementById('p1-sub');
+    const subStatus = P1body.querySelector('.sub-s');
+
+    lines[0].classList.add('on'); await sleep(500);
+    lines[1].classList.add('on'); await sleep(500);
+
+    const subLines = [
+      "scan token storage",
+      "check expiry logic",
+      "verify CSRF coverage",
+      "compare against OWASP-A2",
+    ];
+    for (const txt of subLines) {
+      const s = document.createElement('span');
+      s.className = 'line'; s.innerHTML = `<span class="arr">·</span> ${txt}`;
+      subBody.appendChild(s);
+      await sleep(20);
+      s.classList.add('on');
+      await sleep(rand(450, 700));
+    }
+    subStatus.className = 'chip done status';
+    subStatus.innerHTML = '<span class="dot"></span>done';
+    await sleep(400);
+
+    lines[2].classList.add('on'); await sleep(500);
+    lines[3].classList.add('on'); await sleep(900);
+  }, 2200);
+
+  // ---- 08.2 fleet
+  const P2 = document.getElementById('p2');
+  const fleet = [
+    { name: 'reader',    task: 'src/index.ts', steps: ['scanning imports', 'building call graph', 'done · 12ms'] },
+    { name: 'reader',    task: 'src/auth.ts',  steps: ['scanning imports', 'flagging exports', 'done · 9ms'] },
+    { name: 'reader',    task: 'src/db.ts',    steps: ['scanning imports', 'reading schema', 'done · 18ms'] },
+    { name: 'critic',    task: 'security',     steps: ['enumerating risks', 'cross-checking refs', 'done · 24ms'] },
+    { name: 'critic',    task: 'perf',         steps: ['profiling hot paths', 'noting allocations', 'done · 31ms'] },
+    { name: 'judge',     task: 'merge findings', steps: ['waiting on critics', 'deduplicating', 'done · 7ms'] },
+  ];
+  loop(async () => {
+    P2.innerHTML = fleet.map(f => `
+      <div class="agent-card">
+        <div class="agent-bar">
+          <span class="glyph">${f.name[0].toUpperCase()}</span>
+          <span class="name">${f.name}</span>
+          <span class="chip pending status"><span class="dot"></span>queue</span>
+        </div>
+        <div class="agent-body" data-task="${f.task}"><span class="dim">${f.task}</span></div>
+      </div>`).join('');
+    const cards = P2.querySelectorAll('.agent-card');
+    // start all
+    cards.forEach(c => {
+      const s = c.querySelector('.status');
+      s.className = 'chip running status';
+      s.innerHTML = '<span class="dot"></span>running';
+    });
+    // animate each independently
+    const tasks = Array.from(cards).map(async (card, i) => {
+      const body = card.querySelector('.agent-body');
+      const s = card.querySelector('.status');
+      for (const step of fleet[i].steps) {
+        body.innerHTML = `<span class="dim">${fleet[i].task}</span><br><span class="hi">${step}</span>`;
+        await sleep(rand(550, 1200));
+      }
+      s.className = 'chip done status';
+      s.innerHTML = '<span class="dot"></span>done';
+    });
+    await Promise.all(tasks);
+    await sleep(1400);
+  }, 1400);
+
+  // ---- 08.3 handoff
+  const P3aBody = document.getElementById('p3a-body');
+  const P3bBody = document.getElementById('p3b-body');
+  const P3aS = document.getElementById('p3a-s');
+  const P3bS = document.getElementById('p3b-s');
+  const P3arrow = document.getElementById('p3-arrow');
+  loop(async () => {
+    P3aS.className = 'chip running status'; P3aS.innerHTML = '<span class="dot"></span>thinking';
+    P3bS.className = 'chip pending status'; P3bS.innerHTML = '<span class="dot"></span>idle';
+    P3arrow.classList.remove('on');
+
+    const planSteps = ['drafting steps', 'ordering deps', 'plan ready'];
+    P3aBody.innerHTML = '';
+    P3bBody.innerHTML = '';
+    for (const s of planSteps) {
+      const sp = document.createElement('span');
+      sp.className = 'line'; sp.innerHTML = `<span class="arr">·</span> ${s}`;
+      P3aBody.appendChild(sp);
+      await sleep(20); sp.classList.add('on');
+      await sleep(rand(500, 800));
+    }
+    P3aS.className = 'chip done status'; P3aS.innerHTML = '<span class="dot"></span>handoff <span class="baton"></span>';
+    P3arrow.classList.add('on');
+    await sleep(700);
+
+    P3bS.className = 'chip running status'; P3bS.innerHTML = '<span class="dot"></span>executing';
+    const execSteps = ['received plan', 'running step 1/3', 'running step 2/3', 'running step 3/3', 'all done'];
+    for (const s of execSteps) {
+      const sp = document.createElement('span');
+      sp.className = 'line'; sp.innerHTML = `<span class="arr">·</span> ${s}`;
+      P3bBody.appendChild(sp);
+      await sleep(20); sp.classList.add('on');
+      await sleep(rand(450, 700));
+    }
+    P3bS.className = 'chip done status'; P3bS.innerHTML = '<span class="dot"></span>done';
+    await sleep(1400);
+  }, 1500);
+
+  // ---- 08.4 voting
+  const P4 = document.getElementById('p4');
+  const verifiers = [
+    { lens: 'correctness', text: 'Logic matches the spec',          v: 'yes', c: 0.92 },
+    { lens: 'security',    text: 'No new attack surface introduced', v: 'yes', c: 0.81 },
+    { lens: 'performance', text: 'Adds 12ms tail latency',          v: 'no',  c: 0.74 },
+    { lens: 'tests',       text: 'Coverage holds at 87%',           v: 'yes', c: 0.88 },
+    { lens: 'reproducibility', text: 'Reproducible in CI',          v: 'yes', c: 0.95 },
+  ];
+  loop(async () => {
+    P4.innerHTML = verifiers.map((v, i) => `
+      <div class="vote-row">
+        <span class="ord">${String(i+1).padStart(2,'0')}</span>
+        <div class="perspective"><span class="lens">${v.lens}</span><br>${v.text}</div>
+        <span class="conf">conf ${v.c.toFixed(2)}</span>
+        <span class="verdict ${v.v}">${v.v === 'yes' ? 'survives' : 'refutes'}</span>
+      </div>
+    `).join('') + `
+      <div class="vote-tally">
+        <span class="label">consensus</span>
+        <div class="bar"><div class="fill"></div></div>
+        <span class="result" id="p4-res">— / —</span>
+      </div>
+    `;
+    const rows = P4.querySelectorAll('.vote-row');
+    let yes = 0;
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].classList.add('on');
+      if (verifiers[i].v === 'yes') yes++;
+      const fill = P4.querySelector('.vote-tally .fill');
+      const res = P4.querySelector('#p4-res');
+      const pct = yes / verifiers.length;
+      fill.style.width = (pct * 100) + '%';
+      res.textContent = `${yes} / ${verifiers.length}`;
+      await sleep(rand(450, 720));
+    }
+    await sleep(1400);
+  }, 1500);
+
+  // ---- 08.5 judge verdict
+  const P5 = document.getElementById('p5');
+  const cases = [
+    {
+      claim: "Lines 42–48 of cache.ts will return stale values when the TTL expires mid-request.",
+      verdict: 'confirmed',
+      stamp: 'real',
+      reason: "Reproduced with a clock-skewed test. The guard at line 46 reads `now` once, then re-uses it past the boundary at line 48. Fix: re-check `now` after the await."
+    },
+    {
+      claim: "The migration introduces a deadlock between insert and the autovacuum process.",
+      verdict: 'rejected',
+      stamp: 'false alarm',
+      reason: "Autovacuum acquires a SHARE UPDATE EXCLUSIVE lock, which is compatible with INSERT's row-level lock. The two never block each other."
+    },
+  ];
+  let caseIdx = 0;
+  loop(async () => {
+    const c = cases[caseIdx % cases.length];
+    P5.innerHTML = `
+      <div class="claim"><div class="lbl">claim</div>${c.claim}</div>
+      <div class="verdict-card ${c.verdict}">
+        <div class="reason"><div class="hdr">judge</div>${c.reason}</div>
+        <span class="stamp">${c.stamp}</span>
+      </div>
+    `;
+    const card = P5.querySelector('.verdict-card');
+    await sleep(900);
+    card.classList.add('on');
+    await sleep(2200);
+    caseIdx++;
+  }, 1200);
+</script>
+
+</body>
+</html>

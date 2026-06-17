@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02 · reasoning &amp; cognition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stream { white-space: pre-wrap; word-break: break-word; }
+
+    /* 02.1 thinking trace */
+    .think {
+      font-style: italic;
+      color: var(--text-tertiary);
+      border-left: 1px solid var(--border-default);
+      padding-left: var(--space-16);
+      line-height: 1.7;
+    }
+    .think .live { color: var(--text-secondary); }
+
+    /* 02.2 collapsed summary */
+    .thought-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .thought-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+    }
+    .thought-bar .carat {
+      display: inline-block;
+      width: 10px;
+      transition: transform 0.2s;
+    }
+    .thought-bar .label { color: var(--text-secondary); }
+    .thought-bar .timer { font-variant-numeric: tabular-nums; }
+    .thought-bar .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-warm); animation: pulse 1s infinite; }
+    .thought-bar.done .dot { background: var(--accent-success); animation: none; }
+    .thought-bar.collapsed .carat { transform: rotate(-90deg); }
+    .thought-body {
+      font-style: italic;
+      color: var(--text-tertiary);
+      padding-left: var(--space-16);
+      border-left: 1px solid var(--border-default);
+      line-height: 1.7;
+      max-height: 200px;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s, padding 0.4s;
+    }
+    .thought-body.hidden {
+      max-height: 0;
+      opacity: 0;
+      border-color: transparent;
+    }
+
+    /* 02.3 CoT steps */
+    .cot-steps { display: flex; flex-direction: column; gap: 10px; }
+    .cot-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .cot-step.on { opacity: 1; transform: none; }
+    .cot-step .ord {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.15em;
+      padding-top: 3px;
+      border-top: 1px solid var(--border-default);
+      text-align: center;
+    }
+    .cot-step .ord.active { color: var(--accent); border-color: var(--accent); }
+    .cot-step .body { font-size: 12px; color: var(--text-default); line-height: 1.55; }
+
+    /* 02.4 self-correction */
+    .correct .seg { display: inline; }
+    .correct .ditch {
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+      text-decoration-color: var(--accent-danger);
+    }
+    .correct .aside {
+      color: var(--accent-warm);
+      font-style: italic;
+    }
+
+    /* 02.5 confidence hints */
+    .conf p { margin-bottom: 8px; line-height: 1.7; }
+    .conf .tok {
+      position: relative;
+      padding: 0 2px;
+    }
+    .conf .lo  { background: linear-gradient(transparent 70%, rgba(248, 113, 113, 0.25) 70%); }
+    .conf .mid { background: linear-gradient(transparent 70%, rgba(255, 157, 58, 0.22) 70%); }
+    .conf .hi  { background: linear-gradient(transparent 70%, rgba(52, 211, 153, 0.18) 70%); }
+    .conf .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: var(--space-16);
+    }
+    .conf .legend .sw {
+      display: inline-block;
+      width: 14px;
+      height: 5px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">02 · reasoning &amp; cognition</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 02 — 5 patterns</div>
+  <div class="title">Reasoning &amp; cognition</div>
+  <div class="subtitle">How the agent's internal deliberation surfaces — usually quieter, often collapsible, sometimes hinting at its own uncertainty.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">02.1</span>
+      <span class="name">Thinking trace</span>
+      <span class="desc">italic · dimmed · indented</span>
+    </div>
+    <div class="pattern-body">
+      <div class="think stream" id="p1"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">02.2</span>
+      <span class="name">Collapsed summary</span>
+      <span class="desc">"thought for N.Ns" · expandable</span>
+    </div>
+    <div class="pattern-body">
+      <div class="thought-shell" id="p2">
+        <div class="thought-bar"><span class="dot"></span><span class="carat">▾</span><span class="label">Thinking</span><span class="timer">0.0s</span></div>
+        <div class="thought-body stream"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">02.3</span>
+      <span class="name">Chain of thought</span>
+      <span class="desc">numbered steps · revealed in order</span>
+    </div>
+    <div class="pattern-body">
+      <div class="cot-steps" id="p3"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">02.4</span>
+      <span class="name">Self-correction</span>
+      <span class="desc">"wait — that's wrong" · backtrack</span>
+    </div>
+    <div class="pattern-body">
+      <div class="correct stream" id="p4"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">02.5</span>
+      <span class="name">Confidence hints</span>
+      <span class="desc">per-token uncertainty shading</span>
+    </div>
+    <div class="pattern-body">
+      <div class="conf" id="p5"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) {
+    (async () => { while (true) { await fn(); await sleep(idle); } })();
+  }
+  async function typeInto(el, txt, speed = [22, 55]) {
+    let buf = '';
+    for (const ch of txt) {
+      buf += ch;
+      el.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(/[ ,.]/.test(ch) ? rand(speed[0] * 2, speed[1] * 2) : rand(speed[0], speed[1]));
+    }
+    el.innerHTML = buf;
+  }
+
+  // ---- 02.1 thinking trace
+  const P1 = document.getElementById('p1');
+  loop(async () => {
+    const txt = "The user wants pagination. I should check whether the current API returns a total count — if not, we'll need cursor-based instead of offset. Let me look at the response schema first.";
+    await typeInto(P1, txt, [16, 42]);
+  }, 2400);
+
+  // ---- 02.2 collapsed summary
+  const P2 = document.getElementById('p2');
+  const bar = P2.querySelector('.thought-bar');
+  const carat = P2.querySelector('.carat');
+  const timer = P2.querySelector('.timer');
+  const body = P2.querySelector('.thought-body');
+  loop(async () => {
+    bar.classList.remove('done', 'collapsed');
+    body.classList.remove('hidden');
+    body.innerHTML = '';
+    const txt = "Considering whether to use a worker thread. Pros: doesn't block the main loop. Cons: startup overhead matters for short tasks. Given this runs every minute, worker probably wins.";
+    let elapsed = 0;
+    const tick = setInterval(() => {
+      elapsed += 0.1;
+      timer.textContent = elapsed.toFixed(1) + 's';
+    }, 100);
+    await typeInto(body, txt, [14, 38]);
+    clearInterval(tick);
+    bar.classList.add('done');
+    await sleep(700);
+    bar.classList.add('collapsed');
+    body.classList.add('hidden');
+  }, 2200);
+
+  // ---- 02.3 CoT steps
+  const P3 = document.getElementById('p3');
+  const steps = [
+    "Identify the bottleneck — likely the join on transactions.",
+    "Check if the index on user_id covers the query plan.",
+    "If missing, add a composite index on (user_id, created_at).",
+    "Re-run EXPLAIN and compare cost."
+  ];
+  loop(async () => {
+    P3.innerHTML = steps.map((s, i) =>
+      `<div class="cot-step"><div class="ord">${String(i+1).padStart(2,'0')}</div><div class="body">${s}</div></div>`
+    ).join('');
+    const items = P3.querySelectorAll('.cot-step');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.add('on');
+      items[i].querySelector('.ord').classList.add('active');
+      if (i > 0) items[i-1].querySelector('.ord').classList.remove('active');
+      await sleep(rand(700, 1100));
+    }
+    items[items.length - 1].querySelector('.ord').classList.remove('active');
+  }, 1800);
+
+  // ---- 02.4 self-correction
+  const P4 = document.getElementById('p4');
+  loop(async () => {
+    P4.innerHTML = '';
+    const seg1 = "If we batch the requests every 100ms, the worst case latency is ";
+    await typeInto(P4, seg1, [16, 40]);
+    let buf = seg1;
+    const wrong = "200ms.";
+    for (const ch of wrong) {
+      buf += ch;
+      P4.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(22, 50));
+    }
+    await sleep(550);
+    // backtrack
+    const stricken = buf.slice(0, seg1.length) + `<span class="ditch">${wrong}</span>`;
+    P4.innerHTML = stricken + ' <span class="aside">wait — also network RTT.</span> <span class="caret"></span>';
+    await sleep(800);
+    const fix = " So worst case is ~250ms, not 200.";
+    let acc = '';
+    for (const ch of fix) {
+      acc += ch;
+      P4.innerHTML = stricken + ` <span class="aside">wait — also network RTT.</span>${acc}<span class="caret"></span>`;
+      await sleep(rand(20, 48));
+    }
+    P4.innerHTML = stricken + ` <span class="aside">wait — also network RTT.</span>${fix}`;
+  }, 2400);
+
+  // ---- 02.5 confidence hints
+  const P5 = document.getElementById('p5');
+  const tokens = [
+    { t: "The migration script ", c: 'hi' },
+    { t: "should ", c: 'mid' },
+    { t: "complete in ", c: 'hi' },
+    { t: "roughly four minutes", c: 'lo' },
+    { t: ", though ", c: 'hi' },
+    { t: "the vacuum step ", c: 'mid' },
+    { t: "may dominate if the table is fragmented", c: 'lo' },
+    { t: ".", c: 'hi' },
+  ];
+  const legend = `
+    <div class="legend">
+      <span><span class="sw hi"></span>high</span>
+      <span><span class="sw mid"></span>med</span>
+      <span><span class="sw lo"></span>low</span>
+    </div>`;
+  loop(async () => {
+    P5.innerHTML = '<p id="conf-p"></p>' + legend;
+    const target = P5.querySelector('#conf-p');
+    for (const tk of tokens) {
+      const span = document.createElement('span');
+      span.className = 'tok ' + tk.c;
+      span.style.opacity = '0';
+      span.style.transition = 'opacity 0.25s';
+      span.textContent = tk.t;
+      target.appendChild(span);
+      await sleep(20);
+      span.style.opacity = '1';
+      await sleep(rand(180, 420));
+    }
+  }, 2400);
+</script>
+
+</body>
+</html>

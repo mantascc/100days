@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10 · control &amp; interruption</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stream { white-space: pre-wrap; line-height: 1.7; }
+    .stream.dimmed { color: var(--text-tertiary); }
+    .frozen-tag {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-danger);
+      border: 1px solid var(--accent-danger);
+      padding: 1px 7px;
+      vertical-align: middle;
+    }
+    .ghost-tail {
+      color: var(--text-ghost);
+      text-decoration: line-through;
+      text-decoration-color: rgba(248,113,113,0.3);
+    }
+
+    /* resume */
+    .resume-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      border-left: 2px solid var(--accent-warm);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .resume-bar .label { color: var(--text-default); }
+    .resume-bar button.primary {
+      margin-left: auto;
+      padding: 5px 12px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .resume-bar button.primary.active { background: rgba(0,168,255,0.1); }
+
+    /* user message edit */
+    .msg-user {
+      align-self: flex-end;
+      max-width: 80%;
+      margin-left: auto;
+      padding: 10px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 12px;
+      color: var(--text-default);
+      position: relative;
+      transition: border-color 0.15s;
+    }
+    .msg-user.editing {
+      border-color: var(--accent);
+      background: var(--ground-base);
+    }
+    .msg-user .edit-btn {
+      position: absolute;
+      top: -10px; right: -8px;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      background: var(--ground-base);
+      padding: 2px 6px;
+      border: 1px solid var(--border-default);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .msg-user .edit-btn.active { color: var(--accent); border-color: var(--accent); }
+    .msg-asst {
+      padding: 10px 14px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      max-width: 90%;
+    }
+    .msg-asst.replaced { opacity: 0.3; }
+    .msg-stack { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+
+    /* branch tree */
+    .tree {
+      position: relative;
+      padding: 8px 0;
+    }
+    .tree-row {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 11px;
+    }
+    .tree-row .glyph {
+      text-align: center;
+      color: var(--text-tertiary);
+      font-family: var(--font-mono);
+    }
+    .tree-row .glyph.now { color: var(--accent); }
+    .tree-row .glyph.branch { color: var(--accent-warm); }
+    .tree-row .label { color: var(--text-default); }
+    .tree-row .label .meta { color: var(--text-tertiary); font-size: 10px; margin-left: 8px; letter-spacing: 0.1em; }
+    .tree-row.future .label { color: var(--text-ghost); }
+
+    /* undo toast */
+    .undo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .undo .summary { color: var(--text-default); }
+    .undo .summary .count { color: var(--accent); }
+    .undo .timer {
+      flex: 1;
+      height: 1px;
+      background: var(--ground-surface);
+      position: relative;
+    }
+    .undo .timer .fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent-warm);
+      width: 100%;
+      transition: width linear;
+    }
+    .undo button {
+      padding: 5px 12px;
+      border: 1px solid var(--accent-warm);
+      color: var(--accent-warm);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .undo.applied { border-color: var(--accent-success); }
+    .undo.applied .summary .count { color: var(--accent-success); }
+    .undo.reverted { opacity: 0.7; border-color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">10 · control &amp; interruption</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 10 — 5 patterns</div>
+  <div class="title">Control &amp; interruption</div>
+  <div class="subtitle">The user side of the conversation — stopping, steering, rewinding, forking. Reversibility made visible.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">10.1</span>
+      <span class="name">Cancel mid-stream</span>
+      <span class="desc">freeze · dim · tail strike-through</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream" id="p1"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">10.2</span>
+      <span class="name">Resume</span>
+      <span class="desc">paused stream · continuation bar</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream" id="p2-text"></div>
+      <div class="resume-bar" id="p2-bar" style="display:none;">
+        <span class="label">paused at 380 tokens</span>
+        <span class="dim">— continuation available</span>
+        <button class="primary" id="p2-resume">resume</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">10.3</span>
+      <span class="name">Edit &amp; retry</span>
+      <span class="desc">edit prior message · regenerate</span>
+    </div>
+    <div class="pattern-body">
+      <div class="msg-stack" id="p3"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">10.4</span>
+      <span class="name">Branch / fork</span>
+      <span class="desc">timeline · diverging paths</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tree" id="p4"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">10.5</span>
+      <span class="name">Undo last action</span>
+      <span class="desc">snackbar · countdown · revert</span>
+    </div>
+    <div class="pattern-body">
+      <div id="p5"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 10.1 cancel mid-stream
+  const P1 = document.getElementById('p1');
+  loop(async () => {
+    const head = "The most likely cause is a missing index on the join column. ";
+    const tail = "Once added, the planner should switch from a hash join to a nested loop, cutting the query time by an order of magnitude.";
+    const cutAt = 28; // chars into tail before cancel
+    P1.classList.remove('dimmed');
+    P1.innerHTML = '';
+    let buf = '';
+    for (const ch of head) {
+      buf += ch;
+      P1.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(18, 50));
+    }
+    let i = 0;
+    for (const ch of tail) {
+      if (i++ >= cutAt) break;
+      buf += ch;
+      P1.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(18, 50));
+    }
+    // user hits cancel
+    P1.innerHTML = buf + '<span class="frozen-tag">cancelled</span>';
+    await sleep(2000);
+  }, 1600);
+
+  // ---- 10.2 resume
+  const P2text = document.getElementById('p2-text');
+  const P2bar = document.getElementById('p2-bar');
+  const P2resume = document.getElementById('p2-resume');
+  loop(async () => {
+    const part1 = "I started analyzing the migration. The new column requires a default backfill, ";
+    const part2 = "which on a 50M-row table will lock writes for roughly 18 minutes. We should switch to an additive migration: add column nullable, backfill in batches, then enforce NOT NULL.";
+
+    P2text.innerHTML = '';
+    P2bar.style.display = 'none';
+    P2resume.classList.remove('active');
+
+    let buf = '';
+    for (const ch of part1) {
+      buf += ch;
+      P2text.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(15, 40));
+    }
+    P2text.innerHTML = buf;
+    P2bar.style.display = 'flex';
+    await sleep(1400);
+    P2resume.classList.add('active');
+    await sleep(400);
+    P2bar.style.display = 'none';
+
+    for (const ch of part2) {
+      buf += ch;
+      P2text.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(15, 40));
+    }
+    P2text.innerHTML = buf;
+    await sleep(1800);
+  }, 1400);
+
+  // ---- 10.3 edit & retry
+  const P3 = document.getElementById('p3');
+  loop(async () => {
+    P3.innerHTML = `
+      <div class="msg-user">Write me a haiku about deploy day.<span class="edit-btn">edit</span></div>
+      <div class="msg-asst" id="asst-orig">Cold ship, hot coffee —
+the merge queue exhales softly,
+prod inhales the change.</div>
+    `;
+    const user = P3.querySelector('.msg-user');
+    const edit = P3.querySelector('.edit-btn');
+    const orig = P3.querySelector('#asst-orig');
+    await sleep(1400);
+    edit.classList.add('active');
+    await sleep(300);
+    user.classList.add('editing');
+    user.firstChild.textContent = 'Write me a haiku about deploy day, but anxious.';
+    await sleep(900);
+    user.classList.remove('editing');
+    edit.classList.remove('active');
+    orig.classList.add('replaced');
+
+    const newAsst = document.createElement('div');
+    newAsst.className = 'msg-asst';
+    P3.appendChild(newAsst);
+    const txt = "Finger hovers green —\nrollback plans recited twice,\nwind through empty halls.";
+    let buf = '';
+    for (const ch of txt) {
+      buf += ch;
+      newAsst.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(18, 55));
+    }
+    newAsst.innerHTML = buf;
+    await sleep(2000);
+  }, 1500);
+
+  // ---- 10.4 branch / fork
+  const P4 = document.getElementById('p4');
+  const tree = [
+    { g: '●', label: 'why is the build flaky?', meta: 'main · 2 min ago', cls: '' },
+    { g: '│', label: '', meta: '', cls: '' },
+    { g: '●', label: 'looking at race condition in test setup', meta: 'main', cls: 'now' },
+    { g: '├─', label: 'try fix A · debounce setUp()', meta: 'fork · branch-a', cls: 'branch' },
+    { g: '│', label: '', meta: '', cls: 'future' },
+    { g: '●', label: 'still flaky · 12% fail rate', meta: 'branch-a', cls: 'future' },
+    { g: '└─', label: 'try fix B · isolate db per worker', meta: 'fork · branch-b', cls: 'branch' },
+    { g: '│', label: '', meta: '', cls: 'future' },
+    { g: '●', label: 'green · 0 fails over 200 runs', meta: 'branch-b', cls: 'future' },
+  ];
+  loop(async () => {
+    P4.innerHTML = tree.map(r =>
+      `<div class="tree-row ${r.cls === 'future' ? 'future' : ''}">
+        <span class="glyph ${r.cls}">${r.g}</span>
+        <span class="label">${r.label}${r.meta ? `<span class="meta">${r.meta}</span>` : ''}</span>
+      </div>`
+    ).join('');
+    // animate the "future" rows fading in
+    const futures = P4.querySelectorAll('.tree-row.future');
+    futures.forEach(f => { f.style.opacity = '0'; f.style.transition = 'opacity 0.4s'; });
+    await sleep(1200);
+    for (const f of futures) {
+      f.style.opacity = '1';
+      await sleep(rand(180, 380));
+    }
+    await sleep(1800);
+  }, 1600);
+
+  // ---- 10.5 undo
+  const P5 = document.getElementById('p5');
+  loop(async () => {
+    P5.innerHTML = `<div class="undo">
+      <span class="summary">Edited <span class="count">4 files</span></span>
+      <span class="timer"><span class="fill"></span></span>
+      <button>undo</button>
+    </div>`;
+    const card = P5.querySelector('.undo');
+    const fill = card.querySelector('.fill');
+    fill.style.transitionDuration = '3000ms';
+    await sleep(60);
+    fill.style.width = '0%';
+    await sleep(2200);
+    // user clicks undo
+    card.classList.add('reverted');
+    card.querySelector('.summary').innerHTML = 'Reverted <span class="count">4 files</span> to prior state';
+    card.querySelector('button').style.display = 'none';
+    fill.style.background = 'var(--text-tertiary)';
+    await sleep(1800);
+  }, 1200);
+</script>
+
+</body>
+</html>

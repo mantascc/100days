@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01 · text streaming</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stream { white-space: pre-wrap; word-break: break-word; }
+    .word-stream span { opacity: 0; transition: opacity 0.18s ease-out; }
+    .word-stream span.on { opacity: 1; }
+    .sent-stream p {
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      margin-bottom: 8px;
+    }
+    .sent-stream p.on { opacity: 1; transform: none; }
+
+    /* markdown progressive */
+    .md-stream h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: 0.04em;
+      margin: 0 0 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .md-stream ul { list-style: none; padding: 0; margin: 0; }
+    .md-stream li {
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.3s, transform 0.3s;
+      padding: 2px 0;
+      color: var(--text-default);
+    }
+    .md-stream li::before {
+      content: '— ';
+      color: var(--text-tertiary);
+    }
+    .md-stream .on { opacity: 1; transform: none; }
+
+    /* code stream */
+    .code-stream {
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      white-space: pre;
+      line-height: 1.7;
+    }
+    .code-stream .k { color: var(--accent); transition: color 0.4s; }
+    .code-stream .s { color: var(--accent-warm); transition: color 0.4s; }
+    .code-stream .c { color: var(--accent-success); transition: color 0.4s; }
+    .code-stream .n { color: var(--text-primary); transition: color 0.4s; }
+    .code-stream .raw { color: var(--text-secondary) !important; }
+
+    /* mid-stream edit */
+    .edit-stream .strike {
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+      text-decoration-color: var(--accent-danger);
+    }
+    .edit-stream .add {
+      color: var(--accent-success);
+      background: rgba(52, 211, 153, 0.08);
+      padding: 0 2px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">01 · text streaming</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 01 — 6 patterns</div>
+  <div class="title">Text streaming</div>
+  <div class="subtitle">How model output appears as it arrives. The base rhythm under every agent UI.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">01.1</span>
+      <span class="name">Token reveal</span>
+      <span class="desc">char-by-char · jittered cadence</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream" id="p1"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">01.2</span>
+      <span class="name">Word reveal</span>
+      <span class="desc">chunked · fade-in per word</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream word-stream" id="p2"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">01.3</span>
+      <span class="name">Sentence reveal</span>
+      <span class="desc">block-level · rise + fade</span>
+    </div>
+    <div class="pattern-body">
+      <div class="sent-stream" id="p3"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">01.4</span>
+      <span class="name">Markdown progressive</span>
+      <span class="desc">elements materialize as parsed</span>
+    </div>
+    <div class="pattern-body">
+      <div class="md-stream" id="p4"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">01.5</span>
+      <span class="name">Code + syntax catch-up</span>
+      <span class="desc">raw stream · highlight follows</span>
+    </div>
+    <div class="pattern-body">
+      <div class="code-stream" id="p5"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">01.6</span>
+      <span class="name">Mid-stream edit</span>
+      <span class="desc">model rewrites a prior phrase</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream edit-stream" id="p6"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function loop(fn, idle = 2400) {
+    (async function spin() {
+      while (true) {
+        await fn();
+        await sleep(idle);
+      }
+    })();
+  }
+
+  // ---- 01.1 token reveal
+  const P1 = document.getElementById('p1');
+  loop(async () => {
+    const txt = "Tokens arrive one at a time, each one a small decision sampled from a distribution over the vocabulary.";
+    P1.innerHTML = '<span class="caret"></span>';
+    let buf = '';
+    for (const ch of txt) {
+      buf += ch;
+      P1.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(/[ ,.]/.test(ch) ? rand(40, 110) : rand(18, 55));
+    }
+    await sleep(500);
+    P1.innerHTML = buf;
+  });
+
+  // ---- 01.2 word reveal
+  const P2 = document.getElementById('p2');
+  loop(async () => {
+    const words = "Word streaming groups tokens into visible chunks. Each word fades in as it commits.".split(/(\s+)/);
+    P2.innerHTML = words.map(w => /\s/.test(w) ? w : `<span>${w}</span>`).join('');
+    const spans = P2.querySelectorAll('span');
+    for (const s of spans) {
+      s.classList.add('on');
+      await sleep(rand(60, 160));
+    }
+  });
+
+  // ---- 01.3 sentence reveal
+  const P3 = document.getElementById('p3');
+  loop(async () => {
+    const sents = [
+      "Sentences land as complete blocks.",
+      "Useful when the agent buffers before flushing.",
+      "Feels more deliberate, less keyboard-y."
+    ];
+    P3.innerHTML = sents.map(s => `<p>${s}</p>`).join('');
+    const ps = P3.querySelectorAll('p');
+    for (const p of ps) {
+      p.classList.add('on');
+      await sleep(rand(550, 850));
+    }
+  });
+
+  // ---- 01.4 markdown progressive
+  const P4 = document.getElementById('p4');
+  loop(async () => {
+    P4.innerHTML = `
+      <h3>Steps to migrate</h3>
+      <ul>
+        <li>Snapshot the current schema</li>
+        <li>Run the up migration on staging</li>
+        <li>Verify row counts match</li>
+        <li>Cut over traffic</li>
+      </ul>
+    `;
+    const heading = P4.querySelector('h3');
+    const items = P4.querySelectorAll('li');
+    await sleep(120);
+    heading.classList.add('on');
+    await sleep(420);
+    for (const li of items) {
+      li.classList.add('on');
+      await sleep(rand(280, 520));
+    }
+  });
+
+  // ---- 01.5 code + syntax catch-up
+  const P5 = document.getElementById('p5');
+  const tokens = [
+    { t: 'k',   s: 'function' },
+    { t: 'n',   s: ' stream' },
+    { t: 'raw', s: '(' },
+    { t: 'n',   s: 'text' },
+    { t: 'raw', s: ', ' },
+    { t: 'n',   s: 'rate' },
+    { t: 'raw', s: ') {\n  ' },
+    { t: 'k',   s: 'for' },
+    { t: 'raw', s: ' (' },
+    { t: 'k',   s: 'const' },
+    { t: 'raw', s: ' ch ' },
+    { t: 'k',   s: 'of' },
+    { t: 'raw', s: ' text) ' },
+    { t: 'c',   s: '// per character\n  ' },
+    { t: 'raw', s: '  yield ' },
+    { t: 's',   s: '`${ch}`' },
+    { t: 'raw', s: ';\n}' },
+  ];
+  loop(async () => {
+    P5.innerHTML = '';
+    const spans = [];
+    for (const tok of tokens) {
+      const span = document.createElement('span');
+      span.className = tok.t === 'raw' ? '' : 'raw';
+      span.dataset.target = tok.t;
+      span.textContent = tok.s;
+      P5.appendChild(span);
+      spans.push(span);
+      await sleep(rand(35, 95));
+    }
+    await sleep(280);
+    // syntax catches up
+    for (const s of spans) {
+      const target = s.dataset.target;
+      if (target && target !== 'raw') {
+        s.classList.remove('raw');
+        s.classList.add(target);
+      }
+      await sleep(rand(20, 45));
+    }
+  }, 2200);
+
+  // ---- 01.6 mid-stream edit
+  const P6 = document.getElementById('p6');
+  loop(async () => {
+    P6.innerHTML = '';
+    const part1 = "The cache layer uses ";
+    const wrong = "Redis with a 60-second TTL.";
+    const correction = "Memcached with a 90-second TTL.";
+
+    let buf = part1;
+    for (const ch of part1) {
+      P6.innerHTML = buf.slice(0, buf.indexOf(ch) + 1) + '<span class="caret"></span>';
+      await sleep(rand(20, 60));
+    }
+    let typed = '';
+    for (const ch of wrong) {
+      typed += ch;
+      P6.innerHTML = part1 + typed + '<span class="caret"></span>';
+      await sleep(rand(20, 60));
+    }
+    await sleep(650);
+    // strike the wrong half
+    P6.innerHTML = part1 + `<span class="strike">${wrong}</span> <span class="caret"></span>`;
+    await sleep(480);
+    let fix = '';
+    for (const ch of correction) {
+      fix += ch;
+      P6.innerHTML = part1 + `<span class="strike">${wrong}</span> <span class="add">${fix}</span><span class="caret"></span>`;
+      await sleep(rand(22, 60));
+    }
+    await sleep(500);
+    P6.innerHTML = part1 + `<span class="strike">${wrong}</span> <span class="add">${correction}</span>`;
+  }, 2600);
+</script>
+
+</body>
+</html>
