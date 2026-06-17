@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>86 · agent-stream scrub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+      --warn: #ffb84d;
+      --error: #ff5c5c;
+      --good: #6fd99e;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-weight: 300;
+      overflow: hidden;
+    }
+    body { display: flex; flex-direction: column; }
+
+    header {
+      padding: 20px 32px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+    .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+    header h1 {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+    header p {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      max-width: 78ch;
+      line-height: 1.55;
+    }
+
+    .body {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    aside {
+      width: 240px;
+      border-right: 1px solid var(--border-subtle);
+      background: var(--ground-base);
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .pattern-item {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      transition: background 120ms;
+      position: relative;
+    }
+    .pattern-item:hover { background: var(--ground-raised); }
+    .pattern-item.active { background: var(--ground-surface); }
+    .pattern-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--accent);
+    }
+    .pattern-num { color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+    .pattern-name { color: var(--text-default); text-transform: lowercase; }
+    .pattern-item.active .pattern-name { color: var(--text-primary); }
+
+    .workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .work-head {
+      padding: 18px 32px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .work-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+    .work-num {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.12em;
+      font-variant-numeric: tabular-nums;
+    }
+    .work-title {
+      font-size: 14px;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+      text-transform: lowercase;
+    }
+    .work-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      max-width: 80ch;
+    }
+
+    .tracks {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 32px 0;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .track {
+      border: 1px solid var(--border-subtle);
+      background: var(--ground-base);
+      position: relative;
+      overflow: hidden;
+    }
+    .track-label {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .surface {
+      flex: 1;
+      padding: 36px 24px 20px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-default);
+      overflow: hidden;
+      min-height: 220px;
+    }
+
+    .mechanism {
+      height: 96px;
+      padding: 28px 24px 22px;
+      position: relative;
+    }
+    .mech-track-line {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 30px;
+      height: 1px;
+      background: var(--border-default);
+    }
+    .mech-tick {
+      position: absolute;
+      bottom: 22px;
+      width: 1px;
+      height: 16px;
+      background: var(--text-tertiary);
+      cursor: help;
+    }
+    .mech-tick.fired { background: var(--accent); height: 20px; bottom: 22px; }
+    .mech-tick:hover { background: var(--text-primary); }
+    .mech-tick-label {
+      position: absolute;
+      bottom: 4px;
+      font-size: 9px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.06em;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .mech-tick-label.fired { color: var(--accent); }
+    .mech-tick-tooltip {
+      position: absolute;
+      bottom: 56px;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      padding: 4px 8px;
+      font-size: 10px;
+      color: var(--text-default);
+      letter-spacing: 0.06em;
+      transform: translateX(-50%);
+      pointer-events: none;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      opacity: 0;
+      transition: opacity 120ms;
+      z-index: 5;
+    }
+    .mech-tick-tooltip.show { opacity: 1; }
+    .mech-band {
+      position: absolute;
+      bottom: 30px;
+      height: 8px;
+      background: rgba(255, 184, 77, 0.18);
+      border-left: 1px solid var(--warn);
+      border-right: 1px solid var(--warn);
+    }
+    .mech-band-label {
+      position: absolute;
+      bottom: 5px;
+      font-size: 9px;
+      color: var(--warn);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .playhead-line {
+      position: absolute;
+      top: 0; bottom: 30px;
+      width: 1px;
+      background: var(--text-primary);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .scrubber {
+      padding: 14px 32px 22px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .play-btn, .speed-btn {
+      height: 32px;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.08em;
+      padding: 0 12px;
+    }
+    .play-btn { width: 32px; padding: 0; font-size: 12px; }
+    .play-btn:hover, .speed-btn:hover { border-color: var(--text-tertiary); }
+    .speed-btn.on { background: var(--text-primary); color: var(--ground-void); border-color: var(--text-primary); }
+
+    .speed-group { display: flex; gap: 4px; }
+
+    .scrub-track {
+      flex: 1;
+      height: 28px;
+      position: relative;
+      cursor: pointer;
+    }
+    .scrub-rail {
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: var(--border-default);
+      transform: translateY(-50%);
+    }
+    .scrub-fill {
+      position: absolute;
+      left: 0; top: 50%;
+      height: 1px;
+      background: var(--text-default);
+      transform: translateY(-50%);
+    }
+    .scrub-head {
+      position: absolute;
+      top: 50%;
+      width: 10px; height: 20px;
+      background: var(--text-primary);
+      transform: translate(-50%, -50%);
+    }
+    .scrub-time {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+      min-width: 96px;
+      text-align: right;
+    }
+
+    .keyhint {
+      padding: 10px 32px 16px;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: var(--text-ghost);
+      text-transform: uppercase;
+      display: flex;
+      gap: 18px;
+      flex-shrink: 0;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--ground-base);
+    }
+    .keyhint kbd {
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      padding: 2px 6px;
+      margin-right: 4px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 400;
+    }
+
+    /* surface widgets */
+    .tw-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 14px;
+      background: var(--text-primary);
+      vertical-align: text-bottom;
+      margin-left: 2px;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+    .strike { text-decoration: line-through; color: var(--text-tertiary); }
+    .insert { color: var(--accent); }
+    .dim { color: var(--text-tertiary); opacity: 0.55; }
+    .json {
+      font-family: var(--font-mono);
+      color: var(--text-default);
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .json .key { color: var(--accent); }
+    .json .val { color: var(--text-default); }
+    .json .punct { color: var(--text-tertiary); }
+    .tool-card {
+      border: 1px solid var(--border-default);
+      background: var(--ground-raised);
+      padding: 14px 16px;
+      font-size: 11px;
+      max-width: 420px;
+    }
+    .tool-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .tool-name { color: var(--text-default); font-size: 12px; letter-spacing: 0.02em; }
+    .tool-status {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-status::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+    }
+    .status-pending { color: var(--text-tertiary); }
+    .status-running { color: var(--accent); }
+    .status-done { color: var(--good); }
+    .status-error { color: var(--error); }
+    .status-wait { color: var(--warn); }
+    .tool-body { color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+    .countdown { color: var(--warn); font-size: 13px; letter-spacing: 0.06em; }
+    .micro-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border-subtle);
+      margin: 10px 0 6px;
+      position: relative;
+    }
+    .micro-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent);
+    }
+    .micro-fill.warn { background: var(--warn); }
+    .summary {
+      border-left: 2px solid var(--accent);
+      padding-left: 14px;
+      color: var(--text-default);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .approve-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .approve-row button {
+      padding: 4px 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: var(--ground-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-default);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .interrupt-tag {
+      color: var(--error);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      margin-left: 8px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">entry 86 · agent-stream</div>
+  <h1>streaming patterns as scrubbable timelines — mechanism exposed</h1>
+  <p>Top track shows what the user sees; bottom track shows what's actually happening — debounce gates, batch boundaries, retry windows, interrupt points. Drag the playhead, scrub with arrow keys, change speed. Mechanism ticks hover-reveal their exact firing time.</p>
+</header>
+
+<div class="body">
+  <aside id="sidebar"></aside>
+
+  <div class="workspace">
+    <div class="work-head">
+      <div class="work-title-row">
+        <div class="work-num" id="work-num"></div>
+        <div class="work-title" id="work-title">—</div>
+      </div>
+      <div class="work-desc" id="work-desc"></div>
+    </div>
+    <div class="tracks">
+      <div class="track" style="flex:1">
+        <div class="track-label">surface</div>
+        <div class="surface" id="surface"></div>
+      </div>
+      <div class="track">
+        <div class="track-label">mechanism</div>
+        <div class="mechanism" id="mechanism"></div>
+      </div>
+    </div>
+    <div class="scrubber">
+      <button class="play-btn" id="play" title="space">▶</button>
+      <div class="speed-group" id="speedGroup">
+        <button class="speed-btn" data-speed="0.5">0.5×</button>
+        <button class="speed-btn on" data-speed="1">1×</button>
+        <button class="speed-btn" data-speed="2">2×</button>
+      </div>
+      <div class="scrub-track" id="scrubTrack">
+        <div class="scrub-rail"></div>
+        <div class="scrub-fill" id="scrubFill"></div>
+        <div class="scrub-head" id="scrubHead"></div>
+      </div>
+      <div class="scrub-time" id="scrubTime">0.00 / 0.00s</div>
+    </div>
+    <div class="keyhint">
+      <span><kbd>space</kbd> play / pause</span>
+      <span><kbd>←</kbd> <kbd>→</kbd> step 200ms</span>
+      <span><kbd>shift + ← →</kbd> step 1s</span>
+      <span><kbd>[</kbd> <kbd>]</kbd> speed</span>
+      <span><kbd>↑</kbd> <kbd>↓</kbd> pattern</span>
+      <span><kbd>0</kbd> reset</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function typedUpTo(text, t, perChar=22) {
+  const n = Math.floor(t / perChar);
+  return text.slice(0, n);
+}
+function cursor(t, until) {
+  return t < until ? '<span class="tw-cursor"></span>' : '';
+}
+
+const PATTERNS = [
+  {
+    num: 6,
+    name: 'mid-stream edits',
+    desc: 'Model writes a wrong fact, then mid-stream deletes and rewrites it. Surface track shows the strike+replace. Mechanism track exposes the revise decision and the resume point.',
+    duration: 4200,
+    surface(t) {
+      const part1 = "The capital of France is ";
+      const wrong = "London.";
+      const right = "Paris, a city of two million.";
+      let out = '';
+      if (t < 1700) {
+        out = typedUpTo(part1, t);
+        if (t > part1.length * 22) {
+          const off = t - part1.length * 22;
+          out += typedUpTo(wrong, off);
+        }
+        out += cursor(t, 1700);
+      } else if (t < 2100) {
+        out = part1 + `<span class="strike">${wrong}</span>`;
+        out += cursor(t, 2100);
+      } else {
+        out = part1 + `<span class="strike">${wrong}</span> `;
+        const off = t - 2100;
+        out += `<span class="insert">${typedUpTo(right, off)}</span>`;
+        out += cursor(t, this.duration - 50);
+      }
+      return out;
+    },
+    ticks: [
+      { t: 1700, label: 'revise', fire: true },
+      { t: 1850, label: 'delete' },
+      { t: 2100, label: 'resume' },
+    ],
+  },
+  {
+    num: 10,
+    name: 'self-correction',
+    desc: 'Reasoning emits a wrong arithmetic step, then catches it and crosses it out before continuing. The mechanism track marks the doubt and the correction.',
+    duration: 4000,
+    surface(t) {
+      const setup = "Solve x² + 3x + 2 = 0.\nFactoring: (x + 1)(x + 2) = 0.\n";
+      const wrong = "Therefore x = 1 or x = 2.";
+      const right = "Therefore x = -1 or x = -2.";
+      let out = '';
+      if (t < 1800) {
+        out = typedUpTo(setup, t).replace(/\n/g, '<br>');
+        if (t > setup.length * 22) {
+          const off = t - setup.length * 22;
+          out += typedUpTo(wrong, off);
+        }
+        out += cursor(t, 1800);
+      } else if (t < 2200) {
+        out = setup.replace(/\n/g, '<br>') + `<span class="strike">${wrong}</span>`;
+        out += cursor(t, 2200);
+      } else {
+        out = setup.replace(/\n/g, '<br>') + `<span class="strike">${wrong}</span><br>`;
+        const off = t - 2200;
+        out += `<span class="insert">${typedUpTo(right, off)}</span>`;
+        out += cursor(t, this.duration - 50);
+      }
+      return out;
+    },
+    ticks: [
+      { t: 1800, label: 'doubt', fire: true },
+      { t: 2200, label: 'correct' },
+    ],
+  },
+  {
+    num: 13,
+    name: 'streaming json arguments',
+    desc: 'Tool arguments stream key-by-key. Surface shows a clean syntax-tinted JSON object materializing; mechanism shows each parser commit as a discrete tick.',
+    duration: 4000,
+    surface(t) {
+      const stages = [
+        { t: 200,  s: '{' },
+        { t: 600,  s: '{\n  "name": "edit_file"' },
+        { t: 1200, s: '{\n  "name": "edit_file",\n  "path": "src/app.ts"' },
+        { t: 1900, s: '{\n  "name": "edit_file",\n  "path": "src/app.ts",\n  "find": "foo"' },
+        { t: 2700, s: '{\n  "name": "edit_file",\n  "path": "src/app.ts",\n  "find": "foo",\n  "replace": "bar"' },
+        { t: 3400, s: '{\n  "name": "edit_file",\n  "path": "src/app.ts",\n  "find": "foo",\n  "replace": "bar"\n}' },
+      ];
+      let raw = '';
+      for (const s of stages) if (t >= s.t) raw = s.s;
+      const html = raw
+        .replace(/("[^"]+")(\s*:)/g, '<span class="key">$1</span><span class="punct">$2</span>')
+        .replace(/: ("[^"]+")/g, ': <span class="val">$1</span>')
+        .replace(/([{},])/g, '<span class="punct">$1</span>')
+        .replace(/\n/g, '<br>');
+      return `<pre class="json">${html}</pre>`;
+    },
+    ticks: [
+      { t: 200,  label: 'open' },
+      { t: 600,  label: 'name' },
+      { t: 1200, label: 'path' },
+      { t: 1900, label: 'find' },
+      { t: 2700, label: 'replace' },
+      { t: 3400, label: 'close', fire: true },
+    ],
+  },
+  {
+    num: 17,
+    name: 'tool error + retry',
+    desc: 'Tool runs, fails, retries with backoff. Surface shows the calm card cycling through its statuses; mechanism shows the failure tick and exposes the backoff window as a band.',
+    duration: 5000,
+    surface(t) {
+      let status, statusClass, body;
+      if (t < 700) { status = 'pending'; statusClass='status-pending'; body='preparing request'; }
+      else if (t < 1800) { status = 'running'; statusClass='status-running'; body='fetching https://api.example.com/data'; }
+      else if (t < 2400) { status = 'error'; statusClass='status-error'; body='connection timeout (504)'; }
+      else if (t < 2900) { status = 'retrying'; statusClass='status-wait'; body='backoff window · 500ms'; }
+      else if (t < 4200) { status = 'running'; statusClass='status-running'; body='retry attempt 2 of 3'; }
+      else { status = 'done'; statusClass='status-done'; body='received 1.2KB payload'; }
+      return `
+        <div class="tool-card">
+          <div class="tool-head">
+            <div class="tool-name">search_web</div>
+            <div class="tool-status ${statusClass}">${status}</div>
+          </div>
+          <div class="tool-body">${body}</div>
+        </div>`;
+    },
+    ticks: [
+      { t: 700,  label: 'send' },
+      { t: 1800, label: 'error', fire: true },
+      { t: 2400, label: 'retry' },
+      { t: 4200, label: 'ok' },
+    ],
+    bands: [{ from: 2400, to: 2900, label: 'backoff' }],
+  },
+  {
+    num: 18,
+    name: 'permission gate',
+    desc: 'Tool waits at an approval gate. Surface shows the prompt and the user buttons; mechanism marks the gate opening and the wait window as a band, ending at the approve flush.',
+    duration: 4800,
+    surface(t) {
+      if (t < 800) {
+        return `
+          <div class="tool-card">
+            <div class="tool-head">
+              <div class="tool-name">delete_file</div>
+              <div class="tool-status status-pending">preparing</div>
+            </div>
+            <div class="tool-body">path: src/legacy/old-config.json</div>
+          </div>`;
+      } else if (t < 3200) {
+        return `
+          <div class="tool-card">
+            <div class="tool-head">
+              <div class="tool-name">delete_file</div>
+              <div class="tool-status status-wait">approval required</div>
+            </div>
+            <div class="tool-body">path: src/legacy/old-config.json</div>
+            <div class="approve-row">
+              <button>approve</button>
+              <button>deny</button>
+            </div>
+          </div>`;
+      } else if (t < 3700) {
+        return `
+          <div class="tool-card">
+            <div class="tool-head">
+              <div class="tool-name">delete_file</div>
+              <div class="tool-status status-running">running</div>
+            </div>
+            <div class="tool-body">approved · executing</div>
+          </div>`;
+      } else {
+        return `
+          <div class="tool-card">
+            <div class="tool-head">
+              <div class="tool-name">delete_file</div>
+              <div class="tool-status status-done">done</div>
+            </div>
+            <div class="tool-body">removed 1 file</div>
+          </div>`;
+      }
+    },
+    ticks: [
+      { t: 800,  label: 'gate' },
+      { t: 3200, label: 'approve', fire: true },
+      { t: 3700, label: 'flush' },
+    ],
+    bands: [{ from: 800, to: 3200, label: 'wait' }],
+  },
+  {
+    num: 49,
+    name: 'cancel mid-stream',
+    desc: 'User cancels while text streams. Surface freezes mid-sentence and dims; mechanism marks the exact interrupt point. Honest about where the cancellation landed.',
+    duration: 4000,
+    surface(t) {
+      const text = "Once upon a time, in a small village nestled between two mountains, there lived a clockmaker who believed time could be persuaded to flow backwards if you asked it nicely enough.";
+      const cancelT = 2200;
+      if (t < cancelT) {
+        return typedUpTo(text, t) + (t < cancelT - 50 ? '<span class="tw-cursor"></span>' : '');
+      } else {
+        const frozen = typedUpTo(text, cancelT);
+        return `<span class="dim">${frozen}</span><span class="interrupt-tag">⏸ interrupted</span>`;
+      }
+    },
+    ticks: [
+      { t: 2200, label: 'cancel', fire: true },
+    ],
+  },
+  {
+    num: 55,
+    name: 'retry countdown',
+    desc: 'After a failure, a visible countdown bar fills before the retry fires. Surface shows the countdown UI; mechanism shows the backoff band — the part the user does not get to skip.',
+    duration: 5500,
+    surface(t) {
+      if (t < 600) {
+        return `<div class="tool-card">
+          <div class="tool-head"><div class="tool-name">api_call</div><div class="tool-status status-error">failed</div></div>
+          <div class="tool-body">rate-limited (429)</div>
+        </div>`;
+      } else if (t < 4200) {
+        const elapsed = t - 600;
+        const total = 3600;
+        const pct = Math.min(1, elapsed / total);
+        const secs = Math.max(0, Math.ceil((total - elapsed) / 1000));
+        return `<div class="tool-card">
+          <div class="tool-head"><div class="tool-name">api_call</div><div class="tool-status status-wait">retrying in ${secs}s</div></div>
+          <div class="micro-bar"><div class="micro-fill warn" style="width:${pct*100}%"></div></div>
+          <div class="tool-body">exponential backoff · attempt 3 of 5</div>
+        </div>`;
+      } else if (t < 5100) {
+        return `<div class="tool-card">
+          <div class="tool-head"><div class="tool-name">api_call</div><div class="tool-status status-running">running</div></div>
+          <div class="tool-body">retry firing</div>
+        </div>`;
+      } else {
+        return `<div class="tool-card">
+          <div class="tool-head"><div class="tool-name">api_call</div><div class="tool-status status-done">done</div></div>
+          <div class="tool-body">200 OK · 240ms</div>
+        </div>`;
+      }
+    },
+    ticks: [
+      { t: 600,  label: 'fail', fire: true },
+      { t: 4200, label: 'retry' },
+      { t: 5100, label: 'ok' },
+    ],
+    bands: [{ from: 600, to: 4200, label: 'backoff' }],
+  },
+  {
+    num: 60,
+    name: 'compression / summarization',
+    desc: 'A long context compresses into a summary. Surface shows the text physically shrinking into a callout; mechanism shows the compression cycle as a band — the moment the agent gave up some recall in exchange for headroom.',
+    duration: 4500,
+    surface(t) {
+      const long = "Earlier the user asked about pagination patterns, then about caching strategies, then about cache invalidation, then specifically about cache invalidation in distributed systems, then about the CAP theorem implications, then about practical examples in Redis, then about TTL strategies, then about probabilistic eviction.";
+      if (t < 1200) {
+        return `<div class="dim">${long}</div>`;
+      } else if (t < 3000) {
+        const elapsed = t - 1200;
+        const pct = elapsed / 1800;
+        const cutLen = Math.floor(long.length * (1 - pct * 0.85));
+        const shown = long.slice(0, cutLen);
+        return `
+          <div class="dim" style="opacity:${1 - pct*0.6}">${shown}…</div>
+          <div class="micro-bar"><div class="micro-fill" style="width:${pct*100}%"></div></div>
+          <div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color: var(--text-tertiary);">compressing · ${Math.floor(pct*100)}%</div>
+        `;
+      } else {
+        return `
+          <div class="summary">User explored pagination → caching → invalidation → distributed systems → CAP → Redis TTL → probabilistic eviction.</div>
+          <div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color: var(--text-tertiary); margin-top:14px;">compressed · 67% reduction</div>
+        `;
+      }
+    },
+    ticks: [
+      { t: 1200, label: 'start' },
+      { t: 3000, label: 'done', fire: true },
+    ],
+    bands: [{ from: 1200, to: 3000, label: 'compress' }],
+  },
+];
+
+// --- state ---
+let activeIdx = 0;
+let playhead = 0;
+let playing = false;
+let speed = 1;
+let lastFrame = 0;
+
+const sidebar = document.getElementById('sidebar');
+const surface = document.getElementById('surface');
+const mechanism = document.getElementById('mechanism');
+const workTitle = document.getElementById('work-title');
+const workNum = document.getElementById('work-num');
+const workDesc = document.getElementById('work-desc');
+const playBtn = document.getElementById('play');
+const scrubTrack = document.getElementById('scrubTrack');
+const scrubFill = document.getElementById('scrubFill');
+const scrubHead = document.getElementById('scrubHead');
+const scrubTime = document.getElementById('scrubTime');
+const speedGroup = document.getElementById('speedGroup');
+
+PATTERNS.forEach((p, i) => {
+  const item = document.createElement('div');
+  item.className = 'pattern-item' + (i === 0 ? ' active' : '');
+  item.dataset.idx = i;
+  item.innerHTML = `<span class="pattern-num">${String(p.num).padStart(2,'0')}</span><span class="pattern-name">${p.name}</span>`;
+  item.addEventListener('click', () => selectPattern(i));
+  sidebar.appendChild(item);
+});
+
+function selectPattern(idx) {
+  activeIdx = ((idx % PATTERNS.length) + PATTERNS.length) % PATTERNS.length;
+  playhead = 0;
+  [...sidebar.children].forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  renderAll();
+}
+
+function setSpeed(s) {
+  speed = s;
+  [...speedGroup.children].forEach(b => b.classList.toggle('on', parseFloat(b.dataset.speed) === s));
+}
+
+speedGroup.addEventListener('click', (e) => {
+  const b = e.target.closest('.speed-btn');
+  if (!b) return;
+  setSpeed(parseFloat(b.dataset.speed));
+});
+
+function renderMechanism() {
+  const p = PATTERNS[activeIdx];
+  mechanism.innerHTML = '';
+  const rail = document.createElement('div');
+  rail.className = 'mech-track-line';
+  mechanism.appendChild(rail);
+
+  const rect = mechanism.getBoundingClientRect();
+  const innerW = rect.width - 48;
+  const leftPad = 24;
+
+  if (p.bands) {
+    for (const b of p.bands) {
+      const div = document.createElement('div');
+      div.className = 'mech-band';
+      div.style.left = (leftPad + (b.from / p.duration) * innerW) + 'px';
+      div.style.width = (((b.to - b.from) / p.duration) * innerW) + 'px';
+      mechanism.appendChild(div);
+      if (b.label) {
+        const bl = document.createElement('div');
+        bl.className = 'mech-band-label';
+        bl.style.left = (leftPad + (b.from / p.duration) * innerW + 4) + 'px';
+        bl.textContent = b.label;
+        mechanism.appendChild(bl);
+      }
+    }
+  }
+
+  for (const tk of p.ticks) {
+    const x = leftPad + (tk.t / p.duration) * innerW;
+    const isFired = playhead >= tk.t && tk.fire;
+    const tick = document.createElement('div');
+    tick.className = 'mech-tick' + (isFired ? ' fired' : '');
+    tick.style.left = x + 'px';
+    tick.dataset.t = tk.t;
+    tick.dataset.label = tk.label;
+    mechanism.appendChild(tick);
+    const lbl = document.createElement('div');
+    lbl.className = 'mech-tick-label' + (isFired ? ' fired' : '');
+    lbl.style.left = x + 'px';
+    lbl.textContent = tk.label;
+    mechanism.appendChild(lbl);
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'mech-tick-tooltip';
+    tooltip.style.left = x + 'px';
+    tooltip.textContent = `${tk.label} · ${(tk.t/1000).toFixed(2)}s`;
+    mechanism.appendChild(tooltip);
+    tick.addEventListener('mouseenter', () => tooltip.classList.add('show'));
+    tick.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+  }
+
+  // playhead line on mechanism track
+  const playX = leftPad + (playhead / p.duration) * innerW;
+  const pl = document.createElement('div');
+  pl.className = 'playhead-line';
+  pl.style.left = playX + 'px';
+  mechanism.appendChild(pl);
+}
+
+function renderSurface() {
+  const p = PATTERNS[activeIdx];
+  surface.innerHTML = p.surface(playhead);
+}
+
+function renderScrubber() {
+  const p = PATTERNS[activeIdx];
+  const pct = playhead / p.duration;
+  const rect = scrubTrack.getBoundingClientRect();
+  scrubFill.style.width = (rect.width * pct) + 'px';
+  scrubHead.style.left = (rect.width * pct) + 'px';
+  scrubTime.textContent = `${(playhead/1000).toFixed(2)} / ${(p.duration/1000).toFixed(2)}s`;
+}
+
+function renderAll() {
+  const p = PATTERNS[activeIdx];
+  workTitle.textContent = p.name;
+  workNum.textContent = `entry 86 · pattern ${String(p.num).padStart(2,'0')}`;
+  workDesc.textContent = p.desc;
+  renderSurface();
+  renderMechanism();
+  renderScrubber();
+}
+
+let dragging = false;
+function setPlayheadFromX(clientX) {
+  const p = PATTERNS[activeIdx];
+  const rect = scrubTrack.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  playhead = pct * p.duration;
+  renderAll();
+}
+scrubTrack.addEventListener('mousedown', (e) => {
+  dragging = true;
+  pause();
+  setPlayheadFromX(e.clientX);
+});
+window.addEventListener('mousemove', (e) => {
+  if (dragging) setPlayheadFromX(e.clientX);
+});
+window.addEventListener('mouseup', () => { dragging = false; });
+
+function play() {
+  const p = PATTERNS[activeIdx];
+  if (playhead >= p.duration - 10) playhead = 0;
+  playing = true;
+  playBtn.textContent = '❚❚';
+}
+function pause() {
+  playing = false;
+  playBtn.textContent = '▶';
+}
+function toggle() { playing ? pause() : play(); }
+
+playBtn.addEventListener('click', toggle);
+
+// keyboard
+const SPEEDS = [0.5, 1, 2];
+document.addEventListener('keydown', (e) => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  const p = PATTERNS[activeIdx];
+  switch (e.key) {
+    case ' ':
+      e.preventDefault();
+      toggle();
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      pause();
+      playhead = Math.max(0, playhead - (e.shiftKey ? 1000 : 200));
+      renderAll();
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      pause();
+      playhead = Math.min(p.duration, playhead + (e.shiftKey ? 1000 : 200));
+      renderAll();
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      selectPattern(activeIdx - 1);
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      selectPattern(activeIdx + 1);
+      break;
+    case '[': {
+      const i = SPEEDS.indexOf(speed);
+      setSpeed(SPEEDS[Math.max(0, i - 1)]);
+      break;
+    }
+    case ']': {
+      const i = SPEEDS.indexOf(speed);
+      setSpeed(SPEEDS[Math.min(SPEEDS.length - 1, i + 1)]);
+      break;
+    }
+    case '0':
+      playhead = 0;
+      renderAll();
+      break;
+  }
+});
+
+window.addEventListener('resize', renderAll);
+
+function tick(now) {
+  const dt = now - lastFrame;
+  lastFrame = now;
+  if (playing) {
+    const p = PATTERNS[activeIdx];
+    playhead += dt * speed;
+    if (playhead >= p.duration) {
+      playhead = p.duration;
+      pause();
+    }
+    renderAll();
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame((n) => { lastFrame = n; tick(n); });
+
+setTimeout(renderAll, 0);
+</script>
+
+</body>
+</html>

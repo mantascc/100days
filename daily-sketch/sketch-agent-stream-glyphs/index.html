@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-agent-stream-glyphs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      min-height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-weight: 300;
+    }
+
+    header {
+      padding: 32px 32px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    header .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+    header p {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      max-width: 64ch;
+      line-height: 1.6;
+    }
+
+    main {
+      padding: 32px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 32px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: default;
+    }
+
+    .glyph-box {
+      width: 140px;
+      height: 140px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-default);
+      position: relative;
+      transition: transform 240ms cubic-bezier(.2,.7,.3,1), border-color 240ms;
+    }
+    .card:hover .glyph-box {
+      transform: scale(1.18);
+      border-color: var(--text-tertiary);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-align: center;
+    }
+    .card-num {
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+    .card-name {
+      color: var(--text-default);
+      text-transform: lowercase;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">agent-stream · glyphs</div>
+  <h1>streaming patterns as computed thumbnails</h1>
+  <p>Each glyph hashes its pattern id to a seed and runs the pattern's own timing recipe — jitter, cadence, sweep, pulse. The wall is a typology you read by silhouette: bundles cluster, raw streams jitter, file-edits sweep.</p>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+// --- seeded rng ---
+function hash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function mulberry32(seed) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+const FG = '#f5f5f7';
+const DIM = '#666666';
+const GHOST = '#333333';
+const ACCENT = '#00a8ff';
+
+const GLYPHS = [
+  { num:1, name:'token typewriter',
+    init(rng) {
+      const cells = 6 * 6;
+      const sched = Array.from({length: cells}, (_, i) => i * 70 + (rng() - 0.5) * 90);
+      return { sched, period: sched[cells-1] + 600 };
+    },
+    draw(ctx, t, W, H, st) {
+      const tt = t % st.period;
+      const cols = 6, rows = 6;
+      const pad = 14, cw = (W - pad*2) / cols, ch = (H - pad*2) / rows;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < cols*rows; i++) {
+        if (tt > st.sched[i]) {
+          const c = i % cols, r = Math.floor(i / cols);
+          const x = pad + c * cw + 1;
+          const y = pad + r * ch + ch * 0.62;
+          ctx.fillRect(x, y, cw - 3, 2);
+        }
+      }
+    },
+  },
+  { num:3, name:'sentence pulse',
+    init() { return { period: 2800 }; },
+    draw(ctx, t, W, H, st) {
+      const tt = (t % st.period) / st.period;
+      const lines = 4;
+      const linePeriod = 1 / (lines + 1.5);
+      const pad = 18, lh = (H - pad*2) / lines;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < lines; i++) {
+        const start = i * linePeriod;
+        const end = start + linePeriod * 0.8;
+        const a = Math.max(0, Math.min(1, (tt - start) / (end - start)));
+        if (a <= 0) continue;
+        const fullW = W - pad*2 - (i === lines-1 ? 32 : 0);
+        ctx.globalAlpha = Math.min(1, a * 2);
+        ctx.fillRect(pad, pad + i * lh + lh*0.35, fullW * Math.min(1, a*1.4), 3);
+      }
+      ctx.globalAlpha = 1;
+    },
+  },
+  { num:30, name:'spinner',
+    init() { return {}; },
+    draw(ctx, t, W, H) {
+      const cx = W/2, cy = H/2, r = Math.min(W,H) * 0.32;
+      ctx.strokeStyle = GHOST;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.stroke();
+      const rot = t * 0.0028;
+      ctx.strokeStyle = FG;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, rot, rot + Math.PI*0.6);
+      ctx.stroke();
+      // phase tick — a small dot orbiting
+      const px = cx + Math.cos(rot + Math.PI*0.6) * r;
+      const py = cy + Math.sin(rot + Math.PI*0.6) * r;
+      ctx.fillStyle = ACCENT;
+      ctx.beginPath();
+      ctx.arc(px, py, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    },
+  },
+  { num:31, name:'progress bar',
+    init() { return { period: 3000 }; },
+    draw(ctx, t, W, H, st) {
+      const tt = (t % st.period) / st.period;
+      const barH = 6;
+      const y = (H - barH) / 2;
+      const pad = 16;
+      const w = W - pad*2;
+      ctx.fillStyle = GHOST;
+      ctx.fillRect(pad, y, w, barH);
+      ctx.fillStyle = FG;
+      ctx.fillRect(pad, y, w * tt, barH);
+      // percentage tick mark
+      ctx.fillStyle = DIM;
+      ctx.font = '300 9px IBM Plex Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${Math.floor(tt*100)}%`, pad, y + barH + 14);
+    },
+  },
+  { num:33, name:'breathing ellipsis',
+    init() { return {}; },
+    draw(ctx, t, W, H) {
+      const cx = W/2, cy = H/2;
+      const spacing = 22;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < 3; i++) {
+        const phase = t * 0.003 - i * 0.6;
+        const a = Math.max(0.15, (Math.sin(phase) + 1) / 2);
+        const r = 4.5 + a * 2;
+        ctx.globalAlpha = a;
+        ctx.beginPath();
+        ctx.arc(cx + (i - 1) * spacing, cy, r, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    },
+  },
+  { num:46, name:'image resolve',
+    init(rng) {
+      const N = 14;
+      const targets = new Float32Array(N*N);
+      const noise = new Float32Array(N*N);
+      // target: a soft radial gradient with some structure
+      const cx = N/2, cy = N/2;
+      for (let i = 0; i < N*N; i++) {
+        const r = Math.floor(i / N), c = i % N;
+        const dx = c - cx + 0.5, dy = r - cy + 0.5;
+        const d = Math.sqrt(dx*dx + dy*dy) / (N*0.55);
+        targets[i] = Math.max(0, 1 - d) * (0.4 + rng()*0.6);
+        noise[i] = rng();
+      }
+      return { N, targets, noise, period: 3500 };
+    },
+    draw(ctx, t, W, H, st) {
+      const tt = (t % st.period) / st.period;
+      const p = Math.pow(tt, 1.5);
+      const N = st.N;
+      const pad = 12;
+      const cell = (W - pad*2) / N;
+      for (let i = 0; i < N*N; i++) {
+        const v = st.noise[i] * (1-p) + st.targets[i] * p;
+        const a = Math.floor(v * 255);
+        ctx.fillStyle = `rgb(${a},${a},${a})`;
+        const r = Math.floor(i / N), c = i % N;
+        ctx.fillRect(pad + c*cell, pad + r*cell, cell+0.5, cell+0.5);
+      }
+    },
+  },
+  { num:47, name:'audio waveform',
+    init(rng) {
+      const bars = 18;
+      const phase = Array.from({length: bars}, () => rng() * Math.PI * 2);
+      const freq = Array.from({length: bars}, () => 0.002 + rng() * 0.003);
+      return { bars, phase, freq };
+    },
+    draw(ctx, t, W, H, st) {
+      const pad = 14;
+      const w = W - pad*2;
+      const bw = w / st.bars;
+      const midY = H / 2;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < st.bars; i++) {
+        const a = Math.abs(Math.sin(t * st.freq[i] + st.phase[i]));
+        const env = 0.2 + a * 0.7;
+        const h = env * (H * 0.6);
+        ctx.fillRect(pad + i * bw + 0.5, midY - h/2, bw - 1.5, h);
+      }
+    },
+  },
+  { num:63, name:'shimmer load',
+    init() { return { period: 1800 }; },
+    draw(ctx, t, W, H, st) {
+      // background skeleton rects
+      ctx.fillStyle = '#1a1a1a';
+      const rows = 3;
+      const pad = 18;
+      const rh = 8;
+      const gap = 14;
+      for (let i = 0; i < rows; i++) {
+        const w = (W - pad*2) * (i === rows-1 ? 0.55 : 1);
+        ctx.fillRect(pad, pad + 16 + i*(rh+gap), w, rh);
+      }
+      // sweep
+      const tt = (t % st.period) / st.period;
+      const sweepX = -W * 0.4 + tt * (W + W*0.8);
+      const g = ctx.createLinearGradient(sweepX, 0, sweepX + W*0.4, 0);
+      g.addColorStop(0, 'rgba(245,245,247,0)');
+      g.addColorStop(0.5, 'rgba(245,245,247,0.35)');
+      g.addColorStop(1, 'rgba(245,245,247,0)');
+      ctx.save();
+      ctx.beginPath();
+      for (let i = 0; i < rows; i++) {
+        const w = (W - pad*2) * (i === rows-1 ? 0.55 : 1);
+        ctx.rect(pad, pad + 16 + i*(rh+gap), w, rh);
+      }
+      ctx.clip();
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    },
+  },
+];
+
+const grid = document.getElementById('grid');
+const cards = GLYPHS.map(g => {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const box = document.createElement('div');
+  box.className = 'glyph-box';
+  const canvas = document.createElement('canvas');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 140 * dpr;
+  canvas.height = 140 * dpr;
+  box.appendChild(canvas);
+  card.appendChild(box);
+
+  const label = document.createElement('div');
+  label.className = 'card-label';
+  label.innerHTML = `<span class="card-num">${String(g.num).padStart(2,'0')}</span><span class="card-name">${g.name}</span>`;
+  card.appendChild(label);
+
+  grid.appendChild(card);
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const seed = hash(`${g.num}-${g.name}`);
+  const rng = mulberry32(seed);
+  const st = g.init(rng);
+
+  return { glyph: g, ctx, state: st, W: 140, H: 140 };
+});
+
+function tick(now) {
+  for (const c of cards) {
+    c.ctx.clearRect(0, 0, c.W, c.H);
+    c.glyph.draw(c.ctx, now, c.W, c.H, c.state);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>
