@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>03 · tool calls</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* tool call card */
+    .tc {
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 12px;
+    }
+    .tc-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .tc-bar .name { color: var(--text-primary); letter-spacing: 0.04em; }
+    .tc-bar .name .ns { color: var(--text-tertiary); }
+    .tc-bar .status { margin-left: auto; }
+    .tc-body {
+      padding: 12px 14px;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      line-height: 1.55;
+      font-size: 11.5px;
+    }
+    .tc-body .k { color: var(--accent); }
+    .tc-body .v { color: var(--text-default); }
+    .tc-body .s { color: var(--accent-warm); }
+    .tc-body .p { color: var(--text-tertiary); }
+    .tc-result {
+      border-top: 1px solid var(--border-default);
+      padding: 10px 14px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .tc-result.on { max-height: 200px; padding: 10px 14px; }
+    .tc-result .head {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .tc-stack { display: flex; flex-direction: column; gap: 12px; }
+    .tc-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .chain {
+      display: grid;
+      grid-template-columns: 1fr 24px 1fr 24px 1fr;
+      align-items: stretch;
+      gap: 0;
+    }
+    .chain .arrow {
+      align-self: center;
+      color: var(--text-tertiary);
+      text-align: center;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    .chain .arrow.on { color: var(--accent); }
+
+    .toggle {
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color 0.15s;
+    }
+    .toggle:hover { color: var(--accent); }
+
+    .approval {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-top: 1px solid var(--accent-warm);
+      background: rgba(255, 157, 58, 0.06);
+      font-size: 11px;
+      color: var(--text-default);
+    }
+    .approval .ask { margin-right: auto; }
+    .approval button {
+      padding: 4px 10px;
+      border: 1px solid var(--border-default);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .approval button.go { color: var(--accent-success); border-color: var(--accent-success); }
+    .approval button.no { color: var(--text-tertiary); }
+    .approval button.active { background: var(--ground-surface); }
+
+    .retry-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 14px;
+      border-top: 1px solid var(--border-default);
+      background: rgba(248, 113, 113, 0.04);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .retry-row .timer { color: var(--accent-warm); font-variant-numeric: tabular-nums; }
+
+    .nested {
+      margin-top: 8px;
+      padding-left: 14px;
+      border-left: 1px solid var(--border-default);
+    }
+    .nested .tc-bar { padding: 6px 10px; font-size: 11px; }
+    .nested .tc-body { padding: 8px 10px; font-size: 10.5px; }
+    .nested .sub-line { display: block; opacity: 0; transition: opacity 0.25s; }
+    .nested .sub-line.on { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">03 · tool calls</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 03 — 8 patterns</div>
+  <div class="title">Tool calls</div>
+  <div class="subtitle">Discrete blocks where the agent reaches out to the world. Status, args, results, errors — the whole lifecycle.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <!-- 03.1 single -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.1</span>
+      <span class="name">Single tool call</span>
+      <span class="desc">pending → running → done</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc" id="p1">
+        <div class="tc-bar">
+          <span class="name"><span class="ns">fs.</span>read</span>
+          <span class="chip pending status"><span class="dot"></span>pending</span>
+        </div>
+        <div class="tc-body">{ <span class="k">"path"</span>: <span class="s">"src/server.ts"</span> }</div>
+        <div class="tc-result"><div class="head">result</div><div class="rbody"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03.2 streaming args -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.2</span>
+      <span class="name">Streaming arguments</span>
+      <span class="desc">JSON builds key-by-key</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc" id="p2">
+        <div class="tc-bar">
+          <span class="name"><span class="ns">bash.</span>exec</span>
+          <span class="chip running status"><span class="dot"></span>streaming</span>
+        </div>
+        <div class="tc-body" id="p2-args"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03.3 parallel bundle -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.3</span>
+      <span class="name">Parallel bundle</span>
+      <span class="desc">fan-out · independent resolves</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc-row" id="p3"></div>
+    </div>
+  </div>
+
+  <!-- 03.4 sequential chain -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.4</span>
+      <span class="name">Sequential chain</span>
+      <span class="desc">each waits for previous</span>
+    </div>
+    <div class="pattern-body">
+      <div class="chain" id="p4"></div>
+    </div>
+  </div>
+
+  <!-- 03.5 expand/collapse result -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.5</span>
+      <span class="name">Expand &amp; collapse</span>
+      <span class="desc">result hidden by default</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc" id="p5">
+        <div class="tc-bar">
+          <span class="name"><span class="ns">db.</span>query</span>
+          <span class="chip done status"><span class="dot"></span>done · 142ms</span>
+          <span class="toggle" id="p5-toggle">▾ show result</span>
+        </div>
+        <div class="tc-body">SELECT id, email FROM users WHERE active = true LIMIT 5</div>
+        <div class="tc-result" id="p5-result"><div class="head">result · 5 rows</div><div class="rbody">
+1  alice@acme.io
+2  bob@acme.io
+3  carol@acme.io
+4  dave@acme.io
+5  eve@acme.io</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03.6 error + retry -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.6</span>
+      <span class="name">Error + retry</span>
+      <span class="desc">fail → backoff → recover</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc" id="p6">
+        <div class="tc-bar">
+          <span class="name"><span class="ns">http.</span>fetch</span>
+          <span class="chip pending status"><span class="dot"></span>pending</span>
+        </div>
+        <div class="tc-body">GET https://api.example.com/v2/items</div>
+        <div class="retry-row" id="p6-retry" style="display:none;">
+          <span class="err">503 Service Unavailable</span>
+          <span>retrying in <span class="timer">2.0s</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03.7 approval -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.7</span>
+      <span class="name">Approval gate</span>
+      <span class="desc">user confirmation inline</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc" id="p7">
+        <div class="tc-bar">
+          <span class="name"><span class="ns">fs.</span>write</span>
+          <span class="chip pending status"><span class="dot"></span>awaiting approval</span>
+        </div>
+        <div class="tc-body">{ <span class="k">"path"</span>: <span class="s">".env.local"</span>, <span class="k">"mode"</span>: <span class="s">"overwrite"</span> }</div>
+        <div class="approval" id="p7-approval">
+          <span class="ask">Allow write to <span class="warn">.env.local</span>?</span>
+          <button class="no">deny</button>
+          <button class="go">approve</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03.8 sub-agent -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">03.8</span>
+      <span class="name">Sub-agent spawn</span>
+      <span class="desc">nested run inside the call</span>
+    </div>
+    <div class="pattern-body">
+      <div class="tc" id="p8">
+        <div class="tc-bar">
+          <span class="name"><span class="ns">agent.</span>delegate</span>
+          <span class="chip running status"><span class="dot"></span>running</span>
+        </div>
+        <div class="tc-body">{ <span class="k">"task"</span>: <span class="s">"audit auth middleware"</span> }
+          <div class="nested">
+            <div class="tc">
+              <div class="tc-bar">
+                <span class="name"><span class="ns">sub-agent</span></span>
+                <span class="chip running status"><span class="dot"></span>thinking</span>
+              </div>
+              <div class="tc-body" id="p8-sub"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  function setStatus(card, klass, label) {
+    const s = card.querySelector('.status');
+    s.className = 'chip ' + klass + ' status';
+    s.innerHTML = '<span class="dot"></span>' + label;
+  }
+
+  // ---- 03.1 single
+  const P1 = document.getElementById('p1');
+  const P1res = P1.querySelector('.tc-result');
+  const P1rbody = P1.querySelector('.rbody');
+  loop(async () => {
+    setStatus(P1, 'pending', 'pending');
+    P1res.classList.remove('on');
+    P1rbody.textContent = '';
+    await sleep(600);
+    setStatus(P1, 'running', 'running');
+    await sleep(900);
+    setStatus(P1, 'done', 'done · 38ms');
+    P1rbody.textContent = "// src/server.ts\nimport { createServer } from 'http';\nconst port = process.env.PORT ?? 3000;\n…";
+    P1res.classList.add('on');
+    await sleep(2200);
+  }, 1800);
+
+  // ---- 03.2 streaming args
+  const P2args = document.getElementById('p2-args');
+  const argSteps = [
+    "{",
+    "{\n  ",
+    "{\n  <span class=\"k\">\"command\"</span>:",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm run",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm run build\"</span>,",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm run build\"</span>,\n  <span class=\"k\">\"cwd\"</span>:",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm run build\"</span>,\n  <span class=\"k\">\"cwd\"</span>: <span class=\"s\">\"./packages/app\"</span>,",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm run build\"</span>,\n  <span class=\"k\">\"cwd\"</span>: <span class=\"s\">\"./packages/app\"</span>,\n  <span class=\"k\">\"timeout\"</span>: <span class=\"v\">60000</span>",
+    "{\n  <span class=\"k\">\"command\"</span>: <span class=\"s\">\"npm run build\"</span>,\n  <span class=\"k\">\"cwd\"</span>: <span class=\"s\">\"./packages/app\"</span>,\n  <span class=\"k\">\"timeout\"</span>: <span class=\"v\">60000</span>\n}",
+  ];
+  loop(async () => {
+    for (const step of argSteps) {
+      P2args.innerHTML = step + '<span class="caret"></span>';
+      await sleep(rand(180, 380));
+    }
+    P2args.innerHTML = argSteps[argSteps.length - 1];
+  }, 2000);
+
+  // ---- 03.3 parallel bundle
+  const P3 = document.getElementById('p3');
+  const bundle = [
+    { name: 'grep', arg: '"useEffect"', dur: 1600 },
+    { name: 'read', arg: 'package.json', dur: 800 },
+    { name: 'ls',   arg: './src',       dur: 2400 },
+  ];
+  function cardHtml(b) {
+    return `<div class="tc">
+      <div class="tc-bar">
+        <span class="name"><span class="ns">${b.name}.</span>run</span>
+        <span class="chip pending status"><span class="dot"></span>pending</span>
+      </div>
+      <div class="tc-body" style="font-size:11px;">${b.arg}</div>
+    </div>`;
+  }
+  loop(async () => {
+    P3.innerHTML = bundle.map(cardHtml).join('');
+    const cards = P3.querySelectorAll('.tc');
+    await sleep(120);
+    cards.forEach(c => setStatus(c, 'running', 'running'));
+    const finishes = bundle.map((b, i) => sleep(b.dur).then(() => setStatus(cards[i], 'done', `done · ${b.dur}ms`)));
+    await Promise.all(finishes);
+    await sleep(1200);
+  }, 1500);
+
+  // ---- 03.4 sequential chain
+  const P4 = document.getElementById('p4');
+  const chain = [
+    { name: 'plan',  arg: 'design migration' },
+    { name: 'write', arg: 'migrations/001.sql' },
+    { name: 'apply', arg: 'staging db' },
+  ];
+  loop(async () => {
+    P4.innerHTML = chain.map((b, i) =>
+      `${cardHtml(b)}${i < chain.length - 1 ? '<div class="arrow">→</div>' : ''}`
+    ).join('');
+    const cards = P4.querySelectorAll('.tc');
+    const arrows = P4.querySelectorAll('.arrow');
+    for (let i = 0; i < cards.length; i++) {
+      setStatus(cards[i], 'running', 'running');
+      await sleep(rand(800, 1200));
+      setStatus(cards[i], 'done', 'done');
+      if (arrows[i]) arrows[i].classList.add('on');
+      await sleep(280);
+    }
+    await sleep(1200);
+  }, 1400);
+
+  // ---- 03.5 expand/collapse
+  const P5toggle = document.getElementById('p5-toggle');
+  const P5result = document.getElementById('p5-result');
+  let p5open = false;
+  function toggleP5(open) {
+    p5open = open;
+    P5result.classList.toggle('on', open);
+    P5toggle.textContent = open ? '▴ hide result' : '▾ show result';
+  }
+  P5toggle.addEventListener('click', () => toggleP5(!p5open));
+  loop(async () => {
+    toggleP5(false);
+    await sleep(1400);
+    toggleP5(true);
+    await sleep(2000);
+  }, 1200);
+
+  // ---- 03.6 error + retry
+  const P6 = document.getElementById('p6');
+  const P6retry = document.getElementById('p6-retry');
+  const P6timer = P6retry.querySelector('.timer');
+  loop(async () => {
+    setStatus(P6, 'pending', 'pending');
+    P6retry.style.display = 'none';
+    await sleep(500);
+    setStatus(P6, 'running', 'running');
+    await sleep(1100);
+    setStatus(P6, 'error', 'error · 503');
+    P6retry.style.display = 'flex';
+    for (let t = 2.0; t >= 0; t -= 0.1) {
+      P6timer.textContent = t.toFixed(1) + 's';
+      await sleep(100);
+    }
+    P6retry.style.display = 'none';
+    setStatus(P6, 'running', 'running · retry');
+    await sleep(900);
+    setStatus(P6, 'done', 'done · 220ms');
+    await sleep(1600);
+  }, 1200);
+
+  // ---- 03.7 approval
+  const P7 = document.getElementById('p7');
+  const P7approval = document.getElementById('p7-approval');
+  loop(async () => {
+    setStatus(P7, 'pending', 'awaiting approval');
+    P7approval.style.display = 'flex';
+    const approve = P7approval.querySelector('.go');
+    approve.classList.remove('active');
+    await sleep(1600);
+    approve.classList.add('active');
+    await sleep(400);
+    P7approval.style.display = 'none';
+    setStatus(P7, 'running', 'running');
+    await sleep(900);
+    setStatus(P7, 'done', 'done');
+    await sleep(1800);
+  }, 1400);
+
+  // ---- 03.8 sub-agent
+  const P8sub = document.getElementById('p8-sub');
+  const subLines = [
+    "→ reading middleware/auth.ts",
+    "→ checking token expiry logic",
+    "→ scanning for plaintext storage",
+    "→ done · 1 issue flagged",
+  ];
+  loop(async () => {
+    P8sub.innerHTML = subLines.map(l => `<span class="sub-line">${l}</span>`).join('');
+    const items = P8sub.querySelectorAll('.sub-line');
+    for (const it of items) {
+      it.classList.add('on');
+      await sleep(rand(550, 900));
+    }
+    await sleep(1500);
+  }, 1400);
+</script>
+
+</body>
+</html>

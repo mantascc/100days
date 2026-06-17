@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>07 · long-running</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* background chip */
+    .bg-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      border-radius: 30px;
+      font-size: 11px;
+      color: var(--text-default);
+    }
+    .bg-chip .pulse {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      position: relative;
+    }
+    .bg-chip .pulse::after {
+      content: '';
+      position: absolute; inset: -3px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      animation: ring 1.4s ease-out infinite;
+    }
+    @keyframes ring {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .bg-chip .name { color: var(--text-primary); }
+    .bg-chip .time {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-tertiary);
+      padding-left: 8px;
+      border-left: 1px solid var(--border-default);
+    }
+    .bg-chip .stop {
+      cursor: pointer;
+      color: var(--text-tertiary);
+      transition: color 0.15s;
+    }
+    .bg-chip .stop:hover { color: var(--accent-danger); }
+
+    /* log tail */
+    .log {
+      background: var(--ground-void);
+      border: 1px solid var(--border-default);
+      max-height: 220px;
+      overflow: hidden;
+      font-size: 11px;
+      padding: 8px 0;
+    }
+    .log-row {
+      padding: 1px 14px;
+      white-space: pre;
+      display: grid;
+      grid-template-columns: 80px 50px 1fr;
+      gap: 10px;
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+    .log-row.on { opacity: 1; }
+    .log-row .ts { color: var(--text-ghost); font-variant-numeric: tabular-nums; }
+    .log-row .lvl { font-size: 10px; letter-spacing: 0.15em; }
+    .log-row .lvl.info { color: var(--text-tertiary); }
+    .log-row .lvl.ok { color: var(--accent-success); }
+    .log-row .lvl.warn { color: var(--accent-warm); }
+    .log-row .lvl.err { color: var(--accent-danger); }
+    .log-row .msg { color: var(--text-default); }
+    .log-row .msg .dim { color: var(--text-tertiary); }
+
+    /* streaming chart */
+    .chart {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+    .chart svg { display: block; width: 100%; height: 80px; }
+    .chart .now {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      min-width: 80px;
+    }
+    .chart .now .v {
+      font-size: 18px;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .chart .now .u {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .chart .now .delta {
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* toast */
+    .toast-area {
+      position: relative;
+      min-height: 80px;
+    }
+    .toast {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      border-left: 2px solid var(--accent-success);
+      transform: translateX(20px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .toast.in { transform: none; opacity: 1; }
+    .toast.out { transform: translateX(20px); opacity: 0; }
+    .toast .ico {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--accent-success);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .toast .title { color: var(--text-primary); font-size: 12px; }
+    .toast .sub { color: var(--text-tertiary); font-size: 10px; letter-spacing: 0.05em; margin-top: 2px; }
+    .toast .action {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">07 · long-running</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 07 — 4 patterns</div>
+  <div class="title">Long-running</div>
+  <div class="subtitle">When work outlives the immediate stream — background chips, log tails, metric sparklines, and the notifications that close them out.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">07.1</span>
+      <span class="name">Background chip</span>
+      <span class="desc">persistent pill · elapsed · stop</span>
+    </div>
+    <div class="pattern-body">
+      <div class="bg-chip" id="p1">
+        <span class="pulse"></span>
+        <span class="name">benchmark suite</span>
+        <span class="time" id="p1-time">00:00</span>
+        <span class="stop">stop</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">07.2</span>
+      <span class="name">Log tail</span>
+      <span class="desc">tail -f · auto-scroll · levels</span>
+    </div>
+    <div class="pattern-body">
+      <div class="log" id="p2"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">07.3</span>
+      <span class="name">Streaming metric</span>
+      <span class="desc">sparkline · values shift left</span>
+    </div>
+    <div class="pattern-body">
+      <div class="chart" id="p3">
+        <svg viewBox="0 0 600 80" preserveAspectRatio="none">
+          <path id="p3-line" fill="none" stroke="#00a8ff" stroke-width="1.5" />
+          <path id="p3-area" fill="rgba(0,168,255,0.08)" stroke="none" />
+        </svg>
+        <div class="now">
+          <span class="v" id="p3-v">—</span>
+          <span class="u">tok/s</span>
+          <span class="delta" id="p3-d"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">07.4</span>
+      <span class="name">Completion toast</span>
+      <span class="desc">slide-in · auto-dismiss</span>
+    </div>
+    <div class="pattern-body">
+      <div class="toast-area" id="p4"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 07.1 background chip
+  const P1time = document.getElementById('p1-time');
+  loop(async () => {
+    let s = 0;
+    while (s < 240) {
+      const mm = String(Math.floor(s/60)).padStart(2,'0');
+      const ss = String(s%60).padStart(2,'0');
+      P1time.textContent = mm + ':' + ss;
+      await sleep(1000);
+      s++;
+    }
+  }, 800);
+
+  // ---- 07.2 log tail
+  const P2 = document.getElementById('p2');
+  const logTemplates = [
+    { lvl: 'info', msg: 'agent.start · session <span class="dim">abc-12f0</span>' },
+    { lvl: 'info', msg: 'tools.load · <span class="dim">read, write, bash</span>' },
+    { lvl: 'info', msg: 'plan.create · 4 steps' },
+    { lvl: 'ok',   msg: 'step.done · <span class="dim">read schema</span>' },
+    { lvl: 'info', msg: 'fetch · <span class="dim">api.example.com/v2/orders</span>' },
+    { lvl: 'warn', msg: 'rate-limit · <span class="dim">retry in 1.4s</span>' },
+    { lvl: 'ok',   msg: 'fetch.done · <span class="dim">200 · 1.2kb</span>' },
+    { lvl: 'info', msg: 'write · <span class="dim">migrations/0042.sql</span>' },
+    { lvl: 'err',  msg: 'lint.fail · <span class="dim">missing semicolon line 14</span>' },
+    { lvl: 'info', msg: 'edit · <span class="dim">retry with patch</span>' },
+    { lvl: 'ok',   msg: 'lint.ok' },
+    { lvl: 'ok',   msg: 'plan.complete · 14.2s' },
+  ];
+  let logT = 0;
+  loop(async () => {
+    P2.innerHTML = '';
+    for (const tpl of logTemplates) {
+      logT += rand(0.3, 1.2);
+      const ts = logT.toFixed(2).padStart(7, '0') + 's';
+      const row = document.createElement('div');
+      row.className = 'log-row';
+      row.innerHTML = `<span class="ts">${ts}</span><span class="lvl ${tpl.lvl}">${tpl.lvl.toUpperCase()}</span><span class="msg">${tpl.msg}</span>`;
+      P2.appendChild(row);
+      // keep only most recent rows visible (auto-scroll feel)
+      while (P2.children.length > 9) P2.removeChild(P2.firstChild);
+      await sleep(20);
+      row.classList.add('on');
+      await sleep(rand(280, 720));
+    }
+    await sleep(1200);
+  }, 1500);
+
+  // ---- 07.3 streaming chart
+  const lineEl = document.getElementById('p3-line');
+  const areaEl = document.getElementById('p3-area');
+  const vEl = document.getElementById('p3-v');
+  const dEl = document.getElementById('p3-d');
+  const W = 600, H = 80, N = 60;
+  let series = Array.from({ length: N }, () => 50);
+  function drawChart() {
+    const min = Math.min(...series);
+    const max = Math.max(...series);
+    const range = Math.max(max - min, 1);
+    const step = W / (N - 1);
+    const pts = series.map((v, i) => [i * step, H - 4 - ((v - min) / range) * (H - 8)]);
+    const linePath = 'M ' + pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' L ');
+    const areaPath = linePath + ` L ${W},${H} L 0,${H} Z`;
+    lineEl.setAttribute('d', linePath);
+    areaEl.setAttribute('d', areaPath);
+  }
+  function tick() {
+    const last = series[series.length - 1];
+    const drift = (Math.random() - 0.5) * 6;
+    const next = Math.max(10, Math.min(140, last + drift + (Math.sin(Date.now() / 2000) * 2)));
+    series.push(next);
+    series.shift();
+    vEl.textContent = next.toFixed(0);
+    const delta = next - series[series.length - 8];
+    dEl.textContent = (delta >= 0 ? '+' : '') + delta.toFixed(1);
+    dEl.className = 'delta ' + (delta >= 0 ? 'ok' : 'err');
+    drawChart();
+  }
+  drawChart();
+  setInterval(tick, 220);
+
+  // ---- 07.4 completion toast
+  const P4 = document.getElementById('p4');
+  loop(async () => {
+    P4.innerHTML = `<div class="toast">
+      <span class="ico">✓</span>
+      <div>
+        <div class="title">Benchmark suite complete</div>
+        <div class="sub">142 tests · 2 regressions · 3m 14s</div>
+      </div>
+      <span class="action">view</span>
+    </div>`;
+    const t = P4.querySelector('.toast');
+    await sleep(120);
+    t.classList.add('in');
+    await sleep(2400);
+    t.classList.add('out');
+    await sleep(400);
+    P4.innerHTML = '';
+  }, 1400);
+</script>
+
+</body>
+</html>

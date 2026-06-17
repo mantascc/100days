@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04 · file operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .file {
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 11.5px;
+    }
+    .file-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-default);
+      color: var(--text-secondary);
+    }
+    .file-bar .path { color: var(--text-default); }
+    .file-bar .stat {
+      margin-left: auto;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .file-bar .stat .add { color: var(--accent-success); }
+    .file-bar .stat .del { color: var(--accent-danger); }
+
+    .lines {
+      font-family: var(--font-mono);
+      padding: 6px 0;
+    }
+    .ln {
+      display: grid;
+      grid-template-columns: 32px 18px 1fr;
+      gap: 0;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.2s, transform 0.2s;
+      padding: 0 14px 0 0;
+      white-space: pre;
+    }
+    .ln.on { opacity: 1; transform: none; }
+    .ln .nr {
+      text-align: right;
+      padding-right: 8px;
+      color: var(--text-ghost);
+      font-size: 10.5px;
+    }
+    .ln .mk { color: var(--text-ghost); padding-left: 6px; }
+    .ln .tx { color: var(--text-secondary); }
+    .ln.add { background: rgba(52, 211, 153, 0.06); }
+    .ln.add .mk { color: var(--accent-success); }
+    .ln.add .tx { color: var(--text-default); }
+    .ln.del { background: rgba(248, 113, 113, 0.06); }
+    .ln.del .mk { color: var(--accent-danger); }
+    .ln.del .tx { color: var(--text-tertiary); text-decoration: line-through; text-decoration-color: rgba(248,113,113,0.4); }
+
+    .hunk-hdr {
+      padding: 4px 14px;
+      color: var(--accent-muted);
+      font-size: 10.5px;
+      background: rgba(0, 168, 255, 0.04);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      letter-spacing: 0.05em;
+    }
+
+    .trunc {
+      padding: 6px 14px;
+      color: var(--text-tertiary);
+      font-size: 10.5px;
+      border-top: 1px dashed var(--border-default);
+      letter-spacing: 0.1em;
+    }
+
+    .grep-list { font-size: 11.5px; }
+    .grep-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      padding: 6px 14px;
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 0.2s, transform 0.2s;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .grep-row:first-child { border-top: none; }
+    .grep-row.on { opacity: 1; transform: none; }
+    .grep-row .loc { color: var(--text-tertiary); font-size: 10.5px; margin-bottom: 2px; }
+    .grep-row .loc .file { color: var(--accent-muted); }
+    .grep-row .loc .ln { color: var(--text-secondary); }
+    .grep-row .src { color: var(--text-default); white-space: pre; }
+    .grep-row .src .hit { background: rgba(0, 168, 255, 0.2); color: var(--text-primary); padding: 0 2px; }
+
+    .batch { display: flex; flex-direction: column; gap: 8px; }
+    .batch .file-bar { font-size: 11px; }
+    .batch .lines { max-height: 90px; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">04 · file operations</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 04 — 6 patterns</div>
+  <div class="title">File operations</div>
+  <div class="subtitle">How the agent shows what it's touching on disk — diffs, creates, reads, batches, and search hits.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <!-- 04.1 edit diff stream -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">04.1</span>
+      <span class="name">Edit diff stream</span>
+      <span class="desc">+/− lines · staggered reveal</span>
+    </div>
+    <div class="pattern-body">
+      <div class="file" id="p1">
+        <div class="file-bar">
+          <span class="chip running"><span class="dot"></span>editing</span>
+          <span class="path">src/router/auth.ts</span>
+          <span class="stat"><span class="add">+4</span> <span class="del">−2</span></span>
+        </div>
+        <div class="lines"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04.2 file create -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">04.2</span>
+      <span class="name">File create</span>
+      <span class="desc">new file · full stream</span>
+    </div>
+    <div class="pattern-body">
+      <div class="file" id="p2">
+        <div class="file-bar">
+          <span class="chip pending"><span class="dot"></span>creating</span>
+          <span class="path">migrations/0042_add_billing.sql</span>
+          <span class="stat"><span class="add">+12</span></span>
+        </div>
+        <div class="lines"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04.3 file read preview -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">04.3</span>
+      <span class="name">File read · truncated</span>
+      <span class="desc">head preview · "... N more"</span>
+    </div>
+    <div class="pattern-body">
+      <div class="file" id="p3">
+        <div class="file-bar">
+          <span class="chip done"><span class="dot"></span>read</span>
+          <span class="path">package.json</span>
+          <span class="stat">247 lines</span>
+        </div>
+        <div class="lines"></div>
+        <div class="trunc">… 239 more lines</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04.4 multi-file batch -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">04.4</span>
+      <span class="name">Multi-file batch</span>
+      <span class="desc">stack of diffs · grouped</span>
+    </div>
+    <div class="pattern-body">
+      <div class="batch" id="p4"></div>
+    </div>
+  </div>
+
+  <!-- 04.5 patch hunks -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">04.5</span>
+      <span class="name">Patch hunks</span>
+      <span class="desc">@@ context headers · git-style</span>
+    </div>
+    <div class="pattern-body">
+      <div class="file" id="p5">
+        <div class="file-bar">
+          <span class="chip done"><span class="dot"></span>patched</span>
+          <span class="path">lib/cache.ts</span>
+          <span class="stat"><span class="add">+3</span> <span class="del">−1</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04.6 grep -->
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">04.6</span>
+      <span class="name">Grep results</span>
+      <span class="desc">hits stream in as found</span>
+    </div>
+    <div class="pattern-body">
+      <div class="file" id="p6">
+        <div class="file-bar">
+          <span class="chip running"><span class="dot"></span>searching</span>
+          <span class="path">grep "useEffect" src/</span>
+          <span class="stat"><span class="hits">0 hits</span></span>
+        </div>
+        <div class="grep-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  function lineNode(nr, kind, txt) {
+    const el = document.createElement('div');
+    el.className = 'ln ' + (kind || '');
+    el.innerHTML = `<span class="nr">${nr ?? ''}</span><span class="mk">${kind === 'add' ? '+' : kind === 'del' ? '−' : ' '}</span><span class="tx">${txt}</span>`;
+    return el;
+  }
+
+  // ---- 04.1 diff stream
+  const P1lines = document.querySelector('#p1 .lines');
+  const diff1 = [
+    { nr: 12, k: '',    t: "export async function authenticate(req: Request) {" },
+    { nr: 13, k: '',    t: "  const token = req.headers.get('authorization');" },
+    { nr: 14, k: 'del', t: "  if (!token) return null;" },
+    { nr: 14, k: 'add', t: "  if (!token) throw new UnauthorizedError();" },
+    { nr: 15, k: 'add', t: "  const claims = await verifyJwt(token);" },
+    { nr: 16, k: 'del', t: "  return decodeJwt(token);" },
+    { nr: 16, k: 'add', t: "  if (claims.exp < Date.now() / 1000) {" },
+    { nr: 17, k: 'add', t: "    throw new TokenExpiredError();" },
+    { nr: 18, k: '',    t: "  }" },
+    { nr: 19, k: '',    t: "}" },
+  ];
+  loop(async () => {
+    P1lines.innerHTML = '';
+    for (const ln of diff1) {
+      const el = lineNode(ln.nr, ln.k, ln.t);
+      P1lines.appendChild(el);
+      await sleep(20);
+      el.classList.add('on');
+      await sleep(rand(120, 280));
+    }
+  }, 2200);
+
+  // ---- 04.2 file create
+  const P2lines = document.querySelector('#p2 .lines');
+  const P2chip = document.querySelector('#p2 .chip');
+  const createLines = [
+    "-- 0042_add_billing.sql",
+    "BEGIN;",
+    "",
+    "CREATE TABLE billing_accounts (",
+    "  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),",
+    "  user_id     uuid NOT NULL REFERENCES users(id),",
+    "  plan        text NOT NULL CHECK (plan IN ('free','pro','team')),",
+    "  trial_ends  timestamptz,",
+    "  created_at  timestamptz NOT NULL DEFAULT now()",
+    ");",
+    "",
+    "CREATE INDEX billing_accounts_user_idx ON billing_accounts(user_id);",
+    "",
+    "COMMIT;",
+  ];
+  loop(async () => {
+    P2lines.innerHTML = '';
+    P2chip.className = 'chip pending';
+    P2chip.innerHTML = '<span class="dot"></span>creating';
+    let n = 1;
+    for (const t of createLines) {
+      const el = lineNode(n++, 'add', t);
+      P2lines.appendChild(el);
+      await sleep(20);
+      el.classList.add('on');
+      await sleep(rand(80, 200));
+    }
+    P2chip.className = 'chip done';
+    P2chip.innerHTML = '<span class="dot"></span>created';
+  }, 2400);
+
+  // ---- 04.3 read truncated
+  const P3lines = document.querySelector('#p3 .lines');
+  const readLines = [
+    '{',
+    '  "name": "agent-stream-lab",',
+    '  "version": "0.1.0",',
+    '  "private": true,',
+    '  "scripts": {',
+    '    "dev": "vite",',
+    '    "build": "vite build",',
+    '    "lint": "eslint ."',
+  ];
+  loop(async () => {
+    P3lines.innerHTML = '';
+    let n = 1;
+    for (const t of readLines) {
+      const el = lineNode(n++, '', t);
+      P3lines.appendChild(el);
+      await sleep(20);
+      el.classList.add('on');
+      await sleep(rand(60, 140));
+    }
+  }, 2200);
+
+  // ---- 04.4 multi-file batch
+  const P4 = document.getElementById('p4');
+  const batch = [
+    {
+      path: 'src/lib/auth.ts',
+      add: 3, del: 1,
+      lines: [
+        { k: '', t: "export const SESSION_TTL = " },
+        { k: 'del', t: "  60 * 60;" },
+        { k: 'add', t: "  60 * 60 * 24;" },
+      ],
+    },
+    {
+      path: 'src/server/session.ts',
+      add: 2, del: 0,
+      lines: [
+        { k: '', t: "import { SESSION_TTL } from '../lib/auth';" },
+        { k: 'add', t: "import { logger } from '../lib/log';" },
+        { k: 'add', t: "logger.debug({ ttl: SESSION_TTL });" },
+      ],
+    },
+    {
+      path: 'tests/auth.test.ts',
+      add: 4, del: 2,
+      lines: [
+        { k: 'del', t: "expect(ttl).toBe(3600);" },
+        { k: 'add', t: "expect(ttl).toBe(86400);" },
+        { k: '', t: "expect(session.user).toBeDefined();" },
+      ],
+    },
+  ];
+  function fileHtml(b) {
+    return `<div class="file">
+      <div class="file-bar">
+        <span class="chip done"><span class="dot"></span>edit</span>
+        <span class="path">${b.path}</span>
+        <span class="stat"><span class="add">+${b.add}</span> <span class="del">−${b.del}</span></span>
+      </div>
+      <div class="lines"></div>
+    </div>`;
+  }
+  loop(async () => {
+    P4.innerHTML = batch.map(fileHtml).join('');
+    const fileEls = P4.querySelectorAll('.file');
+    for (let i = 0; i < batch.length; i++) {
+      const linesEl = fileEls[i].querySelector('.lines');
+      for (const ln of batch[i].lines) {
+        const el = lineNode('', ln.k, ln.t);
+        linesEl.appendChild(el);
+        await sleep(20);
+        el.classList.add('on');
+        await sleep(rand(120, 240));
+      }
+      await sleep(280);
+    }
+  }, 2000);
+
+  // ---- 04.5 patch hunks
+  const P5 = document.getElementById('p5');
+  const hunks = [
+    {
+      header: '@@ -8,5 +8,7 @@ class Cache {',
+      lines: [
+        { nr: 8,  k: '', t: "  constructor(private maxSize: number) {" },
+        { nr: 9,  k: '', t: "    this.store = new Map();" },
+        { nr: 10, k: 'add', t: "    this.hits = 0;" },
+        { nr: 11, k: 'add', t: "    this.misses = 0;" },
+        { nr: 12, k: '', t: "  }" },
+      ],
+    },
+    {
+      header: '@@ -22,3 +24,4 @@ get(key: string) {',
+      lines: [
+        { nr: 22, k: '', t: "    const v = this.store.get(key);" },
+        { nr: 23, k: 'del', t: "    return v;" },
+        { nr: 23, k: 'add', t: "    if (v) this.hits++; else this.misses++;" },
+        { nr: 24, k: 'add', t: "    return v;" },
+      ],
+    },
+  ];
+  loop(async () => {
+    [...P5.querySelectorAll('.hunk-hdr, .lines')].forEach(n => n.remove());
+    for (const hunk of hunks) {
+      const hdr = document.createElement('div');
+      hdr.className = 'hunk-hdr';
+      hdr.textContent = hunk.header;
+      P5.appendChild(hdr);
+      const linesEl = document.createElement('div');
+      linesEl.className = 'lines';
+      P5.appendChild(linesEl);
+      await sleep(220);
+      for (const ln of hunk.lines) {
+        const el = lineNode(ln.nr, ln.k, ln.t);
+        linesEl.appendChild(el);
+        await sleep(20);
+        el.classList.add('on');
+        await sleep(rand(110, 240));
+      }
+      await sleep(320);
+    }
+  }, 2200);
+
+  // ---- 04.6 grep
+  const P6list = document.querySelector('#p6 .grep-list');
+  const P6hits = document.querySelector('#p6 .hits');
+  const hits = [
+    { f: 'src/hooks/useDebounce.ts', l: 4,  s: "import { useEffect } from 'react';", h: 'useEffect' },
+    { f: 'src/hooks/useDebounce.ts', l: 11, s: "  useEffect(() => {", h: 'useEffect' },
+    { f: 'src/pages/Dashboard.tsx',  l: 18, s: "  useEffect(() => { fetchUser(); }, []);", h: 'useEffect' },
+    { f: 'src/pages/Settings.tsx',   l: 9,  s: "  useEffect(() => loadPrefs(), []);", h: 'useEffect' },
+    { f: 'src/lib/intervals.ts',     l: 22, s: "// avoid useEffect double-call in StrictMode", h: 'useEffect' },
+  ];
+  function escapeHl(s, hl) {
+    return s.replace(hl, `<span class="hit">${hl}</span>`);
+  }
+  loop(async () => {
+    P6list.innerHTML = '';
+    P6hits.textContent = '0 hits';
+    for (let i = 0; i < hits.length; i++) {
+      const h = hits[i];
+      const el = document.createElement('div');
+      el.className = 'grep-row';
+      el.innerHTML = `
+        <div class="loc"><span class="file">${h.f}</span><span>:</span><span class="ln">${h.l}</span></div>
+        <div class="src">${escapeHl(h.s, h.h)}</div>
+      `;
+      P6list.appendChild(el);
+      await sleep(20);
+      el.classList.add('on');
+      P6hits.textContent = `${i + 1} hit${i ? 's' : ''}`;
+      await sleep(rand(280, 580));
+    }
+  }, 1800);
+</script>
+
+</body>
+</html>

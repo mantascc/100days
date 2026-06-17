@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 · multimodal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* image tile */
+    .img-tile {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .canvas-wrap {
+      width: 220px;
+      height: 220px;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      position: relative;
+      overflow: hidden;
+    }
+    .canvas-wrap canvas { display: block; width: 100%; height: 100%; }
+    .canvas-wrap .step-tag {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      background: rgba(10,10,10,0.8);
+      padding: 3px 7px;
+      border: 1px solid var(--border-default);
+    }
+    .img-meta { display: flex; flex-direction: column; gap: 6px; }
+    .img-meta .prompt {
+      font-size: 12px;
+      color: var(--text-default);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .img-meta .params {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 14px;
+      font-size: 10.5px;
+      color: var(--text-tertiary);
+      margin-top: 8px;
+    }
+    .img-meta .params .k { letter-spacing: 0.15em; text-transform: uppercase; font-size: 9px; }
+    .img-meta .params .v { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+    /* audio waveform */
+    .wave-host {
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      padding: 16px 18px;
+    }
+    .wave-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .wave-top .now { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .wave {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 50px;
+    }
+    .wave .bar {
+      flex: 1;
+      background: var(--text-ghost);
+      transition: background 0.3s, height 0.15s ease;
+      min-width: 2px;
+    }
+    .wave .bar.on { background: var(--accent); }
+    .wave .bar.played { background: var(--accent-muted); }
+    .transcript {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 14px;
+      line-height: 1.6;
+      min-height: 1.6em;
+    }
+    .transcript .word { opacity: 0; transition: opacity 0.2s; padding: 0 2px; }
+    .transcript .word.on { opacity: 1; }
+    .transcript .word.live { color: var(--accent); }
+
+    /* video frames */
+    .frames {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+    }
+    .frame {
+      aspect-ratio: 16 / 10;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .frame.on { opacity: 1; transform: none; }
+    .frame canvas { width: 100%; height: 100%; display: block; }
+    .frame .num {
+      position: absolute;
+      top: 3px; left: 4px;
+      font-size: 8px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.1em;
+      font-variant-numeric: tabular-nums;
+    }
+    .video-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+    .video-meta .progress {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">09 · multimodal</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 09 — 3 patterns</div>
+  <div class="title">Multimodal</div>
+  <div class="subtitle">When output isn't text — images that emerge from noise, waveforms that fill in, frames that compose into motion.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">09.1</span>
+      <span class="name">Image generation tile</span>
+      <span class="desc">noise → low-res → resolve</span>
+    </div>
+    <div class="pattern-body">
+      <div class="img-tile">
+        <div class="canvas-wrap">
+          <canvas id="p1-canvas" width="220" height="220"></canvas>
+          <span class="step-tag" id="p1-step">step 0 / 24</span>
+        </div>
+        <div class="img-meta">
+          <div class="prompt">"a still life of rusted gears resting on linen, soft afternoon light, oil painting"</div>
+          <div class="params">
+            <span class="k">model</span><span class="v">sd-xl-1.0</span>
+            <span class="k">steps</span><span class="v">24</span>
+            <span class="k">cfg</span><span class="v">7.5</span>
+            <span class="k">seed</span><span class="v">0x4f2a3b</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">09.2</span>
+      <span class="name">Audio waveform</span>
+      <span class="desc">bars grow · transcript syncs</span>
+    </div>
+    <div class="pattern-body">
+      <div class="wave-host">
+        <div class="wave-top">
+          <span>generating · voice-04</span>
+          <span class="now" id="p2-time">0:00 / 0:00</span>
+        </div>
+        <div class="wave" id="p2-wave"></div>
+        <div class="transcript" id="p2-trans"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">09.3</span>
+      <span class="name">Video frame stream</span>
+      <span class="desc">frames materialize in order</span>
+    </div>
+    <div class="pattern-body">
+      <div class="video-meta">
+        <span>render · 24fps · 8s clip</span>
+        <span class="progress" id="p3-progress">0 / 24 frames</span>
+      </div>
+      <div class="frames" id="p3"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 09.1 image generation (denoising)
+  const canvas = document.getElementById('p1-canvas');
+  const ctx = canvas.getContext('2d');
+  const stepTag = document.getElementById('p1-step');
+  const W = canvas.width, H = canvas.height;
+  const STEPS = 24;
+
+  // base "target" — a gradient + soft circles to feel like a still life shape
+  function drawTarget(t) {
+    // t in [0,1] for sharpness
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const c = off.getContext('2d');
+    // background gradient
+    const g = c.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#7a6a52');
+    g.addColorStop(1, '#3d3327');
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    // table line
+    c.fillStyle = 'rgba(0,0,0,0.18)';
+    c.fillRect(0, H*0.62, W, 2);
+    // gears as circles
+    const gears = [
+      { x: 80,  y: 130, r: 38, col: '#b07a3e' },
+      { x: 130, y: 150, r: 28, col: '#7a4c25' },
+      { x: 165, y: 120, r: 18, col: '#cc9a5b' },
+    ];
+    for (const ge of gears) {
+      const rg = c.createRadialGradient(ge.x - ge.r*0.4, ge.y - ge.r*0.4, ge.r*0.1, ge.x, ge.y, ge.r);
+      rg.addColorStop(0, '#e0c089');
+      rg.addColorStop(1, ge.col);
+      c.fillStyle = rg;
+      c.beginPath(); c.arc(ge.x, ge.y, ge.r, 0, Math.PI*2); c.fill();
+      // hole
+      c.fillStyle = '#1a1208';
+      c.beginPath(); c.arc(ge.x, ge.y, ge.r*0.32, 0, Math.PI*2); c.fill();
+    }
+    return off;
+  }
+  const target = drawTarget();
+
+  async function denoise() {
+    // start with pure noise, gradually blend toward target
+    for (let i = 0; i <= STEPS; i++) {
+      const t = i / STEPS;
+      // draw target with diminishing blur
+      ctx.filter = `blur(${(1 - t) * 14}px)`;
+      ctx.drawImage(target, 0, 0);
+      ctx.filter = 'none';
+      // overlay noise that fades out
+      const noiseAlpha = (1 - t) * 0.85;
+      const img = ctx.getImageData(0, 0, W, H);
+      const data = img.data;
+      for (let p = 0; p < data.length; p += 4) {
+        if (Math.random() < noiseAlpha * 0.9) {
+          const n = Math.random() * 255;
+          const mix = noiseAlpha;
+          data[p]   = data[p]   * (1 - mix) + n * mix;
+          data[p+1] = data[p+1] * (1 - mix) + n * mix;
+          data[p+2] = data[p+2] * (1 - mix) + n * mix;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      stepTag.textContent = `step ${i} / ${STEPS}`;
+      await sleep(60 + (1 - t) * 30);
+    }
+  }
+  loop(async () => {
+    await denoise();
+    await sleep(1600);
+    stepTag.textContent = 'done · 1.4s';
+    await sleep(600);
+  }, 1000);
+
+  // ---- 09.2 audio waveform
+  const waveEl = document.getElementById('p2-wave');
+  const timeEl = document.getElementById('p2-time');
+  const transEl = document.getElementById('p2-trans');
+  const WAVE_N = 60;
+  const transcript = ['The', 'cache', 'layer', 'uses', 'memcached', 'with', 'a', 'ninety-second', 'TTL', 'and', 'lazy', 'invalidation', 'on', 'write.'];
+  function buildWave() {
+    waveEl.innerHTML = '';
+    for (let i = 0; i < WAVE_N; i++) {
+      const b = document.createElement('div');
+      b.className = 'bar';
+      b.style.height = '4px';
+      waveEl.appendChild(b);
+    }
+  }
+  buildWave();
+  loop(async () => {
+    buildWave();
+    transEl.innerHTML = transcript.map(w => `<span class="word">${w}</span>`).join(' ');
+    const bars = waveEl.querySelectorAll('.bar');
+    const words = transEl.querySelectorAll('.word');
+    const total = WAVE_N;
+    let prevWordIdx = -1;
+    for (let i = 0; i < total; i++) {
+      const t = i / total;
+      // envelope: rise, plateau, taper
+      const env = Math.min(1, Math.sin(t * Math.PI) * 1.4);
+      const h = 6 + env * (Math.random() * 36 + 4);
+      bars[i].style.height = h.toFixed(0) + 'px';
+      bars[i].classList.add('on');
+      // mark played
+      for (let j = 0; j < i; j++) bars[j].classList.remove('on'), bars[j].classList.add('played');
+      // sync word
+      const wIdx = Math.min(transcript.length - 1, Math.floor(t * transcript.length));
+      if (wIdx !== prevWordIdx) {
+        if (prevWordIdx >= 0) words[prevWordIdx].classList.remove('live');
+        words[wIdx].classList.add('on', 'live');
+        prevWordIdx = wIdx;
+      }
+      timeEl.textContent = `${(t * 4.5).toFixed(1)}s / 4.5s`;
+      await sleep(75);
+    }
+    bars.forEach(b => b.classList.remove('on'));
+    bars[total - 1].classList.add('played');
+    if (prevWordIdx >= 0) words[prevWordIdx].classList.remove('live');
+    timeEl.textContent = '4.5s / 4.5s';
+    await sleep(1600);
+  }, 1000);
+
+  // ---- 09.3 video frames
+  const P3 = document.getElementById('p3');
+  const P3prog = document.getElementById('p3-progress');
+  const FRAMES = 24;
+  loop(async () => {
+    P3.innerHTML = '';
+    const els = [];
+    for (let i = 0; i < FRAMES; i++) {
+      const f = document.createElement('div');
+      f.className = 'frame';
+      f.innerHTML = `<canvas></canvas><span class="num">${String(i+1).padStart(2,'0')}</span>`;
+      P3.appendChild(f);
+      els.push(f);
+    }
+    for (let i = 0; i < FRAMES; i++) {
+      const fc = els[i].querySelector('canvas');
+      const w = fc.offsetWidth || 50, h = fc.offsetHeight || 32;
+      fc.width = w; fc.height = h;
+      const fctx = fc.getContext('2d');
+      // gradient sky
+      const t = i / FRAMES;
+      const g = fctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, `hsl(${210 + t * 80}, 40%, ${30 + t * 25}%)`);
+      g.addColorStop(1, `hsl(${20 + t * 30}, 60%, ${45 + t * 10}%)`);
+      fctx.fillStyle = g; fctx.fillRect(0, 0, w, h);
+      // sun moving up
+      fctx.fillStyle = '#ffe0a0';
+      fctx.beginPath();
+      const sx = w * (0.2 + t * 0.5);
+      const sy = h * (0.85 - t * 0.6);
+      fctx.arc(sx, sy, Math.max(3, h * 0.18), 0, Math.PI * 2);
+      fctx.fill();
+      // horizon
+      fctx.fillStyle = 'rgba(0,0,0,0.45)';
+      fctx.fillRect(0, h * 0.78, w, h * 0.22);
+
+      els[i].classList.add('on');
+      P3prog.textContent = `${i + 1} / ${FRAMES} frames`;
+      await sleep(rand(120, 220));
+    }
+    await sleep(1600);
+  }, 1400);
+</script>
+
+</body>
+</html>

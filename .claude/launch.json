@@ -66,6 +66,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8820", "--directory", "/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-eixample-tiles"],
       "port": 8820
+    },
+    {
+      "name": "sketch-agent-streaming-patterns",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8830", "--directory", "daily-sketch/sketch-agent-streaming-patterns"],
+      "port": 8830
     }
   ]
 }

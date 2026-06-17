@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11 · errors &amp; recovery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stream { white-space: pre-wrap; line-height: 1.7; }
+
+    .err-banner {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(248, 113, 113, 0.05);
+      border: 1px solid var(--accent-danger);
+      border-left-width: 2px;
+      margin-top: 10px;
+      font-size: 11px;
+      transform: translateX(-6px);
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .err-banner.on { opacity: 1; transform: none; }
+    .err-banner .ico {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(248, 113, 113, 0.18);
+      color: var(--accent-danger);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .err-banner .msg { color: var(--text-default); }
+    .err-banner .msg .code { color: var(--accent-danger); }
+    .err-banner .msg .sub { color: var(--text-tertiary); font-size: 10px; display: block; margin-top: 2px; }
+    .err-banner button {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+    }
+    .err-banner button.primary { color: var(--accent); border-color: var(--accent); }
+
+    /* retry countdown */
+    .retry-card {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      border-left: 2px solid var(--accent-warm);
+    }
+    .retry-card .clock {
+      position: relative;
+      width: 48px; height: 48px;
+    }
+    .retry-card svg { transform: rotate(-90deg); }
+    .retry-card .clock .t {
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      color: var(--accent-warm);
+      font-variant-numeric: tabular-nums;
+    }
+    .retry-card .body { font-size: 11.5px; color: var(--text-default); }
+    .retry-card .body .lbl { color: var(--text-tertiary); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; }
+    .retry-card .body .attempt {
+      color: var(--text-tertiary);
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    /* rate limit */
+    .rl {
+      padding: 14px 16px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      border-left: 2px solid var(--accent-warm);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .rl .head-row { display: flex; align-items: center; gap: 10px; }
+    .rl .head-row .chip { border-color: var(--accent-warm); }
+    .rl .head-row .chip .dot { background: var(--accent-warm); }
+    .rl .head-row .where { color: var(--text-default); }
+    .rl .bar-track {
+      height: 4px;
+      background: var(--ground-surface);
+      position: relative;
+      overflow: hidden;
+    }
+    .rl .bar-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--accent-warm);
+      transition: width 0.3s ease;
+    }
+    .rl .meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .rl .meta .resume { color: var(--accent); }
+
+    /* fallback switch */
+    .fallback {
+      padding: 14px 16px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+    .fallback .model {
+      padding: 8px 12px;
+      border: 1px solid var(--border-default);
+      background: var(--ground-base);
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .fallback .model.tried { color: var(--text-tertiary); border-style: dashed; opacity: 0.6; }
+    .fallback .model.tried .name { text-decoration: line-through; }
+    .fallback .model.tried .status { color: var(--accent-danger); }
+    .fallback .model.active { border-color: var(--accent); color: var(--text-default); }
+    .fallback .model.active .status { color: var(--accent); }
+    .fallback .model .name { font-size: 12px; color: var(--text-default); }
+    .fallback .model .status { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 4px; }
+    .fallback .arr { color: var(--text-tertiary); font-size: 14px; }
+    .fallback-log {
+      margin-top: 8px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .fallback-log .row { opacity: 0; transition: opacity 0.25s; }
+    .fallback-log .row.on { opacity: 1; }
+    .fallback-log .row .t { color: var(--text-ghost); margin-right: 8px; font-variant-numeric: tabular-nums; }
+    .fallback-log .row.err { color: var(--accent-danger); }
+    .fallback-log .row.ok { color: var(--accent-success); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">11 · errors &amp; recovery</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 11 — 4 patterns</div>
+  <div class="title">Errors &amp; recovery</div>
+  <div class="subtitle">When things fail mid-stream — how the failure surfaces and how the agent gets back on its feet.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">11.1</span>
+      <span class="name">Error banner</span>
+      <span class="desc">interrupts the stream · actionable</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stream" id="p1-stream"></div>
+      <div class="err-banner" id="p1-banner">
+        <span class="ico">!</span>
+        <div class="msg"><span class="code">connection_reset</span> while reading from api.example.com<span class="sub">attempt 1 of 3 · last byte at offset 1240</span></div>
+        <button>details</button>
+        <button class="primary">retry</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">11.2</span>
+      <span class="name">Retry countdown</span>
+      <span class="desc">exponential backoff · visible</span>
+    </div>
+    <div class="pattern-body">
+      <div class="retry-card">
+        <div class="clock">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="20" fill="none" stroke="#2a2a2a" stroke-width="2" />
+            <circle id="p2-ring" cx="24" cy="24" r="20" fill="none" stroke="#ff9d3a" stroke-width="2"
+              stroke-dasharray="125.6" stroke-dashoffset="0" />
+          </svg>
+          <span class="t" id="p2-t">3.0</span>
+        </div>
+        <div class="body">
+          <div class="lbl">retrying</div>
+          <div>http.fetch · <span class="dim">/v3/orders</span></div>
+          <div class="attempt" id="p2-att">attempt 2 of 3 · backoff 4s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">11.3</span>
+      <span class="name">Rate limit pause</span>
+      <span class="desc">quota visible · reset time</span>
+    </div>
+    <div class="pattern-body">
+      <div class="rl">
+        <div class="head-row">
+          <span class="chip"><span class="dot"></span>rate limit</span>
+          <span>requests/minute exceeded</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="p3-fill" style="width:100%;"></div></div>
+        <div class="meta">
+          <span>quota <span id="p3-q">100 / 100</span></span>
+          <span class="resume">resumes at <span id="p3-reset">14:32:18</span> · <span id="p3-in">in 47s</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">11.4</span>
+      <span class="name">Fallback switch</span>
+      <span class="desc">primary fails → secondary takes over</span>
+    </div>
+    <div class="pattern-body">
+      <div class="fallback" id="p4">
+        <div class="model" id="p4-a">
+          <div class="name">opus 4.7</div>
+          <div class="status">primary</div>
+        </div>
+        <div class="arr">→</div>
+        <div class="model" id="p4-b">
+          <div class="name">sonnet 4.6</div>
+          <div class="status">fallback</div>
+        </div>
+        <div class="arr">→</div>
+        <div class="model" id="p4-c">
+          <div class="name">haiku 4.5</div>
+          <div class="status">last resort</div>
+        </div>
+      </div>
+      <div class="fallback-log" id="p4-log"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 11.1 error banner
+  const P1stream = document.getElementById('p1-stream');
+  const P1banner = document.getElementById('p1-banner');
+  loop(async () => {
+    P1banner.classList.remove('on');
+    P1stream.innerHTML = '';
+    const txt = "Fetching the order schema from the upstream service. The endpoint responds with a JSON envelope, and the relevant ";
+    let buf = '';
+    for (const ch of txt) {
+      buf += ch;
+      P1stream.innerHTML = buf + '<span class="caret"></span>';
+      await sleep(rand(16, 42));
+    }
+    P1stream.innerHTML = buf;
+    await sleep(220);
+    P1banner.classList.add('on');
+    await sleep(2400);
+  }, 1400);
+
+  // ---- 11.2 retry countdown
+  const P2t = document.getElementById('p2-t');
+  const P2ring = document.getElementById('p2-ring');
+  const P2att = document.getElementById('p2-att');
+  loop(async () => {
+    const attempts = [
+      { dur: 2.0, attempt: 'attempt 1 of 3 · backoff 2s' },
+      { dur: 4.0, attempt: 'attempt 2 of 3 · backoff 4s' },
+      { dur: 8.0, attempt: 'attempt 3 of 3 · backoff 8s' },
+    ];
+    for (const a of attempts) {
+      P2att.textContent = a.attempt;
+      const C = 2 * Math.PI * 20;
+      P2ring.setAttribute('stroke-dasharray', C);
+      const steps = Math.floor(a.dur * 10);
+      for (let i = 0; i <= steps; i++) {
+        const left = a.dur * (1 - i / steps);
+        P2t.textContent = left.toFixed(1);
+        const off = C * (i / steps);
+        P2ring.setAttribute('stroke-dashoffset', off);
+        await sleep(100);
+      }
+      await sleep(300);
+    }
+  }, 1200);
+
+  // ---- 11.3 rate limit
+  const P3fill = document.getElementById('p3-fill');
+  const P3q = document.getElementById('p3-q');
+  const P3in = document.getElementById('p3-in');
+  const P3reset = document.getElementById('p3-reset');
+  loop(async () => {
+    let secs = 60;
+    P3q.textContent = '100 / 100';
+    P3fill.style.width = '100%';
+    const baseTime = 14 * 60 + 32; // 14:32 in minutes for demo
+    while (secs > 0) {
+      secs--;
+      P3in.textContent = `in ${secs}s`;
+      P3fill.style.width = (secs / 60 * 100) + '%';
+      await sleep(700);
+    }
+    P3q.textContent = '0 / 100';
+    P3in.textContent = 'resumed';
+    await sleep(1400);
+  }, 1000);
+
+  // ---- 11.4 fallback
+  const A = document.getElementById('p4-a');
+  const B = document.getElementById('p4-b');
+  const C = document.getElementById('p4-c');
+  const P4log = document.getElementById('p4-log');
+  function logLine(t, txt, cls = '') {
+    const r = document.createElement('div');
+    r.className = 'row ' + cls;
+    r.innerHTML = `<span class="t">${t}</span>${txt}`;
+    P4log.appendChild(r);
+    requestAnimationFrame(() => r.classList.add('on'));
+  }
+  loop(async () => {
+    [A, B, C].forEach(m => { m.classList.remove('active', 'tried'); });
+    P4log.innerHTML = '';
+    A.classList.add('active');
+    A.querySelector('.status').textContent = 'trying';
+    logLine('0.0s', 'request → opus 4.7');
+    await sleep(900);
+    logLine('0.9s', 'overloaded · 529', 'err');
+    A.classList.remove('active');
+    A.classList.add('tried');
+    A.querySelector('.status').textContent = 'overloaded';
+    await sleep(500);
+
+    B.classList.add('active');
+    B.querySelector('.status').textContent = 'trying';
+    logLine('1.4s', 'fallback → sonnet 4.6');
+    await sleep(900);
+    logLine('2.3s', 'streaming response', 'ok');
+    B.querySelector('.status').textContent = 'active';
+    await sleep(2200);
+  }, 1500);
+</script>
+
+</body>
+</html>

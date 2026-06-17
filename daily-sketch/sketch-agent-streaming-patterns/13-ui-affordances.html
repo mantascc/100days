@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>13 · ui affordances</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* skeleton */
+    .skel-card {
+      padding: 14px 16px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .skel-bar {
+      height: 12px;
+      background: var(--ground-surface);
+      transition: opacity 0.3s;
+    }
+    .skel-bar.w90 { width: 90%; }
+    .skel-bar.w65 { width: 65%; }
+    .skel-bar.w75 { width: 75%; }
+    .skel-content {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .skel-content.on { display: flex; }
+    .skel-content .ttl { color: var(--text-primary); font-size: 13px; }
+    .skel-content .body { color: var(--text-secondary); font-size: 11.5px; line-height: 1.6; }
+
+    /* shimmer */
+    .shim-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      gap: 14px;
+      padding: 10px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      align-items: center;
+    }
+    .shim {
+      position: relative;
+      overflow: hidden;
+      background: var(--ground-surface);
+    }
+    .shim::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+      animation: shim 1.4s infinite;
+    }
+    @keyframes shim {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .shim-row .avatar { width: 32px; height: 32px; }
+    .shim-row .lines { display: flex; flex-direction: column; gap: 6px; }
+    .shim-row .lines .l { height: 8px; }
+    .shim-row .lines .l1 { width: 80%; }
+    .shim-row .lines .l2 { width: 50%; }
+    .shim-row .stat { height: 18px; width: 60px; justify-self: end; }
+
+    /* LQIP blur-up */
+    .lqip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .lqip {
+      aspect-ratio: 1 / 1;
+      position: relative;
+      overflow: hidden;
+      background: var(--ground-surface);
+      border: 1px solid var(--border-default);
+    }
+    .lqip .blur, .lqip .crisp {
+      position: absolute;
+      inset: 0;
+      transition: opacity 0.6s ease, filter 0.6s ease;
+    }
+    .lqip .blur { filter: blur(8px); }
+    .lqip.loaded .blur { opacity: 0; filter: blur(0); }
+    .lqip.loaded .crisp { opacity: 1; }
+    .lqip .crisp { opacity: 0; }
+
+    /* stagger */
+    .stagger {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stag {
+      padding: 10px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 11px;
+      color: var(--text-default);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .stag.on { opacity: 1; transform: none; }
+    .stag .k {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+    .stag .v { color: var(--text-primary); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+    /* slide-in */
+    .slide-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .slide {
+      padding: 10px 14px;
+      background: var(--ground-raised);
+      border: 1px solid var(--border-default);
+      font-size: 11.5px;
+      color: var(--text-default);
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      transform: translateY(16px);
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.35s;
+    }
+    .slide.on { transform: none; opacity: 1; }
+    .slide .ico { color: var(--accent); }
+    .slide .meta { color: var(--text-tertiary); font-size: 10px; letter-spacing: 0.1em; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="back" href="index.html">← catalog</a>
+  <span class="sep">/</span>
+  <span class="crumb">13 · ui affordances</span>
+</nav>
+
+<div class="head">
+  <div class="label">theme 13 — 5 patterns</div>
+  <div class="title">UI affordances</div>
+  <div class="subtitle">Loading-state primitives. The bits of motion that smooth over latency without committing to content.</div>
+</div>
+
+<div class="pattern-stack">
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">13.1</span>
+      <span class="name">Skeleton → content</span>
+      <span class="desc">placeholders dissolve · text appears</span>
+    </div>
+    <div class="pattern-body">
+      <div class="skel-card" id="p1">
+        <div class="skel-bar w90"></div>
+        <div class="skel-bar w65"></div>
+        <div class="skel-bar w75"></div>
+        <div class="skel-content">
+          <div class="ttl">Auth middleware audit</div>
+          <div class="body">Two findings: tokens stored in localStorage are XSS-exposed; refresh tokens never rotate. Suggested fix: switch to httpOnly cookies + short-lived access tokens.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">13.2</span>
+      <span class="name">Shimmer load</span>
+      <span class="desc">moving highlight · time of motion</span>
+    </div>
+    <div class="pattern-body">
+      <div class="shim-row">
+        <div class="shim avatar"></div>
+        <div class="lines">
+          <div class="shim l l1"></div>
+          <div class="shim l l2"></div>
+        </div>
+        <div class="shim stat"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">13.3</span>
+      <span class="name">LQIP blur-up</span>
+      <span class="desc">tiny preview · crisp fades over</span>
+    </div>
+    <div class="pattern-body">
+      <div class="lqip-grid" id="p3"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">13.4</span>
+      <span class="name">Fade-in stagger</span>
+      <span class="desc">grid of items · sequential</span>
+    </div>
+    <div class="pattern-body">
+      <div class="stagger" id="p4"></div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="pattern-head">
+      <span class="num">13.5</span>
+      <span class="name">Slide-in from below</span>
+      <span class="desc">stack rises into place</span>
+    </div>
+    <div class="pattern-body">
+      <div class="slide-stack" id="p5"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>back to <a href="index.html" class="accent">catalog</a></footer>
+
+<script>
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function loop(fn, idle = 2400) { (async () => { while (true) { await fn(); await sleep(idle); } })(); }
+
+  // ---- 13.1 skeleton
+  const P1 = document.getElementById('p1');
+  loop(async () => {
+    const bars = P1.querySelectorAll('.skel-bar');
+    const content = P1.querySelector('.skel-content');
+    bars.forEach(b => b.style.opacity = '1');
+    content.classList.remove('on');
+    await sleep(1600);
+    bars.forEach(b => b.style.opacity = '0');
+    await sleep(300);
+    bars.forEach(b => b.style.display = 'none');
+    content.classList.add('on');
+    await sleep(2400);
+    bars.forEach(b => { b.style.display = ''; b.style.opacity = '0'; });
+    content.classList.remove('on');
+    await sleep(50);
+    bars.forEach(b => b.style.opacity = '1');
+  }, 1000);
+
+  // ---- 13.3 LQIP grid
+  const P3 = document.getElementById('p3');
+  function makeTile(hueA, hueB, blurSeed) {
+    // build a crisp gradient + low-res blur version
+    const c = document.createElement('div');
+    c.className = 'lqip';
+    const cBlur = document.createElement('canvas');
+    cBlur.className = 'blur';
+    cBlur.width = 8; cBlur.height = 8;
+    const ctxB = cBlur.getContext('2d');
+    // 3x3 sampled colors
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        const h = (hueA + (x / 8) * (hueB - hueA)) % 360;
+        const l = 28 + Math.sin(y * 0.6 + blurSeed) * 10 + (y / 8) * 16;
+        ctxB.fillStyle = `hsl(${h}, 35%, ${l}%)`;
+        ctxB.fillRect(x, y, 1, 1);
+      }
+    }
+    cBlur.style.width = '100%';
+    cBlur.style.height = '100%';
+    cBlur.style.imageRendering = 'auto';
+
+    const cCrisp = document.createElement('canvas');
+    cCrisp.className = 'crisp';
+    cCrisp.width = 120; cCrisp.height = 120;
+    const ctxC = cCrisp.getContext('2d');
+    const g = ctxC.createLinearGradient(0, 0, 120, 120);
+    g.addColorStop(0, `hsl(${hueA}, 45%, 32%)`);
+    g.addColorStop(1, `hsl(${hueB}, 50%, 48%)`);
+    ctxC.fillStyle = g; ctxC.fillRect(0, 0, 120, 120);
+    // overlay shape
+    ctxC.fillStyle = 'rgba(255,255,255,0.08)';
+    ctxC.beginPath();
+    ctxC.arc(40 + blurSeed * 8 % 60, 60 + blurSeed * 6 % 40, 28, 0, Math.PI * 2);
+    ctxC.fill();
+    ctxC.fillStyle = 'rgba(0,0,0,0.18)';
+    ctxC.fillRect(0, 92, 120, 28);
+    cCrisp.style.width = '100%'; cCrisp.style.height = '100%';
+
+    c.appendChild(cBlur);
+    c.appendChild(cCrisp);
+    return c;
+  }
+  const tileSpecs = [
+    [200, 260, 1],
+    [30, 60, 2],
+    [320, 0, 3],
+    [180, 220, 4],
+    [40, 100, 5],
+    [280, 320, 6],
+    [120, 160, 7],
+    [10, 50, 8],
+  ];
+  loop(async () => {
+    P3.innerHTML = '';
+    const tiles = tileSpecs.map(s => makeTile(s[0], s[1], s[2]));
+    tiles.forEach(t => P3.appendChild(t));
+    await sleep(700);
+    for (const t of tiles) {
+      t.classList.add('loaded');
+      await sleep(rand(180, 380));
+    }
+    await sleep(2000);
+  }, 1200);
+
+  // ---- 13.4 stagger
+  const P4 = document.getElementById('p4');
+  const cells = [
+    { k: 'tokens', v: '24,128' },
+    { k: 'tools',  v: '6 active' },
+    { k: 'files',  v: '12 read' },
+    { k: 'elapsed',v: '42.1s' },
+    { k: 'cost',   v: '$0.18' },
+    { k: 'cache',  v: '88% hit' },
+  ];
+  loop(async () => {
+    P4.innerHTML = cells.map(c => `<div class="stag"><div class="k">${c.k}</div><div class="v">${c.v}</div></div>`).join('');
+    const items = P4.querySelectorAll('.stag');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.add('on');
+      await sleep(80);
+    }
+    await sleep(2400);
+  }, 1000);
+
+  // ---- 13.5 slide-in
+  const P5 = document.getElementById('p5');
+  const evs = [
+    { ico: '●', txt: 'task created · audit auth middleware', t: 'just now' },
+    { ico: '◆', txt: 'plan generated · 5 steps', t: '0:02' },
+    { ico: '◆', txt: 'tool: read src/middleware/auth.ts', t: '0:04' },
+    { ico: '◆', txt: 'tool: grep "verifyJwt" src/', t: '0:06' },
+    { ico: '◆', txt: 'finding · token expiry never checked', t: '0:09' },
+    { ico: '✓', txt: 'patch applied · auth.ts +12 −2', t: '0:14' },
+  ];
+  loop(async () => {
+    P5.innerHTML = evs.map(e => `
+      <div class="slide">
+        <span class="ico">${e.ico}</span>
+        <span>${e.txt}</span>
+        <span class="meta">${e.t}</span>
+      </div>`).join('');
+    const items = P5.querySelectorAll('.slide');
+    for (const it of items) {
+      it.classList.add('on');
+      await sleep(rand(120, 220));
+    }
+    await sleep(2400);
+  }, 1000);
+</script>
+
+</body>
+</html>
