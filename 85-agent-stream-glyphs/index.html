@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>85 · agent-stream glyphs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+      --good: #6fd99e;
+      --bad: #ff5c5c;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      min-height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-weight: 300;
+    }
+
+    header {
+      padding: 32px 32px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+    header p {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      max-width: 70ch;
+      line-height: 1.6;
+    }
+
+    .filterbar {
+      display: flex;
+      gap: 8px;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--ground-base);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-default);
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 120ms;
+    }
+    .pill:hover { color: var(--text-default); border-color: var(--text-tertiary); }
+    .pill.on { background: var(--text-primary); color: var(--ground-void); border-color: var(--text-primary); }
+
+    main {
+      padding: 36px 32px 48px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 36px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .glyph-box {
+      width: 130px;
+      height: 130px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-default);
+      position: relative;
+      transition: transform 240ms cubic-bezier(.2,.7,.3,1), border-color 240ms;
+    }
+    .card:hover .glyph-box {
+      transform: scale(1.16);
+      border-color: var(--text-tertiary);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-align: center;
+    }
+    .card-num {
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+    .card-name {
+      color: var(--text-default);
+      text-transform: lowercase;
+    }
+    .card-cat {
+      color: var(--text-ghost);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* feature overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .overlay-inner {
+      display: grid;
+      grid-template-columns: 280px 380px;
+      gap: 48px;
+      align-items: center;
+      max-width: 90vw;
+    }
+    .overlay-glyph {
+      width: 280px;
+      height: 280px;
+      background: var(--ground-base);
+      border: 1px solid var(--border-default);
+    }
+    .overlay-glyph canvas { width: 100%; height: 100%; }
+    .overlay-text .eyebrow { margin-bottom: 8px; }
+    .overlay-num {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 6px;
+    }
+    .overlay-name {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+      text-transform: lowercase;
+      margin-bottom: 18px;
+    }
+    .overlay-cat {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .overlay-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 42ch;
+    }
+    .overlay-meta {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-default);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      line-height: 1.7;
+    }
+    .overlay-meta b {
+      color: var(--text-default);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 9px;
+      display: inline-block;
+      width: 70px;
+    }
+    .overlay-close {
+      position: fixed;
+      top: 32px;
+      right: 32px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      background: none;
+      border: 1px solid var(--border-default);
+      font-family: var(--font-mono);
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .overlay-close:hover { color: var(--text-primary); border-color: var(--text-primary); }
+
+    @media (max-width: 700px) {
+      .overlay-inner { grid-template-columns: 1fr; gap: 24px; }
+      .overlay-glyph { width: 220px; height: 220px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">entry 85 · agent-stream</div>
+  <h1>streaming patterns as computed glyphs</h1>
+  <p>A library of agent-streaming patterns rendered as hash-seeded animated thumbnails. Each glyph runs the pattern's actual timing recipe — jitter, cadence, sweep, pulse — so the typology is legible by silhouette. Click one to feature it. Filter by category.</p>
+</header>
+
+<div class="filterbar" id="filterbar"></div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <button class="overlay-close" id="overlayClose">esc · close</button>
+  <div class="overlay-inner">
+    <div class="overlay-glyph"><canvas id="overlayCanvas"></canvas></div>
+    <div class="overlay-text">
+      <div class="overlay-cat" id="overlayCat"></div>
+      <div class="overlay-num" id="overlayNum"></div>
+      <div class="overlay-name" id="overlayName"></div>
+      <div class="overlay-desc" id="overlayDesc"></div>
+      <div class="overlay-meta" id="overlayMeta"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function hash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function mulberry32(seed) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+const FG = '#f5f5f7';
+const DIM = '#666666';
+const GHOST = '#333333';
+const ACCENT = '#00a8ff';
+const GOOD = '#6fd99e';
+const BAD = '#ff5c5c';
+
+const GLYPHS = [
+  { num:1, name:'token typewriter', cat:'text',
+    desc:'Rapid character-by-character reveal with per-token jitter. The classic streaming feel — speed plus randomness sells the "typed by hand" illusion.',
+    recipe:'cell schedule = i·70ms + jitter ±45ms · period ≈ 3.1s',
+    init(rng) {
+      const cells = 6 * 6;
+      const sched = Array.from({length: cells}, (_, i) => i * 70 + (rng() - 0.5) * 90);
+      return { sched, period: sched[cells-1] + 600 };
+    },
+    draw(ctx, t, W, H, st) {
+      const tt = t % st.period;
+      const cols = 6, rows = 6;
+      const pad = W * 0.1, cw = (W - pad*2) / cols, ch = (H - pad*2) / rows;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < cols*rows; i++) {
+        if (tt > st.sched[i]) {
+          const c = i % cols, r = Math.floor(i / cols);
+          const x = pad + c * cw + 1;
+          const y = pad + r * ch + ch * 0.62;
+          ctx.fillRect(x, y, cw - 3, Math.max(2, H * 0.014));
+        }
+      }
+    },
+  },
+  { num:3, name:'sentence pulse', cat:'text',
+    desc:'Slow, sentence-by-sentence reveal — each line lands as a single unit instead of streaming. Rhythm comes from the line-break beat.',
+    recipe:'4 lines · per-line beat = 1/5 period · period 2.8s',
+    init() { return { period: 2800 }; },
+    draw(ctx, t, W, H, st) {
+      const tt = (t % st.period) / st.period;
+      const lines = 4;
+      const linePeriod = 1 / (lines + 1.5);
+      const pad = W * 0.13, lh = (H - pad*2) / lines;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < lines; i++) {
+        const start = i * linePeriod;
+        const end = start + linePeriod * 0.8;
+        const a = Math.max(0, Math.min(1, (tt - start) / (end - start)));
+        if (a <= 0) continue;
+        const fullW = W - pad*2 - (i === lines-1 ? W*0.22 : 0);
+        ctx.globalAlpha = Math.min(1, a * 2);
+        ctx.fillRect(pad, pad + i * lh + lh*0.35, fullW * Math.min(1, a*1.4), Math.max(2, H*0.022));
+      }
+      ctx.globalAlpha = 1;
+    },
+  },
+  { num:30, name:'spinner', cat:'progress',
+    desc:'Indeterminate work: phase-tick orbiting a dim ring. The orbiting dot is the contract — something is happening; not telling you how much.',
+    recipe:'arc sweep = π·0.6 · rotation rate = 0.0028 rad/ms',
+    init() { return {}; },
+    draw(ctx, t, W, H) {
+      const cx = W/2, cy = H/2, r = Math.min(W,H) * 0.32;
+      ctx.strokeStyle = GHOST;
+      ctx.lineWidth = Math.max(1.5, W * 0.018);
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.stroke();
+      const rot = t * 0.0028;
+      ctx.strokeStyle = FG;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, rot, rot + Math.PI*0.6);
+      ctx.stroke();
+      const px = cx + Math.cos(rot + Math.PI*0.6) * r;
+      const py = cy + Math.sin(rot + Math.PI*0.6) * r;
+      ctx.fillStyle = ACCENT;
+      ctx.beginPath();
+      ctx.arc(px, py, Math.max(2, W*0.022), 0, Math.PI*2);
+      ctx.fill();
+    },
+  },
+  { num:31, name:'progress bar', cat:'progress',
+    desc:'Determinate work: bar fills 0 → 100, percent below. The honest case — you know the budget.',
+    recipe:'linear · period 3s · loops',
+    init() { return { period: 3000 }; },
+    draw(ctx, t, W, H, st) {
+      const tt = (t % st.period) / st.period;
+      const barH = Math.max(4, H * 0.05);
+      const y = (H - barH) / 2;
+      const pad = W * 0.12;
+      const w = W - pad*2;
+      ctx.fillStyle = GHOST;
+      ctx.fillRect(pad, y, w, barH);
+      ctx.fillStyle = FG;
+      ctx.fillRect(pad, y, w * tt, barH);
+      ctx.fillStyle = DIM;
+      ctx.font = `300 ${Math.max(8, W*0.07)}px IBM Plex Mono`;
+      ctx.textAlign = 'left';
+      ctx.fillText(`${Math.floor(tt*100)}%`, pad, y + barH + H*0.1);
+    },
+  },
+  { num:33, name:'breathing ellipsis', cat:'progress',
+    desc:'Three dots breathing in phase-offset. The heartbeat — the simplest possible "I am alive" signal.',
+    recipe:'sin(t·0.003 − i·0.6) · phase offset 0.6 rad',
+    init() { return {}; },
+    draw(ctx, t, W, H) {
+      const cx = W/2, cy = H/2;
+      const spacing = W * 0.16;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < 3; i++) {
+        const phase = t * 0.003 - i * 0.6;
+        const a = Math.max(0.15, (Math.sin(phase) + 1) / 2);
+        const r = Math.max(2.5, W * 0.033) + a * (W * 0.014);
+        ctx.globalAlpha = a;
+        ctx.beginPath();
+        ctx.arc(cx + (i - 1) * spacing, cy, r, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    },
+  },
+  { num:46, name:'image resolve', cat:'multimodal',
+    desc:'A multimodal classic: start as noise, denoise toward the target. The signal is the *trajectory* — that something is forming.',
+    recipe:'lerp(noise, target, t^1.5) · 14×14 grid · period 3.5s',
+    init(rng) {
+      const N = 14;
+      const targets = new Float32Array(N*N);
+      const noise = new Float32Array(N*N);
+      const cx = N/2, cy = N/2;
+      for (let i = 0; i < N*N; i++) {
+        const r = Math.floor(i / N), c = i % N;
+        const dx = c - cx + 0.5, dy = r - cy + 0.5;
+        const d = Math.sqrt(dx*dx + dy*dy) / (N*0.55);
+        targets[i] = Math.max(0, 1 - d) * (0.4 + rng()*0.6);
+        noise[i] = rng();
+      }
+      return { N, targets, noise, period: 3500 };
+    },
+    draw(ctx, t, W, H, st) {
+      const tt = (t % st.period) / st.period;
+      const p = Math.pow(tt, 1.5);
+      const N = st.N;
+      const pad = W * 0.085;
+      const cell = (W - pad*2) / N;
+      for (let i = 0; i < N*N; i++) {
+        const v = st.noise[i] * (1-p) + st.targets[i] * p;
+        const a = Math.floor(v * 255);
+        ctx.fillStyle = `rgb(${a},${a},${a})`;
+        const r = Math.floor(i / N), c = i % N;
+        ctx.fillRect(pad + c*cell, pad + r*cell, cell+0.5, cell+0.5);
+      }
+    },
+  },
+  { num:47, name:'audio waveform', cat:'multimodal',
+    desc:'Vertical bars driven by per-bar phase + frequency. Reads as audio building, but it\'s pure phase math.',
+    recipe:'18 bars · freq ∈ [0.002, 0.005] · independent phase',
+    init(rng) {
+      const bars = 18;
+      const phase = Array.from({length: bars}, () => rng() * Math.PI * 2);
+      const freq = Array.from({length: bars}, () => 0.002 + rng() * 0.003);
+      return { bars, phase, freq };
+    },
+    draw(ctx, t, W, H, st) {
+      const pad = W * 0.1;
+      const w = W - pad*2;
+      const bw = w / st.bars;
+      const midY = H / 2;
+      ctx.fillStyle = FG;
+      for (let i = 0; i < st.bars; i++) {
+        const a = Math.abs(Math.sin(t * st.freq[i] + st.phase[i]));
+        const env = 0.2 + a * 0.7;
+        const h = env * (H * 0.6);
+        ctx.fillRect(pad + i * bw + 0.5, midY - h/2, bw - 1.5, h);
+      }
+    },
+  },
+  { num:63, name:'shimmer load', cat:'progress',
+    desc:'Skeleton bars with a traveling highlight. The single most reused loading pattern in the wild — pure motion, no content.',
+    recipe:'clipped lineargradient · period 1.8s',
+    init() { return { period: 1800 }; },
+    draw(ctx, t, W, H, st) {
+      ctx.fillStyle = '#1a1a1a';
+      const rows = 3;
+      const pad = W * 0.13;
+      const rh = Math.max(5, H * 0.06);
+      const gap = H * 0.1;
+      for (let i = 0; i < rows; i++) {
+        const w = (W - pad*2) * (i === rows-1 ? 0.55 : 1);
+        ctx.fillRect(pad, pad + H*0.12 + i*(rh+gap), w, rh);
+      }
+      const tt = (t % st.period) / st.period;
+      const sweepX = -W * 0.4 + tt * (W + W*0.8);
+      const g = ctx.createLinearGradient(sweepX, 0, sweepX + W*0.4, 0);
+      g.addColorStop(0, 'rgba(245,245,247,0)');
+      g.addColorStop(0.5, 'rgba(245,245,247,0.35)');
+      g.addColorStop(1, 'rgba(245,245,247,0)');
+      ctx.save();
+      ctx.beginPath();
+      for (let i = 0; i < rows; i++) {
+        const w = (W - pad*2) * (i === rows-1 ? 0.55 : 1);
+        ctx.rect(pad, pad + H*0.12 + i*(rh+gap), w, rh);
+      }
+      ctx.clip();
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    },
+  },
+  // --- new patterns ---
+  { num:20, name:'file diff stream', cat:'files',
+    desc:'Edit diff streaming in — green added lines + red removed lines accumulate from top. The signature of a working code-edit agent.',
+    recipe:'rows reveal at 110ms each · sign weighted seed-random',
+    init(rng) {
+      const rows = 10;
+      const widths = Array.from({length: rows}, () => 0.4 + rng()*0.5);
+      const signs = Array.from({length: rows}, () => rng() < 0.55 ? 1 : -1);
+      return { rows, widths, signs, period: rows*110 + 700 };
+    },
+    draw(ctx, t, W, H, st) {
+      const tt = t % st.period;
+      const pad = W * 0.1;
+      const rh = (H - pad*2) / st.rows;
+      const barH = Math.max(2, rh * 0.55);
+      for (let i = 0; i < st.rows; i++) {
+        const reveal = i * 110;
+        if (tt < reveal) continue;
+        const y = pad + i * rh + rh*0.2;
+        // gutter sign
+        ctx.fillStyle = st.signs[i] > 0 ? GOOD : BAD;
+        ctx.fillRect(pad, y, Math.max(2, W*0.018), barH);
+        // line
+        ctx.fillStyle = st.signs[i] > 0 ? 'rgba(111,217,158,0.65)' : 'rgba(255,92,92,0.55)';
+        ctx.fillRect(pad + W*0.04, y, (W - pad*2 - W*0.05) * st.widths[i], barH);
+      }
+    },
+  },
+  { num:32, name:'step indicator', cat:'progress',
+    desc:'1/5 → 5/5 — discrete steps lighting in sequence. The cleanest possible model of "you are here in a sequence."',
+    recipe:'5 nodes · 600ms per step · 700ms hold at end',
+    init() { return { steps: 5, perStep: 600, hold: 700 }; },
+    draw(ctx, t, W, H, st) {
+      const period = st.steps * st.perStep + st.hold;
+      const tt = t % period;
+      const lit = Math.min(st.steps, Math.floor(tt / st.perStep) + 1);
+      const cy = H / 2;
+      const pad = W * 0.12;
+      const span = W - pad*2;
+      const gap = span / (st.steps - 1);
+      // connector line
+      ctx.strokeStyle = GHOST;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad, cy); ctx.lineTo(pad + span, cy);
+      ctx.stroke();
+      for (let i = 0; i < st.steps; i++) {
+        const x = pad + i * gap;
+        const isLit = i < lit;
+        ctx.fillStyle = isLit ? FG : '#1a1a1a';
+        ctx.strokeStyle = isLit ? FG : DIM;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, cy, Math.max(4, W*0.04), 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      // active edge — line up to last lit
+      if (lit > 1) {
+        ctx.strokeStyle = FG;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, cy);
+        ctx.lineTo(pad + (lit - 1) * gap, cy);
+        ctx.stroke();
+      }
+    },
+  },
+  { num:42, name:'parallel agent fleet', cat:'multi-agent',
+    desc:'A grid of agents, each independently running. Cells brighten on local activity, fading on idle — the fleet "shimmers."',
+    recipe:'5×5 cells · sin-driven activity · phase per cell',
+    init(rng) {
+      const N = 5;
+      const phase = Array.from({length: N*N}, () => rng()*Math.PI*2);
+      const freq = Array.from({length: N*N}, () => 0.001 + rng()*0.003);
+      return { N, phase, freq };
+    },
+    draw(ctx, t, W, H, st) {
+      const N = st.N;
+      const pad = W * 0.1;
+      const cell = (W - pad*2) / N;
+      const inset = cell * 0.18;
+      for (let i = 0; i < N*N; i++) {
+        const r = Math.floor(i / N), c = i % N;
+        const a = Math.max(0.08, Math.abs(Math.sin(t * st.freq[i] + st.phase[i])));
+        ctx.fillStyle = a > 0.75 ? FG : (a > 0.45 ? '#888' : '#222');
+        ctx.fillRect(pad + c*cell + inset, pad + r*cell + inset, cell - inset*2, cell - inset*2);
+      }
+    },
+  },
+  { num:58, name:'memory write', cat:'state',
+    desc:'A short pulse marking a write to persistent memory. Discrete, infrequent, deliberate — different from streaming work.',
+    recipe:'pulse every 2.4s · radial flash + chip · 600ms decay',
+    init() { return { period: 2400, pulse: 600 }; },
+    draw(ctx, t, W, H, st) {
+      const tt = t % st.period;
+      const cx = W/2, cy = H/2;
+      // background chip
+      const chipW = W*0.5, chipH = H*0.18;
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(cx - chipW/2, cy - chipH/2, chipW, chipH);
+      ctx.strokeStyle = DIM;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - chipW/2 + 0.5, cy - chipH/2 + 0.5, chipW - 1, chipH - 1);
+      // pulse
+      if (tt < st.pulse) {
+        const p = tt / st.pulse;
+        const ringR = p * W * 0.5;
+        ctx.strokeStyle = `rgba(0,168,255,${(1-p) * 0.9})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, ringR, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.fillStyle = `rgba(0,168,255,${1-p})`;
+      } else {
+        ctx.fillStyle = ACCENT;
+      }
+      // chip fill highlight
+      ctx.fillRect(cx - chipW/2 + 4, cy - chipH/2 + 4, chipW - 8, chipH - 8);
+      // tick labels
+      ctx.fillStyle = '#0a0a0a';
+      ctx.font = `300 ${Math.max(7, W*0.06)}px IBM Plex Mono`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('mem ←', cx, cy);
+    },
+  },
+];
+
+const CATEGORIES = [
+  { id: 'all', label: 'all' },
+  { id: 'text', label: 'text' },
+  { id: 'progress', label: 'progress' },
+  { id: 'files', label: 'files' },
+  { id: 'multimodal', label: 'multimodal' },
+  { id: 'multi-agent', label: 'multi-agent' },
+  { id: 'state', label: 'state' },
+];
+
+let activeFilter = 'all';
+
+const filterbar = document.getElementById('filterbar');
+CATEGORIES.forEach(cat => {
+  const pill = document.createElement('button');
+  pill.className = 'pill' + (cat.id === 'all' ? ' on' : '');
+  pill.textContent = cat.label;
+  pill.dataset.cat = cat.id;
+  pill.addEventListener('click', () => {
+    activeFilter = cat.id;
+    [...filterbar.children].forEach(c => c.classList.toggle('on', c.dataset.cat === cat.id));
+    applyFilter();
+  });
+  filterbar.appendChild(pill);
+});
+
+const grid = document.getElementById('grid');
+const cards = GLYPHS.map(g => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.cat = g.cat;
+
+  const box = document.createElement('div');
+  box.className = 'glyph-box';
+  const canvas = document.createElement('canvas');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 130 * dpr;
+  canvas.height = 130 * dpr;
+  box.appendChild(canvas);
+  card.appendChild(box);
+
+  const label = document.createElement('div');
+  label.className = 'card-label';
+  label.innerHTML = `<span class="card-num">${String(g.num).padStart(2,'0')}</span><span class="card-name">${g.name}</span><span class="card-cat">${g.cat}</span>`;
+  card.appendChild(label);
+
+  grid.appendChild(card);
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const seed = hash(`${g.num}-${g.name}`);
+  const rng = mulberry32(seed);
+  const st = g.init(rng);
+
+  card.addEventListener('click', () => featureGlyph(g));
+
+  return { glyph: g, ctx, state: st, W: 130, H: 130, el: card };
+});
+
+function applyFilter() {
+  for (const c of cards) {
+    c.el.style.display = (activeFilter === 'all' || c.glyph.cat === activeFilter) ? '' : 'none';
+  }
+}
+
+// --- overlay ---
+const overlay = document.getElementById('overlay');
+const overlayCanvas = document.getElementById('overlayCanvas');
+const overlayCtx = overlayCanvas.getContext('2d');
+const overlayDpr = window.devicePixelRatio || 1;
+overlayCanvas.width = 280 * overlayDpr;
+overlayCanvas.height = 280 * overlayDpr;
+overlayCtx.scale(overlayDpr, overlayDpr);
+
+let featured = null;
+let featuredState = null;
+
+function featureGlyph(g) {
+  document.getElementById('overlayCat').textContent = g.cat;
+  document.getElementById('overlayNum').textContent = `pattern ${String(g.num).padStart(2,'0')}`;
+  document.getElementById('overlayName').textContent = g.name;
+  document.getElementById('overlayDesc').textContent = g.desc;
+  document.getElementById('overlayMeta').innerHTML = `<div><b>recipe</b>${g.recipe || ''}</div>`;
+  featured = g;
+  const seed = hash(`${g.num}-${g.name}-feature`);
+  featuredState = g.init(mulberry32(seed));
+  overlay.classList.add('open');
+}
+
+function closeOverlay() {
+  overlay.classList.remove('open');
+  featured = null;
+}
+
+document.getElementById('overlayClose').addEventListener('click', closeOverlay);
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
+
+function tick(now) {
+  for (const c of cards) {
+    if (c.el.style.display === 'none') continue;
+    c.ctx.clearRect(0, 0, c.W, c.H);
+    c.glyph.draw(c.ctx, now, c.W, c.H, c.state);
+  }
+  if (featured) {
+    overlayCtx.clearRect(0, 0, 280, 280);
+    featured.draw(overlayCtx, now, 280, 280, featuredState);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>

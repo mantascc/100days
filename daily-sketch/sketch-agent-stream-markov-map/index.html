@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-agent-stream-markov-map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      min-height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-weight: 300;
+    }
+
+    header {
+      padding: 32px 32px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    header .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+    header p {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      max-width: 64ch;
+      line-height: 1.6;
+    }
+
+    main {
+      padding: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--border-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .card {
+      background: var(--ground-base);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+    }
+    .card-num {
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+    .card-title {
+      color: var(--text-default);
+      text-transform: lowercase;
+    }
+    .card-shape {
+      margin-left: auto;
+      color: var(--text-ghost);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+
+    .card svg {
+      width: 100%;
+      height: 180px;
+      display: block;
+    }
+
+    .edge {
+      stroke: var(--text-ghost);
+      stroke-width: 1;
+      fill: none;
+    }
+    .edge.active {
+      stroke: var(--accent);
+    }
+    .node {
+      fill: var(--ground-raised);
+      stroke: var(--text-tertiary);
+      stroke-width: 1;
+    }
+    .node.lit {
+      fill: var(--accent);
+      stroke: var(--accent);
+    }
+    .node-label {
+      fill: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      letter-spacing: 0.04em;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+    .walker {
+      fill: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">agent-stream · markov-map</div>
+  <h1>streaming patterns as state machines</h1>
+  <p>Each card is a Markov walk over an agent-streaming pattern. A walker steps node-to-node by weighted edges; each traversal leaves a fading trail, so frequent paths glow and rare ones recede. The wall reads as a typology by trail density.</p>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+const PATTERNS = [
+  { num:12, title:'single tool call', shape:'linear',
+    nodes: [
+      {id:'pending', x:50,  y:90},
+      {id:'running', x:140, y:90},
+      {id:'done',    x:230, y:90},
+    ],
+    edges: [
+      {from:'pending', to:'running', w:1},
+      {from:'running', to:'done',    w:1},
+      {from:'done',    to:'pending', w:1},
+    ],
+  },
+  { num:14, title:'parallel bundle', shape:'fan-out/in',
+    nodes: [
+      {id:'call',  x:40,  y:90},
+      {id:'a',     x:130, y:35},
+      {id:'b',     x:130, y:90},
+      {id:'c',     x:130, y:145},
+      {id:'merge', x:220, y:90},
+    ],
+    edges: [
+      {from:'call',to:'a',w:1},{from:'call',to:'b',w:1},{from:'call',to:'c',w:1},
+      {from:'a',to:'merge',w:1},{from:'b',to:'merge',w:1},{from:'c',to:'merge',w:1},
+      {from:'merge',to:'call',w:1},
+    ],
+  },
+  { num:15, title:'sequential chain', shape:'DAG',
+    nodes: [
+      {id:'call₁', x:35,  y:90},
+      {id:'res₁',  x:105, y:90},
+      {id:'call₂', x:175, y:90},
+      {id:'res₂',  x:245, y:90},
+    ],
+    edges: [
+      {from:'call₁',to:'res₁',w:1},
+      {from:'res₁',to:'call₂',w:1},
+      {from:'call₂',to:'res₂',w:1},
+      {from:'res₂',to:'call₁',w:1},
+    ],
+  },
+  { num:17, title:'error + retry', shape:'self-loop',
+    nodes: [
+      {id:'call', x:50,  y:90},
+      {id:'run',  x:135, y:90},
+      {id:'done', x:225, y:50},
+      {id:'err',  x:225, y:130},
+    ],
+    edges: [
+      {from:'call',to:'run',w:1},
+      {from:'run',to:'done',w:0.7},
+      {from:'run',to:'err',w:0.3},
+      {from:'err',to:'call',w:1},
+      {from:'done',to:'call',w:1},
+    ],
+  },
+  { num:18, title:'permission gate', shape:'absorbing',
+    nodes: [
+      {id:'call', x:45,  y:90},
+      {id:'gate', x:135, y:90},
+      {id:'ok',   x:225, y:50},
+      {id:'stop', x:225, y:130},
+    ],
+    edges: [
+      {from:'call',to:'gate',w:1},
+      {from:'gate',to:'ok',w:0.8},
+      {from:'gate',to:'stop',w:0.2},
+      {from:'ok',to:'call',w:1},
+      {from:'stop',to:'call',w:1},
+    ],
+  },
+  { num:19, title:'nested spawn', shape:'recursive',
+    nodes: [
+      {id:'main',   x:40,  y:90},
+      {id:'spawn',  x:105, y:90},
+      {id:'sub',    x:175, y:90},
+      {id:'return', x:245, y:90},
+    ],
+    edges: [
+      {from:'main',to:'spawn',w:1},
+      {from:'spawn',to:'sub',w:1},
+      {from:'sub',to:'return',w:1},
+      {from:'return',to:'main',w:1},
+    ],
+  },
+  { num:43, title:'agent handoff', shape:'bridge',
+    nodes: [
+      {id:'a·think', x:50,  y:55},
+      {id:'a·call',  x:130, y:55},
+      {id:'b·think', x:160, y:135},
+      {id:'b·done',  x:240, y:135},
+    ],
+    edges: [
+      {from:'a·think',to:'a·call',w:1},
+      {from:'a·call',to:'b·think',w:1},
+      {from:'b·think',to:'b·done',w:1},
+      {from:'b·done',to:'a·think',w:1},
+    ],
+  },
+  { num:44, title:'voting / consensus', shape:'fan-in',
+    nodes: [
+      {id:'q',     x:40,  y:90},
+      {id:'v₁',    x:130, y:35},
+      {id:'v₂',    x:130, y:90},
+      {id:'v₃',    x:130, y:145},
+      {id:'tally', x:220, y:90},
+    ],
+    edges: [
+      {from:'q',to:'v₁',w:1},{from:'q',to:'v₂',w:1},{from:'q',to:'v₃',w:1},
+      {from:'v₁',to:'tally',w:1},{from:'v₂',to:'tally',w:1},{from:'v₃',to:'tally',w:1},
+      {from:'tally',to:'q',w:1},
+    ],
+  },
+];
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs={}) {
+  const n = document.createElementNS(SVG_NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+
+function edgeKey(e) { return `${e.from}→${e.to}`; }
+
+function buildCard(p, idx) {
+  const card = document.createElement('article');
+  card.className = 'card';
+
+  const head = document.createElement('div');
+  head.className = 'card-header';
+  head.innerHTML = `<span class="card-num">${String(p.num).padStart(2,'0')}</span><span class="card-title">${p.title}</span><span class="card-shape">${p.shape}</span>`;
+  card.appendChild(head);
+
+  const svg = el('svg', { viewBox: '0 0 280 180', preserveAspectRatio: 'xMidYMid meet' });
+
+  const nodeMap = {};
+  for (const n of p.nodes) nodeMap[n.id] = n;
+
+  const edgeRefs = {};
+  for (const e of p.edges) {
+    const a = nodeMap[e.from], b = nodeMap[e.to];
+    const line = el('line', { x1:a.x, y1:a.y, x2:b.x, y2:b.y, class:'edge' });
+    svg.appendChild(line);
+    edgeRefs[edgeKey(e)] = line;
+  }
+
+  const nodeRefs = {};
+  for (const n of p.nodes) {
+    const c = el('circle', { cx:n.x, cy:n.y, r:7, class:'node' });
+    svg.appendChild(c);
+    const labelY = n.y > 110 ? n.y - 13 : n.y + 19;
+    const t = el('text', { x:n.x, y:labelY, class:'node-label' });
+    t.textContent = n.id;
+    svg.appendChild(t);
+    nodeRefs[n.id] = c;
+  }
+
+  const walker = el('circle', { r:3.5, cx:p.nodes[0].x, cy:p.nodes[0].y, class:'walker' });
+  svg.appendChild(walker);
+
+  card.appendChild(svg);
+  return {
+    el: card,
+    pattern: p,
+    nodeMap,
+    nodeRefs,
+    edgeRefs,
+    edgeEnergy: Object.fromEntries(p.edges.map(e => [edgeKey(e), 0])),
+    walker,
+    state: {
+      mode: 'dwell',
+      currentId: p.nodes[0].id,
+      dwellRem: 200 + Math.random()*200,
+      travelT: 0,
+      travelDur: 0,
+      fromId: null,
+      toId: null,
+      activeEdge: null,
+    },
+    // per-card cadence variation
+    travelBase: 600 + (idx % 4) * 70,
+    dwellBase:  220 + (idx % 3) * 60,
+  };
+}
+
+function pickEdge(p, fromId) {
+  const out = p.edges.filter(e => e.from === fromId);
+  const total = out.reduce((s,e) => s + e.w, 0);
+  let r = Math.random() * total;
+  for (const e of out) { r -= e.w; if (r <= 0) return e; }
+  return out[out.length - 1];
+}
+
+function stepCard(c, dt) {
+  const s = c.state;
+  if (s.mode === 'dwell') {
+    s.dwellRem -= dt;
+    if (s.dwellRem <= 0) {
+      const e = pickEdge(c.pattern, s.currentId);
+      if (!e) return;
+      s.mode = 'travel';
+      s.fromId = e.from;
+      s.toId = e.to;
+      s.travelT = 0;
+      s.travelDur = c.travelBase + (Math.random() - 0.5) * 120;
+      s.activeEdge = edgeKey(e);
+      c.edgeEnergy[s.activeEdge] = 1;
+    }
+  } else {
+    s.travelT += dt / s.travelDur;
+    if (s.travelT >= 1) {
+      s.travelT = 1;
+      s.currentId = s.toId;
+      s.mode = 'dwell';
+      s.dwellRem = c.dwellBase + (Math.random() - 0.5) * 80;
+      s.activeEdge = null;
+    }
+  }
+  // decay edges
+  for (const k in c.edgeEnergy) {
+    c.edgeEnergy[k] = Math.max(0, c.edgeEnergy[k] - dt * 0.0008);
+  }
+}
+
+function renderCard(c) {
+  const s = c.state;
+  // walker position
+  let wx, wy;
+  if (s.mode === 'dwell') {
+    const n = c.nodeMap[s.currentId];
+    wx = n.x; wy = n.y;
+  } else {
+    const a = c.nodeMap[s.fromId], b = c.nodeMap[s.toId];
+    const t = s.travelT;
+    wx = a.x + (b.x - a.x) * t;
+    wy = a.y + (b.y - a.y) * t;
+  }
+  c.walker.setAttribute('cx', wx);
+  c.walker.setAttribute('cy', wy);
+
+  // edges
+  for (const k in c.edgeRefs) {
+    const e = c.edgeEnergy[k];
+    const op = 0.08 + e * 0.7;
+    const ref = c.edgeRefs[k];
+    ref.setAttribute('stroke-opacity', op);
+    if (e > 0.5) ref.setAttribute('class', 'edge active');
+    else ref.setAttribute('class', 'edge');
+  }
+
+  // nodes
+  for (const id in c.nodeRefs) {
+    const ref = c.nodeRefs[id];
+    const lit = (s.mode === 'dwell' && s.currentId === id);
+    ref.setAttribute('class', lit ? 'node lit' : 'node');
+  }
+}
+
+const grid = document.getElementById('grid');
+const cards = PATTERNS.map((p, i) => {
+  const c = buildCard(p, i);
+  grid.appendChild(c.el);
+  return c;
+});
+
+let last = performance.now();
+function tick(now) {
+  const dt = Math.min(now - last, 64);
+  last = now;
+  for (const c of cards) {
+    stepCard(c, dt);
+    renderCard(c);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>
