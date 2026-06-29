@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>87 · attention distribution</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-grid: #161618;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #2e2e34;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%; min-height: 100vh; min-height: 100dvh;
+      background: var(--ground-void); color: var(--text-default);
+      font-family: var(--font-mono);
+      overflow: hidden;
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+    header {
+      position: fixed; top: 14px; left: 0; right: 0;
+      text-align: center;
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--text-secondary); z-index: 10; pointer-events: none;
+    }
+    main {
+      width: 100%;
+      height: 100vh; height: 100dvh;
+      display: grid; place-items: center;
+      padding: 44px 8px 16px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      width: min(96vmin, 1080px);
+      aspect-ratio: 1 / 1;
+      max-width: 100%;
+      max-height: calc(100dvh - 72px);
+      gap: 1px;
+      background: var(--ground-grid);
+      border: 1px solid var(--ground-grid);
+    }
+    .cell {
+      background: var(--ground-void);
+      position: relative;
+      overflow: hidden;
+    }
+    .cell-label {
+      position: absolute;
+      top: 6px; left: 8px;
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-tertiary); z-index: 1;
+      pointer-events: none;
+    }
+    .cell canvas { display: block; width: 100%; height: 100%; }
+
+    @media (max-width: 520px) {
+      header { font-size: 8px; letter-spacing: 0.18em; top: 12px; }
+      .cell-label { font-size: 7px; letter-spacing: 0.16em; top: 4px; left: 5px; }
+      main { padding: 36px 4px 8px; }
+    }
+    @media (max-height: 480px) and (orientation: landscape) {
+      header { top: 6px; font-size: 8px; }
+      main { padding: 24px 4px 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>attention arena · 9 lenses · 100 agents · 5 voices</header>
+
+<main><div class="grid" id="grid"></div></main>
+
+<script>
+(() => {
+  // ─── Shared simulation ─────────────────────────────────────────────────
+  const VOICES = [
+    { name: 'pulse',  color: '#4dd1ff', glyph: 'square'   },
+    { name: 'echo',   color: '#ff7ab8', glyph: 'circle'   },
+    { name: 'spark',  color: '#ffc24a', glyph: 'plus'     },
+    { name: 'drift',  color: '#6cf2a3', glyph: 'triangle' },
+    { name: 'murmur', color: '#b89cff', glyph: 'diamond'  },
+  ];
+  const N_AGENTS = 100;
+  const N_VOICES = VOICES.length;
+
+  const agents = [];
+  for (let i = 0; i < N_AGENTS; i++) {
+    agents.push({
+      target: -1,
+      attention: 0.3 + Math.random() * 0.7,
+      state: 'idle',
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+
+  const HISTORY_MAX = 240;
+  const history = [];
+  let voiceCounts = new Array(N_VOICES).fill(0);
+  let focusedTotal = 0;
+
+  function stepSim() {
+    for (const a of agents) {
+      if (a.state === 'idle') {
+        a.attention = Math.min(1, a.attention + 0.0010);
+        if (a.attention > 0.65 + Math.random() * 0.15) {
+          a.target = (Math.random() * N_VOICES) | 0;
+          a.state = 'focused';
+        }
+      } else {
+        a.attention -= 0.0015;
+        if (a.attention < 0.08) {
+          a.state = 'idle';
+          a.target = -1;
+        }
+      }
+    }
+    voiceCounts = new Array(N_VOICES).fill(0);
+    focusedTotal = 0;
+    for (const a of agents) {
+      if (a.target >= 0) { voiceCounts[a.target]++; focusedTotal++; }
+    }
+    history.push(voiceCounts.slice());
+    if (history.length > HISTORY_MAX) history.shift();
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────
+  const rgbCache = {};
+  function rgba(hex, a) {
+    let c = rgbCache[hex];
+    if (!c) {
+      const n = parseInt(hex.slice(1), 16);
+      c = rgbCache[hex] = { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    }
+    return `rgba(${c.r},${c.g},${c.b},${a})`;
+  }
+
+  function drawGlyph(ctx, g, x, y, color, s) {
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = Math.max(0.9, s * 0.22);
+    switch (g) {
+      case 'square':
+        ctx.fillRect(x - s, y - s, s * 2, s * 2);
+        break;
+      case 'circle':
+        ctx.beginPath();
+        ctx.arc(x, y, s, 0, Math.PI * 2);
+        ctx.stroke();
+        break;
+      case 'plus':
+        ctx.lineCap = 'butt';
+        ctx.beginPath();
+        ctx.moveTo(x - s * 1.1, y); ctx.lineTo(x + s * 1.1, y);
+        ctx.moveTo(x, y - s * 1.1); ctx.lineTo(x, y + s * 1.1);
+        ctx.stroke();
+        break;
+      case 'triangle':
+        ctx.beginPath();
+        ctx.moveTo(x, y - s);
+        ctx.lineTo(x + s, y + s * 0.85);
+        ctx.lineTo(x - s, y + s * 0.85);
+        ctx.closePath();
+        ctx.stroke();
+        break;
+      case 'diamond':
+        ctx.beginPath();
+        ctx.moveTo(x, y - s * 1.1);
+        ctx.lineTo(x + s * 1.1, y);
+        ctx.lineTo(x, y + s * 1.1);
+        ctx.lineTo(x - s * 1.1, y);
+        ctx.closePath();
+        ctx.stroke();
+        break;
+    }
+  }
+
+  // ─── Cell renderers ───────────────────────────────────────────────────
+
+  // 01 · beams — voices on right rail of cell, agents wander/steer
+  function makeBeams() {
+    let pos = null, homes = null, lastW = 0, lastH = 0;
+    return (ctx, w, h) => {
+      if (!pos || lastW !== w || lastH !== h) {
+        // Idle "home" positions live in the left ~70% of the cell so the population
+        // doesn't drift rightward as focus cycles accumulate.
+        homes = agents.map(() => ({
+          x: 6 + Math.random() * (w * 0.66 - 12),
+          y: 8 + Math.random() * (h - 16),
+        }));
+        pos = homes.map(hm => ({ x: hm.x, y: hm.y, vx: 0, vy: 0 }));
+        lastW = w; lastH = h;
+      }
+      const railX = w * 0.82;
+      const vy = i => h * (0.14 + 0.72 * (i / (N_VOICES - 1)));
+      const standoff = Math.min(w, h) * 0.10;
+
+      for (let i = 0; i < N_AGENTS; i++) {
+        const a = agents[i], p = pos[i];
+        if (a.state === 'focused') {
+          // Radial pull weakens as the agent nears the voice; tangential nudge
+          // ramps up so it orbits rather than crashes into the anchor.
+          const dx = railX - p.x, dy = vy(a.target) - p.y, d = Math.hypot(dx, dy) || 1;
+          const closeness = Math.min(1, d / standoff);
+          const kr = 0.022 * closeness * closeness;
+          const kt = 0.010 * (1 - closeness);
+          p.vx += (dx / d) * kr + (-dy / d) * kt;
+          p.vy += (dy / d) * kr + (dx / d) * kt;
+        } else {
+          // Idle agents drift back toward their home spot — the restoring force
+          // is gentle but persistent, so over time wanderers re-spread leftward.
+          const hm = homes[i];
+          const dx = hm.x - p.x, dy = hm.y - p.y, d = Math.hypot(dx, dy) || 1;
+          p.vx += (dx / d) * 0.012;
+          p.vy += (dy / d) * 0.012;
+          p.vx += (Math.random() - 0.5) * 0.028;
+          p.vy += (Math.random() - 0.5) * 0.028;
+        }
+        p.vx *= 0.92; p.vy *= 0.92;
+        const sp = Math.hypot(p.vx, p.vy);
+        const cap = a.state === 'focused' ? Math.max(0.5, w * 0.004) : Math.max(0.25, w * 0.002);
+        if (sp > cap) { p.vx *= cap / sp; p.vy *= cap / sp; }
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 2) { p.x = 2; p.vx = Math.abs(p.vx); }
+        if (p.x > railX - 4) { p.x = railX - 4; p.vx = -Math.abs(p.vx); }
+        if (p.y < 2) { p.y = 2; p.vy = Math.abs(p.vy); }
+        if (p.y > h - 2) { p.y = h - 2; p.vy = -Math.abs(p.vy); }
+      }
+
+      ctx.lineWidth = 0.6;
+      for (let i = 0; i < N_AGENTS; i++) {
+        const a = agents[i], p = pos[i];
+        if (a.state !== 'focused') continue;
+        ctx.strokeStyle = rgba(VOICES[a.target].color, 0.08 + a.attention * 0.18);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(railX, vy(a.target));
+        ctx.stroke();
+      }
+      const s = Math.max(2.5, Math.min(w, h) * 0.030);
+      for (let i = 0; i < N_VOICES; i++) {
+        drawGlyph(ctx, VOICES[i].glyph, railX, vy(i), VOICES[i].color, s);
+      }
+      for (let i = 0; i < N_AGENTS; i++) {
+        const a = agents[i], p = pos[i];
+        ctx.fillStyle = a.state === 'focused' ? VOICES[a.target].color : '#444';
+        ctx.fillRect(Math.round(p.x), Math.round(p.y), 1.5, 1.5);
+      }
+    };
+  }
+
+  // 02 · bars — horizontal bar chart
+  function renderBars(ctx, w, h) {
+    const padX = w * 0.10, padY = h * 0.18;
+    const rowH = (h - padY * 2) / N_VOICES;
+    const maxCount = Math.max(1, ...voiceCounts);
+    const s = Math.max(2, Math.min(rowH, w * 0.05) * 0.45);
+    for (let i = 0; i < N_VOICES; i++) {
+      const y = padY + rowH * (i + 0.5);
+      drawGlyph(ctx, VOICES[i].glyph, padX + s, y, VOICES[i].color, s);
+      const barX = padX + s * 2 + 8;
+      const barW = w - barX - padX;
+      const fillW = (voiceCounts[i] / maxCount) * barW;
+      const barH = Math.max(2, rowH * 0.20);
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(barX, y - barH / 2, barW, barH);
+      ctx.fillStyle = rgba(VOICES[i].color, 0.92);
+      ctx.fillRect(barX, y - barH / 2, fillW, barH);
+    }
+  }
+
+  // 03 · bubbles — area proportional to listeners, smoothed
+  function makeBubbles() {
+    const r = new Array(N_VOICES).fill(0);
+    return (ctx, w, h) => {
+      const maxR = Math.min(w, h) * 0.085;
+      const baseR = maxR * 0.18;
+      const avg = N_AGENTS / N_VOICES;
+      for (let i = 0; i < N_VOICES; i++) {
+        const target = baseR + Math.min(1, voiceCounts[i] / (avg * 1.6)) * (maxR - baseR);
+        r[i] += (target - r[i]) * 0.08;
+      }
+      const cy = h / 2;
+      for (let i = 0; i < N_VOICES; i++) {
+        const cx = w * (0.10 + 0.20 * i);
+        const rr = Math.max(2, r[i]);
+        ctx.fillStyle = rgba(VOICES[i].color, 0.18);
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = rgba(VOICES[i].color, 0.9);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = VOICES[i].color;
+        ctx.fillRect(cx - 1, cy - 1, 2, 2);
+      }
+    };
+  }
+
+  // 04 · units — 10×10 dot grid, sorted by voice
+  function renderUnits(ctx, w, h) {
+    const sorted = agents
+      .map(a => ({ target: a.target, state: a.state }))
+      .sort((a, b) => {
+        if (a.target === b.target) return 0;
+        if (a.target === -1) return 1;
+        if (b.target === -1) return -1;
+        return a.target - b.target;
+      });
+    const cols = 10, rows = 10;
+    const pad = Math.min(w, h) * 0.10;
+    const cellW = (w - pad * 2) / cols;
+    const cellH = (h - pad * 2) / rows;
+    const ds = Math.max(2, Math.min(cellW, cellH) * 0.38);
+    for (let i = 0; i < N_AGENTS; i++) {
+      const r = Math.floor(i / cols);
+      const c = i % cols;
+      const x = pad + c * cellW + cellW / 2;
+      const y = pad + r * cellH + cellH / 2;
+      const a = sorted[i];
+      ctx.fillStyle = a.state === 'focused' ? VOICES[a.target].color : '#3a3a3a';
+      ctx.fillRect(x - ds / 2, y - ds / 2, ds, ds);
+    }
+  }
+
+  // 05 · lines — overlaid sparklines of voice counts over time
+  function renderLines(ctx, w, h) {
+    if (history.length < 2) return;
+    const padX = w * 0.06, padY = h * 0.18;
+    const innerW = w - padX * 2;
+    const innerH = h - padY * 2;
+    let maxCount = 1;
+    for (const row of history) for (const c of row) if (c > maxCount) maxCount = c;
+    // Baseline
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padX, padY + innerH + 0.5);
+    ctx.lineTo(padX + innerW, padY + innerH + 0.5);
+    ctx.stroke();
+    for (let v = 0; v < N_VOICES; v++) {
+      ctx.strokeStyle = rgba(VOICES[v].color, 0.9);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < history.length; i++) {
+        const x = padX + (i / (HISTORY_MAX - 1)) * innerW;
+        const y = padY + innerH - (history[i][v] / maxCount) * innerH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // 06 · pulse — concentric expanding rings, frequency ∝ listeners
+  function makePulse() {
+    let rings = [];
+    const cd = new Array(N_VOICES).fill(0);
+    return (ctx, w, h) => {
+      const cy = h / 2;
+      const maxR = Math.min(w, h) * 0.35;
+      const life = 60;
+      for (let i = 0; i < N_VOICES; i++) {
+        cd[i] -= 1;
+        if (voiceCounts[i] > 0 && cd[i] <= 0) {
+          cd[i] = Math.max(6, Math.round(50 / (voiceCounts[i] + 0.5)));
+          rings.push({ v: i, x: w * (0.10 + 0.20 * i), y: cy, age: 0 });
+        }
+      }
+      rings = rings.filter(r => r.age < life);
+      for (const r of rings) {
+        r.age += 1;
+        const t = r.age / life;
+        const radius = t * maxR;
+        const alpha = (1 - t) * 0.55;
+        ctx.strokeStyle = rgba(VOICES[r.v].color, alpha);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      for (let i = 0; i < N_VOICES; i++) {
+        const cx = w * (0.10 + 0.20 * i);
+        ctx.fillStyle = VOICES[i].color;
+        ctx.fillRect(cx - 1, cy - 1, 2, 2);
+      }
+    };
+  }
+
+  // 07 · orbit — voices at pentagon vertices, agents spring toward target
+  function makeOrbit() {
+    let pos = null, lastW = 0, lastH = 0;
+    return (ctx, w, h) => {
+      const cx = w / 2, cy = h / 2;
+      const R = Math.min(w, h) * 0.36;
+      if (!pos || lastW !== w || lastH !== h) {
+        pos = agents.map(() => ({
+          x: cx + (Math.random() - 0.5) * R * 0.3,
+          y: cy + (Math.random() - 0.5) * R * 0.3,
+          vx: 0, vy: 0,
+        }));
+        lastW = w; lastH = h;
+      }
+      const vp = [];
+      for (let i = 0; i < N_VOICES; i++) {
+        const ang = -Math.PI / 2 + (i / N_VOICES) * Math.PI * 2;
+        vp.push({ x: cx + Math.cos(ang) * R, y: cy + Math.sin(ang) * R });
+      }
+      for (let i = 0; i < N_AGENTS; i++) {
+        const a = agents[i], p = pos[i];
+        let tx, ty, k;
+        if (a.state === 'focused') {
+          tx = vp[a.target].x; ty = vp[a.target].y; k = 0.030;
+        } else {
+          tx = cx; ty = cy; k = 0.010;
+        }
+        const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy) || 1;
+        p.vx += (dx / d) * k + (Math.random() - 0.5) * 0.07;
+        p.vy += (dy / d) * k + (Math.random() - 0.5) * 0.07;
+        p.vx *= 0.86; p.vy *= 0.86;
+        p.x += p.vx; p.y += p.vy;
+      }
+      const s = Math.max(2.5, Math.min(w, h) * 0.035);
+      for (let i = 0; i < N_VOICES; i++) {
+        drawGlyph(ctx, VOICES[i].glyph, vp[i].x, vp[i].y, VOICES[i].color, s);
+      }
+      for (let i = 0; i < N_AGENTS; i++) {
+        const a = agents[i], p = pos[i];
+        ctx.fillStyle = a.state === 'focused' ? VOICES[a.target].color : '#444';
+        ctx.fillRect(Math.round(p.x), Math.round(p.y), 1.5, 1.5);
+      }
+    };
+  }
+
+  // 08 · tide — vertical columns, height ∝ listeners, smoothed
+  function makeTide() {
+    const cur = new Array(N_VOICES).fill(0);
+    return (ctx, w, h) => {
+      const padX = w * 0.10, padTop = h * 0.18, padBot = h * 0.12;
+      const innerW = w - padX * 2;
+      const innerH = h - padTop - padBot;
+      const colW = innerW / N_VOICES;
+      const barW = colW * 0.58;
+      const maxCount = N_AGENTS * 0.6;
+      for (let i = 0; i < N_VOICES; i++) {
+        const target = Math.min(1, voiceCounts[i] / maxCount) * innerH;
+        cur[i] += (target - cur[i]) * 0.10;
+        const hi = Math.max(1.5, cur[i]);
+        const x = padX + colW * i + (colW - barW) / 2;
+        const baseY = padTop + innerH;
+        ctx.fillStyle = '#161618';
+        ctx.fillRect(x, padTop, barW, innerH);
+        const grad = ctx.createLinearGradient(0, baseY - hi, 0, baseY);
+        grad.addColorStop(0, rgba(VOICES[i].color, 0.95));
+        grad.addColorStop(1, rgba(VOICES[i].color, 0.35));
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, baseY - hi, barW, hi);
+      }
+    };
+  }
+
+  // 09 · radial — spokes from center, length ∝ listeners
+  function renderRadial(ctx, w, h) {
+    const cx = w / 2, cy = h / 2;
+    const maxR = Math.min(w, h) * 0.36;
+    const minR = maxR * 0.16;
+    const maxCount = N_AGENTS * 0.55;
+    for (let i = 0; i < N_VOICES; i++) {
+      const ang = -Math.PI / 2 + (i / N_VOICES) * Math.PI * 2;
+      const len = minR + Math.min(1, voiceCounts[i] / maxCount) * (maxR - minR);
+      const cos = Math.cos(ang), sin = Math.sin(ang);
+      ctx.strokeStyle = '#171719';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + cos * maxR, cy + sin * maxR);
+      ctx.stroke();
+      ctx.strokeStyle = VOICES[i].color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + cos * len, cy + sin * len);
+      ctx.stroke();
+      const s = Math.max(2, Math.min(w, h) * 0.024);
+      drawGlyph(ctx, VOICES[i].glyph, cx + cos * (maxR + s * 1.4), cy + sin * (maxR + s * 1.4), VOICES[i].color, s);
+    }
+    ctx.fillStyle = '#a8aab8';
+    ctx.fillRect(cx - 1.5, cy - 1.5, 3, 3);
+  }
+
+  // ─── Assemble grid ────────────────────────────────────────────────────
+  const cells = [
+    { label: '01 · beams',   render: makeBeams() },
+    { label: '02 · bars',    render: renderBars },
+    { label: '03 · bubbles', render: makeBubbles() },
+    { label: '04 · units',   render: renderUnits },
+    { label: '05 · lines',   render: renderLines },
+    { label: '06 · pulse',   render: makePulse() },
+    { label: '07 · orbit',   render: makeOrbit() },
+    { label: '08 · tide',    render: makeTide() },
+    { label: '09 · radial',  render: renderRadial },
+  ];
+
+  const gridEl = document.getElementById('grid');
+  for (const cell of cells) {
+    const div = document.createElement('div');
+    div.className = 'cell';
+    div.innerHTML = `<span class="cell-label">${cell.label}</span><canvas></canvas>`;
+    gridEl.appendChild(div);
+    cell.el = div;
+    cell.canvas = div.querySelector('canvas');
+    cell.ctx = cell.canvas.getContext('2d');
+  }
+
+  function fit() {
+    const dpr = window.devicePixelRatio || 1;
+    for (const cell of cells) {
+      const r = cell.canvas.getBoundingClientRect();
+      cell.canvas.width = Math.max(1, Math.round(r.width * dpr));
+      cell.canvas.height = Math.max(1, Math.round(r.height * dpr));
+      cell.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cell.w = r.width;
+      cell.h = r.height;
+    }
+  }
+
+  function loop() {
+    stepSim();
+    for (const cell of cells) {
+      cell.ctx.clearRect(0, 0, cell.w, cell.h);
+      cell.render(cell.ctx, cell.w, cell.h);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // ResizeObserver handles the more reliable case of grid sizing on iOS Safari
+  const ro = new ResizeObserver(fit);
+  ro.observe(gridEl);
+  window.addEventListener('orientationchange', () => setTimeout(fit, 100));
+
+  fit();
+  loop();
+})();
+</script>
+
+</body>
+</html>
