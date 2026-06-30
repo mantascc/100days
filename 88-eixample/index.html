@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EIXAMPLE — generative editions</title>
+<style>
+  :root{
+    --bg:#3a3a6a;        /* indigo field, from the artwork */
+    --panel:#222244;
+    --ink:#efe7d8; --muted:#a7a3c4; --line:#3d3d64;
+    --accent:#f2c63b;    /* yellow — shared with --gold */
+    --gold:#f2c63b;
+    --error:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#16162c;color:var(--ink);overflow-x:hidden;
+    font-family:ui-monospace,"DepartureMono",Menlo,Consolas,monospace}
+  .wrap{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+  aside{background:var(--panel);border-right:1px solid var(--line);
+    padding:22px 20px;display:flex;flex-direction:column;gap:16px;overflow:auto}
+  h1{font-size:15px;letter-spacing:.34em;margin:0;font-weight:700}
+  .sub{font-size:10px;color:var(--muted);letter-spacing:.14em;line-height:1.7;margin-top:6px}
+  label{display:block;font-size:10px;letter-spacing:.18em;color:var(--muted);
+    text-transform:uppercase;margin-bottom:7px}
+  .field{border-top:1px solid var(--line);padding-top:13px}
+  input[type=number]{width:100%;background:#16162c;border:1px solid var(--line);
+    color:var(--ink);font:inherit;padding:9px 10px;border-radius:4px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px}
+  button{flex:1;background:#16162c;border:1px solid var(--line);color:var(--ink);
+    font:inherit;font-size:11px;letter-spacing:.08em;padding:10px;border-radius:4px;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.solid{background:var(--accent);color:#160c06;border-color:var(--accent);font-weight:700}
+  .val{float:right;color:var(--ink)}
+  .seg{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .seg button{border:0;border-radius:0;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--gold);color:#160c06;font-weight:700}
+  main{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px;gap:16px}
+  .plate{background:#0e0e22;padding:22px;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  #stage{display:grid;gap:0;line-height:0}
+  #stage img{width:100%;height:100%;display:block;image-rendering:auto}
+  .label{font-size:11px;letter-spacing:.24em;color:var(--muted);text-align:center;
+    display:flex;flex-direction:column;gap:5px}
+  .label b{color:var(--ink);letter-spacing:.3em;font-weight:700}
+  .hint{font-size:10px;color:var(--muted);max-width:540px;text-align:center;line-height:1.7}
+  .err{color:var(--error);font-size:11px;max-width:420px;text-align:center;line-height:1.6}
+  .sheet-handle{display:none}
+
+  @media (max-width:768px){
+    .wrap{grid-template-columns:minmax(0,1fr);min-height:100svh}
+    main{padding:18px 14px calc(88px + env(safe-area-inset-bottom,0px));gap:12px;
+      justify-content:flex-start;align-items:stretch}
+    .plate{padding:10px;width:100%;max-width:640px;margin:0 auto}
+    .label,.hint{max-width:100%;width:100%;padding:0;text-align:center}
+    .hint{font-size:10px;line-height:1.6}
+    aside{
+      position:fixed;left:0;right:0;bottom:0;z-index:10;
+      border-right:0;border-top:2px solid var(--accent);
+      padding:0 16px calc(18px + env(safe-area-inset-bottom,0px));
+      gap:14px;max-height:82svh;overflow-y:auto;
+      border-radius:16px 16px 0 0;box-shadow:0 -18px 50px rgba(0,0,0,.5);
+      transform:translateY(calc(100% - 76px));transition:transform .26s ease;
+      overscroll-behavior:contain;
+    }
+    aside.open{transform:translateY(0)}
+    .sheet-handle{
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:2;background:var(--panel);
+      padding:18px 16px 14px;margin:0 -16px;
+      border-bottom:1px solid transparent;cursor:pointer;user-select:none;
+    }
+    aside.open .sheet-handle{border-bottom-color:var(--line)}
+    .sheet-handle:before{
+      content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);
+      width:42px;height:4px;border-radius:2px;background:var(--accent);
+    }
+    .sheet-label{font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;padding-top:8px}
+    .sheet-label b{color:var(--accent);letter-spacing:.22em;font-weight:700;font-size:12px}
+    .sheet-arrow{color:var(--accent);font-size:18px;padding-top:8px;transition:transform .2s;font-weight:700}
+    aside.open .sheet-arrow{transform:rotate(180deg)}
+    .field:first-of-type{border-top:0;padding-top:0}
+  }
+
+  @media print{aside{display:none}.wrap{display:block}main{padding:0}
+    .plate{box-shadow:none;background:#fff}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside id="sheet">
+    <div class="sheet-handle" id="sheetToggle">
+      <span class="sheet-label"><b id="sheetLabel">Original</b> · controls</span>
+      <span class="sheet-arrow">▴</span>
+    </div>
+    <div>
+      <h1>EIXAMPLE</h1>
+      <div class="sub">256 GLYPHS · ONE GRID LANGUAGE<br>EDITIONS NUMBERED AS ADDRESSES</div>
+    </div>
+
+    <div class="field">
+      <label>Mode</label>
+      <div class="seg" id="mode">
+        <button data-m="original" class="on">Original</button>
+        <button data-m="shuffle">Shuffle</button>
+        <button data-m="sample">Sampling</button>
+      </div>
+      <div class="sub" id="ruledesc" style="margin-top:6px">The canonical drawing. 256 glyphs in their original order.</div>
+    </div>
+
+    <div class="field" id="editionfield" style="display:none">
+      <label>Edition № <span class="val">/ 256</span></label>
+      <input type="number" id="edition" min="1" max="256" value="1">
+      <div class="row" style="margin-top:8px">
+        <button id="prev">◀ prev</button>
+        <button id="next">next ▶</button>
+      </div>
+    </div>
+
+    <div class="field" id="gridfield" style="display:none">
+      <label>Block size <span class="val" id="gv">16 × 16</span></label>
+      <input type="range" id="grid" min="4" max="16" value="16">
+      <div class="sub" style="margin-top:6px">4×4 pocket · 8×8 illa (one block) · 16×16 full district</div>
+    </div>
+
+    <div class="field" id="palfield" style="display:none">
+      <label>Palette <span class="val" id="pv">12 / 256</span></label>
+      <input type="range" id="pal" min="2" max="256" value="12">
+      <div class="sub" style="margin-top:6px">← smaller pool = denser repetition, monoculture at the floor</div>
+    </div>
+
+    <div class="field" id="rotfield" style="display:none">
+      <label>Orientation</label>
+      <div class="seg" id="rot">
+        <button data-r="0" class="on">Upright</button>
+        <button data-r="1">Allow turns</button>
+      </div>
+    </div>
+
+    <div class="field row" id="randfield" style="display:none">
+      <button id="rand">⟳ random edition</button>
+    </div>
+    <div class="field row">
+      <button class="solid" id="dl">↓ PNG</button>
+      <button id="prn">⎙ print</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="plate"><div id="stage"></div></div>
+    <div class="label">
+      <b id="addr">CARRER DE L'EIXAMPLE</b>
+      <span id="meta">Nº 001 / 256</span>
+    </div>
+    <div class="hint">The edition № is a deterministic address: the same number always redraws the
+      same arrangement, so a print can be signed, sold, and re-pressed from its number alone.
+      Permutation editions are bijections of the 256-glyph alphabet.</div>
+    <div class="err" id="err"></div>
+  </main>
+</div>
+
+<script>
+/* ---------- deterministic PRNG ---------- */
+function xmur3(str){let h=1779033703^str.length;
+  for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19;}
+  return ()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return (h^=h>>>16)>>>0;};}
+function mulberry32(a){return ()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function rngFor(n){return mulberry32(xmur3('eixample-'+String(n).padStart(3,'0'))());}
+
+/* ---------- the 256-glyph deck (row-major) ---------- */
+const TILES=[];
+for(let r=0;r<16;r++)for(let c=0;c<16;c++)TILES.push(`images/segment_${r}_${c}.png`);
+const ORIGINAL=TILES.map((t,i)=>i); // identity order
+
+/* Fisher–Yates with seeded rng */
+function shuffle(arr,rng){const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ---------- build an edition's index layout ---------- */
+function layout(n,N,mode,K){
+  if(mode==='original') return ORIGINAL.slice(0,N*N);
+  const rng=rngFor(n);
+  const need=N*N;
+  if(mode==='shuffle'){
+    return shuffle(ORIGINAL,rng).slice(0,need);
+  } else {                                // sampling: draws with replacement from K-tile palette
+    const pal=shuffle(ORIGINAL,rngFor(n*101+7)).slice(0,K);
+    const out=[];for(let i=0;i<need;i++)out.push(pal[Math.floor(rng()*K)]);return out;
+  }
+}
+function rotations(n,N,allow){
+  if(!allow) return new Array(N*N).fill(0);
+  const rng=rngFor(n*7919+1);            // independent stream
+  return Array.from({length:N*N},()=>Math.floor(rng()*4)*90);
+}
+
+/* ---------- state + render ---------- */
+const $=id=>document.getElementById(id);
+let st={edition:1,N:16,mode:'original',rot:0,pal:12};
+
+const MODE_DESC={
+  original:'The canonical drawing. 256 glyphs in their original order.',
+  shuffle :'Every glyph appears once — a reshuffling of the whole city.',
+  sample  :'Draws with replacement from a K-tile palette — shrink K to densify.'
+};
+
+function applyModeVisibility(){
+  const m=st.mode;
+  $('editionfield').style.display = m==='original'?'none':'';
+  $('gridfield'   ).style.display = m==='original'?'none':'';
+  $('rotfield'    ).style.display = m==='original'?'none':'';
+  $('randfield'   ).style.display = m==='original'?'none':'';
+  $('palfield'    ).style.display = m==='sample'  ?''    :'none';
+  $('ruledesc').textContent=MODE_DESC[m];
+}
+
+function render(){
+  if(st.mode!=='original'){
+    st.N=+$('grid').value;
+    st.pal=+$('pal').value;
+  } else {
+    st.N=16;
+  }
+  const idx=layout(st.edition,st.N,st.mode,st.pal);
+  const rot=rotations(st.edition,st.N,st.mode==='original'?0:st.rot);
+  const stage=$('stage');
+  // collapse stage first so its old width can't inflate the grid track during measurement
+  stage.style.width='0px';stage.style.height='0px';
+  const plate=stage.parentElement, main=plate.parentElement;
+  const mCS=getComputedStyle(main), pCS=getComputedStyle(plate);
+  const inner = main.clientWidth
+    - parseFloat(mCS.paddingLeft) - parseFloat(mCS.paddingRight)
+    - parseFloat(pCS.paddingLeft) - parseFloat(pCS.paddingRight);
+  const cap=Math.min(640, Math.max(160, inner));
+  const cell=Math.max(8, Math.floor(cap/st.N));
+  const px=cell*st.N;
+  stage.style.gridTemplateColumns=`repeat(${st.N},${cell}px)`;
+  stage.style.width=px+'px';stage.style.height=px+'px';
+  stage.innerHTML=idx.map((g,i)=>{
+    const tr=rot[i]?`transform:rotate(${rot[i]}deg)`:'';
+    return `<img src="${TILES[g]}" style="${tr}" alt="" onerror="window.__tileErr&&window.__tileErr()">`;
+  }).join('');
+  $('gv').textContent=`${st.N} × ${st.N}`;
+  $('pv').textContent=`${st.pal} / 256`;
+  $('meta').textContent=
+    st.mode==='original' ? 'ORIGINAL · 16 × 16' :
+    st.mode==='shuffle'  ? `Nº ${String(st.edition).padStart(3,'0')} / 256 · shuffle` :
+                           `Nº ${String(st.edition).padStart(3,'0')} / 256 · sampling · palette ${st.pal}`;
+  $('sheetLabel').textContent =
+    st.mode==='original' ? 'Original' :
+    st.mode==='shuffle'  ? `Shuffle · Nº ${String(st.edition).padStart(3,'0')}` :
+                           `Sampling · Nº ${String(st.edition).padStart(3,'0')} · pal ${st.pal}`;
+}
+
+/* ---------- PNG export: rasterize the current layout to canvas ---------- */
+const __imgCache={};
+function loadTile(g){
+  if(__imgCache[g]) return Promise.resolve(__imgCache[g]);
+  return new Promise((res,rej)=>{const im=new Image();
+    im.onload=()=>{__imgCache[g]=im;res(im);};
+    im.onerror=()=>rej(new Error('tile '+g));im.src=TILES[g];});
+}
+async function exportPNG(){
+  const idx=layout(st.edition,st.N,st.mode,st.pal);
+  const rot=rotations(st.edition,st.N,st.mode==='original'?0:st.rot);
+  await Promise.all([...new Set(idx)].map(loadTile));
+  const t=__imgCache[idx[0]].naturalWidth||128;
+  const S=st.N*t;
+  const cv=document.createElement('canvas');cv.width=cv.height=S;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#3a3a6a';
+  ctx.fillRect(0,0,S,S);
+  idx.forEach((g,i)=>{const x=(i%st.N)*t,y=Math.floor(i/st.N)*t,r=rot[i];
+    if(r){ctx.save();ctx.translate(x+t/2,y+t/2);ctx.rotate(r*Math.PI/180);
+      ctx.drawImage(__imgCache[g],-t/2,-t/2,t,t);ctx.restore();}
+    else ctx.drawImage(__imgCache[g],x,y,t,t);});
+  cv.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=exportName()+'.png';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');
+}
+function exportName(){
+  return st.mode==='original'?'eixample-original':
+    `eixample-${st.mode}-${String(st.edition).padStart(3,'0')}`+(st.mode==='sample'?`-pal${st.pal}`:'');
+}
+
+/* ---------- wiring ---------- */
+$('grid').addEventListener('input',render);
+$('pal').addEventListener('input',render);
+$('edition').addEventListener('input',()=>{st.edition=Math.max(1,Math.min(256,+$('edition').value||1));render();});
+$('prev').onclick=()=>{st.edition=(st.edition+254)%256+1;$('edition').value=st.edition;render();};
+$('next').onclick=()=>{st.edition=st.edition%256+1;$('edition').value=st.edition;render();};
+$('rand').onclick=()=>{st.edition=1+Math.floor(Math.random()*256);$('edition').value=st.edition;render();};
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');st.mode=b.dataset.m;
+  applyModeVisibility();render();});
+document.querySelectorAll('#rot button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#rot button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');st.rot=+b.dataset.r;render();});
+$('dl').onclick=exportPNG;
+$('prn').onclick=()=>window.print();
+$('sheetToggle').onclick=()=>$('sheet').classList.toggle('open');
+
+let __rt;
+window.addEventListener('resize',()=>{clearTimeout(__rt);__rt=setTimeout(render,80);});
+
+let errShown=false;
+window.__tileErr=()=>{if(errShown)return;errShown=true;
+  $('err').textContent='Tiles not found. Keep editions.html in the same folder as the images/ directory.';};
+
+applyModeVisibility();
+render();
+</script>
+</body>
+</html>

@@ -78,6 +78,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8822", "--directory", "daily-sketch/sketch-eixample-fullscreen-grid"],
       "port": 8822
+    },
+    {
+      "name": "88-eixample",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "88-eixample"],
+      "port": 8080
     }
   ]
 }
