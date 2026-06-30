@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-eixample-fullscreen-grid</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: #16162c; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; }
+    #grid {
+      display: grid;
+      line-height: 0;
+    }
+    .cell { line-height: 0; }
+    .cell.edge { background: #16162c; }
+    .cell img { width: 100%; height: 100%; display: block; }
+  </style>
+</head>
+<body>
+
+<div id="grid"></div>
+
+<script>
+  const TILES = [];
+  for (let r = 0; r < 16; r++)
+    for (let c = 0; c < 16; c++)
+      TILES.push(`images/segment_${r}_${c}.png`);
+
+  const CELL = 72;
+  const SWAP_COUNT = 5;
+  const SWAP_EVERY_MS = 4_000;
+
+  const grid = document.getElementById('grid');
+  const innerCells = [];
+
+  function rand(n) { return Math.floor(Math.random() * n); }
+  function pickTile() { return TILES[rand(256)]; }
+
+  function render() {
+    const cols = Math.ceil(window.innerWidth / CELL);
+    const rows = Math.ceil(window.innerHeight / CELL);
+    grid.style.gridTemplateColumns = `repeat(${cols}, ${CELL}px)`;
+    grid.style.gridTemplateRows = `repeat(${rows}, ${CELL}px)`;
+    const frag = document.createDocumentFragment();
+    innerCells.length = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('div');
+        const isEdge = r === 0 || r === rows - 1 || c === 0 || c === cols - 1;
+        if (isEdge) {
+          cell.className = 'cell edge';
+        } else {
+          cell.className = 'cell';
+          const img = document.createElement('img');
+          img.src = pickTile();
+          img.alt = '';
+          cell.appendChild(img);
+          innerCells.push(img);
+        }
+        frag.appendChild(cell);
+      }
+    }
+    grid.replaceChildren(frag);
+  }
+
+  function swapBatch() {
+    if (!innerCells.length) return;
+    const picks = new Set();
+    const n = Math.min(SWAP_COUNT, innerCells.length);
+    while (picks.size < n) picks.add(rand(innerCells.length));
+    picks.forEach(idx => { innerCells[idx].src = pickTile(); });
+  }
+
+  render();
+  setInterval(swapBatch, SWAP_EVERY_MS);
+
+  let resizeT;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(render, 150);
+  });
+</script>
+
+</body>
+</html>

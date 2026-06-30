@@ -72,6 +72,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8830", "--directory", "daily-sketch/sketch-agent-streaming-patterns"],
       "port": 8830
+    },
+    {
+      "name": "sketch-eixample-fullscreen-grid",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8822", "--directory", "daily-sketch/sketch-eixample-fullscreen-grid"],
+      "port": 8822
     }
   ]
 }
