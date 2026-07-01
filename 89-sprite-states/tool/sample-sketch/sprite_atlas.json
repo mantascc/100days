@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "image": "sprite_sheet.png",
+    "cell": {
+      "w": 128,
+      "h": 128
+    },
+    "cols": 4,
+    "rows": 4,
+    "fps": 6,
+    "states": [
+      "idle",
+      "working",
+      "attention_need",
+      "failed"
+    ]
+  },
+  "frames": {
+    "idle_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "idle_02": {
+      "frame": {
+        "x": 128,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "idle_03": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "idle_04": {
+      "frame": {
+        "x": 384,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "working_01": {
+      "frame": {
+        "x": 0,
+        "y": 128,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "working_02": {
+      "frame": {
+        "x": 128,
+        "y": 128,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "working_03": {
+      "frame": {
+        "x": 256,
+        "y": 128,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "working_04": {
+      "frame": {
+        "x": 384,
+        "y": 128,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "attention_need_01": {
+      "frame": {
+        "x": 0,
+        "y": 256,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "attention_need_02": {
+      "frame": {
+        "x": 128,
+        "y": 256,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "attention_need_03": {
+      "frame": {
+        "x": 256,
+        "y": 256,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "attention_need_04": {
+      "frame": {
+        "x": 384,
+        "y": 256,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "failed_01": {
+      "frame": {
+        "x": 0,
+        "y": 384,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "failed_02": {
+      "frame": {
+        "x": 128,
+        "y": 384,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "failed_03": {
+      "frame": {
+        "x": 256,
+        "y": 384,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "failed_04": {
+      "frame": {
+        "x": 384,
+        "y": 384,
+        "w": 128,
+        "h": 128
+      }
+    }
+  },
+  "animations": {
+    "idle": [
+      "idle_01",
+      "idle_02",
+      "idle_03",
+      "idle_04"
+    ],
+    "working": [
+      "working_01",
+      "working_02",
+      "working_03",
+      "working_04"
+    ],
+    "attention_need": [
+      "attention_need_01",
+      "attention_need_02",
+      "attention_need_03",
+      "attention_need_04"
+    ],
+    "failed": [
+      "failed_01",
+      "failed_02",
+      "failed_03",
+      "failed_04"
+    ]
+  }
+}

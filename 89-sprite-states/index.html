@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>89 · sprite states — four-state atlas documentation</title>
+<meta name="description" content="Documentation for the create-sprite four-state atlas: idle, working, attention, error. Live playback at 80×80.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap">
+<style>
+:root {
+  --ground-void: #0a0a0a;
+  --ground-base: #0f0f0f;
+  --ground-raised: #141414;
+  --ground-surface: #1a1a1a;
+  --ground-float: #202024;
+
+  --text-primary: #ffffff;
+  --text-default: #f5f5f7;
+  --text-secondary: #a8aab8;
+  --text-tertiary: #666666;
+  --text-ghost: #333333;
+
+  --border-subtle: #1a1a1a;
+  --border-default: #2a2a2a;
+  --border-strong: #3a3d52;
+
+  --accent: #ffb020;
+  --state-idle: #78cdbc;
+  --state-working: #ffb020;
+  --state-attention: #f4a94a;
+  --state-error: #ff5f5f;
+
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Monaco, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --duration-fast: 100ms;
+  --duration-base: 150ms;
+  --duration-slow: 300ms;
+  --ease-snap: linear;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: var(--ground-void);
+  color: var(--text-default);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, canvas { display: block; }
+
+/* ── LAYOUT ── */
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 64px 32px 96px;
+}
+
+section {
+  padding: 48px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+section:first-of-type { border-top: none; padding-top: 0; }
+
+.section-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 20px;
+  color: var(--text-primary);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  text-transform: lowercase;
+}
+
+.section-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin-bottom: 32px;
+  line-height: 1.75;
+}
+
+/* ── ORIGIN BAR ── */
+
+.origin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.origin-bar .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.origin-bar span:not(.dot) { letter-spacing: 0.04em; }
+.origin-bar a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px solid var(--border-default); }
+.origin-bar a:hover { border-color: var(--text-secondary); }
+
+/* ── HERO ── */
+
+.hero {
+  padding: 24px 0 40px;
+  border-top: none;
+}
+
+.hero-title {
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 300;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  font-style: italic;
+  font-weight: 300;
+  margin-bottom: 40px;
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 24px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 24px;
+}
+
+.meta-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-cell .k {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meta-cell .v {
+  font-size: 14px;
+  color: var(--text-default);
+  font-weight: 400;
+}
+
+/* ── PLAYBACK ── */
+
+.playback {
+  display: grid;
+  gap: 32px;
+  justify-items: center;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.demo-cell {
+  padding: 20px 16px 16px;
+  background: var(--ground-base);
+  border: 1px solid var(--border-default);
+  display: grid;
+  place-items: center;
+  gap: 14px;
+}
+
+.demo-stage {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.04) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.04) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.demo-stage canvas {
+  width: 80px;
+  height: 80px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+}
+
+.demo-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.demo-label .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--dot);
+  flex-shrink: 0;
+}
+
+.demo-label .row-idx {
+  margin-left: auto;
+  color: var(--text-ghost);
+  font-size: 9px;
+}
+
+/* ── CONTROLS ── */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 440px;
+  padding: 12px 4px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.caption-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.caption-inline .pulse {
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.field-row {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+}
+
+.field-row label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.field-row .inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.field-row input[type="number"] {
+  width: 72px;
+  height: 34px;
+  padding: 0 10px;
+  background: var(--ground-base);
+  border: 1px solid var(--border-default);
+  color: var(--text-default);
+  font: inherit;
+  font-size: 12px;
+}
+
+.field-row input[type="number"]:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+
+.field-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.field-row .value {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  min-width: 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── ATLAS ── */
+
+.atlas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border-default);
+  border: 1px solid var(--border-default);
+}
+
+.atlas-cell {
+  position: relative;
+  background:
+    var(--ground-base),
+    linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%);
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.03) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.03) 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  background-color: var(--ground-base);
+  padding: 20px 16px 40px;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+}
+
+.atlas-cell canvas {
+  width: 100%;
+  max-width: 128px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+}
+
+.atlas-cell::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.atlas-cell::after {
+  content: attr(data-coord);
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 9px;
+  color: var(--text-ghost);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── STATE TABLE ── */
+
+.state-table {
+  display: grid;
+  gap: 1px;
+  background: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.state-detail {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 24px;
+  background: var(--ground-base);
+}
+
+.state-detail .head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.state-detail .head .dot {
+  width: 8px;
+  height: 8px;
+  background: var(--dot);
+  flex-shrink: 0;
+}
+
+.state-detail .head .name {
+  font-size: 13px;
+  color: var(--text-default);
+  font-weight: 400;
+}
+
+.state-detail .desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.state-detail .signal {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── RAW SHEET ── */
+
+.sheet-wrap {
+  padding: 32px;
+  background: var(--ground-base);
+  border: 1px solid var(--border-default);
+  display: grid;
+  place-items: center;
+}
+
+.sheet {
+  max-width: 100%;
+  width: 512px;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.03) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.03) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+/* ── FOOTER ── */
+
+.footer {
+  padding-top: 40px;
+  margin-top: 40px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  font-size: 10px;
+  color: var(--text-ghost);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── RESPONSIVE ── */
+
+@media (max-width: 720px) {
+  .page { padding: 40px 20px 64px; }
+  section { padding: 32px 0; }
+
+  .hero-title { line-height: 1.05; }
+  .hero-sub { margin-bottom: 28px; }
+
+  .playback { gap: 24px; }
+
+  .demo-grid { gap: 10px; }
+
+  .demo-cell { padding: 14px 10px 12px; gap: 10px; }
+
+  .demo-label { font-size: 9px; letter-spacing: 0.08em; gap: 6px; }
+  .demo-label .row-idx { display: none; }
+
+  .controls { flex-direction: column; align-items: stretch; gap: 12px; }
+
+  .atlas { grid-template-columns: repeat(2, 1fr); }
+
+  .state-detail {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 16px 20px;
+  }
+  .state-detail .signal { justify-self: start; }
+
+  .sheet-wrap { padding: 16px; }
+  .sheet { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="origin-bar">
+    <span class="dot"></span>
+    <span>89 · sprite states</span>
+    <span>·</span>
+    <span>atlas · 4 × 4 · 128px cell</span>
+    <span>·</span>
+    <span>source: <a href="tool/sample-sketch/">tool/sample-sketch</a></span>
+  </div>
+
+  <section class="hero">
+    <h1 class="hero-title">four states.</h1>
+    <p class="hero-sub">
+      A character sprite emitted by <code>create-sprite/</code> ships with a fixed grammar — one row per agent state, four frames per row. The atlas is the whole vocabulary; the demo is one word at a time.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-cell"><span class="k">Cell</span><span class="v">128 × 128</span></div>
+      <div class="meta-cell"><span class="k">Grid</span><span class="v">4 rows · 4 cols</span></div>
+      <div class="meta-cell"><span class="k">FPS</span><span class="v">6 default</span></div>
+      <div class="meta-cell"><span class="k">Demo</span><span class="v">80 × 80</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">demo · live playback</div>
+    <h2 class="section-title">at 80 × 80</h2>
+    <p class="section-desc">
+      All four states at once, each stage 80 × 80, nearest-neighbor downsample from the native 128 cell. Frames advance in lockstep so the character reads as a single subject cycling through its dispositions. Checker exposes transparency.
+    </p>
+
+    <div class="playback">
+      <div class="demo-grid" id="demo-grid"></div>
+
+      <div class="controls">
+        <div class="caption-inline">
+          <span class="pulse"></span>
+          <span>frame <span id="frame-num">01</span> / 04</span>
+        </div>
+        <div class="field-row">
+          <label>fps</label>
+          <div class="inline">
+            <input id="fps" type="range" min="1" max="24" value="6" step="1">
+            <span class="value" id="fps-value">6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">atlas · 16 frames</div>
+    <h2 class="section-title">grid</h2>
+    <p class="section-desc">
+      Every cell in the sheet, addressed by row × column. Rows encode state, columns encode frame index. Frame 01 is the resting pose; 02–04 carry the motion.
+    </p>
+    <div class="atlas" id="atlas"></div>
+  </section>
+
+  <section>
+    <div class="section-label">states · semantics</div>
+    <h2 class="section-title">signals</h2>
+    <p class="section-desc">
+      What each row is <em>for</em>. States are dispositions the character can be in — not effects. The signal column names the pose or overlay that carries the meaning.
+    </p>
+    <div class="state-table" id="state-table"></div>
+  </section>
+
+  <section>
+    <div class="section-label">asset · raw sheet</div>
+    <h2 class="section-title">source</h2>
+    <p class="section-desc">
+      The transparent 512 × 512 PNG, unmodified. Rows: idle · working · attention_need · failed. Columns: frames 01 → 04.
+    </p>
+    <div class="sheet-wrap">
+      <img class="sheet" src="sprite_sheet.png" alt="Sprite sheet · 4 × 4 grid of 128 × 128 cells">
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>day 89</span>
+    <span>·</span>
+    <span>sprite-states</span>
+    <span>·</span>
+    <span>generated by create-sprite</span>
+  </div>
+
+</div>
+
+<script>
+const STATES = [
+  { id: "idle",           label: "idle",      meaning: "waiting for input",     signal: "slow blink · calm",         dot: "var(--state-idle)" },
+  { id: "working",        label: "working",   meaning: "executing a task",      signal: "eye squint · bounce",       dot: "var(--state-working)" },
+  { id: "attention_need", label: "attention", meaning: "needs a decision",      signal: "orange ? overhead",         dot: "var(--state-attention)" },
+  { id: "failed",         label: "error",     meaning: "hit an unrecoverable failure", signal: "red ! overhead",     dot: "var(--state-error)" },
+];
+
+const CELL = 128;
+const COLS = 4;
+const ROWS = 4;
+
+const img = new Image();
+let sheetReady = false;
+
+let currentFrame = 0;
+let currentFps = 6;
+let lastFrameTime = 0;
+
+const demoGridEl = document.getElementById("demo-grid");
+const fpsInput = document.getElementById("fps");
+const fpsValue = document.getElementById("fps-value");
+const frameNumEl = document.getElementById("frame-num");
+const atlasEl = document.getElementById("atlas");
+const stateTableEl = document.getElementById("state-table");
+
+const demoCanvases = [];
+
+// ── build demo grid (2 × 2, all states at once) ────────
+STATES.forEach((s, i) => {
+  const cell = document.createElement("div");
+  cell.className = "demo-cell";
+  cell.style.setProperty("--dot", s.dot);
+  cell.innerHTML = `
+    <div class="demo-stage">
+      <canvas width="80" height="80"></canvas>
+    </div>
+    <div class="demo-label">
+      <span class="dot"></span>
+      <span class="id">${s.label}</span>
+      <span class="row-idx">row ${i}</span>
+    </div>
+  `;
+  demoGridEl.append(cell);
+  const canvas = cell.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  demoCanvases.push({ ctx, row: i });
+});
+
+// ── build atlas ────────────────────────────────────────
+for (let r = 0; r < ROWS; r++) {
+  for (let c = 0; c < COLS; c++) {
+    const cell = document.createElement("div");
+    cell.className = "atlas-cell";
+    cell.dataset.label = `${STATES[r].label} · ${String(c + 1).padStart(2, "0")}`;
+    cell.dataset.coord = `[${r},${c}]`;
+    const canvas = document.createElement("canvas");
+    canvas.width = CELL;
+    canvas.height = CELL;
+    cell.append(canvas);
+    atlasEl.append(cell);
+  }
+}
+
+// ── build state table ──────────────────────────────────
+STATES.forEach((s, i) => {
+  const row = document.createElement("div");
+  row.className = "state-detail";
+  row.style.setProperty("--dot", s.dot);
+  row.innerHTML = `
+    <div class="head">
+      <span class="dot"></span>
+      <span class="name">${s.label}</span>
+    </div>
+    <div class="desc">${s.meaning} · row ${i} · atlas id <code>${s.id}</code></div>
+    <div class="signal">${s.signal}</div>
+  `;
+  stateTableEl.append(row);
+});
+
+// ── controls wiring ────────────────────────────────────
+fpsInput.addEventListener("input", () => {
+  currentFps = Number(fpsInput.value) || 6;
+  fpsValue.textContent = String(currentFps);
+});
+
+function updateCaption() {
+  frameNumEl.textContent = String(currentFrame + 1).padStart(2, "0");
+}
+
+// ── atlas paint (once ready) ───────────────────────────
+function paintAtlas() {
+  const cells = atlasEl.querySelectorAll(".atlas-cell canvas");
+  cells.forEach((canvas, i) => {
+    const r = Math.floor(i / COLS);
+    const c = i % COLS;
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, CELL, CELL);
+    ctx.drawImage(img, c * CELL, r * CELL, CELL, CELL, 0, 0, CELL, CELL);
+  });
+}
+
+// ── main loop ──────────────────────────────────────────
+function tick(time) {
+  if (sheetReady) {
+    if (time - lastFrameTime > 1000 / currentFps) {
+      currentFrame = (currentFrame + 1) % COLS;
+      lastFrameTime = time;
+      updateCaption();
+    }
+    const col = currentFrame;
+    for (const { ctx, row } of demoCanvases) {
+      ctx.clearRect(0, 0, 80, 80);
+      ctx.drawImage(img, col * CELL, row * CELL, CELL, CELL, 0, 0, 80, 80);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+img.onload = () => {
+  sheetReady = true;
+  paintAtlas();
+  updateCaption();
+  requestAnimationFrame(tick);
+};
+img.src = "sprite_sheet.png";
+</script>
+
+</body>
+</html>

@@ -1,5 +1,10 @@
 [
   {
+    "id": "89-sprite-states",
+    "path": "100days/89-sprite-states",
+    "description": "Sprite States — clear-channel style documentation for the four-state agent character atlas emitted by create-sprite (idle · working · attention · error) rendered from a 4×4 transparent PNG at 128px per cell; the live demo shows all four states at once in a 2×2 grid of 80×80 stages, frames advancing in lockstep under a single fps slider; a full atlas map addressed by row × column; a signals table naming the pose or overlay that carries each state's meaning; and the raw sheet at the bottom, reflowed for mobile with a two-column atlas below 720px; ships with the create-sprite tool packed into tool/"
+  },
+  {
     "id": "88-eixample",
     "path": "100days/88-eixample",
     "description": "Eixample — a hand-painted 16×16 pictograph (256 glyphs) reframed as a generative grid language with three modes: original (the canonical drawing), shuffle (seeded Fisher–Yates bijection over all 256 glyphs), and sampling (draws with replacement from a K-tile palette, slider from 2 to 256, smaller pool densifying the field into wallpaper); deterministic per (mode, №, palette) via xmur3 → mulberry32, optional 90° rotations on an independent seed stream, PNG export, and a responsive bottom-sheet of controls below 768px"
