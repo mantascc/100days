@@ -2,52 +2,52 @@
   {
     "id": "89-sprite-states",
     "path": "100days/89-sprite-states",
-    "description": "Sprite States — clear-channel style documentation for the four-state agent character atlas emitted by create-sprite (idle · working · attention · error) rendered from a 4×4 transparent PNG at 128px per cell; the live demo shows all four states at once in a 2×2 grid of 80×80 stages, frames advancing in lockstep under a single fps slider; a full atlas map addressed by row × column; a signals table naming the pose or overlay that carries each state's meaning; and the raw sheet at the bottom, reflowed for mobile with a two-column atlas below 720px; ships with the create-sprite tool packed into tool/"
+    "description": "Sprite States — clear-channel docs for the create-sprite four-state atlas (idle · working · attention · error); 2×2 live demo at 80×80 with the tool packed alongside"
   },
   {
     "id": "88-eixample",
     "path": "100days/88-eixample",
-    "description": "Eixample — a hand-painted 16×16 pictograph (256 glyphs) reframed as a generative grid language with three modes: original (the canonical drawing), shuffle (seeded Fisher–Yates bijection over all 256 glyphs), and sampling (draws with replacement from a K-tile palette, slider from 2 to 256, smaller pool densifying the field into wallpaper); deterministic per (mode, №, palette) via xmur3 → mulberry32, optional 90° rotations on an independent seed stream, PNG export, and a responsive bottom-sheet of controls below 768px"
+    "description": "Eixample — hand-painted 16×16 pictograph reframed as a generative grid language across three modes (original, shuffle, sampling); deterministic per (mode, №, palette)"
   },
   {
     "id": "87-attention-distribution",
     "path": "100days/87-attention-distribution",
-    "description": "Attention Distribution — nine ways to read the same simulation of 100 dot-agents distributing finite attention across 5 competing voices (pulse, echo, spark, drift, murmur), arranged as a 3×3 grid of small multiples: beams to a voice rail, horizontal bars, area-coded bubbles, a 100-dot unit chart sorted by allegiance, overlaid sparklines of voice share over time, pulse rings emitted at a cadence inverse to listener count, a pentagonal orbit, smoothed tide columns, and radial spokes; one stepSim per frame fans out across nine lenses, DPR-aware canvases via ResizeObserver fit the viewport on desktop and mobile alike"
+    "description": "Attention Distribution — nine ways to read one simulation of 100 dot-agents distributing finite attention across 5 voices, as a 3×3 grid of small multiples"
   },
   {
     "id": "86-agent-stream-scrub",
     "path": "100days/86-agent-stream-scrub",
-    "description": "Agent-Stream Scrub — a scrubbable two-track reference for eight agent-streaming patterns (mid-stream edits, self-correction, streaming JSON, tool error+retry, permission gate, cancel, retry countdown, compression); the surface track shows what the user sees while a parallel mechanism track exposes debounce gates, retry windows, interrupt points, and compression cycles, with draggable playhead, 0.5×/1×/2× speed, and full keyboard control"
+    "description": "Agent-Stream Scrub — scrubbable two-track reference for eight agent-streaming patterns: surface track (what the user sees) versus mechanism track (gates, retries, interrupts)"
   },
   {
     "id": "85-agent-stream-glyphs",
     "path": "100days/85-agent-stream-glyphs",
-    "description": "Agent-Stream Glyphs — a library of twelve agent-streaming patterns rendered as hash-seeded animated thumbnails (token typewriter, sentence pulse, spinner, progress bar, breathing ellipsis, image resolve, audio waveform, shimmer, file diff stream, step indicator, parallel agent fleet, memory write); category filters and a click-to-feature overlay let you read the typology by silhouette and inspect each recipe up close"
+    "description": "Agent-Stream Glyphs — twelve agent-streaming patterns as hash-seeded animated thumbnails, with category filters and a click-to-feature overlay"
   },
   {
     "id": "84-id-card",
     "path": "100days/84-id-card",
-    "description": "ID Card — living credential for Mantas Lilis with a distant particle void, animated flow-field surface, mouse-reactive 3D tilt and sheen, randomized serial, generated barcode, and issued date stamp"
+    "description": "ID Card — living credential with a particle void, mouse-reactive 3D tilt, and generated barcode"
   },
   {
     "id": "83-video-index",
     "path": "100days/83-video-index",
-    "description": "Video Index — a grid of every previous sketch as a 3–4 second looping clip, recorded by a headless Chromium running Playwright scenarios that an LLM agent authored from each sketch's source; ffmpeg trims warmup and transcodes to MP4 + poster, mobile gets single-stream centered playback, reduced-motion gets a posters-only fallback"
+    "description": "Video Index — grid of every previous sketch as a 3–4s loop, recorded by a headless Chromium running LLM-authored Playwright scenarios"
   },
   {
     "id": "82-z-axis",
     "path": "100days/82-z-axis",
-    "description": "Z-Axis \u2014 nine micro-explorations of depth as a UI material (two-state toggle, stacked deck, modal lift, z-scroll, hover grid, pressed state, layer explode, parallax cursor, notification arrival) switched via a floating island controller with prev/next, dot indicators, and arrow-key navigation"
+    "description": "Z-Axis \u2014 nine micro-explorations of depth as a UI material, switched via a floating controller"
   },
   {
     "id": "79-idle-states",
     "path": "100days/79-idle-states",
-    "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across two pages (ambient + instrumented): breath, caret, drift, lean-toward, hover, orbit, listening bars, elapsed counter; each paired with claim/signal/motion/risk metadata, switched via a floating pill dock"
+    "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across ambient and instrumented pages"
   },
   {
     "id": "78-ascii-sheets-docs",
     "path": "100days/78-ascii-sheets-docs",
-    "description": "ASCII Sheets — promotional showcase for the ASCII sheet primitive: hero with auto-cycling filters, twelve live use-case tiles (header, modal, toast, divider, drawer, image-reveal, marquee, tooltip, etc.), five-formula gallery, and glyph + palette rails that retheme the hero on click"
+    "description": "ASCII Sheets — showcase for the ASCII sheet primitive: twelve use-case tiles and a five-formula gallery, with glyph and palette rails that retheme the hero"
   },
   {
     "id": "01-entropy",
