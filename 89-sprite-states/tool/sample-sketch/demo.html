@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cat Sprite Sheet Preview</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      background: #11100f;
+      color: #f6e7d7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    main {
+      width: min(1040px, 100%);
+      display: grid;
+      gap: 18px;
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: minmax(240px, 360px) 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .stage {
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+    }
+
+    canvas {
+      width: 320px;
+      height: 320px;
+      image-rendering: pixelated;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    button,
+    input {
+      min-height: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #1e1b18;
+      color: inherit;
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button[aria-pressed="true"] {
+      border-color: #78cdbc;
+      background: #26322f;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      color: rgba(246, 231, 215, 0.72);
+    }
+
+    input {
+      padding: 0 12px;
+    }
+
+    .sheet {
+      max-width: 100%;
+      image-rendering: pixelated;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.04) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.04) 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    }
+
+    @media (max-width: 760px) {
+      .preview {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        min-height: 300px;
+      }
+
+      canvas {
+        width: 256px;
+        height: 256px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="preview">
+      <div class="stage">
+        <canvas id="sprite" width="128" height="128"></canvas>
+      </div>
+      <div class="controls">
+        <div class="state-grid" id="states"></div>
+        <label>
+          FPS
+          <input id="fps" type="number" min="1" max="24" value="6">
+        </label>
+      </div>
+    </section>
+    <img class="sheet" src="sprite_sheet.png" alt="Sprite sheet">
+  </main>
+
+  <script>
+    const states = ["idle", "working", "attention_need", "failed"];
+    const labels = {
+      idle: "Idle",
+      working: "Working",
+      attention_need: "Attention",
+      failed: "Failed"
+    };
+    const cell = 128;
+    const canvas = document.getElementById("sprite");
+    const ctx = canvas.getContext("2d");
+    const fpsInput = document.getElementById("fps");
+    const buttons = document.getElementById("states");
+    const img = new Image();
+    let state = "idle";
+    let tick = 0;
+    let last = 0;
+
+    ctx.imageSmoothingEnabled = false;
+
+    for (const key of states) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = labels[key];
+      button.setAttribute("aria-pressed", key === state ? "true" : "false");
+      button.addEventListener("click", () => {
+        state = key;
+        tick = 0;
+        for (const node of buttons.children) {
+          node.setAttribute("aria-pressed", node === button ? "true" : "false");
+        }
+      });
+      buttons.append(button);
+    }
+
+    function draw(time) {
+      const fps = Math.max(1, Math.min(24, Number(fpsInput.value) || 6));
+      if (time - last > 1000 / fps) {
+        tick += 1;
+        last = time;
+      }
+      const row = states.indexOf(state);
+      const col = tick % 4;
+      ctx.clearRect(0, 0, cell, cell);
+      ctx.drawImage(img, col * cell, row * cell, cell, cell, 0, 0, cell, cell);
+      requestAnimationFrame(draw);
+    }
+
+    img.onload = () => requestAnimationFrame(draw);
+    img.src = "sprite_sheet.png";
+  </script>
+</body>
+</html>

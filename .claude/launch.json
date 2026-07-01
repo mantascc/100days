@@ -84,6 +84,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8080", "--directory", "88-eixample"],
       "port": 8080
+    },
+    {
+      "name": "89-sprite-states",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8823", "--directory", "89-sprite-states"],
+      "port": 8823
     }
   ]
 }
