@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aida 02: Moog Grid</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        #stage {
+            position: relative;
+            width: 88vmin;
+            aspect-ratio: 2 / 1;
+            background: #2a2a2a;
+            border: 1px solid #2a2a2a;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1px;
+        }
+
+        .cell {
+            position: relative;
+            background: #0f0f0f;
+            overflow: hidden;
+        }
+
+        .cell canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cell-label {
+            position: absolute;
+            left: 8px;
+            bottom: 6px;
+            font-size: 8px;
+            letter-spacing: 0.14em;
+            color: #333;
+            text-transform: uppercase;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .player-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: 1px solid #2a2a2a;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #555;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: border-color 120ms, color 120ms;
+        }
+
+        .player-btn:hover {
+            border-color: #3a3a3a;
+            color: #888;
+        }
+
+        .player-btn.playing {
+            border-color: rgba(255,170,0,0.25);
+            color: #888;
+        }
+
+        .player-light {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            flex-shrink: 0;
+            transition: background 120ms, box-shadow 120ms;
+        }
+
+        .player-btn.playing .player-light {
+            background: #ffaa00;
+            box-shadow: 0 0 6px rgba(255,170,0,0.7);
+        }
+
+        .snap-bar {
+            width: 88vmin;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .source-group {
+            display: flex;
+            gap: 1px;
+        }
+
+        .src-btn {
+            font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+        }
+
+        .src-btn.playing {
+            border-color: rgba(255,170,0,0.25);
+            color: #888;
+        }
+
+        .src-btn.playing .player-light {
+            background: #ffaa00;
+            box-shadow: 0 0 6px rgba(255,170,0,0.7);
+        }
+
+        .src-btn.missing {
+            border-color: rgba(255,80,80,0.25);
+            color: #644;
+        }
+
+        .sens-btn {
+            cursor: default;
+            gap: 10px;
+            padding: 6px 12px;
+        }
+
+        .sens-btn input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 110px;
+            height: 2px;
+            background: #2a2a2a;
+            outline: none;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .sens-btn input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 8px;
+            height: 8px;
+            background: #ffaa00;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+        }
+
+        .sens-btn input[type=range]::-moz-range-thumb {
+            width: 8px;
+            height: 8px;
+            background: #ffaa00;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+        }
+
+        #sens-value {
+            min-width: 32px;
+            text-align: right;
+            color: #888;
+        }
+
+        @media (max-aspect-ratio: 1 / 1) {
+            .wrapper {
+                gap: 10px;
+            }
+            #stage {
+                width: min(88vw, calc(72vh / 2));
+                aspect-ratio: 1 / 2;
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+            }
+            .snap-bar {
+                width: min(88vw, calc(72vh / 2));
+            }
+            .controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+            .source-group {
+                order: 1;
+            }
+            .sens-btn {
+                order: 2;
+                gap: 8px;
+            }
+            .sens-btn input[type=range] {
+                width: 90px;
+            }
+            .player-btn {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="snap-bar">
+        <span class="player-btn" style="border:none; cursor:default;">Aida 02</span>
+        <button class="player-btn" id="snap-btn">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+            </svg>
+            snapshot
+        </button>
+    </div>
+    <div id="stage"></div>
+    <div class="controls">
+        <div class="source-group" id="source-group">
+            <button class="player-btn src-btn" data-src="0714-1">
+                <span class="player-light"></span>
+                <span>0714-1</span>
+            </button>
+            <button class="player-btn src-btn" data-src="0714-2">
+                <span class="player-light"></span>
+                <span>0714-2</span>
+            </button>
+            <button class="player-btn src-btn" data-src="mic">
+                <span class="player-light"></span>
+                <span>mic</span>
+            </button>
+        </div>
+        <div class="player-btn sens-btn">
+            <span>sens</span>
+            <input type="range" id="sens" min="25" max="400" value="100" step="1">
+            <span id="sens-value">1.0&times;</span>
+        </div>
+    </div>
+</div>
+
+<script>
+'use strict';
+
+const AMBER      = 'rgba(255,170,0,0.72)';
+const AMBER_DIM  = 'rgba(255,170,0,0.22)';
+const AMBER_IDLE = 'rgba(255,170,0,0.08)';
+const GRID_GREY  = '#1a1a1a';
+
+// ── Audio (mic + two samples, toggled) ─────────────────────────────────────
+let audioCtx    = null;
+let analyser    = null;
+let timeData    = null;
+let freqData    = null;
+let rms         = 0;
+
+let micStream   = null;
+let micNode     = null;
+
+let sampleEl    = null;
+let sampleNode  = null;
+let destWired   = false;
+
+let activeSource = null; // null | 'mic' | '0714-1' | '0714-2'
+
+let sensitivity = 1.0;
+const sensEl      = document.getElementById('sens');
+const sensValueEl = document.getElementById('sens-value');
+sensEl.addEventListener('input', () => {
+    sensitivity = sensEl.value / 100;
+    sensValueEl.textContent = sensitivity.toFixed(1) + '×';
+});
+
+async function ensureAudio() {
+    if (!audioCtx) {
+        audioCtx  = new AudioContext();
+        analyser  = audioCtx.createAnalyser();
+        analyser.fftSize               = 2048;
+        analyser.smoothingTimeConstant = 0.0;
+        timeData = new Uint8Array(analyser.fftSize);
+        freqData = new Uint8Array(analyser.frequencyBinCount);
+    }
+    await audioCtx.resume();
+}
+
+function stopCurrent() {
+    if (activeSource === 'mic') {
+        if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+        if (micNode)   { try { micNode.disconnect(); } catch (_) {} micNode = null; }
+    } else if (activeSource === '0714-1' || activeSource === '0714-2') {
+        if (sampleEl) sampleEl.pause();
+        if (destWired && analyser) {
+            try { analyser.disconnect(audioCtx.destination); } catch (_) {}
+            destWired = false;
+        }
+    }
+    activeSource = null;
+}
+
+async function startMic() {
+    let stream;
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl:  false,
+            }
+        });
+    } catch (err) {
+        console.warn('Microphone permission denied or unavailable:', err);
+        return false;
+    }
+    await ensureAudio();
+    micStream = stream;
+    micNode = audioCtx.createMediaStreamSource(micStream);
+    micNode.connect(analyser);
+    activeSource = 'mic';
+    return true;
+}
+
+async function startSample(name) {
+    await ensureAudio();
+    if (!sampleEl) {
+        sampleEl = new Audio();
+        sampleEl.loop = true;
+        sampleEl.crossOrigin = 'anonymous';
+        sampleNode = audioCtx.createMediaElementSource(sampleEl);
+        sampleNode.connect(analyser);
+    }
+    if (!destWired) {
+        analyser.connect(audioCtx.destination);
+        destWired = true;
+    }
+    sampleEl.src = 'sounds/' + name + '.m4a';
+    try {
+        await sampleEl.play();
+    } catch (err) {
+        console.warn('Sample play failed:', err);
+        if (destWired) { try { analyser.disconnect(audioCtx.destination); } catch (_) {} destWired = false; }
+        return false;
+    }
+    activeSource = name;
+    return true;
+}
+
+function updateSourceUI() {
+    document.querySelectorAll('.src-btn').forEach(b => {
+        b.classList.toggle('playing', b.dataset.src === activeSource);
+    });
+}
+
+async function toggleSource(src) {
+    const wasActive = activeSource === src;
+    stopCurrent();
+    if (!wasActive) {
+        const ok = src === 'mic' ? await startMic() : await startSample(src);
+        if (!ok) {
+            const btn = document.querySelector(`.src-btn[data-src="${src}"]`);
+            if (btn) {
+                btn.classList.add('missing');
+                setTimeout(() => btn.classList.remove('missing'), 1200);
+            }
+        }
+    }
+    updateSourceUI();
+}
+
+document.querySelectorAll('.src-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleSource(btn.dataset.src));
+});
+
+// ── Grid ───────────────────────────────────────────────────────────────────
+const CELLS = [
+    { label: '01 phase', fade: 0.24, render: renderPhase },
+    { label: '02 scope', fade: null, render: renderScope },
+    { label: '03 ring',  fade: null, render: renderRing },
+    { label: '04 diag',  fade: 0.20, render: renderDiag },
+    { label: '05 bands', fade: null, render: renderBands },
+    { label: '06 cross', fade: null, render: renderCross },
+    { label: '07 orbit', fade: 0.16, render: renderOrbit },
+];
+
+const stage = document.getElementById('stage');
+const cells = CELLS.map(cfg => {
+    const wrap = document.createElement('div');
+    wrap.className = 'cell';
+    const cv = document.createElement('canvas');
+    const lbl = document.createElement('div');
+    lbl.className = 'cell-label';
+    lbl.textContent = cfg.label;
+    wrap.appendChild(cv);
+    wrap.appendChild(lbl);
+    stage.appendChild(wrap);
+    return { ctx: cv.getContext('2d'), canvas: cv, wrap, cfg, W: 0, H: 0 };
+});
+
+const spacer = document.createElement('div');
+spacer.className = 'cell empty';
+stage.appendChild(spacer);
+
+let dpr = 1;
+
+function resize() {
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    cells.forEach(c => {
+        const r = c.wrap.getBoundingClientRect();
+        c.canvas.width  = Math.max(1, Math.round(r.width  * dpr));
+        c.canvas.height = Math.max(1, Math.round(r.height * dpr));
+        c.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        c.W = r.width;
+        c.H = r.height;
+    });
+}
+
+resize();
+window.addEventListener('resize', resize);
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function clearCell(ctx, W, H, fade) {
+    if (fade === null) {
+        ctx.fillStyle = '#0f0f0f';
+        ctx.fillRect(0, 0, W, H);
+    } else {
+        ctx.fillStyle = `rgba(15,15,15,${fade})`;
+        ctx.fillRect(0, 0, W, H);
+    }
+}
+
+function drawCenterAxes(ctx, W, H) {
+    ctx.strokeStyle = GRID_GREY;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H);
+    ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2);
+    ctx.stroke();
+}
+
+function drawMidline(ctx, W, H) {
+    ctx.strokeStyle = GRID_GREY;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2);
+    ctx.stroke();
+}
+
+function drawBaseline(ctx, W, H) {
+    ctx.strokeStyle = GRID_GREY;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, H - 0.5); ctx.lineTo(W, H - 0.5);
+    ctx.stroke();
+}
+
+function idleCircle(ctx, W, H, frame) {
+    const r = Math.min(W, H) * 0.20;
+    const t = frame * 0.008;
+    ctx.beginPath();
+    ctx.strokeStyle = AMBER_IDLE;
+    ctx.lineWidth = 0.7;
+    for (let i = 0; i <= 128; i++) {
+        const a = (i / 128) * Math.PI * 2 + t;
+        const x = W / 2 + Math.cos(a) * r;
+        const y = H / 2 + Math.sin(a) * r;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+
+function idleDiag(ctx, W, H, frame) {
+    const R = Math.min(W, H) * 0.34;
+    const cx = W / 2, cy = H / 2;
+    const wobble = Math.sin(frame * 0.02) * 4;
+    ctx.strokeStyle = AMBER_IDLE;
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(cx - R, cy - R + wobble);
+    ctx.lineTo(cx + R, cy + R + wobble);
+    ctx.stroke();
+}
+
+// ── Renderers ──────────────────────────────────────────────────────────────
+
+// 01 — Phase Lissajous (x=t, y=t+offset). The original.
+function renderPhase(ctx, W, H, d) {
+    if (!d.playing) return idleCircle(ctx, W, H, d.frame);
+    const len = d.timeData.length;
+    const off = Math.floor(len / 4);
+    ctx.beginPath();
+    ctx.strokeStyle = AMBER;
+    ctx.lineWidth = 0.6;
+    for (let i = 0; i < len - off; i++) {
+        const xv = d.timeData[i]       / 128 - 1;
+        const yv = d.timeData[i + off] / 128 - 1;
+        const x  = W / 2 + xv * W * 0.44;
+        const y  = H / 2 + yv * H * 0.44;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+
+// 02 — Classic oscilloscope waveform.
+function renderScope(ctx, W, H, d) {
+    drawMidline(ctx, W, H);
+    if (!d.playing) return;
+    ctx.beginPath();
+    ctx.strokeStyle = AMBER;
+    ctx.lineWidth = 0.8;
+    const N = d.timeData.length;
+    const step = Math.max(1, Math.floor(N / (W * 1.2)));
+    for (let i = 0, drawn = 0; i < N; i += step, drawn++) {
+        const v = d.timeData[i] / 128 - 1;
+        const x = (i / N) * W;
+        const y = H / 2 + v * H * 0.42;
+        drawn === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+
+// 04 — Concentric ring pulsing with RMS.
+function renderRing(ctx, W, H, d) {
+    drawCenterAxes(ctx, W, H);
+    const base = Math.min(W, H) * 0.20;
+    const r    = base + d.rms * Math.min(W, H) * 0.30;
+    ctx.beginPath();
+    ctx.strokeStyle = d.playing ? AMBER : AMBER_DIM;
+    ctx.lineWidth = 1;
+    ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    if (d.playing) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255,170,0,0.18)';
+        ctx.arc(W / 2, H / 2, base, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+}
+
+// 07 — Diagonal (rotated 45°) waveform.
+function renderDiag(ctx, W, H, d) {
+    if (!d.playing) return idleDiag(ctx, W, H, d.frame);
+    ctx.save();
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(Math.PI / 4);
+    ctx.strokeStyle = AMBER;
+    ctx.lineWidth = 0.7;
+    const R = Math.min(W, H) * 0.5;
+    const N = d.timeData.length;
+    const step = Math.max(1, Math.floor(N / (2 * R)));
+    ctx.beginPath();
+    for (let i = 0, k = 0; i < N; i += step, k++) {
+        const t = (i / N) * 2 - 1;
+        const v = d.timeData[i] / 128 - 1;
+        const x = t * R;
+        const y = v * R * 0.36;
+        k === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+}
+
+// 08 — Six concentric ring bands driven by freq groups.
+function renderBands(ctx, W, H, d) {
+    drawCenterAxes(ctx, W, H);
+    const N = 6;
+    const bins = Math.floor(d.freqData ? d.freqData.length * 0.5 / N : 1);
+    const rMax = Math.min(W, H) * 0.46;
+    for (let i = 0; i < N; i++) {
+        let sum = 0;
+        for (let j = 0; j < bins; j++) sum += d.freqData ? (d.freqData[i * bins + j] || 0) : 0;
+        const v = d.playing ? (sum / bins) / 255 : 0;
+        const r = (i + 1) / N * rMax * (0.55 + v * 0.85);
+        ctx.lineWidth = 0.6 + v * 1.2;
+        ctx.globalAlpha = 0.14 + v * 0.72;
+        ctx.strokeStyle = AMBER;
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+}
+
+// 10 — Crosshair sizing with RMS.
+function renderCross(ctx, W, H, d) {
+    drawCenterAxes(ctx, W, H);
+    const len = (0.18 + (d.playing ? d.rms : 0) * 0.68) * Math.min(W, H);
+    ctx.strokeStyle = d.playing ? AMBER : AMBER_DIM;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - len / 2, H / 2);
+    ctx.lineTo(W / 2 + len / 2, H / 2);
+    ctx.moveTo(W / 2, H / 2 - len / 2);
+    ctx.lineTo(W / 2, H / 2 + len / 2);
+    ctx.stroke();
+}
+
+// 12 — Orbit scatter, sample dots i vs i+off, with trailing fade.
+function renderOrbit(ctx, W, H, d) {
+    if (!d.playing) return idleCircle(ctx, W, H, d.frame);
+    const N = d.timeData.length;
+    const off = Math.floor(N / 8);
+    ctx.fillStyle = AMBER;
+    const dot = Math.max(1, Math.round(Math.min(W, H) * 0.006));
+    for (let i = 0; i < N; i += 6) {
+        const xv = d.timeData[i]                 / 128 - 1;
+        const yv = d.timeData[(i + off) % N]     / 128 - 1;
+        const x  = W / 2 + xv * W * 0.42;
+        const y  = H / 2 + yv * H * 0.42;
+        ctx.fillRect(x, y, dot, dot);
+    }
+}
+
+// ── Main loop ──────────────────────────────────────────────────────────────
+let frame = 0;
+
+function computeRMS(td) {
+    if (!td) return 0;
+    let s = 0;
+    for (let i = 0; i < td.length; i++) {
+        const v = td[i] / 128 - 1;
+        s += v * v;
+    }
+    return Math.sqrt(s / td.length);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    frame++;
+    if (activeSource && analyser) {
+        analyser.getByteTimeDomainData(timeData);
+        analyser.getByteFrequencyData(freqData);
+        if (sensitivity !== 1) {
+            for (let i = 0; i < timeData.length; i++) {
+                const s = 128 + (timeData[i] - 128) * sensitivity;
+                timeData[i] = s < 0 ? 0 : s > 255 ? 255 : s;
+            }
+            for (let i = 0; i < freqData.length; i++) {
+                const s = freqData[i] * sensitivity;
+                freqData[i] = s > 255 ? 255 : s;
+            }
+        }
+        rms = computeRMS(timeData);
+    } else {
+        rms = 0;
+    }
+    const data = { timeData, freqData, rms, frame, playing: activeSource !== null };
+    cells.forEach(c => {
+        clearCell(c.ctx, c.W, c.H, c.cfg.fade);
+        c.cfg.render(c.ctx, c.W, c.H, data);
+    });
+}
+
+animate();
+
+// ── Snapshot: compose all 12 cells into one image ──────────────────────────
+document.getElementById('snap-btn').addEventListener('click', () => {
+    const stageRect = stage.getBoundingClientRect();
+    const out = document.createElement('canvas');
+    out.width  = Math.round(stageRect.width  * dpr);
+    out.height = Math.round(stageRect.height * dpr);
+    const c = out.getContext('2d');
+    c.fillStyle = '#2a2a2a';
+    c.fillRect(0, 0, out.width, out.height);
+    cells.forEach(cell => {
+        const r = cell.wrap.getBoundingClientRect();
+        const dx = Math.round((r.left - stageRect.left) * dpr);
+        const dy = Math.round((r.top  - stageRect.top)  * dpr);
+        const dw = Math.round(r.width  * dpr);
+        const dh = Math.round(r.height * dpr);
+        c.drawImage(cell.canvas, dx, dy, dw, dh);
+    });
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const a = document.createElement('a');
+    a.href     = out.toDataURL('image/png');
+    a.download = `moog-phase-grid-${ts}.png`;
+    a.click();
+});
+</script>
+</body>
+</html>
