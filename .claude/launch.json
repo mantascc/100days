@@ -90,6 +90,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8823", "--directory", "89-sprite-states"],
       "port": 8823
+    },
+    {
+      "name": "sketch-moog-phase-grid",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8831", "--directory", "daily-sketch/sketch-moog-phase-grid"],
+      "port": 8831
     }
   ]
 }
