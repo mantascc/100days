@@ -96,6 +96,18 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8831", "--directory", "daily-sketch/sketch-moog-phase-grid"],
       "port": 8831
+    },
+    {
+      "name": "sketch-audio-reactive-agents-v2",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8832", "--directory", "daily-sketch/sketch-audio-reactive-agents-v2"],
+      "port": 8832
+    },
+    {
+      "name": "90-aida001",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8833", "--directory", "90-aida001"],
+      "port": 8833
     }
   ]
 }

@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AIDA001</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --ground-void: #0a0a0a;
+    --ground-base: #0f0f0f;
+    --ground-raised: #141414;
+    --ground-surface: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-default: #f5f5f7;
+    --text-secondary: #a8aab8;
+    --text-tertiary: #666;
+    --border-subtle: rgba(255,255,255,.06);
+    --border-default: rgba(255,255,255,.14);
+    --accent: #00a8ff;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%; margin: 0;
+    background: var(--ground-void); color: var(--text-default);
+    font: 400 13px/1.5 var(--font-mono);
+    overflow: hidden;
+  }
+
+  #stage { position: fixed; inset: 0; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  header.title {
+    position: fixed;
+    top: 20px; left: 22px;
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--text-secondary);
+    pointer-events: none;
+    z-index: 10;
+  }
+  header.title span { color: var(--text-tertiary); margin-left: 6px; }
+
+  /* ---------- Floating island ---------- */
+  #island-wrap {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  #drawer {
+    width: min(520px, calc(100vw - 40px));
+    background: rgba(20,20,22,.82);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 16px 18px 18px;
+    display: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  #drawer.open { display: block; animation: fade .18s ease-out; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  #drawer h3 {
+    margin: 0 0 12px;
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--text-tertiary); font-weight: 400;
+  }
+  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
+  @media (max-width: 480px) { .controls { grid-template-columns: 1fr; } }
+
+  .ctl { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; padding: 4px 0; }
+  .ctl label { color: var(--text-secondary); font-size: 11px; letter-spacing: .04em; }
+  .ctl output { color: var(--text-primary); font-size: 11px; font-variant-numeric: tabular-nums; min-width: 44px; text-align: right; }
+  .ctl input[type="range"] {
+    grid-column: 1 / -1;
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 2px; background: rgba(255,255,255,.1); border-radius: 2px; outline: none; margin: 4px 0 0;
+  }
+  .ctl input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--text-primary); cursor: pointer;
+    border: 2px solid var(--ground-void);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.2);
+  }
+  .ctl input[type="range"]::-moz-range-thumb {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--text-primary); cursor: pointer;
+    border: 2px solid var(--ground-void);
+  }
+  .drawer-foot {
+    margin-top: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--text-tertiary); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .drawer-foot button {
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--border-subtle); border-radius: 8px;
+    padding: 6px 10px; font: inherit; font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; cursor: pointer;
+  }
+  .drawer-foot button:hover { color: var(--text-primary); border-color: var(--border-default); }
+
+  #island {
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(20,20,22,.82);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    padding: 6px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  }
+  #island button {
+    background: transparent; color: var(--text-secondary);
+    border: 0; border-radius: 999px;
+    padding: 9px 14px; font: inherit; font-size: 12px; letter-spacing: .02em;
+    cursor: pointer; transition: color .14s ease, background .14s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  #island button:hover { color: var(--text-primary); }
+  #island button.active {
+    background: var(--text-primary); color: var(--ground-void);
+  }
+  #island .divider { width: 1px; height: 26px; background: var(--border-subtle); margin: 0 6px; }
+  #island svg { width: 22px; height: 22px; }
+
+  /* Play/Pause — the media-player anchor */
+  #playPause {
+    background: var(--text-primary); color: var(--ground-void);
+    width: 52px; height: 52px; padding: 0; border-radius: 50%;
+  }
+  #playPause:hover { color: var(--ground-void); background: #e6e6e6; }
+  #playPause svg { width: 26px; height: 26px; fill: currentColor; }
+
+  /* Segmented sample picker */
+  #picker {
+    display: inline-flex; align-items: center;
+    background: rgba(255,255,255,.04);
+    border-radius: 999px;
+    padding: 4px;
+    margin-left: 6px;
+  }
+  #picker button {
+    padding: 9px 16px;
+    font-size: 13px; letter-spacing: .06em;
+    font-variant-numeric: tabular-nums;
+  }
+  #picker button.selected {
+    background: var(--text-primary); color: var(--ground-void);
+  }
+
+  /* Mic button */
+  #micBtn { padding: 12px 16px; }
+  #micBtn svg { stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Gear */
+  #gear { padding: 12px 14px; }
+  #gear svg { stroke: currentColor; fill: none; stroke-width: 1.6; }
+  #gear.open { background: var(--ground-surface); color: var(--text-primary); }
+
+  /* Mobile — tighter island so everything fits on ~360px viewports */
+  @media (max-width: 480px) {
+    #island-wrap { bottom: 18px; }
+    #island { padding: 5px; gap: 2px; }
+    #island button { padding: 8px 10px; }
+    #playPause { width: 34px; height: 34px; }
+    #picker { margin-left: 4px; padding: 2px; }
+    #picker button { padding: 6px 9px; font-size: 10px; letter-spacing: .04em; }
+    #island .divider { margin: 0 2px; }
+    #micBtn { padding: 8px 10px; }
+    #micBtn svg, #gear svg, #island svg { width: 13px; height: 13px; }
+    #gear { padding: 8px 10px; }
+    header.title { top: 14px; left: 16px; font-size: 9px; }
+  }
+
+  #status {
+    position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--text-tertiary); z-index: 15; pointer-events: none;
+    opacity: 0; transition: opacity .3s ease;
+  }
+  #status.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="stage"><canvas id="c"></canvas></div>
+
+<header class="title">AIDA<span>001</span></header>
+
+<div id="island-wrap">
+  <div id="drawer" role="region" aria-label="Sensitivity vector">
+    <h3>Sensitivity Vector</h3>
+    <div class="controls">
+      <div class="ctl">
+        <label for="rmsSpeed">RMS → speed</label>
+        <output id="rmsSpeed-out">12</output>
+        <input id="rmsSpeed" type="range" min="0" max="200" step="1" value="12">
+      </div>
+      <div class="ctl">
+        <label for="rmsJitter">RMS → jitter</label>
+        <output id="rmsJitter-out">100</output>
+        <input id="rmsJitter" type="range" min="0" max="300" step="1" value="100">
+      </div>
+      <div class="ctl">
+        <label for="baseSpeed">Base speed</label>
+        <output id="baseSpeed-out">0.10</output>
+        <input id="baseSpeed" type="range" min="0" max="1" step="0.01" value="0.10">
+      </div>
+      <div class="ctl">
+        <label for="baseJitter">Base jitter</label>
+        <output id="baseJitter-out">0.05</output>
+        <input id="baseJitter" type="range" min="0" max="1" step="0.01" value="0.05">
+      </div>
+      <div class="ctl">
+        <label for="linkDist">Link distance</label>
+        <output id="linkDist-out">54</output>
+        <input id="linkDist" type="range" min="0" max="120" step="1" value="54">
+      </div>
+      <div class="ctl">
+        <label for="agents">Agents</label>
+        <output id="agents-out">200</output>
+        <input id="agents" type="range" min="40" max="500" step="10" value="200">
+      </div>
+      <div class="ctl">
+        <label for="smoothing">Smoothing</label>
+        <output id="smoothing-out">0.84</output>
+        <input id="smoothing" type="range" min="0" max="0.98" step="0.01" value="0.84">
+      </div>
+      <div class="ctl">
+        <label for="gain">Sample gain</label>
+        <output id="gain-out">0.60</output>
+        <input id="gain" type="range" min="0" max="2" step="0.05" value="0.60">
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <span>RMS <span id="rmsRead">0.000</span></span>
+      <button id="reset">Reset</button>
+    </div>
+  </div>
+
+  <nav id="island" aria-label="Player">
+    <button id="playPause" title="Play / Pause (space)" aria-label="Play">
+      <svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true">
+        <polygon points="8,5 8,19 19,12"/>
+      </svg>
+      <svg id="pauseIcon" viewBox="0 0 24 24" aria-hidden="true" style="display:none">
+        <rect x="7" y="5" width="3.5" height="14" rx="1"/>
+        <rect x="13.5" y="5" width="3.5" height="14" rx="1"/>
+      </svg>
+    </button>
+
+    <div id="picker" role="radiogroup" aria-label="Sample">
+      <button data-sample="pattern-1" role="radio">01</button>
+      <button data-sample="pattern-2" role="radio">02</button>
+      <button data-sample="pattern-3" role="radio">03</button>
+    </div>
+
+    <span class="divider" aria-hidden="true"></span>
+
+    <button id="micBtn" title="Mic (M)" aria-label="Microphone" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="9" y="3" width="6" height="12" rx="3"/>
+        <path d="M5 11a7 7 0 0 0 14 0"/>
+        <path d="M12 18v3"/>
+      </svg>
+    </button>
+
+    <button id="gear" title="Settings (S)" aria-label="Settings" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
+      </svg>
+    </button>
+  </nav>
+</div>
+
+<div id="status" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  // ---------- Canvas ----------
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const DPR = Math.max(1, Math.min(2, devicePixelRatio || 1));
+  const GRID = 8;
+  const AGENT_SIZE = 2;
+  let W = 0, H = 0;
+
+  function resize(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---------- Sensitivity vector (defaults) ----------
+  const isMobile = window.matchMedia('(max-width: 768px)').matches
+                   || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+  const DEFAULTS = {
+    rmsSpeed: 12,
+    rmsJitter: 100,
+    baseSpeed: 0.10,
+    baseJitter: 0.05,
+    linkDist: isMobile ? 42 : 54,
+    agents: isMobile ? 90 : 200,
+    smoothing: 0.84,
+    gain: 0.60,
+  };
+  const P = { ...DEFAULTS };
+
+  // ---------- Agents ----------
+  const agents = [];
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function seedAgent(){
+    return {
+      x: rand(AGENT_SIZE, Math.max(AGENT_SIZE + 1, W - AGENT_SIZE)),
+      y: rand(AGENT_SIZE, Math.max(AGENT_SIZE + 1, H - AGENT_SIZE)),
+      vx: rand(-0.2, 0.2),
+      vy: rand(-0.2, 0.2),
+    };
+  }
+  function syncAgentCount(){
+    const target = P.agents | 0;
+    while (agents.length < target) agents.push(seedAgent());
+    if (agents.length > target) agents.length = target;
+  }
+  syncAgentCount();
+
+  // ---------- Audio ----------
+  let ac, analyser, timeData;
+
+  // Media-player state
+  let selectedSample = 'pattern-1';
+  let sourceMode = null;      // 'sample' | 'mic' | null
+  let isPlaying = false;
+  let pausePosition = 0;      // seconds into the current sample where we paused
+  let playStartTime = 0;      // ac.currentTime when the current node started
+  let sampleNode = null;      // { source, gain }
+  let micNode = null;         // { node, stream }
+
+  const SAMPLE_URLS = {
+    'pattern-1': 'samples/pattern-1.m4a', // heartbeat (was 3)
+    'pattern-2': 'samples/pattern-3.wav', // originally sample 1
+    'pattern-3': 'samples/pattern-2.wav', // originally sample 2
+  };
+  const buffers = { 'pattern-1': null, 'pattern-2': null, 'pattern-3': null };
+  const loading = { 'pattern-1': false, 'pattern-2': false, 'pattern-3': false };
+
+  function ensureContext(){
+    if (!ac) {
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = ac.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = P.smoothing;
+      timeData = new Float32Array(analyser.fftSize);
+    }
+    return ac;
+  }
+
+  async function loadBuffer(name){
+    if (buffers[name] || loading[name]) return buffers[name];
+    loading[name] = true;
+    showStatus(`loading ${name}…`);
+    try {
+      const res = await fetch(SAMPLE_URLS[name]);
+      if (!res.ok) throw new Error(`fetch ${name}: ${res.status}`);
+      const ab = await res.arrayBuffer();
+      const buf = await ac.decodeAudioData(ab);
+      buffers[name] = buf;
+      hideStatus();
+      return buf;
+    } catch (e) {
+      console.error(e);
+      showStatus(`failed to load ${name}`);
+      setTimeout(hideStatus, 2000);
+      return null;
+    } finally {
+      loading[name] = false;
+    }
+  }
+
+  function stopSample(rememberPosition){
+    if (!sampleNode) return;
+    if (rememberPosition && buffers[selectedSample]) {
+      const dur = buffers[selectedSample].duration;
+      const elapsed = ac.currentTime - playStartTime + pausePosition;
+      pausePosition = ((elapsed % dur) + dur) % dur;
+    }
+    try {
+      sampleNode.source.onended = null;
+      sampleNode.source.stop(0);
+      sampleNode.source.disconnect();
+      sampleNode.gain.disconnect();
+    } catch {}
+    sampleNode = null;
+    isPlaying = false;
+  }
+
+  function stopMic(){
+    if (!micNode) return;
+    try {
+      micNode.node.disconnect();
+      micNode.stream.getTracks().forEach(t => t.stop());
+    } catch {}
+    micNode = null;
+  }
+
+  async function startSample(offset){
+    ensureContext();
+    if (ac.state === 'suspended') await ac.resume();
+    const buf = await loadBuffer(selectedSample);
+    if (!buf) return;
+    stopMic();
+    stopSample(false);
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const gain = ac.createGain();
+    gain.gain.value = P.gain;
+    src.connect(gain);
+    gain.connect(analyser);
+    gain.connect(ac.destination);
+    const off = Math.max(0, Math.min(offset || 0, buf.duration - 0.001));
+    src.start(0, off);
+    playStartTime = ac.currentTime;
+    pausePosition = off;
+    sampleNode = { source: src, gain };
+    sourceMode = 'sample';
+    isPlaying = true;
+    updateIslandUI();
+  }
+
+  function pauseSample(){
+    if (sourceMode !== 'sample' || !isPlaying) return;
+    stopSample(true);
+    sourceMode = null;
+    updateIslandUI();
+  }
+
+  async function togglePlayPause(){
+    if (sourceMode === 'mic') {
+      stopMic();
+      sourceMode = null;
+      await startSample(pausePosition);
+      return;
+    }
+    if (isPlaying) pauseSample();
+    else await startSample(pausePosition);
+  }
+
+  async function selectSample(name){
+    if (name === selectedSample && sourceMode === 'sample' && isPlaying) return;
+    const wasPlayingSample = (sourceMode === 'sample' && isPlaying);
+    const wasMic = (sourceMode === 'mic');
+    selectedSample = name;
+    pausePosition = 0;
+    updateIslandUI();
+    if (wasPlayingSample || wasMic) {
+      await startSample(0);
+    }
+  }
+
+  async function toggleMic(){
+    ensureContext();
+    if (sourceMode === 'mic') {
+      stopMic();
+      sourceMode = null;
+      updateIslandUI();
+      return;
+    }
+    if (sourceMode === 'sample') {
+      stopSample(true);
+      sourceMode = null;
+    }
+    if (ac.state === 'suspended') await ac.resume();
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true }
+      });
+    } catch (e) {
+      console.error(e);
+      showStatus('microphone denied');
+      setTimeout(hideStatus, 2000);
+      updateIslandUI();
+      return;
+    }
+    const node = ac.createMediaStreamSource(stream);
+    node.connect(analyser);
+    micNode = { node, stream };
+    sourceMode = 'mic';
+    updateIslandUI();
+  }
+
+  function getRMS(){
+    if (!analyser) return 0;
+    analyser.getFloatTimeDomainData(timeData);
+    let sum = 0;
+    for (let i = 0; i < timeData.length; i++) { const v = timeData[i]; sum += v * v; }
+    return Math.sqrt(sum / timeData.length);
+  }
+
+  // ---------- Render loop ----------
+  const EDGE_BOUNCE = 0.98;
+  let rmsRead = 0;
+  const rmsReadout = document.getElementById('rmsRead');
+  let readoutFrame = 0;
+
+  function drawGrid(){
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,.05)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += GRID) { ctx.moveTo(x + 0.5, 0); ctx.lineTo(x + 0.5, H); }
+    for (let y = 0; y <= H; y += GRID) { ctx.moveTo(0, y + 0.5); ctx.lineTo(W, y + 0.5); }
+    ctx.stroke();
+  }
+
+  function step(){
+    requestAnimationFrame(step);
+    drawGrid();
+
+    const rms = getRMS();
+    rmsRead = rmsRead * 0.9 + rms * 0.1;
+    if (++readoutFrame % 6 === 0) rmsReadout.textContent = rmsRead.toFixed(3);
+
+    const speed = P.baseSpeed + P.rmsSpeed * rms;
+    const noiseAmp = P.baseJitter + P.rmsJitter * rms;
+    const link = P.linkDist;
+
+    for (const a of agents) {
+      a.vx += (Math.random() * 2 - 1) * noiseAmp * 0.2;
+      a.vy += (Math.random() * 2 - 1) * noiseAmp * 0.2;
+      const mag = Math.hypot(a.vx, a.vy) || 1e-6;
+      const k = speed / mag;
+      a.vx *= k; a.vy *= k;
+      a.x += a.vx; a.y += a.vy;
+
+      if (a.x < 0) { a.x = 0; a.vx = Math.abs(a.vx) * EDGE_BOUNCE; }
+      if (a.y < 0) { a.y = 0; a.vy = Math.abs(a.vy) * EDGE_BOUNCE; }
+      if (a.x > W - AGENT_SIZE) { a.x = W - AGENT_SIZE; a.vx = -Math.abs(a.vx) * EDGE_BOUNCE; }
+      if (a.y > H - AGENT_SIZE) { a.y = H - AGENT_SIZE; a.vy = -Math.abs(a.vy) * EDGE_BOUNCE; }
+    }
+
+    if (link > 0) {
+      ctx.strokeStyle = 'rgba(160,160,168,0.28)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      const linkSq = link * link;
+      for (let i = 0; i < agents.length; i++) {
+        const a1 = agents[i];
+        for (let j = i + 1; j < agents.length; j++) {
+          const a2 = agents[j];
+          const dx = a2.x - a1.x, dy = a2.y - a1.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 <= linkSq) {
+            ctx.moveTo(a1.x + AGENT_SIZE/2, a1.y + AGENT_SIZE/2);
+            ctx.lineTo(a2.x + AGENT_SIZE/2, a2.y + AGENT_SIZE/2);
+          }
+        }
+      }
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#ffffff';
+    for (const a of agents) {
+      ctx.fillRect(Math.round(a.x), Math.round(a.y), AGENT_SIZE, AGENT_SIZE);
+    }
+  }
+  step();
+
+  // ---------- Controls ----------
+  const drawer = document.getElementById('drawer');
+  const gear = document.getElementById('gear');
+  gear.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    gear.classList.toggle('open', open);
+    gear.setAttribute('aria-expanded', String(open));
+  });
+
+  const playBtn = document.getElementById('playPause');
+  const playIcon = document.getElementById('playIcon');
+  const pauseIcon = document.getElementById('pauseIcon');
+  const micBtn = document.getElementById('micBtn');
+  const picker = document.getElementById('picker');
+
+  playBtn.addEventListener('click', () => togglePlayPause());
+  micBtn.addEventListener('click', () => toggleMic());
+  picker.querySelectorAll('button[data-sample]').forEach(btn => {
+    btn.addEventListener('click', () => selectSample(btn.dataset.sample));
+  });
+
+  function updateIslandUI(){
+    // Sample picker highlight — cleared when mic is the active source
+    const showPickerSelection = sourceMode !== 'mic';
+    picker.querySelectorAll('button[data-sample]').forEach(btn => {
+      const on = showPickerSelection && btn.dataset.sample === selectedSample;
+      btn.classList.toggle('selected', on);
+      btn.setAttribute('aria-checked', String(on));
+    });
+    // Play/Pause icon reflects whether audio is actually running (sample or mic)
+    const running = (sourceMode === 'sample' && isPlaying) || sourceMode === 'mic';
+    playIcon.style.display  = running ? 'none' : '';
+    pauseIcon.style.display = running ? '' : 'none';
+    playBtn.setAttribute('aria-label', running ? 'Pause' : 'Play');
+    // Mic active state
+    micBtn.classList.toggle('active', sourceMode === 'mic');
+    micBtn.setAttribute('aria-pressed', String(sourceMode === 'mic'));
+  }
+  updateIslandUI();
+
+  // Sliders — bind by id, mirror to P and per-slider side effects.
+  const bindings = [
+    ['rmsSpeed',  v => P.rmsSpeed  = +v, v => (+v).toString()],
+    ['rmsJitter', v => P.rmsJitter = +v, v => (+v).toString()],
+    ['baseSpeed', v => P.baseSpeed = +v, v => (+v).toFixed(2)],
+    ['baseJitter',v => P.baseJitter= +v, v => (+v).toFixed(2)],
+    ['linkDist',  v => P.linkDist  = +v, v => (+v).toString()],
+    ['agents',    v => { P.agents = +v; syncAgentCount(); }, v => (+v).toString()],
+    ['smoothing', v => { P.smoothing = +v; if (analyser) analyser.smoothingTimeConstant = +v; }, v => (+v).toFixed(2)],
+    ['gain',      v => { P.gain = +v; if (sampleNode) sampleNode.gain.gain.value = +v; }, v => (+v).toFixed(2)],
+  ];
+  const sliderEls = {};
+  bindings.forEach(([id, apply, fmt]) => {
+    const input = document.getElementById(id);
+    const out = document.getElementById(id + '-out');
+    sliderEls[id] = { input, out, apply, fmt };
+    // DEFAULTS is the source of truth — sync sliders to it so mobile picks up smaller values.
+    input.value = DEFAULTS[id];
+    apply(DEFAULTS[id]);
+    out.textContent = fmt(DEFAULTS[id]);
+    input.addEventListener('input', e => {
+      apply(e.target.value);
+      out.textContent = fmt(e.target.value);
+    });
+  });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    Object.assign(P, DEFAULTS);
+    for (const [id, apply, fmt] of bindings) {
+      sliderEls[id].input.value = DEFAULTS[id];
+      apply(DEFAULTS[id]);
+      sliderEls[id].out.textContent = fmt(DEFAULTS[id]);
+    }
+    syncAgentCount();
+    if (analyser) analyser.smoothingTimeConstant = DEFAULTS.smoothing;
+  });
+
+  // ---------- Status pill ----------
+  const status = document.getElementById('status');
+  let statusTimer;
+  function showStatus(msg){
+    status.textContent = msg;
+    status.classList.add('show');
+    clearTimeout(statusTimer);
+  }
+  function hideStatus(){
+    status.classList.remove('show');
+  }
+
+  // Keyboard shortcuts: space play/pause · 1/2/3 pick sample · m mic · s settings.
+  window.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, textarea')) return;
+    if (e.key === ' ') { e.preventDefault(); togglePlayPause(); }
+    else if (e.key === '1') selectSample('pattern-1');
+    else if (e.key === '2') selectSample('pattern-2');
+    else if (e.key === '3') selectSample('pattern-3');
+    else if (e.key === 'm' || e.key === 'M') toggleMic();
+    else if (e.key === 's' || e.key === 'S') gear.click();
+  });
+})();
+</script>
+</body>
+</html>
