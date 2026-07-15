@@ -42,8 +42,10 @@ AIDA001 is a new sketch category — deliberate blends of audio and visual autho
 ## Samples
 Three loops recorded in the a1da instrument diary (July 15):
 - `samples/pattern-1.m4a` — heartbeat
-- `samples/pattern-2.wav` — pattern (was `0715-pattern`)
-- `samples/pattern-3.wav` — pattern-2 (was `0715-pattern2`)
+- `samples/pattern-2.m4a` — pattern (was `0715-pattern`)
+- `samples/pattern-3.m4a` — pattern-2 (was `0715-pattern2`)
+
+All samples encoded as AAC at 192 kbps for size (~9 MB total instead of ~43 MB for the WAV originals).
 
 ## Notes
 - The pause implementation tracks `pausePosition = (ac.currentTime - playStartTime + pausePosition) % duration`, allowing true resume across loop boundaries.
