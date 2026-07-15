@@ -1,5 +1,10 @@
 [
   {
+    "id": "90-aida001",
+    "path": "100days/90-aida001",
+    "description": "AIDA001 — first audio-visual sketch: agent swarm drifts and jitters to three self-recorded loops or live mic, with a media-player island and a drawer exposing the RMS→animation sensitivity vector"
+  },
+  {
     "id": "89-sprite-states",
     "path": "100days/89-sprite-states",
     "description": "Sprite States — clear-channel docs for the create-sprite four-state atlas (idle · working · attention · error); 2×2 live demo at 80×80 with the tool packed alongside"
