@@ -1,8 +1,8 @@
 {
   "nodes": [
     {
-      "id": "veins/agents-and-particle-systems",
-      "type": "vein",
+      "id": "threads/agents-and-particle-systems",
+      "type": "thread",
       "title": "Agents and particle systems",
       "charge": "high",
       "state": "active",
@@ -25,8 +25,8 @@
         "74-particles"
       ],
       "feeds": [
-        "moves/toroidal-wrapping",
-        "moves/proximity-link-drawing"
+        "techniques/toroidal-wrapping",
+        "techniques/proximity-link-drawing"
       ],
       "sources": [
         "sources/vicsek-flocking",
@@ -36,8 +36,8 @@
       "degree": 17
     },
     {
-      "id": "veins/ascii-and-text-rendering",
-      "type": "vein",
+      "id": "threads/ascii-and-text-rendering",
+      "type": "thread",
       "title": "ASCII and text rendering",
       "charge": "high",
       "state": "active",
@@ -53,16 +53,16 @@
         "78-ascii-sheets-docs"
       ],
       "feeds": [
-        "moves/glyph-density-ramp",
-        "moves/dom-over-canvas-rendering"
+        "techniques/glyph-density-ramp",
+        "techniques/dom-over-canvas-rendering"
       ],
       "sources": [],
       "spawned_count": 9,
       "degree": 13
     },
     {
-      "id": "veins/audio-reactivity",
-      "type": "vein",
+      "id": "threads/audio-reactivity",
+      "type": "thread",
       "title": "Audio reactivity",
       "charge": "high",
       "state": "active",
@@ -74,15 +74,15 @@
         "68-moog-phase"
       ],
       "feeds": [
-        "tensions/audio-reactive-without-gimmick"
+        "themes/audio-reactive-without-gimmick"
       ],
       "sources": [],
       "spawned_count": 5,
       "degree": 4
     },
     {
-      "id": "veins/cellular-automata-and-pattern-formation",
-      "type": "vein",
+      "id": "threads/cellular-automata-and-pattern-formation",
+      "type": "thread",
       "title": "Cellular automata and pattern formation",
       "charge": "medium",
       "state": "active",
@@ -92,8 +92,8 @@
         "52-reaction-diffusion"
       ],
       "feeds": [
-        "moves/imagedata-double-buffer",
-        "tensions/iteration-vs-original-rules"
+        "techniques/imagedata-double-buffer",
+        "themes/iteration-vs-original-rules"
       ],
       "sources": [
         "sources/turing-gray-scott"
@@ -102,8 +102,8 @@
       "degree": 9
     },
     {
-      "id": "veins/design-system-and-reference-sheets",
-      "type": "vein",
+      "id": "threads/design-system-and-reference-sheets",
+      "type": "thread",
       "title": "Design systems and reference sheets",
       "charge": "high",
       "state": "active",
@@ -131,8 +131,8 @@
         "84-id-card"
       ],
       "feeds": [
-        "moves/css-vars-live-controls",
-        "tensions/searching-vs-mapping"
+        "techniques/css-vars-live-controls",
+        "themes/searching-vs-mapping"
       ],
       "sources": [
         "sources/bauhaus-early-computer-graphics"
@@ -141,8 +141,8 @@
       "degree": 16
     },
     {
-      "id": "veins/emergence-from-local-rules",
-      "type": "vein",
+      "id": "threads/emergence-from-local-rules",
+      "type": "thread",
       "title": "Emergence from local rules",
       "charge": "high",
       "state": "active",
@@ -162,8 +162,8 @@
         "54-concept-graph"
       ],
       "feeds": [
-        "moves/imagedata-double-buffer",
-        "tensions/iteration-vs-original-rules"
+        "techniques/imagedata-double-buffer",
+        "themes/iteration-vs-original-rules"
       ],
       "sources": [
         "sources/vicsek-flocking",
@@ -175,8 +175,8 @@
       "degree": 19
     },
     {
-      "id": "veins/generative-typography-and-text",
-      "type": "vein",
+      "id": "threads/generative-typography-and-text",
+      "type": "thread",
       "title": "Generative typography and text",
       "charge": "high",
       "state": "active",
@@ -190,15 +190,15 @@
         "81-lens-wave"
       ],
       "feeds": [
-        "moves/dom-over-canvas-rendering"
+        "techniques/dom-over-canvas-rendering"
       ],
       "sources": [],
       "spawned_count": 7,
       "degree": 7
     },
     {
-      "id": "veins/grids-as-compositional-frame",
-      "type": "vein",
+      "id": "threads/grids-as-compositional-frame",
+      "type": "thread",
       "title": "Grids as compositional frame",
       "charge": "high",
       "state": "active",
@@ -222,16 +222,16 @@
         "71-index-100days"
       ],
       "feeds": [
-        "moves/offscreen-canvas-downsample",
-        "moves/glyph-density-ramp"
+        "techniques/offscreen-canvas-downsample",
+        "techniques/glyph-density-ramp"
       ],
       "sources": [],
       "spawned_count": 17,
       "degree": 20
     },
     {
-      "id": "veins/language-and-nlp-interpretability",
-      "type": "vein",
+      "id": "threads/language-and-nlp-interpretability",
+      "type": "thread",
       "title": "Language and NLP interpretability",
       "charge": "medium",
       "state": "active",
@@ -240,16 +240,16 @@
         "37-sentiment-analyzer"
       ],
       "feeds": [
-        "veins/design-system-and-reference-sheets",
-        "veins/generative-typography-and-text"
+        "threads/design-system-and-reference-sheets",
+        "threads/generative-typography-and-text"
       ],
       "sources": [],
       "spawned_count": 2,
       "degree": 4
     },
     {
-      "id": "veins/networks-and-graphs",
-      "type": "vein",
+      "id": "threads/networks-and-graphs",
+      "type": "thread",
       "title": "Networks and graphs",
       "charge": "high",
       "state": "active",
@@ -271,8 +271,8 @@
         "80-network"
       ],
       "feeds": [
-        "moves/proximity-link-drawing",
-        "moves/d3-force-simulation"
+        "techniques/proximity-link-drawing",
+        "techniques/d3-force-simulation"
       ],
       "sources": [
         "sources/graph-theory-algorithms"
@@ -281,8 +281,8 @@
       "degree": 16
     },
     {
-      "id": "veins/physics-simulation",
-      "type": "vein",
+      "id": "threads/physics-simulation",
+      "type": "thread",
       "title": "Physics simulation",
       "charge": "medium",
       "state": "active",
@@ -298,7 +298,7 @@
         "51-resonant-lattice"
       ],
       "feeds": [
-        "moves/parametric-lissajous-orbits"
+        "techniques/parametric-lissajous-orbits"
       ],
       "sources": [
         "sources/slit-scan-2001"
@@ -307,8 +307,8 @@
       "degree": 8
     },
     {
-      "id": "veins/stochastic-and-noise",
-      "type": "vein",
+      "id": "threads/stochastic-and-noise",
+      "type": "thread",
       "title": "Stochastic and noise",
       "charge": "high",
       "state": "active",
@@ -326,9 +326,9 @@
         "52-reaction-diffusion"
       ],
       "feeds": [
-        "moves/perlin-fbm-displacement",
-        "moves/summed-sines-pseudo-noise",
-        "tensions/randomness-feeling-intentional"
+        "techniques/perlin-fbm-displacement",
+        "techniques/summed-sines-pseudo-noise",
+        "themes/randomness-feeling-intentional"
       ],
       "sources": [
         "sources/brownian-markov",
@@ -338,8 +338,8 @@
       "degree": 22
     },
     {
-      "id": "moves/agent-authored-playwright-capture",
-      "type": "move",
+      "id": "techniques/agent-authored-playwright-capture",
+      "type": "technique",
       "title": "Agent-authored Playwright capture",
       "charge": "low",
       "state": "active",
@@ -347,15 +347,15 @@
         "83-video-index"
       ],
       "feeds": [
-        "veins/design-system-and-reference-sheets"
+        "threads/design-system-and-reference-sheets"
       ],
       "sources": [],
       "spawned_count": 1,
       "degree": 1
     },
     {
-      "id": "moves/backdrop-filter-svg-distort",
-      "type": "move",
+      "id": "techniques/backdrop-filter-svg-distort",
+      "type": "technique",
       "title": "Backdrop-filter SVG distort",
       "charge": "medium",
       "state": "active",
@@ -365,15 +365,15 @@
         "78-ascii-sheets-docs"
       ],
       "feeds": [
-        "veins/ascii-and-text-rendering"
+        "threads/ascii-and-text-rendering"
       ],
       "sources": [],
       "spawned_count": 3,
       "degree": 4
     },
     {
-      "id": "moves/css-vars-live-controls",
-      "type": "move",
+      "id": "techniques/css-vars-live-controls",
+      "type": "technique",
       "title": "CSS vars as live controls",
       "charge": "medium",
       "state": "active",
@@ -388,15 +388,15 @@
         "82-z-axis"
       ],
       "feeds": [
-        "veins/design-system-and-reference-sheets"
+        "threads/design-system-and-reference-sheets"
       ],
       "sources": [],
       "spawned_count": 8,
       "degree": 5
     },
     {
-      "id": "moves/d3-force-simulation",
-      "type": "move",
+      "id": "techniques/d3-force-simulation",
+      "type": "technique",
       "title": "D3 force simulation",
       "charge": "medium",
       "state": "active",
@@ -407,7 +407,7 @@
         "22-directed-network"
       ],
       "feeds": [
-        "veins/networks-and-graphs"
+        "threads/networks-and-graphs"
       ],
       "sources": [
         "sources/graph-theory-algorithms"
@@ -416,8 +416,8 @@
       "degree": 4
     },
     {
-      "id": "moves/dom-over-canvas-rendering",
-      "type": "move",
+      "id": "techniques/dom-over-canvas-rendering",
+      "type": "technique",
       "title": "DOM over canvas rendering",
       "charge": "medium",
       "state": "active",
@@ -431,16 +431,16 @@
         "62-terminal-cli"
       ],
       "feeds": [
-        "veins/ascii-and-text-rendering",
-        "veins/generative-typography-and-text"
+        "threads/ascii-and-text-rendering",
+        "threads/generative-typography-and-text"
       ],
       "sources": [],
       "spawned_count": 7,
       "degree": 9
     },
     {
-      "id": "moves/drag-reorder-collision-packing",
-      "type": "move",
+      "id": "techniques/drag-reorder-collision-packing",
+      "type": "technique",
       "title": "Drag-reorder with collision packing",
       "charge": "low",
       "state": "active",
@@ -448,15 +448,15 @@
         "26-widget-dashboard"
       ],
       "feeds": [
-        "veins/grids-as-compositional-frame"
+        "threads/grids-as-compositional-frame"
       ],
       "sources": [],
       "spawned_count": 1,
       "degree": 1
     },
     {
-      "id": "moves/geodesic-great-circle-path",
-      "type": "move",
+      "id": "techniques/geodesic-great-circle-path",
+      "type": "technique",
       "title": "Geodesic great-circle path",
       "charge": "low",
       "state": "active",
@@ -469,8 +469,8 @@
       "degree": 0
     },
     {
-      "id": "moves/glyph-density-ramp",
-      "type": "move",
+      "id": "techniques/glyph-density-ramp",
+      "type": "technique",
       "title": "Glyph density ramp",
       "charge": "medium",
       "state": "active",
@@ -483,15 +483,15 @@
         "78-ascii-sheets-docs"
       ],
       "feeds": [
-        "veins/ascii-and-text-rendering"
+        "threads/ascii-and-text-rendering"
       ],
       "sources": [],
       "spawned_count": 6,
       "degree": 7
     },
     {
-      "id": "moves/imagedata-double-buffer",
-      "type": "move",
+      "id": "techniques/imagedata-double-buffer",
+      "type": "technique",
       "title": "ImageData double buffer",
       "charge": "low",
       "state": "active",
@@ -501,16 +501,16 @@
         "52-reaction-diffusion"
       ],
       "feeds": [
-        "veins/cellular-automata-and-pattern-formation",
-        "veins/emergence-from-local-rules"
+        "threads/cellular-automata-and-pattern-formation",
+        "threads/emergence-from-local-rules"
       ],
       "sources": [],
       "spawned_count": 3,
       "degree": 7
     },
     {
-      "id": "moves/offscreen-canvas-downsample",
-      "type": "move",
+      "id": "techniques/offscreen-canvas-downsample",
+      "type": "technique",
       "title": "Offscreen canvas downsample",
       "charge": "medium",
       "state": "active",
@@ -522,15 +522,15 @@
         "33-three-body-problem"
       ],
       "feeds": [
-        "veins/grids-as-compositional-frame"
+        "threads/grids-as-compositional-frame"
       ],
       "sources": [],
       "spawned_count": 5,
       "degree": 6
     },
     {
-      "id": "moves/parametric-lissajous-orbits",
-      "type": "move",
+      "id": "techniques/parametric-lissajous-orbits",
+      "type": "technique",
       "title": "Parametric Lissajous orbits",
       "charge": "medium",
       "state": "active",
@@ -541,15 +541,15 @@
         "79-idle-states"
       ],
       "feeds": [
-        "veins/physics-simulation"
+        "threads/physics-simulation"
       ],
       "sources": [],
       "spawned_count": 4,
       "degree": 3
     },
     {
-      "id": "moves/per-cell-threshold-crystallization",
-      "type": "move",
+      "id": "techniques/per-cell-threshold-crystallization",
+      "type": "technique",
       "title": "Per-cell threshold crystallization",
       "charge": "medium",
       "state": "active",
@@ -558,15 +558,15 @@
         "62-terminal-cli"
       ],
       "feeds": [
-        "veins/ascii-and-text-rendering"
+        "threads/ascii-and-text-rendering"
       ],
       "sources": [],
       "spawned_count": 2,
       "degree": 3
     },
     {
-      "id": "moves/perlin-fbm-displacement",
-      "type": "move",
+      "id": "techniques/perlin-fbm-displacement",
+      "type": "technique",
       "title": "Perlin / fBm displacement",
       "charge": "medium",
       "state": "active",
@@ -576,7 +576,7 @@
         "28-liquid-glass"
       ],
       "feeds": [
-        "veins/stochastic-and-noise"
+        "threads/stochastic-and-noise"
       ],
       "sources": [
         "sources/perlin-noise"
@@ -585,8 +585,8 @@
       "degree": 7
     },
     {
-      "id": "moves/proximity-link-drawing",
-      "type": "move",
+      "id": "techniques/proximity-link-drawing",
+      "type": "technique",
       "title": "Proximity link drawing",
       "charge": "high",
       "state": "active",
@@ -598,16 +598,16 @@
         "80-network"
       ],
       "feeds": [
-        "veins/networks-and-graphs",
-        "veins/agents-and-particle-systems"
+        "threads/networks-and-graphs",
+        "threads/agents-and-particle-systems"
       ],
       "sources": [],
       "spawned_count": 5,
       "degree": 8
     },
     {
-      "id": "moves/scripted-await-timeline",
-      "type": "move",
+      "id": "techniques/scripted-await-timeline",
+      "type": "technique",
       "title": "Scripted await timeline",
       "charge": "low",
       "state": "active",
@@ -615,15 +615,15 @@
         "61-hitl-patterns"
       ],
       "feeds": [
-        "veins/design-system-and-reference-sheets"
+        "threads/design-system-and-reference-sheets"
       ],
       "sources": [],
       "spawned_count": 1,
       "degree": 1
     },
     {
-      "id": "moves/summed-sines-pseudo-noise",
-      "type": "move",
+      "id": "techniques/summed-sines-pseudo-noise",
+      "type": "technique",
       "title": "Summed sines pseudo-noise",
       "charge": "medium",
       "state": "active",
@@ -634,15 +634,15 @@
         "81-lens-wave"
       ],
       "feeds": [
-        "veins/stochastic-and-noise"
+        "threads/stochastic-and-noise"
       ],
       "sources": [],
       "spawned_count": 4,
       "degree": 2
     },
     {
-      "id": "moves/toroidal-wrapping",
-      "type": "move",
+      "id": "techniques/toroidal-wrapping",
+      "type": "technique",
       "title": "Toroidal wrapping",
       "charge": "high",
       "state": "active",
@@ -657,15 +657,15 @@
         "24-rock-paper-scissors"
       ],
       "feeds": [
-        "veins/agents-and-particle-systems"
+        "threads/agents-and-particle-systems"
       ],
       "sources": [],
       "spawned_count": 8,
       "degree": 10
     },
     {
-      "id": "moves/typewriter-jitter-output",
-      "type": "move",
+      "id": "techniques/typewriter-jitter-output",
+      "type": "technique",
       "title": "Typewriter output with jitter",
       "charge": "medium",
       "state": "active",
@@ -673,15 +673,15 @@
         "62-terminal-cli"
       ],
       "feeds": [
-        "veins/ascii-and-text-rendering"
+        "threads/ascii-and-text-rendering"
       ],
       "sources": [],
       "spawned_count": 1,
       "degree": 1
     },
     {
-      "id": "tensions/audio-reactive-without-gimmick",
-      "type": "tension",
+      "id": "themes/audio-reactive-without-gimmick",
+      "type": "theme",
       "title": "Audio-reactive without the gimmick",
       "charge": "medium",
       "state": "active",
@@ -691,15 +691,15 @@
         "68-moog-phase"
       ],
       "feeds": [
-        "veins/audio-reactivity"
+        "threads/audio-reactivity"
       ],
       "sources": [],
       "spawned_count": 3,
       "degree": 4
     },
     {
-      "id": "tensions/desktop-only-vs-responsive",
-      "type": "tension",
+      "id": "themes/desktop-only-vs-responsive",
+      "type": "theme",
       "title": "Desktop-only vs responsive",
       "charge": "low",
       "state": "active",
@@ -717,8 +717,8 @@
       "degree": 2
     },
     {
-      "id": "tensions/iteration-vs-original-rules",
-      "type": "tension",
+      "id": "themes/iteration-vs-original-rules",
+      "type": "theme",
       "title": "Iteration vs original rules",
       "charge": "medium",
       "state": "active",
@@ -729,16 +729,16 @@
         "70-clear-channel-2"
       ],
       "feeds": [
-        "veins/cellular-automata-and-pattern-formation",
-        "veins/emergence-from-local-rules"
+        "threads/cellular-automata-and-pattern-formation",
+        "threads/emergence-from-local-rules"
       ],
       "sources": [],
       "spawned_count": 4,
       "degree": 5
     },
     {
-      "id": "tensions/randomness-feeling-intentional",
-      "type": "tension",
+      "id": "themes/randomness-feeling-intentional",
+      "type": "theme",
       "title": "Randomness feeling intentional",
       "charge": "high",
       "state": "active",
@@ -749,15 +749,15 @@
         "56-constrained-variation"
       ],
       "feeds": [
-        "veins/stochastic-and-noise"
+        "threads/stochastic-and-noise"
       ],
       "sources": [],
       "spawned_count": 4,
       "degree": 7
     },
     {
-      "id": "tensions/searching-vs-mapping",
-      "type": "tension",
+      "id": "themes/searching-vs-mapping",
+      "type": "theme",
       "title": "Searching vs mapping",
       "charge": "medium",
       "state": "active",
@@ -768,15 +768,15 @@
         "79-idle-states"
       ],
       "feeds": [
-        "veins/design-system-and-reference-sheets"
+        "threads/design-system-and-reference-sheets"
       ],
       "sources": [],
       "spawned_count": 4,
       "degree": 3
     },
     {
-      "id": "tensions/showing-mechanism-vs-polish",
-      "type": "tension",
+      "id": "themes/showing-mechanism-vs-polish",
+      "type": "theme",
       "title": "Showing mechanism vs polish",
       "charge": "medium",
       "state": "active",
@@ -786,8 +786,8 @@
         "81-lens-wave"
       ],
       "feeds": [
-        "veins/design-system-and-reference-sheets",
-        "moves/backdrop-filter-svg-distort"
+        "threads/design-system-and-reference-sheets",
+        "techniques/backdrop-filter-svg-distort"
       ],
       "sources": [],
       "spawned_count": 3,
@@ -981,8 +981,8 @@
         "71-index-100days"
       ],
       "feeds": [
-        "veins/ascii-and-text-rendering",
-        "veins/design-system-and-reference-sheets"
+        "threads/ascii-and-text-rendering",
+        "threads/design-system-and-reference-sheets"
       ],
       "sources": [],
       "spawned_count": 1,
@@ -1015,875 +1015,889 @@
       "sources": [],
       "spawned_count": 1,
       "degree": 0
+    },
+    {
+      "id": "collisions/vicsek-flocking-x-typography",
+      "type": "collision",
+      "title": "collisions/vicsek-flocking-x-typography",
+      "charge": "high",
+      "state": "active",
+      "spawned": [
+        "daily-sketch/sketch-word-flock"
+      ],
+      "feeds": [],
+      "sources": [],
+      "spawned_count": 1,
+      "degree": 0
     }
   ],
   "links": [
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "moves/toroidal-wrapping",
+      "source": "threads/agents-and-particle-systems",
+      "target": "techniques/toroidal-wrapping",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "moves/proximity-link-drawing",
+      "source": "threads/agents-and-particle-systems",
+      "target": "techniques/proximity-link-drawing",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/agents-and-particle-systems",
+      "source": "threads/agents-and-particle-systems",
       "target": "sources/vicsek-flocking",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/agents-and-particle-systems",
+      "source": "threads/agents-and-particle-systems",
       "target": "sources/brownian-markov",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "moves/glyph-density-ramp",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "techniques/glyph-density-ramp",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "moves/dom-over-canvas-rendering",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "techniques/dom-over-canvas-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/audio-reactivity",
-      "target": "tensions/audio-reactive-without-gimmick",
+      "source": "threads/audio-reactivity",
+      "target": "themes/audio-reactive-without-gimmick",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
-      "target": "moves/imagedata-double-buffer",
+      "source": "threads/cellular-automata-and-pattern-formation",
+      "target": "techniques/imagedata-double-buffer",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
-      "target": "tensions/iteration-vs-original-rules",
+      "source": "threads/cellular-automata-and-pattern-formation",
+      "target": "themes/iteration-vs-original-rules",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
+      "source": "threads/cellular-automata-and-pattern-formation",
       "target": "sources/turing-gray-scott",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "moves/css-vars-live-controls",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "techniques/css-vars-live-controls",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "tensions/searching-vs-mapping",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "themes/searching-vs-mapping",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
+      "source": "threads/design-system-and-reference-sheets",
       "target": "sources/bauhaus-early-computer-graphics",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "moves/imagedata-double-buffer",
+      "source": "threads/emergence-from-local-rules",
+      "target": "techniques/imagedata-double-buffer",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "tensions/iteration-vs-original-rules",
+      "source": "threads/emergence-from-local-rules",
+      "target": "themes/iteration-vs-original-rules",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/emergence-from-local-rules",
+      "source": "threads/emergence-from-local-rules",
       "target": "sources/vicsek-flocking",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/emergence-from-local-rules",
+      "source": "threads/emergence-from-local-rules",
       "target": "sources/schelling-segregation",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/emergence-from-local-rules",
+      "source": "threads/emergence-from-local-rules",
       "target": "sources/kuramoto-fireflies",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/emergence-from-local-rules",
+      "source": "threads/emergence-from-local-rules",
       "target": "sources/turing-gray-scott",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/generative-typography-and-text",
-      "target": "moves/dom-over-canvas-rendering",
+      "source": "threads/generative-typography-and-text",
+      "target": "techniques/dom-over-canvas-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/offscreen-canvas-downsample",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/offscreen-canvas-downsample",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/glyph-density-ramp",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/glyph-density-ramp",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/language-and-nlp-interpretability",
-      "target": "veins/design-system-and-reference-sheets",
+      "source": "threads/language-and-nlp-interpretability",
+      "target": "threads/design-system-and-reference-sheets",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/language-and-nlp-interpretability",
-      "target": "veins/generative-typography-and-text",
+      "source": "threads/language-and-nlp-interpretability",
+      "target": "threads/generative-typography-and-text",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "moves/proximity-link-drawing",
+      "source": "threads/networks-and-graphs",
+      "target": "techniques/proximity-link-drawing",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "moves/d3-force-simulation",
+      "source": "threads/networks-and-graphs",
+      "target": "techniques/d3-force-simulation",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/networks-and-graphs",
+      "source": "threads/networks-and-graphs",
       "target": "sources/graph-theory-algorithms",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/physics-simulation",
-      "target": "moves/parametric-lissajous-orbits",
+      "source": "threads/physics-simulation",
+      "target": "techniques/parametric-lissajous-orbits",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/physics-simulation",
+      "source": "threads/physics-simulation",
       "target": "sources/slit-scan-2001",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/perlin-fbm-displacement",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/perlin-fbm-displacement",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/summed-sines-pseudo-noise",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/summed-sines-pseudo-noise",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "tensions/randomness-feeling-intentional",
+      "source": "threads/stochastic-and-noise",
+      "target": "themes/randomness-feeling-intentional",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/stochastic-and-noise",
+      "source": "threads/stochastic-and-noise",
       "target": "sources/brownian-markov",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/stochastic-and-noise",
+      "source": "threads/stochastic-and-noise",
       "target": "sources/perlin-noise",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/agent-authored-playwright-capture",
-      "target": "veins/design-system-and-reference-sheets",
+      "source": "techniques/agent-authored-playwright-capture",
+      "target": "threads/design-system-and-reference-sheets",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/backdrop-filter-svg-distort",
-      "target": "veins/ascii-and-text-rendering",
+      "source": "techniques/backdrop-filter-svg-distort",
+      "target": "threads/ascii-and-text-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/css-vars-live-controls",
-      "target": "veins/design-system-and-reference-sheets",
+      "source": "techniques/css-vars-live-controls",
+      "target": "threads/design-system-and-reference-sheets",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/d3-force-simulation",
-      "target": "veins/networks-and-graphs",
+      "source": "techniques/d3-force-simulation",
+      "target": "threads/networks-and-graphs",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/d3-force-simulation",
+      "source": "techniques/d3-force-simulation",
       "target": "sources/graph-theory-algorithms",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/dom-over-canvas-rendering",
-      "target": "veins/ascii-and-text-rendering",
+      "source": "techniques/dom-over-canvas-rendering",
+      "target": "threads/ascii-and-text-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/dom-over-canvas-rendering",
-      "target": "veins/generative-typography-and-text",
+      "source": "techniques/dom-over-canvas-rendering",
+      "target": "threads/generative-typography-and-text",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/drag-reorder-collision-packing",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "techniques/drag-reorder-collision-packing",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/glyph-density-ramp",
-      "target": "veins/ascii-and-text-rendering",
+      "source": "techniques/glyph-density-ramp",
+      "target": "threads/ascii-and-text-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/imagedata-double-buffer",
-      "target": "veins/cellular-automata-and-pattern-formation",
+      "source": "techniques/imagedata-double-buffer",
+      "target": "threads/cellular-automata-and-pattern-formation",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/imagedata-double-buffer",
-      "target": "veins/emergence-from-local-rules",
+      "source": "techniques/imagedata-double-buffer",
+      "target": "threads/emergence-from-local-rules",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/offscreen-canvas-downsample",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "techniques/offscreen-canvas-downsample",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/parametric-lissajous-orbits",
-      "target": "veins/physics-simulation",
+      "source": "techniques/parametric-lissajous-orbits",
+      "target": "threads/physics-simulation",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/per-cell-threshold-crystallization",
-      "target": "veins/ascii-and-text-rendering",
+      "source": "techniques/per-cell-threshold-crystallization",
+      "target": "threads/ascii-and-text-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/perlin-fbm-displacement",
-      "target": "veins/stochastic-and-noise",
+      "source": "techniques/perlin-fbm-displacement",
+      "target": "threads/stochastic-and-noise",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/perlin-fbm-displacement",
+      "source": "techniques/perlin-fbm-displacement",
       "target": "sources/perlin-noise",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/proximity-link-drawing",
-      "target": "veins/networks-and-graphs",
+      "source": "techniques/proximity-link-drawing",
+      "target": "threads/networks-and-graphs",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/proximity-link-drawing",
-      "target": "veins/agents-and-particle-systems",
+      "source": "techniques/proximity-link-drawing",
+      "target": "threads/agents-and-particle-systems",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/scripted-await-timeline",
-      "target": "veins/design-system-and-reference-sheets",
+      "source": "techniques/scripted-await-timeline",
+      "target": "threads/design-system-and-reference-sheets",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/summed-sines-pseudo-noise",
-      "target": "veins/stochastic-and-noise",
+      "source": "techniques/summed-sines-pseudo-noise",
+      "target": "threads/stochastic-and-noise",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/toroidal-wrapping",
-      "target": "veins/agents-and-particle-systems",
+      "source": "techniques/toroidal-wrapping",
+      "target": "threads/agents-and-particle-systems",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "moves/typewriter-jitter-output",
-      "target": "veins/ascii-and-text-rendering",
+      "source": "techniques/typewriter-jitter-output",
+      "target": "threads/ascii-and-text-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/audio-reactive-without-gimmick",
-      "target": "veins/audio-reactivity",
+      "source": "themes/audio-reactive-without-gimmick",
+      "target": "threads/audio-reactivity",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/iteration-vs-original-rules",
-      "target": "veins/cellular-automata-and-pattern-formation",
+      "source": "themes/iteration-vs-original-rules",
+      "target": "threads/cellular-automata-and-pattern-formation",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/iteration-vs-original-rules",
-      "target": "veins/emergence-from-local-rules",
+      "source": "themes/iteration-vs-original-rules",
+      "target": "threads/emergence-from-local-rules",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/randomness-feeling-intentional",
-      "target": "veins/stochastic-and-noise",
+      "source": "themes/randomness-feeling-intentional",
+      "target": "threads/stochastic-and-noise",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/searching-vs-mapping",
-      "target": "veins/design-system-and-reference-sheets",
+      "source": "themes/searching-vs-mapping",
+      "target": "threads/design-system-and-reference-sheets",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/showing-mechanism-vs-polish",
-      "target": "veins/design-system-and-reference-sheets",
+      "source": "themes/showing-mechanism-vs-polish",
+      "target": "threads/design-system-and-reference-sheets",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "tensions/showing-mechanism-vs-polish",
-      "target": "moves/backdrop-filter-svg-distort",
-      "kind": "link",
-      "weight": 1
-    },
-    {
-      "source": "seeds/computed-not-curated-thumbnails",
-      "target": "veins/ascii-and-text-rendering",
+      "source": "themes/showing-mechanism-vs-polish",
+      "target": "techniques/backdrop-filter-svg-distort",
       "kind": "link",
       "weight": 1
     },
     {
       "source": "seeds/computed-not-curated-thumbnails",
-      "target": "veins/design-system-and-reference-sheets",
+      "target": "threads/ascii-and-text-rendering",
       "kind": "link",
       "weight": 1
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "veins/emergence-from-local-rules",
+      "source": "seeds/computed-not-curated-thumbnails",
+      "target": "threads/design-system-and-reference-sheets",
+      "kind": "link",
+      "weight": 1
+    },
+    {
+      "source": "threads/agents-and-particle-systems",
+      "target": "threads/emergence-from-local-rules",
       "kind": "co",
       "weight": 9
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "veins/generative-typography-and-text",
+      "source": "threads/agents-and-particle-systems",
+      "target": "threads/generative-typography-and-text",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "veins/networks-and-graphs",
+      "source": "threads/agents-and-particle-systems",
+      "target": "threads/networks-and-graphs",
       "kind": "co",
       "weight": 7
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "veins/physics-simulation",
+      "source": "threads/agents-and-particle-systems",
+      "target": "threads/physics-simulation",
       "kind": "co",
       "weight": 5
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "veins/stochastic-and-noise",
+      "source": "threads/agents-and-particle-systems",
+      "target": "threads/stochastic-and-noise",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "moves/proximity-link-drawing",
+      "source": "threads/agents-and-particle-systems",
+      "target": "techniques/proximity-link-drawing",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "moves/toroidal-wrapping",
+      "source": "threads/agents-and-particle-systems",
+      "target": "techniques/toroidal-wrapping",
       "kind": "co",
       "weight": 8
     },
     {
-      "source": "veins/agents-and-particle-systems",
-      "target": "tensions/randomness-feeling-intentional",
+      "source": "threads/agents-and-particle-systems",
+      "target": "themes/randomness-feeling-intentional",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/agents-and-particle-systems",
+      "source": "threads/agents-and-particle-systems",
       "target": "sources/brownian-markov",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/agents-and-particle-systems",
+      "source": "threads/agents-and-particle-systems",
       "target": "sources/graph-theory-algorithms",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/agents-and-particle-systems",
+      "source": "threads/agents-and-particle-systems",
       "target": "sources/vicsek-flocking",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "moves/backdrop-filter-svg-distort",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "techniques/backdrop-filter-svg-distort",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "moves/dom-over-canvas-rendering",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "techniques/dom-over-canvas-rendering",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "moves/glyph-density-ramp",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "techniques/glyph-density-ramp",
       "kind": "co",
       "weight": 6
     },
     {
-      "source": "veins/ascii-and-text-rendering",
-      "target": "moves/per-cell-threshold-crystallization",
+      "source": "threads/ascii-and-text-rendering",
+      "target": "techniques/per-cell-threshold-crystallization",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/audio-reactivity",
-      "target": "veins/networks-and-graphs",
+      "source": "threads/audio-reactivity",
+      "target": "threads/networks-and-graphs",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/audio-reactivity",
-      "target": "tensions/audio-reactive-without-gimmick",
+      "source": "threads/audio-reactivity",
+      "target": "themes/audio-reactive-without-gimmick",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
-      "target": "veins/emergence-from-local-rules",
+      "source": "threads/cellular-automata-and-pattern-formation",
+      "target": "threads/emergence-from-local-rules",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "threads/cellular-automata-and-pattern-formation",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
-      "target": "veins/stochastic-and-noise",
+      "source": "threads/cellular-automata-and-pattern-formation",
+      "target": "threads/stochastic-and-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/cellular-automata-and-pattern-formation",
-      "target": "moves/imagedata-double-buffer",
+      "source": "threads/cellular-automata-and-pattern-formation",
+      "target": "techniques/imagedata-double-buffer",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "veins/language-and-nlp-interpretability",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "threads/language-and-nlp-interpretability",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "moves/css-vars-live-controls",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "techniques/css-vars-live-controls",
       "kind": "co",
       "weight": 5
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "tensions/desktop-only-vs-responsive",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "themes/desktop-only-vs-responsive",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
-      "target": "tensions/searching-vs-mapping",
+      "source": "threads/design-system-and-reference-sheets",
+      "target": "themes/searching-vs-mapping",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/design-system-and-reference-sheets",
+      "source": "threads/design-system-and-reference-sheets",
       "target": "sources/bauhaus-early-computer-graphics",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "threads/emergence-from-local-rules",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "veins/networks-and-graphs",
+      "source": "threads/emergence-from-local-rules",
+      "target": "threads/networks-and-graphs",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "veins/physics-simulation",
+      "source": "threads/emergence-from-local-rules",
+      "target": "threads/physics-simulation",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "veins/stochastic-and-noise",
+      "source": "threads/emergence-from-local-rules",
+      "target": "threads/stochastic-and-noise",
       "kind": "co",
       "weight": 5
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "moves/imagedata-double-buffer",
+      "source": "threads/emergence-from-local-rules",
+      "target": "techniques/imagedata-double-buffer",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "moves/toroidal-wrapping",
+      "source": "threads/emergence-from-local-rules",
+      "target": "techniques/toroidal-wrapping",
       "kind": "co",
       "weight": 7
     },
     {
-      "source": "veins/emergence-from-local-rules",
-      "target": "tensions/randomness-feeling-intentional",
+      "source": "threads/emergence-from-local-rules",
+      "target": "themes/randomness-feeling-intentional",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/emergence-from-local-rules",
+      "source": "threads/emergence-from-local-rules",
       "target": "sources/brownian-markov",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/emergence-from-local-rules",
+      "source": "threads/emergence-from-local-rules",
       "target": "sources/vicsek-flocking",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/generative-typography-and-text",
-      "target": "veins/grids-as-compositional-frame",
+      "source": "threads/generative-typography-and-text",
+      "target": "threads/grids-as-compositional-frame",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/generative-typography-and-text",
-      "target": "veins/stochastic-and-noise",
+      "source": "threads/generative-typography-and-text",
+      "target": "threads/stochastic-and-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/generative-typography-and-text",
+      "source": "threads/generative-typography-and-text",
       "target": "sources/brownian-markov",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "veins/physics-simulation",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "threads/physics-simulation",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "veins/stochastic-and-noise",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "threads/stochastic-and-noise",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/css-vars-live-controls",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/css-vars-live-controls",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/dom-over-canvas-rendering",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/dom-over-canvas-rendering",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/glyph-density-ramp",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/glyph-density-ramp",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/offscreen-canvas-downsample",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/offscreen-canvas-downsample",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/parametric-lissajous-orbits",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/parametric-lissajous-orbits",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "moves/perlin-fbm-displacement",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "techniques/perlin-fbm-displacement",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "tensions/iteration-vs-original-rules",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "themes/iteration-vs-original-rules",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
-      "target": "tensions/randomness-feeling-intentional",
+      "source": "threads/grids-as-compositional-frame",
+      "target": "themes/randomness-feeling-intentional",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/grids-as-compositional-frame",
+      "source": "threads/grids-as-compositional-frame",
       "target": "sources/perlin-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/language-and-nlp-interpretability",
-      "target": "tensions/desktop-only-vs-responsive",
+      "source": "threads/language-and-nlp-interpretability",
+      "target": "themes/desktop-only-vs-responsive",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "veins/physics-simulation",
+      "source": "threads/networks-and-graphs",
+      "target": "threads/physics-simulation",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "veins/stochastic-and-noise",
+      "source": "threads/networks-and-graphs",
+      "target": "threads/stochastic-and-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "moves/d3-force-simulation",
+      "source": "threads/networks-and-graphs",
+      "target": "techniques/d3-force-simulation",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "moves/proximity-link-drawing",
+      "source": "threads/networks-and-graphs",
+      "target": "techniques/proximity-link-drawing",
       "kind": "co",
       "weight": 5
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "moves/toroidal-wrapping",
+      "source": "threads/networks-and-graphs",
+      "target": "techniques/toroidal-wrapping",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/networks-and-graphs",
-      "target": "tensions/audio-reactive-without-gimmick",
+      "source": "threads/networks-and-graphs",
+      "target": "themes/audio-reactive-without-gimmick",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/networks-and-graphs",
+      "source": "threads/networks-and-graphs",
       "target": "sources/graph-theory-algorithms",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/networks-and-graphs",
+      "source": "threads/networks-and-graphs",
       "target": "sources/vicsek-flocking",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/physics-simulation",
+      "source": "threads/physics-simulation",
       "target": "sources/graph-theory-algorithms",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/imagedata-double-buffer",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/imagedata-double-buffer",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/offscreen-canvas-downsample",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/offscreen-canvas-downsample",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/perlin-fbm-displacement",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/perlin-fbm-displacement",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/proximity-link-drawing",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/proximity-link-drawing",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "moves/toroidal-wrapping",
+      "source": "threads/stochastic-and-noise",
+      "target": "techniques/toroidal-wrapping",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/stochastic-and-noise",
-      "target": "tensions/randomness-feeling-intentional",
+      "source": "threads/stochastic-and-noise",
+      "target": "themes/randomness-feeling-intentional",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "veins/stochastic-and-noise",
+      "source": "threads/stochastic-and-noise",
       "target": "sources/brownian-markov",
       "kind": "co",
       "weight": 4
     },
     {
-      "source": "veins/stochastic-and-noise",
+      "source": "threads/stochastic-and-noise",
       "target": "sources/perlin-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/backdrop-filter-svg-distort",
-      "target": "moves/glyph-density-ramp",
+      "source": "techniques/backdrop-filter-svg-distort",
+      "target": "techniques/glyph-density-ramp",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/css-vars-live-controls",
-      "target": "moves/dom-over-canvas-rendering",
+      "source": "techniques/css-vars-live-controls",
+      "target": "techniques/dom-over-canvas-rendering",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/dom-over-canvas-rendering",
-      "target": "moves/glyph-density-ramp",
+      "source": "techniques/dom-over-canvas-rendering",
+      "target": "techniques/glyph-density-ramp",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/dom-over-canvas-rendering",
-      "target": "moves/per-cell-threshold-crystallization",
+      "source": "techniques/dom-over-canvas-rendering",
+      "target": "techniques/per-cell-threshold-crystallization",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/offscreen-canvas-downsample",
-      "target": "moves/perlin-fbm-displacement",
+      "source": "techniques/offscreen-canvas-downsample",
+      "target": "techniques/perlin-fbm-displacement",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/offscreen-canvas-downsample",
+      "source": "techniques/offscreen-canvas-downsample",
       "target": "sources/perlin-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/perlin-fbm-displacement",
+      "source": "techniques/perlin-fbm-displacement",
       "target": "sources/perlin-noise",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/proximity-link-drawing",
-      "target": "moves/toroidal-wrapping",
+      "source": "techniques/proximity-link-drawing",
+      "target": "techniques/toroidal-wrapping",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/toroidal-wrapping",
-      "target": "tensions/randomness-feeling-intentional",
+      "source": "techniques/toroidal-wrapping",
+      "target": "themes/randomness-feeling-intentional",
       "kind": "co",
       "weight": 2
     },
     {
-      "source": "moves/toroidal-wrapping",
+      "source": "techniques/toroidal-wrapping",
       "target": "sources/brownian-markov",
       "kind": "co",
       "weight": 3
     },
     {
-      "source": "moves/toroidal-wrapping",
+      "source": "techniques/toroidal-wrapping",
       "target": "sources/vicsek-flocking",
       "kind": "co",
       "weight": 2

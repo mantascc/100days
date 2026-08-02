@@ -16,4 +16,4 @@ Alan Turing's 1952 insight that two diffusing, reacting chemicals can break symm
 - [52-reaction-diffusion](../../52-reaction-diffusion/) — Gray-Scott feed/kill parameters explored as a pattern space.
 
 # Charge
-Medium — one sketch deep but the parameter space is vast and only sampled. A natural revival source for the pattern-formation vein.
+Medium — one sketch deep but the parameter space is vast and only sampled. A natural revival source for the pattern-formation thread.

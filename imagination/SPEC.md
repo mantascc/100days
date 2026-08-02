@@ -64,7 +64,7 @@ archive; a practice that only exhales repeats itself. Imagination does both.
 
 - **Exhale (spark).** Before a sketch, the layer is read as a whole and
   proposes what to make next — by colliding distant entities, reviving a
-  charged dormant Seed, or attacking an open Tension with a new Move.
+  charged dormant Seed, or attacking an open Theme with a new Technique.
   Forward-looking.
 
 ```
@@ -88,9 +88,9 @@ root. It is **not** duplicated per sketch.
 │   ├── index.md             # progressive-disclosure listing (see §8)
 │   ├── log.md               # optional chronological history
 │   ├── seeds/
-│   ├── veins/
-│   ├── moves/
-│   ├── tensions/
+│   ├── threads/
+│   ├── techniques/
+│   ├── themes/
 │   ├── sources/
 │   └── collisions/
 ├── 01-entropy/
@@ -100,8 +100,8 @@ root. It is **not** duplicated per sketch.
 ```
 
 Each entity is one markdown file. Its **Entity ID** is its path within
-`imagination/` minus the `.md` suffix — e.g. `veins/emergence.md` has ID
-`veins/emergence`.
+`imagination/` minus the `.md` suffix — e.g. `threads/emergence.md` has ID
+`threads/emergence`.
 
 ---
 
@@ -114,9 +114,9 @@ it does not belong in the layer.
 | Type | Folder | Answers | Lifecycle |
 |------|--------|---------|-----------|
 | **Seed** | `seeds/` | "I want to make X" (not yet made) | consumed when it spawns a sketch |
-| **Vein** | `veins/` | "I keep returning to X" (cross-sketch theme) | never closes; waxes and wanes |
-| **Move** | `moves/` | "I now know how to do X" (owned technique) | accrues; reused, refined |
-| **Tension** | `tensions/` | "How do I X?" (unresolved question) | **never** closes — generative by design |
+| **Thread** | `threads/` | "I keep returning to X" (cross-sketch theme) | never closes; waxes and wanes |
+| **Technique** | `techniques/` | "I now know how to do X" (owned technique) | accrues; reused, refined |
+| **Theme** | `themes/` | "How do I X?" (unresolved question) | **never** closes — generative by design |
 | **Source** | `sources/` | "X feeds my work" (external influence) | persistent reference |
 | **Collision** | `collisions/` | "What if X met Y?" (proposed pairing) | ages until acted on (see §7) |
 
@@ -126,10 +126,10 @@ it does not belong in the layer.
   Seed is the presence of an itch. Seeds are the only type meant to be
   consumed — when a Seed becomes a sketch, mark it `spent` and record the
   sketch in `spawned`.
-- A **Vein** is recognised, not declared. You do not start a Vein; you
+- A **Thread** is recognised, not declared. You do not start a Thread; you
   notice that three sketches were secretly the same sketch.
-- A **Tension** that you answer is no longer a Tension — but resist the
-  urge to answer. A practice with no open Tensions has stopped asking
+- A **Theme** that you answer is no longer a Theme — but resist the
+  urge to answer. A practice with no open Themes has stopped asking
   questions. Down-state them to `dormant`, never `spent`.
 - A **Collision** is the engine. It is the only type the exhale (§6)
   actively manufactures.
@@ -145,13 +145,13 @@ markdown body.
 
 ```yaml
 ---
-id: veins/emergence              # REQUIRED — the entity ID
-type: vein                       # REQUIRED — seed | vein | move | tension | source | collision
+id: threads/emergence              # REQUIRED — the entity ID
+type: thread                       # REQUIRED — seed | thread | technique | theme | source | collision
 title: Emergence from simple rules
 state: active                    # dormant | active | spent  (see §6)
 charge: high                     # how alive it feels right now: low | medium | high
 spawned: [01-entropy, 11-brownian-tree, 18-cellular-automaton]
-feeds: [moves/non-linear-mapping, tensions/order-vs-chaos]
+feeds: [techniques/non-linear-mapping, themes/order-vs-chaos]
 sources: [sources/vicsek-model]
 date: 2026-06-14                 # first captured
 tags: [chaos, agents, generative]
@@ -197,7 +197,7 @@ ever finished; it composts.
   high-`charge` entity is a prime exhale candidate — the thing you have
   been avoiding.
 - **`spent`** — consumed (Seeds) or fully worked through for now. **Spent
-  is reversible.** A spent Vein can go dormant and return; a spent Seed
+  is reversible.** A spent Thread can go dormant and return; a spent Seed
   can re-seed a variant.
 
 ```
@@ -228,7 +228,7 @@ Run after a sketch, or in a weekly pass.
    entity or **strengthen** an existing one (append to `Trace`, raise
    `charge`, add the sketch to `spawned`).
 3. Promote nothing prematurely. A signal seen once is a note; a signal
-   seen twice is a Vein.
+   seen twice is a Thread.
 
 ### 7.2 Exhale — `/spark`
 
@@ -238,8 +238,8 @@ Run before a sketch, when you want the layer to propose work.
 2. Generate **four** sketch prompts, one per strategy:
    - **Collide** — pair two high-`charge` entities from distant folders.
    - **Revive** — surface a `dormant` entity whose `charge` is still high.
-   - **Press** — attack an open `tension` with a recently acquired `move`.
-   - **Break** — deliberately *violate* the highest-`charge` Vein. Name
+   - **Press** — attack an open `theme` with a recently acquired `technique`.
+   - **Break** — deliberately *violate* the highest-`charge` Thread. Name
      the maker's strongest default and propose its opposite. This is the
      anti-echo strategy: a layer that only feeds your obsessions is an
      echo chamber, so `/spark` must also know how to push you off your own
@@ -261,7 +261,7 @@ id: collisions/network-x-typography
 type: collision
 state: dormant
 charge: high            # raised each time it is dodged
-pair: [veins/networks, 23-interactive-typography]
+pair: [threads/networks, 23-interactive-typography]
 proposed: [2026-05-02, 2026-05-20, 2026-06-11]
 ---
 ```
@@ -354,11 +354,11 @@ conventions; major bumps may rename required keys or types.
 ├── index.md
 ├── seeds/
 │   └── self-portrait-from-backlog.md
-├── veins/
+├── threads/
 │   └── emergence.md
-├── moves/
+├── techniques/
 │   └── non-linear-mapping.md
-├── tensions/
+├── themes/
 │   └── audio-reactive-without-gimmick.md
 ├── sources/
 │   └── vicsek-model.md
@@ -366,17 +366,17 @@ conventions; major bumps may rename required keys or types.
     └── network-x-typography.md
 ```
 
-`veins/emergence.md`:
+`threads/emergence.md`:
 
 ```markdown
 ---
-id: veins/emergence
-type: vein
+id: threads/emergence
+type: thread
 title: Emergence from simple rules
 state: active
 charge: high
 spawned: [01-entropy, 11-brownian-tree, 18-cellular-automaton]
-feeds: [moves/non-linear-mapping]
+feeds: [techniques/non-linear-mapping]
 sources: [sources/vicsek-model]
 date: 2026-06-14
 tags: [chaos, agents, generative]
@@ -402,12 +402,12 @@ sound or typography yet — see [the collision](../collisions/network-x-typograp
   for a minute.
 ```
 
-`tensions/audio-reactive-without-gimmick.md`:
+`themes/audio-reactive-without-gimmick.md`:
 
 ```markdown
 ---
-id: tensions/audio-reactive-without-gimmick
-type: tension
+id: themes/audio-reactive-without-gimmick
+type: theme
 title: Audio-reactive without the gimmick
 state: dormant
 charge: medium

@@ -19,4 +19,4 @@ The mathematics of memoryless motion. A Markov process depends only on its curre
 - [12-wind-field](../../12-wind-field/) — fBm extending the same lineage into fields.
 
 # Charge
-A high-charge, deep-running source under the entire stochastic vein. Foundational and frequently drawn from.
+A high-charge, deep-running source under the entire stochastic thread. Foundational and frequently drawn from.

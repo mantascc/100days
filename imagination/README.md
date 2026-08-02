@@ -12,9 +12,9 @@ imagination/
 ├── index.md       at-a-glance listing of every entity, by charge
 ├── log.md         chronological history of the layer
 ├── rituals/       the /spark and /inhale prompts
-├── veins/         what you keep making (11)
-├── moves/         techniques you own (13)
-├── tensions/      questions you keep asking (6)
+├── threads/         what you keep making (11)
+├── techniques/         techniques you own (13)
+├── themes/      questions you keep asking (6)
 ├── sources/       what feeds the work (9)
 ├── seeds/         dormant ideas (5)
 └── collisions/    proposed pairings (grows via /spark)
@@ -24,7 +24,7 @@ Seeded 2026-06-14 by a retroactive harvest of the existing sketchbook.
 
 ## The daily loop
 
-A breathing cycle. Two moves, both lightweight.
+A breathing cycle. Two steps, both lightweight.
 
 - **Morning — `/spark` (exhale).** Before you sketch, run it. It reads the
   whole layer and proposes four prompts: **Collide** two distant
@@ -34,7 +34,7 @@ A breathing cycle. Two moves, both lightweight.
 - **Make the sketch.** Write its `interface.md` as usual. The layer stays
   out of the way.
 - **Evening — `/inhale` (harvest).** Run it on the new sketch. It proposes
-  small diffs: a new technique, a vein gaining a member, a charge ticking
+  small diffs: a new technique, a thread gaining a member, a charge ticking
   up. Approve and it updates the files.
 - **Weekly — skim `index.md`.** See the shape of the field. Notice what's
   gone quiet, what keeps resurfacing unmade.
@@ -57,5 +57,5 @@ it manually.
 ## The one rule worth remembering
 
 Nothing here closes. Entities go **dormant** and **revive**; they never
-get deleted. Tensions are kept open on purpose. The shape of what you
+get deleted. Themes are kept open on purpose. The shape of what you
 abandoned is information too.

@@ -18,4 +18,4 @@ A visual and intellectual lineage rather than a single work: the Bauhaus's reduc
 - [46-oklch-vs-hsl](../../46-oklch-vs-hsl/) — colour as a rigorous, systematic concern.
 
 # Charge
-A grounding, mid-charge influence behind the reference-sheet vein — more a worldview than a technique, and increasingly load-bearing.
+A grounding, mid-charge influence behind the reference-sheet thread — more a worldview than a technique, and increasingly load-bearing.

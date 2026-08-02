@@ -108,6 +108,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8833", "--directory", "90-aida001"],
       "port": 8833
+    },
+    {
+      "name": "imagination-snapshots",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8840", "--directory", "/Users/mantas/Desktop/min7is/100days/imagination/snapshots"],
+      "port": 8840
     }
   ]
 }

@@ -19,8 +19,8 @@ import os, re, json, datetime, itertools
 HERE = os.path.dirname(os.path.abspath(__file__))
 IMAG = os.path.dirname(HERE)                       # .../imagination
 ROOT = os.path.dirname(IMAG)                       # .../100days
-TYPES = ["veins", "moves", "tensions", "sources", "seeds", "collisions"]
-TYPE_ORDER = {"vein": 0, "move": 1, "tension": 2, "source": 3, "seed": 4, "collision": 5}
+TYPES = ["threads", "techniques", "themes", "sources", "seeds", "collisions"]
+TYPE_ORDER = {"thread": 0, "technique": 1, "theme": 2, "source": 3, "seed": 4, "collision": 5}
 
 def parse_fm(text):
     m = re.match(r"^---\n(.*?)\n---", text, re.S)
@@ -113,7 +113,7 @@ def build_timeline(nodes):
     third = int(len(axis_ids) * 2 / 3)
     btarget, bmax = None, -1
     for r in rows:
-        if r["type"] != "vein": continue
+        if r["type"] != "thread": continue
         recent = sum(1 for c in r["cols"] if c >= third)
         if recent > bmax: bmax, btarget = recent, r["id"]
     meta = {"date": datetime.date.today().isoformat(), "sketches": len(axis_ids),
@@ -146,7 +146,7 @@ TIMELINE = r"""<!DOCTYPE html>
     --void:#0a0a0a;--base:#0f0f0f;--raised:#141414;--surface:#1a1a1a;
     --text:#f5f5f7;--t2:#a8aab8;--t3:#666;--ghost:#262626;
     --b-sub:#1a1a1a;--b-def:#2a2a2a;--b-strong:#3a3d52;
-    --vein:#00ffaa;--move:#00a8ff;--tension:#ff0066;--source:#ffaa00;--seed:#00ff88;--collision:#ff0000;
+    --thread:#00ffaa;--technique:#00a8ff;--theme:#ff0066;--source:#ffaa00;--seed:#00ff88;--collision:#ff0000;
     --mono:'JetBrains Mono','IBM Plex Mono','SF Mono',Monaco,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -197,17 +197,17 @@ TIMELINE = r"""<!DOCTYPE html>
 <div id="tip"></div>
 <script>
 const D=__TLDATA__;
-const COLOR={vein:'#00ffaa',move:'#00a8ff',tension:'#ff0066',source:'#ffaa00',seed:'#00ff88',collision:'#ff0000'};
-const NAME={vein:'veins',move:'moves',tension:'tensions',source:'sources',seed:'seeds',collision:'collisions'};
+const COLOR={thread:'#00ffaa',technique:'#00a8ff',theme:'#ff0066',source:'#ffaa00',seed:'#00ff88',collision:'#ff0000'};
+const NAME={thread:'threads',technique:'techniques',theme:'themes',source:'sources',seed:'seeds',collision:'collisions'};
 const CH={high:1,medium:.7,low:.45}, ST={active:1,dormant:.5,spent:.3};
 const cw=11, rh=15, padL=210, padT=34;
-let active={vein:1,move:1,tension:1,source:1,seed:1,collision:1};
+let active={thread:1,technique:1,theme:1,source:1,seed:1,collision:1};
 let sortMode='type', showBreak=true;
 document.getElementById('hmeta').textContent=D.meta.date+'  ·  '+D.meta.entities+' entities across '+D.meta.sketches+' sketches';
 
 // filter buttons
 const fdiv=document.getElementById('filters');
-['vein','move','tension','source','seed','collision'].forEach(t=>{
+['thread','technique','theme','source','seed','collision'].forEach(t=>{
   const b=document.createElement('button');b.textContent=NAME[t];b.dataset.t=t;b.classList.add('act');
   b.style.borderColor=COLOR[t];b.onclick=()=>{active[t]=!active[t];b.classList.toggle('off',!active[t]);render();};
   fdiv.appendChild(b);

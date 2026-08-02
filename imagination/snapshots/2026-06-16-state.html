@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>imagination · state · 2026-06-16</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0a0a0a; --base:#0f0f0f; --raised:#141414; --surface:#1a1a1a; --modal:#242424;
+  --text:#f5f5f7; --t1:#ffffff; --t2:#a8aab8; --t3:#666666; --ghost:#262626;
+  --b-sub:#1a1a1a; --b-def:#2a2a2a; --b-strong:#3a3d52;
+  --thread:#00ffaa; --technique:#00a8ff; --theme:#ff0066; --source:#ffaa00; --seed:#00ff88; --collision:#ff0000;
+  --accent:#00ffaa;
+  --mono:'JetBrains Mono','IBM Plex Mono','SF Mono',Monaco,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.55;padding-bottom:80px}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:5;background:var(--void);border-bottom:1px solid var(--b-sub);
+  display:flex;justify-content:space-between;align-items:baseline;padding:18px 28px}
+header .title{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--t1)}
+header .title .sep{color:var(--t3);margin:0 8px}
+header .meta{font-size:10px;color:var(--t3);letter-spacing:.04em}
+
+/* ── COUNTS STRIP ── */
+.strip{display:grid;grid-template-columns:repeat(6,1fr);border-bottom:1px solid var(--b-sub)}
+.strip .c{padding:14px 22px;border-right:1px solid var(--b-sub);display:flex;flex-direction:column;gap:4px}
+.strip .c:last-child{border-right:none}
+.strip .c .n{font-size:22px;font-weight:500;color:var(--t1);letter-spacing:-.02em}
+.strip .c .l{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--t3)}
+.strip .c .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* ── SECTIONS ── */
+section{padding:28px;border-bottom:1px solid var(--b-sub)}
+section .h{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+section .h .num{font-size:10px;color:var(--t3);letter-spacing:.18em}
+section .h .name{font-size:14px;color:var(--t1);letter-spacing:-.01em}
+section .h .sub{font-size:10px;color:var(--t3);letter-spacing:.04em;margin-left:auto}
+
+/* ── 1. PATTERNS ── */
+.patterns{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pat{border:1px solid var(--b-def);background:var(--base);padding:18px 20px}
+.pat .tag{font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:10px}
+.pat .ttl{font-size:15px;color:var(--t1);margin-bottom:10px;line-height:1.3}
+.pat .body{font-size:12px;color:var(--t2);line-height:1.65}
+.pat .body em{color:var(--text);font-style:normal}
+.pat .body .ref{color:var(--t3)}
+.pat .foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--b-def);font-size:10px;color:var(--t3);letter-spacing:.06em}
+
+/* ── 2. HOT ZONES (bars) ── */
+.bars{display:flex;flex-direction:column;gap:6px;font-size:11px}
+.bar{display:grid;grid-template-columns:240px 1fr 36px;gap:14px;align-items:center;padding:6px 0}
+.bar .nm{color:var(--t1);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .nm .ch{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:8px;vertical-align:middle;background:var(--thread)}
+.bar .track{background:var(--ghost);height:14px;position:relative}
+.bar .track .fill{position:absolute;top:0;left:0;height:100%;background:var(--thread);opacity:.85}
+.bar .track .ticks{position:absolute;inset:0;display:flex;gap:0}
+.bar .track .ticks span{flex:1;border-right:1px solid rgba(10,10,10,.6)}
+.bar .track .ticks span:last-child{border-right:none}
+.bar .n{font-size:12px;color:var(--t2);text-align:right}
+.bars .feeds{grid-column:1/-1;display:flex;gap:8px;font-size:10px;color:var(--t3);letter-spacing:.04em;
+  padding:2px 0 14px 254px;border-bottom:1px solid var(--b-sub);margin-bottom:6px}
+.bars .feeds .f{padding:2px 8px;border:1px solid var(--b-def);color:var(--t3)}
+.bars .feeds .f.tech{border-color:rgba(0,168,255,.35);color:#7fb8d6}
+.bars .feeds .f.tns{border-color:rgba(255,0,102,.35);color:#d67f9a}
+
+/* ── 3. PRESSURE (themes) ── */
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid var(--b-def)}
+.th{padding:16px 20px;border-bottom:1px solid var(--b-def);border-right:1px solid var(--b-def)}
+.th:nth-child(2n){border-right:none}
+.th:nth-last-child(-n+2){border-bottom:none}
+.th .top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.th .top .dot{width:8px;height:8px;border-radius:50%;background:var(--theme)}
+.th .top .dot.med{opacity:.55}.th .top .dot.lo{opacity:.28}
+.th .top .ttl{color:var(--t1);font-size:13px}
+.th .top .charge{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--t3);margin-left:auto}
+.th .q{font-size:12px;color:var(--t2);line-height:1.6}
+.th .spawned{margin-top:10px;font-size:10px;color:var(--t3);letter-spacing:.04em}
+
+/* ── 4. DODGED ── */
+.dodged{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.box{border:1px solid var(--b-def);padding:18px 20px}
+.box .lbl{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--t3);margin-bottom:14px}
+.box .item{padding:12px 0;border-bottom:1px solid var(--b-sub);display:flex;align-items:baseline;gap:12px}
+.box .item:last-child{border-bottom:none;padding-bottom:0}
+.box .item .dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;align-self:center}
+.box .item .dot.col{background:var(--collision)}
+.box .item .dot.sd{background:var(--seed)}
+.box .item .dot.med{opacity:.55}.box .item .dot.lo{opacity:.28}
+.box .item .nm{color:var(--t1);font-size:12px;flex:0 0 auto}
+.box .item .desc{color:var(--t2);font-size:11px;flex:1}
+.box .item .state{color:var(--t3);font-size:9px;letter-spacing:.14em;text-transform:uppercase}
+
+/* ── 5. FIELD ── */
+.field{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:start}
+.field .col{display:flex;flex-direction:column;gap:8px}
+.field .col .ct{font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--t3)}
+.field .col .ct .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.field .col .ct .n{color:var(--t1);margin-left:6px;font-size:10px}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{width:14px;height:14px;border:1px solid var(--b-sub);position:relative;cursor:pointer}
+.cell.t-thread{background:var(--thread)}
+.cell.t-technique{background:var(--technique)}
+.cell.t-theme{background:var(--theme)}
+.cell.t-source{background:var(--source)}
+.cell.t-seed{background:var(--seed)}
+.cell.t-collision{background:var(--collision)}
+.cell.ch-high{opacity:1}
+.cell.ch-medium{opacity:.55}
+.cell.ch-low{opacity:.28}
+.cell.s-dormant{outline:1px dashed rgba(255,255,255,.25);outline-offset:1px}
+.field .legend{margin-top:14px;font-size:10px;color:var(--t3);display:flex;gap:18px;letter-spacing:.04em}
+.field .legend .lg{display:flex;gap:6px;align-items:center}
+.field .legend .swatch{width:10px;height:10px;background:var(--text);display:inline-block}
+
+/* ── TOOLTIP ── */
+#tip{position:fixed;pointer-events:none;background:rgba(20,20,20,.97);border:1px solid var(--b-strong);
+  padding:8px 12px;font-size:10px;opacity:0;transition:opacity .08s;z-index:9;line-height:1.6;max-width:300px}
+#tip .t{color:var(--t1);margin-bottom:4px;font-size:11px}
+#tip .k{color:var(--t3);font-size:9px;text-transform:uppercase;letter-spacing:.1em}
+
+/* ── FOOTER ── */
+footer{padding:24px 28px;color:var(--t3);font-size:10px;letter-spacing:.06em;display:flex;justify-content:space-between}
+footer a{color:var(--t2);text-decoration:none;border-bottom:1px dotted var(--b-def)}
+footer a:hover{color:var(--accent);border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="title">IMAGINATION<span class="sep">·</span>STATE<span class="sep">·</span>2026-06-16</span>
+  <span class="meta">v0.1 · 52 entities · read across daily-sketch/</span>
+</header>
+
+<!-- ─── COUNTS STRIP ─── -->
+<div class="strip">
+  <div class="c"><span class="l"><span class="dot" style="background:var(--thread)"></span>threads</span><span class="n">12</span></div>
+  <div class="c"><span class="l"><span class="dot" style="background:var(--technique)"></span>techniques</span><span class="n">18</span></div>
+  <div class="c"><span class="l"><span class="dot" style="background:var(--theme)"></span>themes</span><span class="n">6</span></div>
+  <div class="c"><span class="l"><span class="dot" style="background:var(--source)"></span>sources</span><span class="n">9</span></div>
+  <div class="c"><span class="l"><span class="dot" style="background:var(--seed)"></span>seeds</span><span class="n">6</span></div>
+  <div class="c"><span class="l"><span class="dot" style="background:var(--collision)"></span>collisions</span><span class="n">2</span></div>
+</div>
+
+<!-- ─── 1. PATTERNS EMERGING ─── -->
+<section>
+  <div class="h"><span class="num">01</span><span class="name">patterns emerging</span><span class="sub">editorial reads · what the layer is doing right now</span></div>
+
+  <div class="patterns">
+    <div class="pat">
+      <div class="tag">pivot</div>
+      <div class="ttl">The interaction designer arrives, late</div>
+      <div class="body">The strongest thread is <em>design systems &amp; reference sheets</em> with <em>21 sketches</em> — every one in the second half. The early sketchbook was generative experiments; the recent sketchbook is taxonomies, palettes, and named systems. <span class="ref">style-seed, clear-channel, hitl-patterns, agent-streaming-patterns.</span> Day-job instincts have overtaken curiosity-driven play.</div>
+      <div class="foot">watch · this thread crowds out the wilder generative ones</div>
+    </div>
+
+    <div class="pat">
+      <div class="tag">substrate</div>
+      <div class="ttl">A grid runs under everything</div>
+      <div class="body"><em>Grids as compositional frame</em> sits at <em>17 sketches</em> and degree <em>20</em> — the second-densest node in the whole layer. It's almost never the subject. It's the silent stage every other thread performs on: ASCII sheets, particle fields, agent typologies, reference catalogs.</div>
+      <div class="foot">stage · the grid is the unmarked default</div>
+    </div>
+
+    <div class="pat">
+      <div class="tag">questions held open</div>
+      <div class="ttl">Nothing has been answered</div>
+      <div class="body"><em>All six themes are still active.</em> Not a single open question has been retired. The practice is comfortable carrying its tensions; <em>randomness feeling intentional</em> burns highest, but <em>mechanism vs polish</em> and <em>searching vs mapping</em> are the lenses that keep sharpening recent work.</div>
+      <div class="foot">by design · §4 — themes never close</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 2. HOT ZONES ─── -->
+<section>
+  <div class="h"><span class="num">02</span><span class="name">hot zones</span><span class="sub">top threads by sketches spawned · all high-charge</span></div>
+
+  <div class="bars" id="bars"></div>
+</section>
+
+<!-- ─── 3. PRESSURE (themes) ─── -->
+<section>
+  <div class="h"><span class="num">03</span><span class="name">pressure · what the practice keeps asking</span><span class="sub">6 themes · 0 closed · by design</span></div>
+
+  <div class="themes">
+    <div class="th">
+      <div class="top"><span class="dot"></span><span class="ttl">Randomness feeling intentional</span><span class="charge">high</span></div>
+      <div class="q">When does noise read as authorship and when does it read as accident? The highest-charge open question in the layer.</div>
+      <div class="spawned">spawned: 6 sketches</div>
+    </div>
+    <div class="th">
+      <div class="top"><span class="dot med"></span><span class="ttl">Showing mechanism vs polish</span><span class="charge">medium</span></div>
+      <div class="q">Expose the workings or finish the surface. Recent work has drifted toward polish; this is the quieter conscience.</div>
+      <div class="spawned">spawned: 3 sketches · ↑ via scrub + streaming-patterns</div>
+    </div>
+    <div class="th">
+      <div class="top"><span class="dot med"></span><span class="ttl">Searching vs mapping</span><span class="charge">medium</span></div>
+      <div class="q">Sequential variation (search) vs simultaneous display (taxonomy) — different cognitive acts. Reference-sheet sketches live entirely on the mapping side.</div>
+      <div class="spawned">spawned: 4 sketches · ↑ via streaming-patterns</div>
+    </div>
+    <div class="th">
+      <div class="top"><span class="dot med"></span><span class="ttl">Audio-reactive without the gimmick</span><span class="charge">medium</span></div>
+      <div class="q">How does sound drive a visual so it feels inevitable, not decorative? Two attempts so far read as "bars that wiggle to music."</div>
+      <div class="spawned">spawned: 2 sketches · pressing on next audio piece</div>
+    </div>
+    <div class="th">
+      <div class="top"><span class="dot med"></span><span class="ttl">Iteration vs original rules</span><span class="charge">medium</span></div>
+      <div class="q">Tune an existing rule or write a new one. Cellular automata, reaction-diffusion, agent variants — the recurring fork.</div>
+      <div class="spawned">spawned: 3 sketches</div>
+    </div>
+    <div class="th">
+      <div class="top"><span class="dot lo"></span><span class="ttl">Desktop-only vs responsive</span><span class="charge">low</span></div>
+      <div class="q">Most sketches assume a wide canvas. Whether that constraint is a value or an unexamined default keeps surfacing.</div>
+      <div class="spawned">spawned: 6 sketches · quiet but recurring</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 4. DODGED & DORMANT ─── -->
+<section>
+  <div class="h"><span class="num">04</span><span class="name">dodged &amp; dormant</span><span class="sub">collisions on the shelf · seeds collecting interest</span></div>
+
+  <div class="dodged">
+    <div class="box">
+      <div class="lbl">collisions (proposed pairings)</div>
+      <div class="item">
+        <span class="dot col"></span>
+        <span class="nm">vicsek × typography</span>
+        <span class="desc">words as flocking agents — alignment vs legibility</span>
+        <span class="state">made → word-flock</span>
+      </div>
+      <div class="item">
+        <span class="dot col med"></span>
+        <span class="nm">kuramoto × bundled tool calls</span>
+        <span class="desc">parallel calls as phase-locking oscillators</span>
+        <span class="state">dodged 1× · charge climbing</span>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="lbl">seeds (itches, not yet scratched)</div>
+      <div class="item">
+        <span class="dot sd"></span>
+        <span class="nm">ASCII sheet web component</span>
+        <span class="desc">reusable primitive for the ASCII house style</span>
+        <span class="state">dormant · medium</span>
+      </div>
+      <div class="item">
+        <span class="dot sd"></span>
+        <span class="nm">Computed, not curated, thumbnails</span>
+        <span class="desc">each sketch's preview generated, not screenshotted · partly revived in agent-stream-glyphs</span>
+        <span class="state">dormant · medium</span>
+      </div>
+      <div class="item">
+        <span class="dot sd"></span>
+        <span class="nm">Whiff — CLI data-viz tool</span>
+        <span class="desc">terminal-native viz primitive</span>
+        <span class="state">dormant · medium</span>
+      </div>
+      <div class="item">
+        <span class="dot sd lo"></span>
+        <span class="nm">2gif tiered roadmap · 3D rule engine · Lens-wave extensions</span>
+        <span class="desc">three lower-charge ideas, still alive on the shelf</span>
+        <span class="state">dormant · low</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 5. THE FIELD ─── -->
+<section>
+  <div class="h"><span class="num">05</span><span class="name">the field</span><span class="sub">all 52 entities · type=color · charge=opacity · dashed=dormant</span></div>
+
+  <div class="field">
+    <div class="col" id="legend-col"></div>
+    <div>
+      <div class="cells" id="cells"></div>
+      <div class="legend">
+        <div class="lg"><span class="swatch" style="background:var(--text);opacity:1"></span>high</div>
+        <div class="lg"><span class="swatch" style="background:var(--text);opacity:.55"></span>medium</div>
+        <div class="lg"><span class="swatch" style="background:var(--text);opacity:.28"></span>low</div>
+        <div class="lg"><span class="swatch" style="outline:1px dashed rgba(255,255,255,.45);outline-offset:1px;background:transparent;border:1px solid var(--b-def)"></span>dormant</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>imagination · v0.1 · <a href="../SPEC.md">spec</a> · <a href="../index.md">index</a> · <a href="../log.md">log</a> · <a href="latest.html">timeline</a></span>
+  <span>generated 2026-06-16 · Clear Channel</span>
+</footer>
+
+<div id="tip"></div>
+
+<script>
+// ── 2. BARS ──
+const HOT = [
+  {nm:'Design systems & reference sheets', n:21, feeds:[['css-vars-live-controls','tech'],['searching-vs-mapping','tns']]},
+  {nm:'Grids as compositional frame', n:17, feeds:[['offscreen-canvas-downsample','tech'],['glyph-density-ramp','tech']]},
+  {nm:'Agents and particle systems', n:16, feeds:[['toroidal-wrapping','tech'],['proximity-link-drawing','tech']]},
+  {nm:'Networks and graphs', n:15, feeds:[['proximity-link-drawing','tech'],['d3-force-simulation','tech']]},
+  {nm:'Emergence from local rules', n:13, feeds:[['imagedata-double-buffer','tech'],['iteration-vs-original-rules','tns']]},
+  {nm:'Stochastic and noise', n:11, feeds:[['perlin-fbm-displacement','tech'],['summed-sines-pseudo-noise','tech'],['randomness-feeling-intentional','tns']]},
+  {nm:'ASCII and text rendering', n:9, feeds:[['glyph-density-ramp','tech'],['dom-over-canvas-rendering','tech']]},
+  {nm:'Physics simulation', n:9, charge:'med', feeds:[]},
+  {nm:'Generative typography & text', n:7, feeds:[['dom-over-canvas-rendering','tech']]},
+  {nm:'Audio reactivity', n:5, feeds:[['audio-reactive-without-gimmick','tns']]},
+];
+const MAX = 21;
+const bars = document.getElementById('bars');
+HOT.forEach(b=>{
+  const row = document.createElement('div'); row.className='bar';
+  const pct = (b.n/MAX)*100;
+  const opacity = b.charge==='med' ? .5 : .85;
+  row.innerHTML = `
+    <span class="nm"><span class="ch" style="opacity:${opacity}"></span>${b.nm}</span>
+    <span class="track"><span class="fill" style="width:${pct}%;opacity:${opacity}"></span></span>
+    <span class="n">${b.n}</span>`;
+  bars.appendChild(row);
+  if(b.feeds.length){
+    const f = document.createElement('div'); f.className='feeds';
+    f.innerHTML = '<span style="color:var(--t3)">feeds →</span>' + b.feeds.map(([n,k])=>`<span class="f ${k}">${n}</span>`).join('');
+    bars.appendChild(f);
+  }
+});
+
+// ── 5. FIELD ──
+// Each entity: [type, charge, state, title]
+const E = {
+  thread: [
+    ['high','active','Design systems & reference sheets'],
+    ['high','active','Grids as compositional frame'],
+    ['high','active','Agents and particle systems'],
+    ['high','active','Networks and graphs'],
+    ['high','active','Emergence from local rules'],
+    ['high','active','Stochastic and noise'],
+    ['high','active','ASCII and text rendering'],
+    ['high','active','Generative typography & text'],
+    ['high','active','Audio reactivity'],
+    ['medium','active','Physics simulation'],
+    ['medium','active','Cellular automata & pattern formation'],
+    ['medium','active','Language & NLP interpretability'],
+  ],
+  technique:[
+    ['high','active','Proximity link drawing'],
+    ['high','active','Toroidal wrapping'],
+    ['medium','active','Backdrop-filter SVG distort'],
+    ['medium','active','CSS vars as live controls'],
+    ['medium','active','D3 force simulation'],
+    ['medium','active','DOM over canvas rendering'],
+    ['medium','active','Glyph density ramp'],
+    ['medium','active','Offscreen canvas downsample'],
+    ['medium','active','Parametric Lissajous orbits'],
+    ['medium','active','Per-cell threshold crystallization'],
+    ['medium','active','Perlin / fBm displacement'],
+    ['medium','active','Summed sines pseudo-noise'],
+    ['medium','active','Typewriter output with jitter'],
+    ['low','active','Agent-authored Playwright capture'],
+    ['low','active','Drag-reorder with collision packing'],
+    ['low','active','Geodesic great-circle path'],
+    ['low','active','ImageData double buffer'],
+    ['low','active','Scripted await timeline'],
+  ],
+  theme:[
+    ['high','active','Randomness feeling intentional'],
+    ['medium','active','Audio-reactive without the gimmick'],
+    ['medium','active','Iteration vs original rules'],
+    ['medium','active','Searching vs mapping'],
+    ['medium','active','Showing mechanism vs polish'],
+    ['low','active','Desktop-only vs responsive'],
+  ],
+  source:[
+    ['high','active','Brownian motion & Markov processes'],
+    ['high','active','Vicsek flocking & Reynolds boids'],
+    ['medium','active','Bauhaus & early computer graphics'],
+    ['medium','active','Graph theory algorithms'],
+    ['medium','active','Kuramoto oscillators & firefly sync'],
+    ['medium','active','Perlin noise'],
+    ['medium','active','Schelling segregation model'],
+    ['medium','active','Turing patterns & Gray-Scott'],
+    ['low','active','Slit-scan & the 2001 star-gate'],
+  ],
+  seed:[
+    ['medium','dormant','ASCII sheet web component'],
+    ['medium','dormant','Computed, not curated, thumbnails'],
+    ['medium','dormant','Whiff — CLI data-viz tool'],
+    ['low','dormant','2gif tiered roadmap'],
+    ['low','dormant','3D rule engine'],
+    ['low','dormant','Lens-wave extensions'],
+  ],
+  collision:[
+    ['high','active','Vicsek × typography'],
+    ['medium','dormant','Kuramoto × bundled tool calls'],
+  ],
+};
+
+const TYPES = ['thread','technique','theme','source','seed','collision'];
+const cells = document.getElementById('cells');
+const legendCol = document.getElementById('legend-col');
+
+TYPES.forEach(t=>{
+  const all = E[t];
+  // legend item
+  const row = document.createElement('div'); row.className='ct';
+  row.innerHTML = `<span class="dot" style="background:var(--${t})"></span>${t}<span class="n">${all.length}</span>`;
+  legendCol.appendChild(row);
+  // cells
+  all.forEach(([ch,st,ttl])=>{
+    const c = document.createElement('div');
+    c.className=`cell t-${t} ch-${ch} s-${st}`;
+    c.dataset.t=t; c.dataset.ch=ch; c.dataset.st=st; c.dataset.ttl=ttl;
+    cells.appendChild(c);
+  });
+});
+
+// tooltip
+const tip = document.getElementById('tip');
+document.addEventListener('mouseover',e=>{
+  const c = e.target.closest('.cell'); if(!c){tip.style.opacity=0;return}
+  tip.innerHTML = `<div class="t">${c.dataset.ttl}</div><div class="k">${c.dataset.t} · ${c.dataset.ch} · ${c.dataset.st}</div>`;
+  tip.style.opacity=1;
+});
+document.addEventListener('mousemove',e=>{
+  tip.style.left=(e.clientX+14)+'px';
+  tip.style.top=(e.clientY+14)+'px';
+});
+document.addEventListener('mouseleave',()=>tip.style.opacity=0);
+</script>
+</body>
+</html>

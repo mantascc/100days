@@ -17,4 +17,4 @@ Ken Perlin's gradient noise — the procedural texture that defines the look of 
 - [13-image-flow-field](../../13-image-flow-field/) — coherent noise advecting pixels.
 
 # Charge
-Steady, mid-charge — the technical source behind the smooth-noise moves. Understood well enough now to be modified rather than merely called.
+Steady, mid-charge — the technical source behind the smooth-noise techniques. Understood well enough now to be modified rather than merely called.

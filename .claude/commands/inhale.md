@@ -18,14 +18,14 @@ With no argument, harvest the most recently modified sketch folder.
 
 1. Read the sketch's `interface.md`, focusing on the **Notes**,
    **Conceptual Tags**, and **Technical Tags** sections.
-2. For each signal, decide its type (§4): seed, vein, move, tension,
+2. For each signal, decide its type (§4): seed, thread, technique, theme,
    source, collision.
 3. For each, choose one action:
    - **Create** a new entity (only if the signal is genuinely new).
    - **Strengthen** an existing entity: append to its `Trace`, add the
      sketch to `spawned`, and/or raise its `charge`.
 4. Apply the promotion rule: a signal seen **once** is just a note — leave
-   it. A signal seen **twice or more** across sketches earns a Vein.
+   it. A signal seen **twice or more** across sketches earns a Thread.
 5. If this sketch fulfils a pending `collisions/` entity, mark that
    collision `spent`.
 
@@ -37,10 +37,10 @@ Present a diff list grouped by action, then ask for confirmation:
 ## /inhale — {sketch}
 
 ### Create
-- veins/{slug} — {title} · charge: {…}  ({why})
+- threads/{slug} — {title} · charge: {…}  ({why})
 
 ### Strengthen
-- moves/{slug} — +spawned: {sketch}, charge {old}→{new}
+- techniques/{slug} — +spawned: {sketch}, charge {old}→{new}
 
 ### Close
 - collisions/{slug} → spent (fulfilled by {sketch})

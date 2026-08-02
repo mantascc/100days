@@ -11,7 +11,7 @@ proposes.
 
 ## Steps
 
-1. Read every entity under `imagination/` (seeds, veins, moves, tensions,
+1. Read every entity under `imagination/` (seeds, threads, techniques, themes,
    sources, collisions). Pay attention to `state` and `charge` in the
    frontmatter.
 2. Produce one prompt per strategy. For each, **name the source entities**
@@ -23,13 +23,13 @@ proposes.
 ## The four strategies
 
 - **Collide** — pair two high-`charge` entities from *distant* folders
-  (e.g. a Vein × a Source, or two unrelated Veins). The further apart, the
+  (e.g. a Thread × a Source, or two unrelated Threads). The further apart, the
   better the spark.
 - **Revive** — surface a `dormant` entity whose `charge` is still high —
   the thing that has been quietly waiting.
-- **Press** — aim a recently acquired `move` at an open `tension`. Use the
+- **Press** — aim a recently acquired `technique` at an open `theme`. Use the
   new tool on the old unanswered question.
-- **Break** — deliberately **violate** the highest-charge Vein. Name the
+- **Break** — deliberately **violate** the highest-charge Thread. Name the
   maker's strongest default, then propose its opposite ("you always reach
   for emergence — make something fully authored, every pixel placed by
   hand"). This strategy exists so the layer pushes the maker off their own
@@ -46,10 +46,10 @@ proposes.
 **Revive** — {dormant entity}
 > {one-sentence sketch}
 
-**Press** — {move} → {tension}
+**Press** — {technique} → {theme}
 > {one-sentence sketch}
 
-**Break** — against {strongest vein}
+**Break** — against {strongest thread}
 > {one-sentence sketch}
 ```
 

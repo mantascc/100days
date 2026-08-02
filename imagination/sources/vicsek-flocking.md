@@ -18,4 +18,4 @@ The two canonical models of self-organised collective motion. Vicsek (1995) redu
 - [10-audio-reactive-agents](../../10-audio-reactive-agents/) — flocking with sound modulating the rule.
 
 # Charge
-The foundational source for the emergence and agents veins — referenced constantly, still generative. The bedrock the practice keeps returning to.
+The foundational source for the emergence and agents threads — referenced constantly, still generative. The bedrock the practice keeps returning to.
