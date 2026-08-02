@@ -186,6 +186,29 @@
             color: var(--accent);
         }
 
+        footer {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+            align-items: baseline;
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+
+        footer a {
+            color: var(--text-tertiary);
+            text-decoration: none;
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
         .banner-label {
             position: absolute;
             top: 50%;
@@ -215,7 +238,7 @@
                 <div>
                     <h1>Hej</h1>
                     <p class="description">
-                        100 day routine to explore computational aesthetics, data expression, coding concepts. Inspired by <a href="https://www.instagram.com/tiantianxu/" style="color: inherit; text-decoration: underline; text-decoration-color: var(--text-tertiary); opacity: 0.8;">Tiantian Xu</a>
+                        100 day routine to explore computational aesthetics, data expression, coding concepts.
                     </p>
                     <a href="https://github.com/mantascc/100days" class="clone-link">github.com/mantascc/100days</a>
                 </div>
@@ -689,6 +712,11 @@
             </a>
 
         </div>
+
+        <footer>
+            <a href="https://mantas.cc">mantas.cc</a>
+            <span>Inspired by <a href="https://www.instagram.com/tiantianxu/">Tiantian Xu</a></span>
+        </footer>
     </div>
 
 <script>
