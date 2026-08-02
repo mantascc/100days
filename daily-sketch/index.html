@@ -1,127 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select</title>
+    <title>Daily Sketch — 100 Days</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&display=swap">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            /* Copied from style-seed.md — same tokens as ../index.html */
+            --ground-void: #0a0a0a;
+            --ground-base: #0f0f0f;
+            --ground-raised: #141414;
+            --ground-surface: #1a1a1a;
 
-        html, body {
-            height: 100%;
-            background: #0E0E0E;
-            font-family: 'DM Mono', monospace;
-            overflow: hidden;
+            --text-primary: #ffffff;
+            --text-default: #f5f5f7;
+            --text-secondary: #a8aab8;
+            --text-tertiary: #666666;
+            --text-ghost: #333333;
+
+            --border-subtle: #1a1a1a;
+            --border-default: #2a2a2a;
+            --border-strong: #3a3d52;
+
+            --accent: #7b6fa5;
+
+            --font-mono: "JetBrains Mono", "IBM Plex Mono", "SF Mono", Monaco, "Courier New", monospace;
+            --text-base: 13px;
+            --leading-base: 1.5;
+
+            --space-4: 16px;
+            --space-8: 32px;
+
+            --duration-fast: 100ms;
+            --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: var(--ground-void);
+            color: var(--text-default);
+            font-family: var(--font-mono);
+            font-size: var(--text-base);
+            line-height: var(--leading-base);
+            padding: var(--space-8);
         }
 
-        .stage {
-            display: flex;
-            align-items: flex-end;
-            gap: 28px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .tile {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        header {
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .crumb {
+            color: var(--text-tertiary);
             text-decoration: none;
-            cursor: pointer;
-            outline: none;
+            transition: color var(--duration-fast) var(--ease-out);
         }
 
-        .tile-canvas-wrap {
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 3px;
-            overflow: hidden;
-            transition: border-color 0.25s ease, transform 0.25s ease;
-            width: 200px;
-            height: 260px;
+        .crumb:hover {
+            color: var(--accent);
         }
 
-        .tile:hover .tile-canvas-wrap {
-            border-color: rgba(255, 255, 255, 0.22);
-            transform: translateY(-6px);
+        h1 {
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 500;
+            margin: 16px 0;
+            letter-spacing: -0.02em;
         }
 
-        .tile canvas {
-            display: block;
+        .description {
+            color: var(--text-secondary);
+            max-width: 62ch;
+        }
+
+        .meta {
+            margin-top: 20px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            color: var(--text-tertiary);
+        }
+
+        .meta a {
+            color: var(--text-tertiary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-default);
+            transition: color var(--duration-fast) var(--ease-out);
+        }
+
+        .meta a:hover {
+            color: var(--accent);
+        }
+
+        /* filter */
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        #filter {
             width: 100%;
-            height: 100%;
-            image-rendering: pixelated;
+            background: var(--ground-base);
+            border: 1px solid var(--border-default);
+            color: var(--text-default);
+            font-family: var(--font-mono);
+            font-size: var(--text-base);
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color var(--duration-fast) var(--ease-out);
         }
 
-        .tile-name {
-            font-size: 11px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            opacity: 0.6;
-            transition: opacity 0.25s ease;
-            padding-left: 1px;
+        #filter::placeholder {
+            color: var(--text-ghost);
         }
 
-        .tile:hover .tile-name {
-            opacity: 1;
+        #filter:focus {
+            border-color: var(--border-strong);
         }
 
+        #count {
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+
+        /* list */
+
+        .month {
+            margin-bottom: 32px;
+        }
+
+        .month-label {
+            color: var(--text-tertiary);
+            padding-bottom: 8px;
+            letter-spacing: 0.08em;
+        }
+
+        .sketch-list {
+            display: grid;
+            gap: 1px;
+            background-color: var(--border-subtle);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .sketch-item {
+            display: grid;
+            grid-template-columns: 44px 220px 1fr;
+            gap: 16px;
+            padding: 12px 16px;
+            background-color: var(--ground-void);
+            transition: background-color var(--duration-fast) var(--ease-out);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sketch-item:hover {
+            background-color: var(--ground-raised);
+        }
+
+        .sketch-day {
+            color: var(--text-ghost);
+        }
+
+        .sketch-name {
+            color: var(--text-secondary);
+            overflow-wrap: anywhere;
+        }
+
+        .sketch-item:hover .sketch-name {
+            color: var(--accent);
+        }
+
+        .sketch-desc {
+            color: var(--text-default);
+        }
+
+        .sketch-desc.empty {
+            color: var(--text-ghost);
+        }
+
+        .badge {
+            color: var(--text-ghost);
+        }
+
+        .badge.serve {
+            color: var(--border-strong);
+        }
+
+        footer p + p {
+            margin-top: 12px;
+        }
+
+        .empty-state {
+            color: var(--text-tertiary);
+            padding: 24px 0;
+        }
+
+        footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-default);
+            color: var(--text-tertiary);
+            max-width: 62ch;
+        }
+
+        footer code {
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 720px) {
+            body { padding: var(--space-4); }
+
+            .sketch-item {
+                grid-template-columns: 44px 1fr;
+                row-gap: 6px;
+            }
+
+            .sketch-desc { grid-column: 2; }
+        }
     </style>
 </head>
+
 <body>
-
-<div class="stage" id="stage"></div>
-
-<script type="module">
-    import { THEMES } from './themes.js';
-
-    const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
-    const stage = document.getElementById('stage');
-
-    function lerp(a, b, t) {
-        return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
-    }
-    function clamp(v) { return Math.max(0, Math.min(255, v)); }
-
-    function drawDither(canvas, PINK, YELLOW) {
-        const wrap = canvas.parentElement;
-        canvas.width  = wrap.offsetWidth;
-        canvas.height = wrap.offsetHeight;
-        const W = canvas.width, H = canvas.height;
-        const ctx = canvas.getContext('2d');
-        const img = ctx.createImageData(W, H);
-        for (let y = 0; y < H; y++) {
-            for (let x = 0; x < W; x++) {
-                const col = lerp(PINK, YELLOW, x / W);
-                const threshold = (BAYER[y % 4][x % 4] / 16) * 60 - 30;
-                const i = (y * W + x) * 4;
-                img.data[i]   = clamp(col[0] + threshold);
-                img.data[i+1] = clamp(col[1] + threshold);
-                img.data[i+2] = clamp(col[2] + threshold);
-                img.data[i+3] = 255;
-            }
-        }
-        ctx.putImageData(img, 0, 0);
-    }
-
-    stage.innerHTML = THEMES.map((theme) => `
-        <a class="tile" href="./sketch-theme/?theme=${theme.slug}">
-            <div class="tile-canvas-wrap">
-                <canvas id="c-${theme.slug}"></canvas>
+    <div class="container">
+        <header>
+            <a class="crumb" href="../index.html">← 100 days</a>
+            <h1>Daily Sketch</h1>
+            <p class="description">
+                The working surface. Sketches land here first and stay here — promotion into the
+                numbered sketchbook is a separate, deliberate call.
+            </p>
+            <div class="meta">
+                <span id="total"></span>
+                <a href="./theme-select.html">theme select</a>
+                <a href="../imagination/index.md">imagination</a>
+                <a href="./agent-patterns.md">agent-patterns.md</a>
             </div>
-            <span class="tile-name" style="color: ${theme.accent}">${theme.slug}</span>
-        </a>
-    `).join('');
+        </header>
 
-    for (const theme of THEMES) {
-        drawDither(document.getElementById(`c-${theme.slug}`), theme.pink, theme.yellow);
-    }
-</script>
+        <div class="filter-row">
+            <input id="filter" type="search" placeholder="filter by name, description, or tag…" autocomplete="off" spellcheck="false">
+            <span id="count"></span>
+        </div>
 
+        <main id="list"></main>
+
+        <footer id="note"></footer>
+    </div>
+
+    <script>
+        // date · slug · href · description · tags
+        // Descriptions are compressed from each sketch's interface.md; sketches
+        // without one show "—" and are counted in the footer.
+        const SKETCHES = [
+            ['2026-08-02', 'sketch-walks-thread', './sketch-walks-thread/index.html', 'Seven agent walks indexed by their leave condition — what ends a dwell. Same environment, seven characters.', 'generative interactive agent curiosity taxonomy canvas thread'],
+            ['2026-08-02', 'sketch-idle-crt', './sketch-idle-crt/index.html', 'The idle face run through the CRT tube treatment: graphite, wireframe only, heavy bloom and live grain.', 'canvas character retro crt bloom phosphor ambient'],
+            ['2026-08-02', 'sketch-field-notes', './sketch-field-notes/index.html', 'Field notes on a house style that was never designed. Every claim carries a sketch citation; every rule, the exception where it stopped holding.', 'design-system reference moodboard emergent computational-aesthetics meta'],
+            ['2026-08-02', 'sketch-audio-agents-grid', './sketch-audio-agents-grid/index.html', 'A 3×3 grid of miniature agent worlds — nine movement rules, one microphone signal.', 'generative audio agents variations canvas'],
+            ['2026-08-02', 'sketch-apophenia-arc', './sketch-apophenia-arc/index.html', 'Conrad’s apophenic arc as an instrument: trema → apophany → anastrophe. One boolean flips sublime to paranoid.', 'apophenia instrument agents particles valve paranoid sublime'],
+            ['2026-08-02', 'sketch-alice-walk', './sketch-alice-walk/index.html', 'A curiosity pattern as an ever-relocating agent: lock → sample → saturate → leap. She never arrives.', 'generative interactive agent curiosity canvas computational-minimalism'],
+            ['2026-08-01', 'sketch-word-flock', './sketch-word-flock/index.html', 'A paragraph whose words are Vicsek agents. Reading-lanes emerge; a legibility lock decides whether you can still read them.', 'vicsek typography flocking generative collision'],
+            ['2026-08-01', 'sketch-position-in-queue', './sketch-position-in-queue/index.html', 'Raster-first experiment: one image generated from a saved text seed, with the web surface reduced to a viewer.', 'imagegen zine bureaucracy comics'],
+            ['2026-08-01', 'sketch-idle', './sketch-idle/index.html', 'A landing page that performs its character — it recharges the longer you leave it alone. Doing nothing is the interaction.', 'character canvas ambient idle bloom'],
+            ['2026-08-01', 'sketch-character-sandbox', './sketch-character-sandbox/index.html', '76 characters as anonymous drifting agents; hover freezes one and opens its ID card.', 'agents canvas character id-card interactive'],
+            ['2026-08-01', 'sketch-character-field', './sketch-character-field/index.html', 'The same 76 figures as one floating node field, where grouping is a lens you switch rather than a fixed structure.', 'networks d3-force character lenses interactive'],
+            ['2026-08-01', 'cat-sprite', './cat-sprite/demo.html', 'One still character image turned into a four-state sprite atlas — idle, working, attention, failed.', 'sprite pixel-art atlas character pipeline'],
+            ['2026-07-15', 'sketch-audio-reactive-agents-v2', './sketch-audio-reactive-agents-v2/index.html', 'AIDA001 — full-bleed audio-reactive swarm with a media-player island and a drawer exposing the RMS→animation vector.', 'audio-reactive particles network ui-drawer samples mic'],
+            ['2026-07-14', 'sketch-moog-phase-grid', './sketch-moog-phase-grid/index.html', 'A 4×2 grid of seven audio-reactive vignettes, all reading one analyser, each drawing shapes a different way.', 'audio generative grid brutalist primitives'],
+            ['2026-06-29', 'sketch-eixample', './sketch-eixample/index.html', 'A hand-painted 16×16 pictograph turned into a generative grid language; each edition a deterministic re-addressing of the city.', 'generative grid typography editions barcelona'],
+            ['2026-06-29', 'sketch-eixample-fullscreen-grid', './sketch-eixample-fullscreen-grid/index.html', 'The 256-glyph eixample alphabet tiled across the whole viewport. No controls, no chrome.', 'generative grid typography fullscreen'],
+            ['2026-06-16', 'sketch-agent-stream-scrub', './sketch-agent-stream-scrub/index.html', 'A scrubbable timeline of streaming patterns, with a second track exposing the mechanism: gates, batches, flushes, retries.', 'agents streaming timeline scrubbable hitl reference-sheet mechanism'],
+            ['2026-06-16', 'sketch-agent-stream-glyphs', './sketch-agent-stream-glyphs/index.html', 'Each streaming pattern earns a computed thumbnail: hash the id to a seed, then run its timing recipe as an animated glyph.', 'generative identity reference-sheet agents streaming procedural glyphs'],
+            ['2026-06-16', 'sketch-agent-stream-markov-map', './sketch-agent-stream-markov-map/index.html', 'The same pattern library as small Markov walks — transition weights drawn as edge ink.', 'agents streaming markov reference-sheet networks brownian design-system'],
+            ['2026-06-16', 'sketch-agent-streaming-patterns', './sketch-agent-streaming-patterns/index.html', 'The catalog the three studies above were cut from.', 'agents streaming interaction typography'],
+            ['2026-06-07', 'sketch-antistyle', './sketch-antistyle/index.html', 'A horizontal gallery walk through antistyle as anti-illusion: every removal of style recorded as a new style decision.', 'gallery antistyle typography scroll essay'],
+            ['2026-05-19', 'sketch-ascii-sheets-variance', './sketch-ascii-sheets-variance/index.html', 'One ASCII primitive, many shapes: headers, modals, toasts, dividers, drawers, marquees, page transitions.', 'component-showcase ascii typography layout scroll generative landing-page'],
+            ['2026-05-19', 'sketch-sticky-banner', './sketch-sticky-banner/index.html', 'Index variant where the Hello world banner is sticky and elevated one level above the project list.', 'layout scroll elevation index-variant'],
+            ['2026-05-19', 'sketch-interaction-stack', './sketch-interaction-stack/index.html', 'The interaction stack, 2026.', 'interaction typography reference'],
+            ['2026-05-19', 'sketch-ascii-sheet-signal', './sketch-ascii-sheet-signal/index.html', 'Redirect — superseded by 77 · ASCII sheet documentation.', 'ascii redirect superseded'],
+            ['2026-04-20', 'sketch-ascii-field-gallery', './sketch-ascii-field-gallery/index.html', 'Eight animated ASCII field variants, each a different interference formula on one dot-density ramp.', 'ascii generative animation typography grid'],
+            ['2026-04-20', 'sketch-ube-field-audio', './sketch-ube-field-audio/index.html', 'A single ube-purple ASCII wave field driven by mic input — bass to speed, mids to density, amplitude to brightness.', 'audio-reactive ascii generative animation microphone'],
+            ['2026-04-20', 'sketch-anna-portfolio', './sketch-anna-portfolio/index.html', 'Single-page portfolio as typographic restraint; the statement types itself character by character.', 'typography portfolio interaction restraint serif'],
+            ['2026-04-20', 'sketch-agent-tool-call', './sketch-agent-tool-call/index.html', 'Reference sheet for the tool-call and thinking indicators shown while an agent reasons.', 'interface agent ai interactive reference-sheet'],
+            ['2026-04-06', 'sketch-mode-toggle', './sketch-mode-toggle/index.html', '', 'mode toggle component'],
+            ['2026-04-02', 'sketch-pretext-canvas', './sketch-pretext-canvas/index.html', 'Pretext — canvas layout demo.', 'canvas layout hello-world'],
+            ['2026-04-02', 'sketch-pretext-dom', './sketch-pretext-dom/index.html', 'Pretext — DOM measurement demo.', 'dom measurement hello-world'],
+            ['2026-04-02', 'sketch-color-explorer-v2', './sketch-color-explorer-v2/index.html', 'Color explorer.', 'color interactive design-tools'],
+            ['2026-03-31', 'sketch-data-forms', './sketch-data-forms/index.html', 'Same dataset, four chapters, eight renderings each. Fixed data, varied representation.', 'data-visualization variation-grid chart-types encoding generative interactive'],
+            ['2026-03-31', 'sketch-terminal-cli', './sketch-terminal-cli/index.html', 'Terminal REPL.', 'terminal cli typography'],
+            ['2026-03-31', 'sketch-geo', './sketch-geo/index.html', '', 'geo'],
+            ['2026-03-09', 'sketch-jetbrains-mono', './sketch-jetbrains-mono/index.html', 'Font explorer: specimen, weights, scale, monospace proof, tracking, glyphs.', 'typography interactive specimen'],
+            ['2026-03-02', 'sketch-theme', './sketch-theme/index.html', 'The themed sketch surface driven by ?theme= from the theme selector.', 'theme color surface'],
+            ['2026-03-02', 'sketch-ascii-loading', './sketch-ascii-loading.html', 'Loading states in ASCII.', 'ascii loading typography'],
+            ['2026-03-01', 'sketch-mesa', './sketch-mesa/index.html', '', 'mesa blank-chapter'],
+            ['2026-03-01', 'sketch-sprig', './sketch-sprig/index.html', '', 'sprig blank-chapter'],
+            ['2026-02-20', 'sketch-graph', './sketch-graph.html', '100 days concept graph.', 'networks graph d3 concepts'],
+            ['2026-02-20', 'sketch-graph-2', './sketch-graph-2.html', '100 days concepts graph, second cut.', 'networks graph d3 concepts'],
+        ];
+
+        const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+                             'July', 'August', 'September', 'October', 'November', 'December'];
+
+        const list = document.getElementById('list');
+        const filter = document.getElementById('filter');
+        const count = document.getElementById('count');
+
+        function monthLabel(date) {
+            const [y, m] = date.split('-');
+            return `${MONTH_NAMES[Number(m) - 1]} ${y}`;
+        }
+
+        function render(query) {
+            const q = query.trim().toLowerCase();
+            const matches = SKETCHES.filter(([date, slug, href, desc, tags]) =>
+                !q || `${slug} ${desc} ${tags}`.toLowerCase().includes(q));
+
+            list.innerHTML = '';
+
+            if (!matches.length) {
+                list.innerHTML = '<p class="empty-state">Nothing matches that.</p>';
+                count.textContent = `0 / ${SKETCHES.length}`;
+                return;
+            }
+
+            let currentMonth = null;
+            let group = null;
+
+            for (const [date, slug, href, desc] of matches) {
+                const label = monthLabel(date);
+
+                if (label !== currentMonth) {
+                    currentMonth = label;
+                    const section = document.createElement('section');
+                    section.className = 'month';
+                    const heading = document.createElement('div');
+                    heading.className = 'month-label';
+                    heading.textContent = label;
+                    group = document.createElement('div');
+                    group.className = 'sketch-list';
+                    section.append(heading, group);
+                    list.append(section);
+                }
+
+                const item = document.createElement('a');
+                item.className = 'sketch-item';
+                item.href = href;
+
+                const day = document.createElement('span');
+                day.className = 'sketch-day';
+                day.textContent = date.slice(8);
+
+                const name = document.createElement('span');
+                name.className = 'sketch-name';
+                name.textContent = slug.replace(/^sketch-/, '');
+
+                if (NEEDS_SERVER.has(slug)) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge serve';
+                    badge.textContent = ' ·serve';
+                    badge.title = NEEDS_SERVER.get(slug) + ' — will not run from file://';
+                    name.append(badge);
+                }
+
+                if (NO_INTERFACE.has(slug)) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.textContent = ' ·no interface';
+                    badge.title = 'no interface.md — /inhale cannot fold this in yet';
+                    name.append(badge);
+                }
+
+                const description = document.createElement('span');
+                description.className = desc ? 'sketch-desc' : 'sketch-desc empty';
+                description.textContent = desc || '—';
+
+                item.append(day, name, description);
+                group.append(item);
+            }
+
+            count.textContent = q
+                ? `${matches.length} / ${SKETCHES.length}`
+                : `${SKETCHES.length} sketches`;
+        }
+
+        // Sketches that cannot run from file:// — ES module imports and local
+        // fetch() are CORS-blocked, and symlinks are not followed. Serve the
+        // repo root (see footer) and these work like the rest.
+        const NEEDS_SERVER = new Map([
+            ['sketch-data-forms',                'ES module import'],
+            ['sketch-geo',                       'ES module import'],
+            ['sketch-mesa',                      'ES module import'],
+            ['sketch-pretext-canvas',            'ES module import'],
+            ['sketch-pretext-dom',               'ES module import'],
+            ['sketch-sprig',                     'ES module import'],
+            ['sketch-theme',                     'ES module import'],
+            ['sketch-antistyle',                 'fetches a local file'],
+            ['sketch-eixample-fullscreen-grid',  'symlinks ../sketch-eixample/images'],
+            ['sketch-moog-phase-grid',           'symlinks ../../sounds'],
+        ]);
+
+        // Folders with no interface.md — /inhale cannot fold these into the
+        // Imagination layer until one is written.
+        const NO_INTERFACE = new Set([
+            'sketch-ascii-sheet-signal', 'sketch-color-explorer-v2', 'sketch-geo',
+            'sketch-mesa', 'sketch-pretext-canvas', 'sketch-pretext-dom',
+            'sketch-sprig', 'sketch-terminal-cli', 'sketch-theme',
+        ]);
+
+        const undescribed = SKETCHES.filter(s => !s[3]).length;
+        document.getElementById('total').textContent =
+            `${SKETCHES.length} sketches · newest ${SKETCHES[0][0]}`;
+        document.getElementById('note').innerHTML =
+            `<p>${SKETCHES.length - NEEDS_SERVER.size} of these open straight from the filesystem. ` +
+            `The ${NEEDS_SERVER.size} marked <span class="badge serve">·serve</span> use ES modules, ` +
+            `local <code>fetch()</code>, or symlinks, so they need an http origin — serve the repo ` +
+            `<em>root</em>, not the sketch folder, or the symlinks still break:<br>` +
+            `<code>python3 -m http.server 8000</code> from <code>100days/</code>, then ` +
+            `<code>localhost:8000/daily-sketch/</code>.</p>` +
+            `<p>A sketch folder carries an <code>interface.md</code> so the Imagination layer’s ` +
+            `<code>/inhale</code> can fold it back in. ${NO_INTERFACE.size} folders here have none ` +
+            `(marked <span class="badge">·no interface</span>), and ${undescribed} have no written ` +
+            `description yet (shown as “—”).</p>`;
+
+        filter.addEventListener('input', () => render(filter.value));
+        render('');
+    </script>
 </body>
+
 </html>

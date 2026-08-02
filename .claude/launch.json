@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "100days",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8000", "--directory", "/Users/mantas/Desktop/min7is/100days"],
+      "port": 8000
+    },
+    {
       "name": "aesthetic-genome",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8080", "--directory", "/Users/mantas/Desktop/min7is/100days/aesthetic-genome"],
