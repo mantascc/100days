@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  :root {
+    --ground-void: #0a0a0a;
+    --ground-base: #111111;
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.45);
+    --text-ghost: rgba(255,255,255,0.25);
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --font: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: var(--font);
+    background: var(--ground-void);
+    color: var(--text-primary);
+  }
+
+  #canvas { position: fixed; inset: 0; display: block; }
+
+  /* ── top bar ─────────────────────────────────────────── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: baseline; gap: 20px;
+    padding: 18px 22px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .title {
+    font-size: 11px; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-ghost);
+    white-space: nowrap;
+  }
+  .title b { color: var(--text-secondary); font-weight: 500; }
+
+  .lenses { display: flex; gap: 6px; pointer-events: auto; flex-wrap: wrap; }
+  .lens {
+    font-family: var(--font); font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 3px;
+    border: 0.5px solid var(--border);
+    background: transparent; color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .lens:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  .lens.active {
+    color: #0a0a0a; background: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+
+  .lens-desc {
+    position: fixed; top: 52px; left: 22px;
+    font-size: 10px; letter-spacing: 0.04em;
+    color: var(--text-ghost); max-width: 340px; line-height: 1.5;
+    pointer-events: none; z-index: 10;
+  }
+
+  /* ── legend ──────────────────────────────────────────── */
+  .legend {
+    position: fixed; left: 22px; bottom: 20px;
+    display: flex; flex-direction: column; gap: 5px;
+    z-index: 10; pointer-events: none;
+  }
+  .legend-row { display: flex; align-items: center; gap: 8px; font-size: 10px; }
+  .legend-sw { width: 8px; height: 8px; border-radius: 1px; flex: none; }
+  .legend-name { color: var(--text-secondary); letter-spacing: 0.06em; text-transform: uppercase; }
+  .legend-count { color: var(--text-ghost); }
+
+  /* ── detail panel ────────────────────────────────────── */
+  .detail {
+    position: fixed; right: 22px; top: 64px;
+    width: 268px;
+    border: 0.5px solid var(--border);
+    background: rgba(17,17,17,0.72);
+    backdrop-filter: blur(8px);
+    border-radius: 5px; padding: 16px 16px 14px;
+    z-index: 10; pointer-events: none;
+    opacity: 0; transition: opacity 0.18s;
+  }
+  .detail.show { opacity: 1; }
+  .detail-name { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+  .detail-sub {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 3px; margin-bottom: 10px;
+  }
+  .detail-desc { font-size: 12px; line-height: 1.55; color: var(--text-secondary); }
+  .detail-mem {
+    margin-top: 12px; padding-top: 10px;
+    border-top: 0.5px solid var(--border);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .mem-row { display: flex; gap: 8px; font-size: 10px; }
+  .mem-key { color: var(--text-ghost); text-transform: uppercase; letter-spacing: 0.08em; min-width: 62px; }
+  .mem-val { color: var(--text-secondary); }
+  .mem-val.here { color: var(--text-primary); }
+
+  .hint {
+    position: fixed; right: 22px; bottom: 20px;
+    font-size: 10px; color: var(--text-ghost);
+    letter-spacing: 0.05em; z-index: 10; pointer-events: none;
+    text-align: right; line-height: 1.6;
+  }
+
+  @media (max-width: 720px) {
+    .topbar { flex-direction: column; gap: 12px; }
+    .detail { display: none; }
+    .lens-desc { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div class="topbar">
+  <div class="title"><b>Character Field</b> &nbsp;·&nbsp; 76 figures, one psyche</div>
+  <div class="lenses" id="lenses"></div>
+</div>
+<div class="lens-desc" id="lensDesc"></div>
+
+<div class="legend" id="legend"></div>
+
+<div class="detail" id="detail">
+  <div class="detail-name" id="dName"></div>
+  <div class="detail-sub" id="dSub"></div>
+  <div class="detail-desc" id="dDesc"></div>
+  <div class="detail-mem" id="dMem"></div>
+</div>
+
+<div class="hint">drag a node · hover to read<br>switch lens to regroup</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA — 76 figures. Each has a group tag per lens.
+// lenses: arc (archive section) · ont (being/force/place) · fn (function) · st (status)
+// ─────────────────────────────────────────────────────────────────────────────
+const N = (id, sub, desc, arc, ont, fn, st) => ({ id, sub, desc, arc, ont, fn, st });
+
+const DATA = [
+  // system vectors
+  N('Gabrielius','Topology','Tracks how the whole structure bends without losing itself — the hidden geometry of the system.','vectors','being','know','established'),
+  N('Aukse','Flow / narrative','Turns states into story, movement into sequence, scattered events into a path that can be followed.','vectors','being','know','established'),
+  N('Ruta','Snapshot / state','Keeper of the present frame: what is true now, before it is explained or improved.','vectors','being','know','established'),
+  N('Vyte','Intuition / compression','Senses the whole before the parts are named; condenses complexity into a felt hunch.','vectors','being','know','established'),
+  N('Aida','Channeling / reception','Lets signals arrive before deciding what they mean.','vectors','being','hold','established'),
+  N('Anomaly','Prediction error','The event that does not fit the model; forces the system to update rather than coast.','vectors','force','know','established'),
+  N('Alice','Curiosity vector','The direction of inquiry itself — the rabbit-hole impulse toward discovery.','vectors','being','move','established'),
+  N('Austeja','Pattern weaver','Interlaces separate threads into living pattern; a textile intelligence of repetition and repair.','vectors','being','know','established'),
+  N('Alexas','Heat sink','Absorbs and regulates excess heat; diffuses overload before combustion.','vectors','being','hold','established'),
+  N('Idle','No vector','A figure without a direction yet — latency, waiting, unused capacity, or refusal to move.','vectors','force','depth','candidate'),
+  // established inner
+  N('Mintis','Pattern-seeing','Recognizes relationships and names structures; risk: over-processing before the body has lived it.','inner','being','know','established'),
+  N('Vėjas','Creative wind','Curiosity, improvisation, surrender; carries signals without controlling the destination.','inner','force','move','established'),
+  N('Alfa','Unconditional love','Grandmother-love: care that stays available through collapse, uncertainty, and shame.','inner','force','hold','established'),
+  N('Kometa','Endurance / momentum','Moves through difficulty with enormous momentum; learning that power need not self-destruct.','inner','being','drive','established'),
+  N('Mirga','Vitality / shimmer','Wild, sensual, playful vitality that appears when tension releases and life is allowed to unfold.','inner','being','feel','established'),
+  N('Perkūnas','Storm / voltage','Thunder and raw jėga; can generate chaos or harness entropy into directed force, peace, love.','inner','force','drive','established'),
+  N('Kūnas','Embodied truth','The body as intelligence before language; moves before the meaning.','inner','being','feel','established'),
+  N('High Performer','Discipline','Relentless function that continues while hurt; tempted to equate worth with endurance.','inner','being','drive','established'),
+  N('Iron Scout','Vigilant endurance','A tried name for the endurance figure: alert, resilient, crossing hard terrain.','inner','being','drive','candidate'),
+  // bar / theater cast
+  N('Ade','Scene voice','A named bar/theater participant, distinct from Aida; temperament not recovered.','bar','being','depth','unrecovered'),
+  N('Shame','Exposure alarm','Predicts exposure and judgment; can make pleasure, visibility, and success feel dangerous.','bar','force','guard','established'),
+  N('Rational Mind','Analysis','Searches for causes, evidence, and plans; risk: solving feelings before they are felt.','bar','being','know','established'),
+  N('Bright Side','Possibility','Detects constructive interpretations; challenge is sincerity over suppression of grief.','bar','being','know','established'),
+  N('Suspicious','Skeptical protection','Scans for hidden motives and threats; protective, but can block trust and ease.','bar','being','guard','established'),
+  N('Uniting','Integration','Seeks shared truth between opposing positions without erasing conflict.','bar','being','hold','established'),
+  N('The Bar Host','Convening','The presence that creates the room where characters meet, argue, and reveal themselves.','bar','being','hold','established'),
+  N('The Audience / Witness','Observation','Hears all voices without immediately becoming any single one.','bar','being','hold','established'),
+  // relational & ancestral
+  N('Father','Authority / protection','Inherited paternal force; the question is what protects without dominating.','relational','being','guard','established'),
+  N('Traveler','Journeying self','Moves through the mythology rather than ruling it from above.','relational','being','move','established'),
+  N('Eros','Desire','Attraction, longing, erotic vitality; movement toward contact.','relational','force','feel','established'),
+  N('The Exile / Išeivis','Liminal belonging','Living between identities; the perspective gained through separation.','relational','being','depth','established'),
+  N('Future Father','Mature protection','The version of Father that offers stable boundaries without control.','relational','being','guard','candidate'),
+  // candidates & temporary names
+  N('Shape-Shifter','Adaptability','Identity fluidity; the capacity to transform between roles. Definition unrecovered.','candidates','being','move','candidate'),
+  N('Šviesa','Light','A symbolic force of light, hope, and path-revealing.','candidates','force','know','candidate'),
+  N('Šoklė','Dance / leap','A leaping feminine force near movement, play, and liberated embodiment.','candidates','being','feel','candidate'),
+  N('Mirgė','Shimmering','A naming branch around flickering vitality, close to what became Mirga.','candidates','being','feel','candidate'),
+  N('Jutra','Sensitivity','A name for feeling, awakening, and vitality; original meaning unpreserved.','candidates','being','feel','candidate'),
+  N('Eiva','Movement','A name with living-force associations; intended role not recoverable.','candidates','being','move','candidate'),
+  // personified forces
+  N('Norlys','North star','Orientation rather than fixed destination — direction without demanding certainty.','forces','force','hold','established'),
+  N('Gelmė','Depth','Inward descent and contact with what the surface cannot grasp.','forces','force','depth','established'),
+  N('Fog','Uncertainty','Not seeing the whole path; tests whether clarity can be carried internally.','forces','force','depth','established'),
+  N('Clarity','Aligned perception','Perceiving what is true or aligned without eliminating ambiguity.','forces','force','know','established'),
+  N('Vitality','Life-energy','Movement, pleasure, curiosity, appetite — before moral evaluation.','forces','force','feel','established'),
+  N('Entropy','Excess charge','Uncontrolled transformation and excess charge; danger and generative disorder.','forces','force','depth','established'),
+  N('The Body','Physical intelligence','The organism as intelligence rather than possession; once personified, became Kūnas.','forces','force','feel','established'),
+  N('Curiosity','Toward the unknown','The movement toward the unknown rather than away — the fuel of Vėjas.','forces','force','move','established'),
+  N('Anxiety','Threat-shaped','Heightened energy interpreting uncertainty as threat.','forces','force','guard','established'),
+  N('Unity','Coherence','Participation in something larger without surrendering individual clarity.','forces','force','hold','established'),
+  N('Surrender','Allowing','Allowing collapse or uncertainty without reading it as annihilation.','forces','force','depth','established'),
+  N('Collapse','Threshold breaking','Breaking an old structure so rebuilding becomes possible.','forces','force','depth','established'),
+  N('Joy','Permitted aliveness','A capacity becoming something permitted rather than earned.','forces','force','feel','established'),
+  N('Anti-Joy / Guilt','Pleasure interruption','Says feeling good is disloyal, insensitive, or undeserved.','forces','force','guard','established'),
+  N('Earnestness','Unironic','Open caring without protective detachment or irony as armor.','forces','force','feel','established'),
+  N('Mundane Victory','Ordinary counting','The recognition that ordinary acts of living count.','forces','force','feel','candidate'),
+  N('Success Guilt','Achievement minimizer','Shrinks achievement to preserve belonging with those who struggle more.','forces','force','guard','established'),
+  N('The Unknown','Threshold presence','Not merely absence of knowledge, but a place or being to be met.','forces','force','depth','established'),
+  N('Silence','Room without performance','A space that may become a room in which one can exist without performing.','forces','force','depth','established'),
+  N('Visibility','Being seen','The desire to be seen and celebrated without performing for recognition.','forces','force','feel','established'),
+  N('Openness','Reception','A potion-like capacity to receive experience without immediate defense.','forces','force','hold','established'),
+  N('Dream','Restorative imagination','Softens rigid waking structures; expressed through Dream Salve.','forces','force','depth','established'),
+  N('Love','Connecting field','Care, attraction, embodied pleasure, transformed electricity — many forms at once.','forces','force','hold','established'),
+  N('Strength','Regulated power','Redefined from endurance-despite-injury into choice, regulation, and not-burning.','forces','force','drive','established'),
+  N('Motion','Chosen movement','Once compulsory, becoming voluntary — motion by choice.','forces','force','move','established'),
+  N('Protection','Safety without control','Differentiated from control, hardness, and anticipatory aggression.','forces','force','guard','established'),
+  // places & objects
+  N('The Bar','Social territory','The room where competing inner positions drink, argue, and confess.','places','place','hold','established'),
+  N('The Stage / Theater','Inner drama','Makes the inner system visible; no one voice becomes the whole self.','places','place','hold','established'),
+  N('The Mysterious Space','Emergence-field','Where Mirga appears, after tension releases and control loosens.','places','place','feel','established'),
+  N('The Garden','Cultivation','Care, slow growth, cultivation — a Mintis-Studio principle.','places','place','hold','established'),
+  N('Liquid','Fluid clarity','Clarity through fluidity rather than rigidity.','places','place','know','established'),
+  N('Wind','Movement','Curiosity and movement; later strongly personified as Vėjas.','places','place','move','established'),
+  N('Comet','Propulsion','Kometa’s image: extraordinary propulsion with the danger of combustion.','places','place','drive','established'),
+  N('Potions Shelf','Ritual interface','A shelf for invoking Dream, Openness, Vitality, and Visibility.','places','place','hold','established'),
+  N('North Star','Orientation','Norlys’s visual form: a guide that stays distant enough not to become rigid.','places','place','hold','established'),
+  // adjacent presences
+  N('Kosmitas','Adjacent','A named adjacent presence; role undefined without invention.','adjacent','being','depth','unrecovered'),
+  N('Tom Orla','Adjacent','A named adjacent presence; relation noted but not yet described.','adjacent','being','depth','unrecovered'),
+  N('Minchiukas','Adjacent','An adjacent presence; the name suggests proximity to Mintis.','adjacent','being','depth','unrecovered'),
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LENSES — each defines hubs (ordered) with label + accent, and a key into node.
+// ─────────────────────────────────────────────────────────────────────────────
+const AC = ['#7b6fa5','#f4bfa0','#f07060','#f4d87a','#f4a0a0','#8fae9b','#7fa8c9','#c98fb0'];
+
+const LENSES = {
+  free: {
+    label: 'Free', key: null,
+    desc: 'No grouping. Every figure floats free — one cloud, one psyche. Pick a lens to watch them migrate.',
+    hubs: []
+  },
+  arc: {
+    label: 'Archive', key: 'arc',
+    desc: 'The maker’s own eight sections of the archive — how the cast was first written down.',
+    hubs: [
+      ['vectors','System vectors'], ['inner','Inner characters'], ['bar','Bar / theater'],
+      ['relational','Relational'], ['candidates','Candidates'], ['forces','Personified forces'],
+      ['places','Places & objects'], ['adjacent','Adjacent']
+    ]
+  },
+  ont: {
+    label: 'Ontology', key: 'ont',
+    desc: 'What kind of thing is it? A being who speaks, a force that behaves like one, or a place that holds them.',
+    hubs: [ ['being','Being'], ['force','Force'], ['place','Place'] ]
+  },
+  fn: {
+    label: 'Function', key: 'fn',
+    desc: 'The psychological job each figure does — read across the archive’s own labels. The interpretive map.',
+    hubs: [
+      ['drive','Drive'], ['feel','Feel'], ['guard','Guard'], ['know','Know'],
+      ['hold','Hold'], ['move','Move'], ['depth','Depth']
+    ]
+  },
+  st: {
+    label: 'Charge', key: 'st',
+    desc: 'How solid is the figure? Established, still a candidate name, or an unrecovered ghost — echoing the design-system lifecycle.',
+    hubs: [ ['established','Established'], ['candidate','Candidate'], ['unrecovered','Unrecovered'] ]
+  }
+};
+
+const LENS_ORDER = ['free','arc','ont','fn','st'];
+const KEY_LABEL = { arc:'Archive', ont:'Ontology', fn:'Function', st:'Charge' };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SETUP
+// ─────────────────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, DPR;
+
+function resize() {
+  DPR = window.devicePixelRatio || 1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+resize();
+
+// persistent character node objects (positions carry across lens switches)
+const nodes = DATA.map((d, i) => ({
+  ...d,
+  x: W/2 + (Math.random()-0.5)*W*0.5,
+  y: H/2 + (Math.random()-0.5)*H*0.5,
+  vx: 0, vy: 0, r: 3.4, kind: 'char'
+}));
+const nodeById = new Map(nodes.map(n => [n.id, n]));
+
+let hubNodes = [];        // active hub nodes
+let links = [];           // char -> hub
+let currentLens = 'free';
+let hubColor = {};        // group key -> accent color
+
+// ── force simulation ─────────────────────────────────────
+const sim = d3.forceSimulation(nodes)
+  .force('charge', d3.forceManyBody().strength(-26))
+  .force('collide', d3.forceCollide().radius(d => d.kind === 'hub' ? 26 : 8).strength(0.9))
+  .force('x', d3.forceX(W/2).strength(0.02))
+  .force('y', d3.forceY(H/2).strength(0.02))
+  .alphaDecay(0.028)
+  .velocityDecay(0.42)
+  .on('tick', tick);
+
+function hubAnchors(n) {
+  // arrange n hubs on an ellipse
+  const cx = W/2, cy = H*0.52;
+  const rx = Math.min(W*0.33, 520), ry = Math.min(H*0.32, 340);
+  if (n === 1) return [[cx, cy]];
+  return d3.range(n).map(i => {
+    const a = -Math.PI/2 + (i / n) * Math.PI*2;
+    return [cx + rx*Math.cos(a), cy + ry*Math.sin(a)];
+  });
+}
+
+function applyLens(lensId) {
+  currentLens = lensId;
+  const L = LENSES[lensId];
+  hubColor = {};
+
+  // remove old hub nodes from sim node list
+  const chars = nodes.filter(n => n.kind === 'char');
+
+  if (!L.key) {
+    hubNodes = []; links = [];
+    sim.nodes(chars);
+    sim.force('link', null);
+    sim.force('x').strength(0.05).x(W/2);
+    sim.force('y').strength(0.05).y(H*0.5);
+    sim.force('charge').strength(-34);
+  } else {
+    const anchors = hubAnchors(L.hubs.length);
+    hubNodes = L.hubs.map(([key, label], i) => {
+      hubColor[key] = AC[i % AC.length];
+      return {
+        id: '__hub_' + key, key, label, kind: 'hub',
+        color: AC[i % AC.length],
+        x: anchors[i][0], y: anchors[i][1],
+        fx: anchors[i][0], fy: anchors[i][1], r: 6
+      };
+    });
+    const hubByKey = new Map(hubNodes.map(h => [h.key, h]));
+    links = chars.map(c => ({ source: c, target: hubByKey.get(c[L.key]) }))
+                 .filter(l => l.target);
+
+    sim.nodes(chars.concat(hubNodes));
+    sim.force('link', d3.forceLink(links).distance(58).strength(0.55));
+    sim.force('x').strength(0.008).x(W/2);
+    sim.force('y').strength(0.008).y(H*0.52);
+    sim.force('charge').strength(-24);
+  }
+  sim.alpha(0.9).restart();
+  renderLensUI();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+let hovered = null;
+
+function colorFor(n) {
+  if (currentLens === 'free') return null;
+  return hubColor[n[LENSES[currentLens].key]] || null;
+}
+
+function tick() {
+  ctx.clearRect(0, 0, W, H);
+
+  const dim = hovered ? 0.14 : 1;
+  const connectedHubKey = hovered ? hovered[LENSES[currentLens].key] : null;
+
+  // links
+  ctx.lineWidth = 1;
+  for (const l of links) {
+    const c = hubColor[l.target.key] || 'rgba(255,255,255,0.3)';
+    let a = 0.10;
+    if (hovered) a = (l.source === hovered) ? 0.55 : 0.03;
+    ctx.strokeStyle = withAlpha(c, a);
+    ctx.beginPath();
+    ctx.moveTo(l.source.x, l.source.y);
+    ctx.lineTo(l.target.x, l.target.y);
+    ctx.stroke();
+  }
+
+  // hubs
+  for (const h of hubNodes) {
+    const active = !hovered || connectedHubKey === h.key;
+    // halo
+    ctx.fillStyle = withAlpha(h.color, active ? 0.14 : 0.05);
+    ctx.beginPath(); ctx.arc(h.x, h.y, 15, 0, Math.PI*2); ctx.fill();
+    // square
+    ctx.fillStyle = withAlpha(h.color, active ? 0.95 : 0.4);
+    ctx.fillRect(h.x-3, h.y-3, 6, 6);
+    // label
+    ctx.font = "500 10px 'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillStyle = withAlpha(h.color, active ? 0.95 : 0.35);
+    ctx.fillText(h.label.toUpperCase(), h.x, h.y + 12);
+    // count
+    const cnt = nodes.filter(n => n.kind==='char' && n[LENSES[currentLens].key]===h.key).length;
+    ctx.font = "300 9px 'IBM Plex Mono', monospace";
+    ctx.fillStyle = withAlpha(h.color, active ? 0.45 : 0.2);
+    ctx.fillText(String(cnt), h.x, h.y + 24);
+  }
+
+  // char nodes
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  for (const n of nodes) {
+    if (n.kind === 'hub') continue;
+    const isHov = n === hovered;
+    const connected = hovered && connectedHubKey === n[LENSES[currentLens].key];
+    const base = colorFor(n);
+    let nodeA = dim;
+    if (hovered) nodeA = isHov ? 1 : (connected ? 0.7 : 0.12);
+
+    // dot
+    const fill = base ? withAlpha(base, nodeA) : withAlpha('#ffffff', nodeA*0.9);
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, isHov ? 5 : n.r, 0, Math.PI*2);
+    ctx.fill();
+    if (isHov) {
+      ctx.strokeStyle = withAlpha(base || '#ffffff', 0.9);
+      ctx.lineWidth = 1; ctx.beginPath();
+      ctx.arc(n.x, n.y, 8.5, 0, Math.PI*2); ctx.stroke();
+    }
+
+    // label
+    const labA = isHov ? 0.95 : (hovered ? (connected ? 0.5 : 0.06) : 0.32);
+    ctx.font = (isHov ? "400 " : "300 ") + "9px 'IBM Plex Mono', monospace";
+    ctx.fillStyle = withAlpha('#ffffff', labA);
+    ctx.fillText(n.id, n.x + 7, n.y);
+  }
+}
+
+function withAlpha(hex, a) {
+  if (hex.startsWith('rgba')) return hex;
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16);
+  const g = parseInt(h.substring(2,4),16);
+  const b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UI: lens tabs, legend, detail
+// ─────────────────────────────────────────────────────────────────────────────
+const lensesEl = document.getElementById('lenses');
+const lensDescEl = document.getElementById('lensDesc');
+const legendEl = document.getElementById('legend');
+
+LENS_ORDER.forEach(id => {
+  const b = document.createElement('button');
+  b.className = 'lens'; b.textContent = LENSES[id].label;
+  b.dataset.id = id;
+  b.onclick = () => applyLens(id);
+  lensesEl.appendChild(b);
+});
+
+function renderLensUI() {
+  [...lensesEl.children].forEach(b => b.classList.toggle('active', b.dataset.id === currentLens));
+  lensDescEl.textContent = LENSES[currentLens].desc;
+  // legend
+  legendEl.innerHTML = '';
+  hubNodes.forEach(h => {
+    const cnt = nodes.filter(n => n.kind==='char' && n[LENSES[currentLens].key]===h.key).length;
+    const row = document.createElement('div'); row.className = 'legend-row';
+    row.innerHTML = `<span class="legend-sw" style="background:${h.color}"></span>`+
+      `<span class="legend-name">${h.label}</span>`+
+      `<span class="legend-count">${cnt}</span>`;
+    legendEl.appendChild(row);
+  });
+}
+
+// detail panel
+const detail = document.getElementById('detail');
+const dName = document.getElementById('dName');
+const dSub = document.getElementById('dSub');
+const dDesc = document.getElementById('dDesc');
+const dMem = document.getElementById('dMem');
+
+function memLabel(key, val) {
+  const L = LENSES[key];
+  const found = (L.hubs || []).find(([k]) => k === val);
+  return found ? found[1] : val;
+}
+
+function showDetail(n) {
+  const accent = colorFor(n) || 'rgba(255,255,255,0.6)';
+  dName.textContent = n.id;
+  dSub.textContent = n.sub;
+  dSub.style.color = accent;
+  dDesc.textContent = n.desc;
+  const rows = [
+    ['Archive', memLabel('arc', n.arc), 'arc'],
+    ['Ontology', memLabel('ont', n.ont), 'ont'],
+    ['Function', memLabel('fn', n.fn), 'fn'],
+    ['Charge', memLabel('st', n.st), 'st'],
+  ];
+  dMem.innerHTML = rows.map(([k, v, key]) =>
+    `<div class="mem-row"><span class="mem-key">${k}</span>`+
+    `<span class="mem-val ${currentLens===key?'here':''}">${v}</span></div>`
+  ).join('');
+  detail.classList.add('show');
+}
+function hideDetail() { detail.classList.remove('show'); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INTERACTION — hover + drag
+// ─────────────────────────────────────────────────────────────────────────────
+let dragging = null;
+
+function pick(mx, my) {
+  let best = null, bestD = 16*16;
+  for (const n of nodes) {
+    if (n.kind === 'hub') continue;
+    const dx = n.x - mx, dy = n.y - my, d = dx*dx + dy*dy;
+    if (d < bestD) { bestD = d; best = n; }
+  }
+  return best;
+}
+
+canvas.addEventListener('pointermove', e => {
+  const mx = e.clientX, my = e.clientY;
+  if (dragging) {
+    dragging.fx = mx; dragging.fy = my;
+    sim.alphaTarget(0.2).restart();
+    return;
+  }
+  const n = pick(mx, my);
+  if (n !== hovered) {
+    hovered = n;
+    canvas.style.cursor = n ? 'pointer' : 'default';
+    if (n) showDetail(n); else hideDetail();
+    if (sim.alpha() < 0.03) tick(); // repaint when settled
+  }
+});
+
+canvas.addEventListener('pointerdown', e => {
+  const n = pick(e.clientX, e.clientY);
+  if (n) {
+    dragging = n; n.fx = n.x; n.fy = n.y;
+    canvas.setPointerCapture(e.pointerId);
+    sim.alphaTarget(0.25).restart();
+  }
+});
+canvas.addEventListener('pointerup', e => {
+  if (dragging) {
+    dragging.fx = null; dragging.fy = null;
+    dragging = null; sim.alphaTarget(0);
+  }
+});
+
+window.addEventListener('resize', () => {
+  resize();
+  applyLens(currentLens); // recompute anchors
+});
+
+// keep a faint life so the field breathes when settled
+sim.alphaMin(0.0008);
+
+// boot
+applyLens('free');
+</script>
+</body>
+</html>

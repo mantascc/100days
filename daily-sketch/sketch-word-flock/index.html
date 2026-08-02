@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>word flock — vicsek typography</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap">
+<style>
+  :root {
+    --paper:    #f3efe6;
+    --paper-2:  #ece6d8;
+    --ink:      #1c1a17;
+    --faint:    #b6ad9a;
+    --ghost:    #d8d0bf;
+    --align:    #c0502a;   /* aligned / hot */
+    --cool:     #3a4a52;   /* disordered / cool */
+    --line:     #ddd5c4;
+    --mono:     'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  #stage { position: relative; flex: 1; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* header */
+  .head {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 18px 22px; pointer-events: none; z-index: 3;
+    mix-blend-mode: multiply;
+  }
+  .head h1 { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; }
+  .head .sub { font-size: 11px; font-weight: 400; color: var(--cool); }
+  .head .phi { font-size: 11px; font-weight: 500; text-align: right; color: var(--cool); }
+  .head .phi b { color: var(--align); font-weight: 600; }
+
+  /* controls */
+  .panel {
+    position: absolute; left: 22px; bottom: 20px; z-index: 4;
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 14px 16px 12px;
+    width: 250px;
+    backdrop-filter: blur(2px);
+  }
+  .panel .row { display: grid; grid-template-columns: 64px 1fr 38px; align-items: center; gap: 8px; margin-bottom: 9px; }
+  .panel .row:last-of-type { margin-bottom: 0; }
+  .panel label { font-size: 10.5px; color: var(--cool); letter-spacing: 0.02em; }
+  .panel output { font-size: 10.5px; color: var(--ink); text-align: right; font-weight: 500; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; height: 2px; background: var(--ghost); border-radius: 2px; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--align); cursor: pointer; border: 2px solid var(--paper);
+  }
+  .panel .toggle { display: flex; align-items: center; gap: 8px; margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line); cursor: pointer; }
+  .panel .toggle .box { width: 13px; height: 13px; border: 1.5px solid var(--cool); border-radius: 3px; position: relative; flex: none; }
+  .panel .toggle.on .box { background: var(--align); border-color: var(--align); }
+  .panel .toggle.on .box::after { content: ''; position: absolute; left: 3px; top: 0.5px; width: 3px; height: 6px; border: solid var(--paper); border-width: 0 2px 2px 0; transform: rotate(43deg); }
+  .panel .toggle span { font-size: 10.5px; color: var(--ink); }
+  .panel .hint { font-size: 9.5px; color: var(--faint); margin-top: 9px; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div class="head">
+    <div>
+      <h1>word flock</h1>
+      <div class="sub">vicsek alignment × typography</div>
+    </div>
+    <div class="phi">order φ <b id="phi">0.00</b><br><span id="phiBar"></span></div>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <label>noise η</label>
+      <input id="noise" type="range" min="0" max="1.2" step="0.01" value="0.32">
+      <output id="noiseV">0.32</output>
+    </div>
+    <div class="row">
+      <label>radius r</label>
+      <input id="radius" type="range" min="40" max="220" step="2" value="120">
+      <output id="radiusV">120</output>
+    </div>
+    <div class="row">
+      <label>speed v</label>
+      <input id="speed" type="range" min="0.2" max="3" step="0.05" value="1.1">
+      <output id="speedV">1.1</output>
+    </div>
+    <div class="toggle on" id="lockT">
+      <div class="box"></div>
+      <span>legibility lock&nbsp;·&nbsp;keep words upright</span>
+    </div>
+    <div class="hint">Each word steers to match its neighbours' heading. Unlock to let words rotate fully to their bearing — alignment wins, reading breaks.</div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W, H, DPR;
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = W * DPR; cv.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resize);
+
+// --- corpus: a self-describing paragraph, kept legible word by word ---
+const corpus = ("words drift across the field each one watching only its " +
+  "nearest few and turning to match their heading no plan no leader and yet " +
+  "a current forms sentences breaking apart and re forming as lanes of " +
+  "aligned glyphs a flock that you can almost still read").split(/\s+/);
+
+const params = {
+  noise: 0.32, radius: 120, speed: 1.1, lock: true
+};
+
+let agents = [];
+function init() {
+  agents = corpus.map((word, i) => ({
+    word,
+    x: Math.random() * W,
+    y: Math.random() * H,
+    a: Math.random() * Math.PI * 2,   // heading
+    disp: 0                            // smoothed local alignment 0..1
+  }));
+}
+
+function wrap(v, max) { return (v % max + max) % max; }
+
+function step() {
+  const r2 = params.radius * params.radius;
+  const next = new Float64Array(agents.length);
+  const localPhi = new Float64Array(agents.length);
+
+  for (let i = 0; i < agents.length; i++) {
+    const ai = agents[i];
+    let sx = 0, sy = 0, n = 0;
+    for (let j = 0; j < agents.length; j++) {
+      const aj = agents[j];
+      // toroidal nearest-image distance
+      let dx = aj.x - ai.x, dy = aj.y - ai.y;
+      if (dx >  W/2) dx -= W; else if (dx < -W/2) dx += W;
+      if (dy >  H/2) dy -= H; else if (dy < -H/2) dy += H;
+      if (dx*dx + dy*dy <= r2) { sx += Math.cos(aj.a); sy += Math.sin(aj.a); n++; }
+    }
+    const mean = Math.atan2(sy, sx);
+    const noise = (Math.random() - 0.5) * params.noise;
+    next[i] = mean + noise;
+    // local order parameter = resultant length / count
+    localPhi[i] = n > 0 ? Math.hypot(sx, sy) / n : 0;
+  }
+
+  let gx = 0, gy = 0;
+  for (let i = 0; i < agents.length; i++) {
+    const a = agents[i];
+    a.a = next[i];
+    a.x = wrap(a.x + Math.cos(a.a) * params.speed, W);
+    a.y = wrap(a.y + Math.sin(a.a) * params.speed, H);
+    a.disp += (localPhi[i] - a.disp) * 0.08;   // ease the colour
+    gx += Math.cos(a.a); gy += Math.sin(a.a);
+  }
+  return Math.hypot(gx, gy) / agents.length;   // global φ
+}
+
+// lerp between cool (disordered) and hot (aligned)
+function heat(t) {
+  const c0 = [58, 74, 82], c1 = [192, 80, 42];
+  const r = Math.round(c0[0] + (c1[0]-c0[0])*t);
+  const g = Math.round(c0[1] + (c1[1]-c0[1])*t);
+  const b = Math.round(c0[2] + (c1[2]-c0[2])*t);
+  return `rgb(${r},${g},${b})`;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+
+  for (const a of agents) {
+    const t = Math.min(1, Math.max(0, (a.disp - 0.15) / 0.75));
+    // heading tick — the bearing, always honest
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    ctx.globalAlpha = 0.20 + 0.30 * t;
+    ctx.strokeStyle = heat(t);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(a.a) * 13, Math.sin(a.a) * 13);
+    ctx.stroke();
+    ctx.restore();
+
+    // the word
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    if (!params.lock) {
+      // unlocked: rotate fully to heading (alignment wins, reading breaks)
+      let ang = a.a;
+      if (ang > Math.PI/2 && ang < 3*Math.PI/2) ang += Math.PI; // avoid upside-down
+      ctx.rotate(ang);
+    } else {
+      // locked: keep upright, but lean a hair toward heading so flow is felt
+      const lean = Math.sin(a.a) * 0.12;
+      ctx.rotate(lean);
+    }
+    const size = 12 + 4 * t;
+    ctx.font = `${500} ${size}px var(--mono), 'JetBrains Mono', monospace`;
+    ctx.font = `${t > 0.6 ? 600 : 400} ${size}px 'JetBrains Mono', monospace`;
+    ctx.globalAlpha = 0.55 + 0.45 * t;
+    ctx.fillStyle = heat(t);
+    ctx.fillText(a.word, 0, -10);
+    ctx.restore();
+  }
+}
+
+const phiEl = document.getElementById('phi');
+const phiBar = document.getElementById('phiBar');
+function loop() {
+  const phi = step();
+  draw();
+  phiEl.textContent = phi.toFixed(2);
+  const blocks = Math.round(phi * 12);
+  phiBar.textContent = '▓'.repeat(blocks) + '░'.repeat(12 - blocks);
+  requestAnimationFrame(loop);
+}
+
+// --- controls ---
+function bind(id, key, fmt) {
+  const el = document.getElementById(id);
+  const out = document.getElementById(id + 'V');
+  const sync = () => { params[key] = parseFloat(el.value); out.textContent = fmt(el.value); };
+  el.addEventListener('input', sync); sync();
+}
+bind('noise', 'noise', v => (+v).toFixed(2));
+bind('radius', 'radius', v => (+v).toFixed(0));
+bind('speed', 'speed', v => (+v).toFixed(2));
+
+const lockT = document.getElementById('lockT');
+lockT.addEventListener('click', () => {
+  params.lock = !params.lock;
+  lockT.classList.toggle('on', params.lock);
+});
+
+resize(); init(); loop();
+window.addEventListener('resize', () => { /* keep agents, just refit field */ });
+</script>
+</body>
+</html>

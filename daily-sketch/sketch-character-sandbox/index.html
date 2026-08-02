@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Sandbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --void: #0a0a0a;
+    --card: #101116;
+    --edge: rgba(255,255,255,0.09);
+    --ink: #e7e7ea;
+    --ink-soft: #8a8d94;
+    --ink-dim: #4a4d55;
+    --ink-ghost: #2c2e35;
+    --font: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--void); color: var(--ink); font-family: var(--font); }
+  #stage { position: fixed; inset: 0; display: block; cursor: crosshair; }
+
+  header { position: fixed; top: 22px; left: 24px; z-index: 10; pointer-events: none; }
+  .mark { font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--ink-soft); }
+  .sub { margin-top: 5px; font-size: 10px; letter-spacing: 0.1em; color: var(--ink-dim); font-weight: 300; }
+
+  .telem { position: fixed; top: 22px; right: 24px; z-index: 10; pointer-events: none;
+    font-size: 10px; letter-spacing: 0.1em; color: var(--ink-dim); text-align: right; text-transform: uppercase; line-height: 1.7; }
+  .telem b { color: var(--ink-soft); font-weight: 400; }
+
+  /* ID card */
+  .card {
+    position: fixed; z-index: 20; width: 264px; pointer-events: none;
+    background: linear-gradient(180deg, #12131a 0%, #0b0c10 100%);
+    border: 1px solid var(--edge); border-radius: 10px;
+    box-shadow: 0 30px 70px -30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.04);
+    padding: 15px 16px 14px; opacity: 0; transform: translateY(4px) scale(0.98);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+  }
+  .card.show { opacity: 1; transform: translateY(0) scale(1); }
+  .card-top { display: flex; justify-content: space-between; align-items: center;
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 12px; }
+  .card-id { color: var(--ink-soft); }
+  .card-chip { padding: 2px 7px; border-radius: 3px; border: 0.5px solid var(--edge); }
+  .card-name { font-size: 17px; font-weight: 500; color: #fff; line-height: 1.1; }
+  .card-vec { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; margin-bottom: 11px; }
+  .card-desc { font-size: 11.5px; line-height: 1.55; color: var(--ink-soft); }
+  .card-info { margin-top: 13px; padding-top: 11px; border-top: 0.5px solid var(--edge);
+    display: grid; grid-template-columns: 62px 1fr; row-gap: 5px; font-size: 10px; }
+  .card-info dt { color: var(--ink-ghost); text-transform: uppercase; letter-spacing: 0.1em; }
+  .card-info dd { color: var(--ink-soft); }
+  .card-coord { margin-top: 11px; font-size: 9px; letter-spacing: 0.1em; color: var(--ink-ghost); text-transform: uppercase; }
+
+  /* group highlight panel */
+  .panel { position: fixed; left: 24px; bottom: 24px; z-index: 12; display: flex; flex-direction: column; gap: 9px; }
+  .ltabs { display: flex; gap: 5px; }
+  .ltab { font-family: var(--font); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 4px 9px; border: 0.5px solid var(--edge); border-radius: 3px; color: var(--ink-dim);
+    background: transparent; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
+  .ltab:hover { color: var(--ink); border-color: rgba(255,255,255,0.2); }
+  .ltab.on { color: #0a0a0a; background: var(--ink-soft); border-color: var(--ink-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; max-width: 540px; }
+  .chip { display: flex; align-items: center; gap: 7px; font-size: 10px; letter-spacing: 0.04em;
+    padding: 4px 9px 4px 7px; border: 0.5px solid var(--edge); border-radius: 3px; color: var(--ink-dim);
+    cursor: pointer; transition: color .15s, background .15s, border-color .15s; text-transform: uppercase; }
+  .chip:hover { color: var(--ink); }
+  .chip.on { color: var(--ink); border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+  .chip .sw { width: 8px; height: 8px; border-radius: 1px; flex: none; opacity: 0.35; transition: opacity .15s; }
+  .chip.on .sw, .chip:hover .sw { opacity: 1; }
+  .chip .ct { color: var(--ink-ghost); }
+  .clear { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-ghost);
+    cursor: pointer; align-self: flex-start; }
+  .clear:hover { color: var(--ink-soft); }
+  @media (max-width: 640px) { .panel { max-width: 84vw; } .chips { max-width: 84vw; } }
+
+  .corner { position: fixed; width: 7px; height: 7px; z-index: 10; border: 1px solid var(--ink-ghost); }
+  .corner.tl { top: 18px; left: 18px; border-right: 0; border-bottom: 0; }
+  .corner.tr { top: 18px; right: 18px; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 18px; left: 18px; border-right: 0; border-top: 0; }
+  .corner.br { bottom: 18px; right: 18px; border-left: 0; border-top: 0; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+
+<header>
+  <div class="mark">Character Sandbox</div>
+  <div class="sub">76 agents adrift · hover to freeze &amp; inspect</div>
+</header>
+<div class="telem" id="telem"><b>76</b> agents<br>0 frozen</div>
+
+<div class="panel">
+  <div class="ltabs" id="ltabs"></div>
+  <div class="chips" id="chips"></div>
+  <div class="clear" id="clear" style="display:none">&#10005; clear highlight</div>
+</div>
+
+<div class="card" id="card">
+  <div class="card-top"><span class="card-id" id="cId">AGENT · 000</span><span class="card-chip" id="cChip">—</span></div>
+  <div class="card-name" id="cName">—</div>
+  <div class="card-vec" id="cVec">—</div>
+  <div class="card-desc" id="cDesc">—</div>
+  <dl class="card-info" id="cInfo"></dl>
+  <div class="card-coord" id="cCoord">—</div>
+</div>
+
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+
+<script>
+// ── data ──────────────────────────────────────────────────────────────
+const D = (id,sub,desc,arc,ont,fn,st)=>({id,sub,desc,arc,ont,fn,st});
+const DATA = [
+  D('Gabrielius','Topology','Tracks how the whole structure bends without losing itself — the hidden geometry of the system.','System vectors','Being','know','established'),
+  D('Aukse','Flow / narrative','Turns states into story, movement into sequence, scattered events into a followable path.','System vectors','Being','know','established'),
+  D('Ruta','Snapshot / state','Keeper of the present frame: what is true now, before it is explained or improved.','System vectors','Being','know','established'),
+  D('Vyte','Intuition / compression','Senses the whole before the parts are named; condenses complexity into a felt hunch.','System vectors','Being','know','established'),
+  D('Aida','Channeling / reception','Lets signals arrive before deciding what they mean.','System vectors','Being','hold','established'),
+  D('Anomaly','Prediction error','The event that does not fit the model; forces the system to update rather than coast.','System vectors','Force','know','established'),
+  D('Alice','Curiosity vector','The direction of inquiry itself — the rabbit-hole impulse toward discovery.','System vectors','Being','move','established'),
+  D('Austeja','Pattern weaver','Interlaces separate threads into living pattern; a textile intelligence of repetition and repair.','System vectors','Being','know','established'),
+  D('Alexas','Heat sink','Absorbs and regulates excess heat; diffuses overload before combustion.','System vectors','Being','hold','established'),
+  D('Idle','No vector','A figure without a direction yet — latency, waiting, unused capacity, or refusal to move.','System vectors','Force','depth','candidate'),
+  D('Mintis','Pattern-seeing','Recognizes relationships and names structures; risk: over-processing before the body has lived it.','Inner characters','Being','know','established'),
+  D('Vėjas','Creative wind','Curiosity, improvisation, surrender; carries signals without controlling the destination.','Inner characters','Force','move','established'),
+  D('Alfa','Unconditional love','Grandmother-love: care that stays available through collapse, uncertainty, and shame.','Inner characters','Force','hold','established'),
+  D('Kometa','Endurance / momentum','Moves through difficulty with enormous momentum; learning that power need not self-destruct.','Inner characters','Being','drive','established'),
+  D('Mirga','Vitality / shimmer','Wild, sensual, playful vitality that appears when tension releases and life is allowed to unfold.','Inner characters','Being','feel','established'),
+  D('Perkūnas','Storm / voltage','Thunder and raw jėga; can generate chaos or harness entropy into directed force, peace, love.','Inner characters','Force','drive','established'),
+  D('Kūnas','Embodied truth','The body as intelligence before language; moves before the meaning.','Inner characters','Being','feel','established'),
+  D('High Performer','Discipline','Relentless function that continues while hurt; tempted to equate worth with endurance.','Inner characters','Being','drive','established'),
+  D('Iron Scout','Vigilant endurance','A tried name for the endurance figure: alert, resilient, crossing hard terrain.','Inner characters','Being','drive','candidate'),
+  D('Ade','Scene voice','A named bar/theater participant, distinct from Aida; temperament not recovered.','Bar / theater','Being','depth','unrecovered'),
+  D('Shame','Exposure alarm','Predicts exposure and judgment; can make pleasure, visibility, and success feel dangerous.','Bar / theater','Force','guard','established'),
+  D('Rational Mind','Analysis','Searches for causes, evidence, and plans; risk: solving feelings before they are felt.','Bar / theater','Being','know','established'),
+  D('Bright Side','Possibility','Detects constructive interpretations; challenge is sincerity over suppression of grief.','Bar / theater','Being','know','established'),
+  D('Suspicious','Skeptical protection','Scans for hidden motives and threats; protective, but can block trust and ease.','Bar / theater','Being','guard','established'),
+  D('Uniting','Integration','Seeks shared truth between opposing positions without erasing conflict.','Bar / theater','Being','hold','established'),
+  D('The Bar Host','Convening','The presence that creates the room where characters meet, argue, and reveal themselves.','Bar / theater','Being','hold','established'),
+  D('The Audience / Witness','Observation','Hears all voices without immediately becoming any single one.','Bar / theater','Being','hold','established'),
+  D('Father','Authority / protection','Inherited paternal force; the question is what protects without dominating.','Relational','Being','guard','established'),
+  D('Traveler','Journeying self','Moves through the mythology rather than ruling it from above.','Relational','Being','move','established'),
+  D('Eros','Desire','Attraction, longing, erotic vitality; movement toward contact.','Relational','Force','feel','established'),
+  D('The Exile / Išeivis','Liminal belonging','Living between identities; the perspective gained through separation.','Relational','Being','depth','established'),
+  D('Future Father','Mature protection','The version of Father that offers stable boundaries without control.','Relational','Being','guard','candidate'),
+  D('Shape-Shifter','Adaptability','Identity fluidity; the capacity to transform between roles. Definition unrecovered.','Candidates','Being','move','candidate'),
+  D('Šviesa','Light','A symbolic force of light, hope, and path-revealing.','Candidates','Force','know','candidate'),
+  D('Šoklė','Dance / leap','A leaping feminine force near movement, play, and liberated embodiment.','Candidates','Being','feel','candidate'),
+  D('Mirgė','Shimmering','A naming branch around flickering vitality, close to what became Mirga.','Candidates','Being','feel','candidate'),
+  D('Jutra','Sensitivity','A name for feeling, awakening, and vitality; original meaning unpreserved.','Candidates','Being','feel','candidate'),
+  D('Eiva','Movement','A name with living-force associations; intended role not recoverable.','Candidates','Being','move','candidate'),
+  D('Norlys','North star','Orientation rather than fixed destination — direction without demanding certainty.','Personified forces','Force','hold','established'),
+  D('Gelmė','Depth','Inward descent and contact with what the surface cannot grasp.','Personified forces','Force','depth','established'),
+  D('Fog','Uncertainty','Not seeing the whole path; tests whether clarity can be carried internally.','Personified forces','Force','depth','established'),
+  D('Clarity','Aligned perception','Perceiving what is true or aligned without eliminating ambiguity.','Personified forces','Force','know','established'),
+  D('Vitality','Life-energy','Movement, pleasure, curiosity, appetite — before moral evaluation.','Personified forces','Force','feel','established'),
+  D('Entropy','Excess charge','Uncontrolled transformation and excess charge; danger and generative disorder.','Personified forces','Force','depth','established'),
+  D('The Body','Physical intelligence','The organism as intelligence rather than possession; once personified, became Kūnas.','Personified forces','Force','feel','established'),
+  D('Curiosity','Toward the unknown','The movement toward the unknown rather than away — the fuel of Vėjas.','Personified forces','Force','move','established'),
+  D('Anxiety','Threat-shaped','Heightened energy interpreting uncertainty as threat.','Personified forces','Force','guard','established'),
+  D('Unity','Coherence','Participation in something larger without surrendering individual clarity.','Personified forces','Force','hold','established'),
+  D('Surrender','Allowing','Allowing collapse or uncertainty without reading it as annihilation.','Personified forces','Force','depth','established'),
+  D('Collapse','Threshold breaking','Breaking an old structure so rebuilding becomes possible.','Personified forces','Force','depth','established'),
+  D('Joy','Permitted aliveness','A capacity becoming something permitted rather than earned.','Personified forces','Force','feel','established'),
+  D('Anti-Joy / Guilt','Pleasure interruption','Says feeling good is disloyal, insensitive, or undeserved.','Personified forces','Force','guard','established'),
+  D('Earnestness','Unironic','Open caring without protective detachment or irony as armor.','Personified forces','Force','feel','established'),
+  D('Mundane Victory','Ordinary counting','The recognition that ordinary acts of living count.','Personified forces','Force','feel','candidate'),
+  D('Success Guilt','Achievement minimizer','Shrinks achievement to preserve belonging with those who struggle more.','Personified forces','Force','guard','established'),
+  D('The Unknown','Threshold presence','Not merely absence of knowledge, but a place or being to be met.','Personified forces','Force','depth','established'),
+  D('Silence','Room without performance','A space that may become a room in which one can exist without performing.','Personified forces','Force','depth','established'),
+  D('Visibility','Being seen','The desire to be seen and celebrated without performing for recognition.','Personified forces','Force','feel','established'),
+  D('Openness','Reception','A potion-like capacity to receive experience without immediate defense.','Personified forces','Force','hold','established'),
+  D('Dream','Restorative imagination','Softens rigid waking structures; expressed through Dream Salve.','Personified forces','Force','depth','established'),
+  D('Love','Connecting field','Care, attraction, embodied pleasure, transformed electricity — many forms at once.','Personified forces','Force','hold','established'),
+  D('Strength','Regulated power','Redefined from endurance-despite-injury into choice, regulation, and not-burning.','Personified forces','Force','drive','established'),
+  D('Motion','Chosen movement','Once compulsory, becoming voluntary — motion by choice.','Personified forces','Force','move','established'),
+  D('Protection','Safety without control','Differentiated from control, hardness, and anticipatory aggression.','Personified forces','Force','guard','established'),
+  D('The Bar','Social territory','The room where competing inner positions drink, argue, and confess.','Places & objects','Place','hold','established'),
+  D('The Stage / Theater','Inner drama','Makes the inner system visible; no one voice becomes the whole self.','Places & objects','Place','hold','established'),
+  D('The Mysterious Space','Emergence-field','Where Mirga appears, after tension releases and control loosens.','Places & objects','Place','feel','established'),
+  D('The Garden','Cultivation','Care, slow growth, cultivation — a Mintis-Studio principle.','Places & objects','Place','hold','established'),
+  D('Liquid','Fluid clarity','Clarity through fluidity rather than rigidity.','Places & objects','Place','know','established'),
+  D('Wind','Movement','Curiosity and movement; later strongly personified as Vėjas.','Places & objects','Place','move','established'),
+  D('Comet','Propulsion','Kometa’s image: extraordinary propulsion with the danger of combustion.','Places & objects','Place','drive','established'),
+  D('Potions Shelf','Ritual interface','A shelf for invoking Dream, Openness, Vitality, and Visibility.','Places & objects','Place','hold','established'),
+  D('North Star','Orientation','Norlys’s visual form: a guide that stays distant enough not to become rigid.','Places & objects','Place','hold','established'),
+  D('Kosmitas','Adjacent','A named adjacent presence; role undefined without invention.','Adjacent','Being','depth','unrecovered'),
+  D('Tom Orla','Adjacent','A named adjacent presence; relation noted but not yet described.','Adjacent','Being','depth','unrecovered'),
+  D('Minchiukas','Adjacent','An adjacent presence; the name suggests proximity to Mintis.','Adjacent','Being','depth','unrecovered'),
+];
+
+const FN_COLOR = { drive:'#f07060', feel:'#f4bfa0', guard:'#c98fb0', know:'#7fa8c9', hold:'#8fae9b', move:'#f4d87a', depth:'#7b6fa5' };
+const FN_LABEL = { drive:'Drive', feel:'Feel', guard:'Guard', know:'Know', hold:'Hold', move:'Move', depth:'Depth' };
+
+// ── setup ─────────────────────────────────────────────────────────────
+const cv = document.getElementById('stage');
+const ctx = cv.getContext('2d');
+let W, H, DPR;
+function resize(){ DPR = Math.max(1, window.devicePixelRatio||1); W=innerWidth; H=innerHeight;
+  cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
+resize(); addEventListener('resize', resize);
+
+const pad3 = n => String(n).padStart(3,'0');
+const agents = DATA.map((d,i)=>({
+  ...d, idn: pad3(i+1), color: FN_COLOR[d.fn],
+  x: Math.random()*W, y: Math.random()*H,
+  angle: Math.random()*Math.PI*2,
+  speed: 7 + Math.random()*11,            // px/s — slow drift
+  turn: (Math.random()-0.5)*0.4,
+  seed: Math.random()*1000,
+}));
+
+let hover = null, mx=-9999, my=-9999;
+cv.addEventListener('pointermove', e => { mx=e.clientX; my=e.clientY; });
+cv.addEventListener('pointerleave', () => { mx=-9999; my=-9999; });
+
+function pick(){
+  let best=null, bd=20*20;
+  for(const a of agents){ const dx=a.x-mx, dy=a.y-my, d=dx*dx+dy*dy; if(d<bd){bd=d; best=a;} }
+  return best;
+}
+
+// ── UI card ───────────────────────────────────────────────────────────
+const card=document.getElementById('card');
+const cId=document.getElementById('cId'), cChip=document.getElementById('cChip');
+const cName=document.getElementById('cName'), cVec=document.getElementById('cVec');
+const cDesc=document.getElementById('cDesc'), cInfo=document.getElementById('cInfo');
+const cCoord=document.getElementById('cCoord'), telem=document.getElementById('telem');
+
+function fillCard(a){
+  cId.textContent = 'AGENT · ' + a.idn;
+  cChip.textContent = a.st;
+  cChip.style.color = a.st==='established' ? 'var(--ink-soft)' : a.st==='candidate' ? '#f4d87a' : '#c98fb0';
+  cName.textContent = a.id;
+  cVec.textContent = a.sub;
+  cVec.style.color = a.color;
+  cDesc.textContent = a.desc;
+  cInfo.innerHTML =
+    `<dt>function</dt><dd style="color:${a.color}">${FN_LABEL[a.fn]}</dd>`+
+    `<dt>archive</dt><dd>${a.arc}</dd>`+
+    `<dt>ontology</dt><dd>${a.ont}</dd>`;
+  cCoord.textContent = `x ${Math.round(a.x)} · y ${Math.round(a.y)} · frozen`;
+}
+function placeCard(a){
+  const w=264, h=card.offsetHeight||300;
+  let x=a.x+18, y=a.y+18;
+  if(x+w>W-14) x=a.x-w-18;
+  if(y+h>H-14) y=H-h-14;
+  if(y<14) y=14;
+  card.style.left=x+'px'; card.style.top=y+'px';
+}
+
+// ── group highlighting ───────────────────────────────────────────────
+const AC = ['#7b6fa5','#f4bfa0','#f07060','#f4d87a','#f4a0a0','#8fae9b','#7fa8c9','#c98fb0'];
+const LENSES = {
+  function: { field:'fn', order:['drive','feel','guard','know','hold','move','depth'], label:FN_LABEL, color:FN_COLOR },
+  archive:  { field:'arc', order:['System vectors','Inner characters','Bar / theater','Relational','Candidates','Personified forces','Places & objects','Adjacent'] },
+  ontology: { field:'ont', order:['Being','Force','Place'], color:{Being:'#7fa8c9',Force:'#f4bfa0',Place:'#8fae9b'}, label:{Being:'Being',Force:'Force',Place:'Place'} },
+  charge:   { field:'st', order:['established','candidate','unrecovered'], color:{established:'#8fae9b',candidate:'#f4d87a',unrecovered:'#c98fb0'}, label:{established:'Established',candidate:'Candidate',unrecovered:'Unrecovered'} },
+};
+LENSES.archive.color = {}; LENSES.archive.label = {};
+LENSES.archive.order.forEach((g,i)=>{ LENSES.archive.color[g]=AC[i%AC.length]; LENSES.archive.label[g]=g; });
+
+let activeLens = 'function';
+const highlighted = new Set();
+let hoverGroup = null;
+
+function groupColor(a){ const L=LENSES[activeLens]; return L.color[a[L.field]]; }
+function hexRgb(hex){ const h=hex.replace('#',''); return `${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)}`; }
+function counts(lens){ const L=LENSES[lens], m={}; agents.forEach(a=>{ m[a[L.field]]=(m[a[L.field]]||0)+1; }); return m; }
+
+const ltabs=document.getElementById('ltabs'), chipsEl=document.getElementById('chips'), clearEl=document.getElementById('clear');
+Object.keys(LENSES).forEach(k=>{ const b=document.createElement('button'); b.className='ltab'; b.textContent=k; b.dataset.k=k;
+  b.onclick=()=>{ activeLens=k; highlighted.clear(); buildChips(); }; ltabs.appendChild(b); });
+
+function buildChips(){
+  [...ltabs.children].forEach(b=>b.classList.toggle('on', b.dataset.k===activeLens));
+  const L=LENSES[activeLens], ct=counts(activeLens);
+  chipsEl.innerHTML='';
+  L.order.forEach(g=>{
+    if(!(g in ct)) return;
+    const chip=document.createElement('div'); chip.className='chip'+(highlighted.has(g)?' on':'');
+    chip.innerHTML=`<span class="sw" style="background:${L.color[g]}"></span>${L.label[g]} <span class="ct">${ct[g]}</span>`;
+    chip.addEventListener('mouseenter',()=>hoverGroup=g);
+    chip.addEventListener('mouseleave',()=>{ if(hoverGroup===g) hoverGroup=null; });
+    chip.addEventListener('click',()=>{ highlighted.has(g)?highlighted.delete(g):highlighted.add(g); buildChips(); });
+    chipsEl.appendChild(chip);
+  });
+  clearEl.style.display = highlighted.size ? 'block' : 'none';
+}
+clearEl.onclick=()=>{ highlighted.clear(); buildChips(); };
+buildChips();
+
+// ── loop ──────────────────────────────────────────────────────────────
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(64, now-last)/1000; last=now;
+  hover = (mx>-9998) ? pick() : null;
+
+  const LF = LENSES[activeLens].field;
+  const anyHi = highlighted.size>0 || !!hoverGroup;
+
+  ctx.clearRect(0,0,W,H);
+  for(const a of agents){
+    const frozen = (a===hover);
+    if(!frozen){
+      a.seed += dt*0.5;
+      a.angle += Math.sin(a.seed)*0.02 + a.turn*dt*0.15;
+      a.x += Math.cos(a.angle)*a.speed*dt;
+      a.y += Math.sin(a.angle)*a.speed*dt;
+      const m=24;
+      if(a.x<-m) a.x=W+m; if(a.x>W+m) a.x=-m;
+      if(a.y<-m) a.y=H+m; if(a.y>H+m) a.y=-m;
+    }
+    const lit = (hoverGroup && a[LF]===hoverGroup) || highlighted.has(a[LF]);
+    let dim = 1;
+    if(hover && !frozen) dim *= 0.34;
+    if(anyHi && !lit && !frozen) dim *= 0.18;
+    const gcol = groupColor(a);
+
+    // glyph
+    if(frozen){
+      ctx.strokeStyle = gcol; ctx.lineWidth=1;
+      ctx.globalAlpha=0.9; ctx.beginPath(); ctx.arc(a.x,a.y,9,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=0.12; ctx.beginPath(); ctx.arc(a.x,a.y,9,0,Math.PI*2); ctx.fillStyle=gcol; ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.fillStyle=gcol; ctx.beginPath(); ctx.arc(a.x,a.y,3,0,Math.PI*2); ctx.fill();
+    } else if(lit){
+      ctx.fillStyle = `rgba(${hexRgb(gcol)},${0.92*dim})`;
+      ctx.beginPath(); ctx.arc(a.x,a.y,2.9,0,Math.PI*2); ctx.fill();
+    } else {
+      ctx.fillStyle = `rgba(231,231,234,${0.5*dim})`;
+      ctx.beginPath(); ctx.arc(a.x,a.y,2.2,0,Math.PI*2); ctx.fill();
+    }
+    // faint id trailing the dot
+    ctx.font = "300 8px 'IBM Plex Mono', monospace";
+    ctx.textBaseline='middle';
+    const labA = frozen ? 0.9 : (lit ? 0.5*dim : 0.16*dim);
+    ctx.fillStyle = `rgba(255,255,255,${labA})`;
+    ctx.fillText(frozen ? a.idn+' · '+a.id : a.idn, a.x+7, a.y);
+  }
+
+  // card + telem
+  if(hover){
+    fillCard(hover); placeCard(hover);
+    card.classList.add('show');
+    telem.innerHTML = `<b>76</b> agents<br><b style="color:${groupColor(hover)}">1</b> frozen · ${hover.idn}`;
+  } else {
+    card.classList.remove('show');
+    if(anyHi){
+      const groups = hoverGroup ? new Set([hoverGroup]) : highlighted;
+      let n=0; agents.forEach(a=>{ if(groups.has(a[LF])) n++; });
+      telem.innerHTML = `<b>76</b> agents<br><b>${n}</b> highlighted · ${activeLens}`;
+    } else {
+      telem.innerHTML = `<b>76</b> agents<br>0 frozen`;
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -18,11 +18,12 @@ Edition 1 (permutation) is the original drawing. The № *is* the artwork's addr
 - **Block size** — 4×4 pocket · 8×8 *illa* (one block) · 16×16 full district
 - **Rule** — permutation / sampling
 - **Orientation** — upright / allow 90° turns (independent seed stream)
+- **Locks** — click any tile to pin it; locked positions keep their original glyph (and stay upright) through every edition. Persisted in localStorage; ⨯ clears them.
 - **↓ SVG** — export current edition (tiles referenced relative to `images/`)
 - **⎙ print** — print-view for a numbered plate
 
 ## verified
-Deterministic per №; permutation is a true bijection (256 unique); all 256 editions distinct (zero collisions); edition 1 == original.
+Deterministic per № (and per lock set); permutation remains a true bijection with any lock subset (locked glyphs hold position, unlocked glyphs shuffle into unlocked positions); all 256 editions distinct under any lock set; edition 1 == original; fully-locked → every edition collapses to the original.
 
 ## stack
 vanilla · DepartureMono · CSS grid · 256 raster glyph tiles in `images/`

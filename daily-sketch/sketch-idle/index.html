@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --ground-void: #0a0a0a;
+    --text-primary: #ffffff;
+    --text-default: #f5f5f7;
+    --text-secondary: #a8aab8;
+    --text-tertiary: #666666;
+    --text-ghost: #333333;
+    --accent: #00a8ff;
+    --font: 'IBM Plex Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%; overflow: hidden;
+    background: var(--ground-void); color: var(--text-default);
+    font-family: var(--font);
+  }
+  #face { position: fixed; inset: 0; display: block; }
+
+  /* header */
+  header {
+    position: fixed; top: 24px; left: 26px; z-index: 10; pointer-events: none;
+  }
+  .mark {
+    font-size: 12px; letter-spacing: 0.42em; text-transform: uppercase;
+    color: var(--text-secondary); font-weight: 400;
+  }
+  .sub {
+    margin-top: 6px; font-size: 11px; letter-spacing: 0.14em;
+    color: var(--text-tertiary); font-weight: 300;
+    transition: color 0.6s;
+  }
+
+  /* readout — claim/signal/motion, quiet lower-left */
+  .readout {
+    position: fixed; left: 26px; bottom: 26px; z-index: 10; pointer-events: none;
+    display: grid; grid-template-columns: 58px 1fr; row-gap: 5px; column-gap: 14px;
+    font-size: 10px; line-height: 1.4;
+  }
+  .readout dt {
+    color: var(--text-ghost); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 400;
+  }
+  .readout dd { color: var(--text-tertiary); font-weight: 300; }
+  .readout dd b { color: var(--text-secondary); font-weight: 400; }
+
+  /* charge meter — lower right */
+  .charge {
+    position: fixed; right: 26px; bottom: 26px; z-index: 10; pointer-events: none;
+    width: 176px; text-align: right;
+  }
+  .charge-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-ghost); margin-bottom: 7px;
+  }
+  .charge-pct { color: var(--text-secondary); font-weight: 400; }
+  .charge-track {
+    height: 2px; width: 100%; background: #1c1c1c; position: relative; overflow: hidden;
+  }
+  .charge-fill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(0,168,255,0.6);
+    transition: width 0.25s linear, opacity 0.6s;
+  }
+
+  /* nudge — center bottom, appears only when still */
+  .nudge {
+    position: fixed; left: 50%; bottom: 15%; transform: translateX(-50%);
+    z-index: 10; pointer-events: none;
+    font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+    color: var(--text-ghost); opacity: 0; transition: opacity 1.2s;
+  }
+
+  /* corner ticks */
+  .corner { position: fixed; width: 7px; height: 7px; z-index: 10; border: 1px solid var(--text-ghost); }
+  .corner.tl { top: 20px; left: 20px; border-right: 0; border-bottom: 0; }
+  .corner.tr { top: 20px; right: 20px; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 20px; left: 20px; border-right: 0; border-top: 0; }
+  .corner.br { bottom: 20px; right: 20px; border-left: 0; border-top: 0; }
+
+  .foot {
+    position: fixed; top: 24px; right: 26px; z-index: 10; pointer-events: none;
+    font-size: 10px; letter-spacing: 0.12em; color: var(--text-ghost); text-align: right;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 640px) {
+    .charge { width: 130px; }
+    .foot { display: none; }
+    .readout { font-size: 9px; grid-template-columns: 50px 1fr; }
+  }
+</style>
+</head>
+<body>
+<canvas id="face"></canvas>
+
+<header>
+  <div class="mark">Idle</div>
+  <div class="sub" id="sub">no vector · recharging</div>
+</header>
+<div class="foot">theater&#8209;rename<br>system vector · candidate</div>
+
+<dl class="readout">
+  <dt>claim</dt><dd><b>alive, resting</b></dd>
+  <dt>signal</dt><dd id="signal">nothing needed</dd>
+  <dt>motion</dt><dd>breath · ~5.5s <span style="color:#333">(not a spinner)</span></dd>
+  <dt>load</dt><dd id="load">0%</dd>
+</dl>
+
+<div class="charge">
+  <div class="charge-head"><span>charge</span><span class="charge-pct" id="pct">0%</span></div>
+  <div class="charge-track"><div class="charge-fill" id="fill"></div></div>
+</div>
+
+<div class="nudge" id="nudge">do nothing</div>
+
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+
+<script>
+const cv = document.getElementById('face');
+const ctx = cv.getContext('2d');
+let DPR = Math.max(1, window.devicePixelRatio || 1);
+let W, H;
+function resize() {
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = W * DPR; cv.height = H * DPR;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+const ACCENT = [0,168,255];
+function acc(a){ return `rgba(${ACCENT[0]},${ACCENT[1]},${ACCENT[2]},${a})`; }
+
+// ── idle / charge state ──────────────────────────────────
+let charge = 0;              // 0..1
+let load = 0;                // 0..1, rises when disturbed
+let lastMove = -9999;        // ms
+const CHARGE_SECS = 34;      // time to fully recharge while still
+const DRAIN_SECS  = 9;       // time to drain if you keep moving
+const STILL_MS    = 650;     // stillness threshold
+
+function stir() { lastMove = performance.now(); }
+window.addEventListener('pointermove', stir);
+window.addEventListener('pointerdown', stir);
+window.addEventListener('touchstart', stir, {passive:true});
+window.addEventListener('touchmove', stir, {passive:true});
+
+const subEl = document.getElementById('sub');
+const pctEl = document.getElementById('pct');
+const fillEl = document.getElementById('fill');
+const loadEl = document.getElementById('load');
+const nudgeEl = document.getElementById('nudge');
+const signalEl = document.getElementById('signal');
+
+let last = performance.now();
+const t0 = last;
+
+function frame(now) {
+  const dt = Math.min(64, now - last) / 1000; last = now;
+  const t = (now - t0) / 1000;
+  const still = (now - lastMove) > STILL_MS;
+
+  // charge climbs while still, drains while stirred
+  if (still) charge = Math.min(1, charge + dt / CHARGE_SECS);
+  else       charge = Math.max(0, charge - dt / DRAIN_SECS);
+  // load is the inverse mood: rises when disturbed, decays to zero at rest
+  load = still ? Math.max(0, load - dt / 3) : Math.min(1, load + dt / 2.2);
+
+  // breath — slow sine, deepens with charge (slower than a spinner on purpose)
+  const period = 5.5;
+  const breath = (Math.sin((t / period) * Math.PI * 2 - Math.PI/2) + 1) / 2; // 0..1
+  const bright = 0.42 + 0.58 * charge;   // face brightness follows charge
+  const full = charge >= 0.999;
+
+  draw(breath, bright, charge);
+
+  // ── UI text ──
+  const pct = Math.round(charge * 100);
+  pctEl.textContent = pct + '%';
+  fillEl.style.width = pct + '%';
+  fillEl.style.opacity = full ? 1 : 0.85;
+  loadEl.innerHTML = Math.round(load * 100) + '%';
+  subEl.textContent = full ? 'recharged' : 'no vector · recharging';
+  subEl.style.color = full ? 'rgba(0,168,255,0.8)' : '';
+  signalEl.textContent = still ? 'nothing needed' : 'leave me be';
+  nudgeEl.textContent = full ? 'recharged' : 'do nothing';
+  nudgeEl.style.opacity = (still && !full) ? 0.5 : (full ? 0.35 : 0);
+
+  requestAnimationFrame(frame);
+}
+
+function draw(breath, bright, charge) {
+  ctx.clearRect(0,0,W,H);
+  const cx = W/2, cy = H*0.46;
+  const base = Math.min(W, H);
+  const R = base * 0.11 * (1 + breath * 0.045);   // head ring, breathing scale
+
+  // ── bloom behind (effect as material) — pulses with breath + charge ──
+  const glowR = R * (2.6 + breath * 0.6);
+  const glowA = (0.05 + breath * 0.10) * (0.35 + 0.65 * charge);
+  const g = ctx.createRadialGradient(cx, cy, R*0.2, cx, cy, glowR);
+  g.addColorStop(0, acc(glowA));
+  g.addColorStop(1, acc(0));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(cx, cy, glowR, 0, Math.PI*2); ctx.fill();
+
+  // ── head ring (held, quiet) ──
+  ctx.strokeStyle = `rgba(255,255,255,${0.10 + 0.10*charge})`;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.stroke();
+
+  // ── face marks: two closed happy-neutral eyes + a soft content mouth ──
+  const stroke = `rgba(245,245,247,${bright})`;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = Math.max(2, base*0.0042);
+  ctx.lineCap = 'round';
+
+  const eyeY = cy - R*0.12;
+  const eyeDX = R*0.42;
+  const eyeW = R*0.30;
+  // closed eye = gentle downward-opening arc that curls up at the ends (content, ˘)
+  drawClosedEye(cx - eyeDX, eyeY, eyeW);
+  drawClosedEye(cx + eyeDX, eyeY, eyeW);
+
+  // mouth — small, calm, faintly upturned
+  const mouthY = cy + R*0.40;
+  const mouthW = R*0.34;
+  ctx.beginPath();
+  ctx.moveTo(cx - mouthW, mouthY);
+  ctx.quadraticCurveTo(cx, mouthY + R*0.14, cx + mouthW, mouthY);
+  ctx.stroke();
+
+  // when fully recharged, a tiny accent breath-dot rests at center
+  if (charge >= 0.999) {
+    ctx.fillStyle = acc(0.4 + breath*0.4);
+    ctx.beginPath(); ctx.arc(cx, cy, base*0.006, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function drawClosedEye(x, y, w) {
+  // an upward-curling arc: ‿ rotated — a calm closed eye
+  ctx.beginPath();
+  ctx.moveTo(x - w, y);
+  ctx.quadraticCurveTo(x, y - w*0.72, x + w, y);
+  ctx.stroke();
+}
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

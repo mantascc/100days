@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Position in Queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --paper: #e9e4d7;
+    --paper-2: #f8f5eb;
+    --ink: #090909;
+    --ink-2: #24211e;
+    --muted: #7d776b;
+    --line: rgba(9, 9, 9, 0.18);
+    --glass: rgba(248, 245, 235, 0.78);
+    --accent: #9f312a;
+    --mono: "DM Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background:
+      linear-gradient(90deg, rgba(9, 9, 9, 0.035) 1px, transparent 1px) 0 0 / 34px 34px,
+      linear-gradient(0deg, rgba(9, 9, 9, 0.025) 1px, transparent 1px) 0 0 / 34px 34px,
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+  }
+
+  body {
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .stage {
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 0;
+  }
+
+  .image-bay {
+    position: relative;
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    overflow: hidden;
+  }
+
+  .image-bay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 22% 18%, rgba(159, 49, 42, 0.09), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(0, 0, 0, 0.04));
+    pointer-events: none;
+  }
+
+  .sheet-wrap {
+    position: relative;
+    width: min(72vh, calc(100vw - 340px));
+    max-width: 780px;
+    min-width: 280px;
+    aspect-ratio: 2 / 3;
+    filter: drop-shadow(0 18px 42px rgba(20, 17, 12, 0.28));
+  }
+
+  .sheet {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--paper-2);
+    border: 1px solid rgba(9, 9, 9, 0.26);
+  }
+
+  .plate {
+    position: fixed;
+    top: 16px;
+    left: 18px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100vw - 36px);
+    color: var(--paper-2);
+    mix-blend-mode: difference;
+    pointer-events: none;
+  }
+
+  .plate h1 {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .plate .mark {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 10px;
+  }
+
+  .rail {
+    border-left: 1px solid var(--line);
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-width: 0;
+    max-height: 100svh;
+  }
+
+  .rail-head,
+  .rail-foot {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rail-foot {
+    border-top: 1px solid var(--line);
+    border-bottom: 0;
+  }
+
+  .kicker {
+    margin: 0 0 8px;
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .rail h2 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.15;
+    font-weight: 500;
+  }
+
+  .meta {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+  }
+
+  .tabs button {
+    appearance: none;
+    border: 0;
+    min-height: 38px;
+    background: rgba(248, 245, 235, 0.82);
+    color: var(--muted);
+    font: 500 10px/1 var(--mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .tabs button[aria-selected="true"] {
+    background: var(--ink);
+    color: var(--paper-2);
+  }
+
+  .panel {
+    overflow: auto;
+    min-height: 0;
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  .entry {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .entry h3 {
+    margin: 0 0 10px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .entry p,
+  .entry li {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .entry ul {
+    margin: 0;
+    padding-left: 16px;
+  }
+
+  .queue {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 2px;
+    margin-top: 14px;
+  }
+
+  .queue span {
+    height: 18px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(9, 9, 9, 0.18);
+    color: var(--muted);
+    font-size: 9px;
+  }
+
+  .queue span:last-child {
+    background: var(--accent);
+    color: var(--paper-2);
+    border-color: var(--accent);
+  }
+
+  .source-link {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    font-size: 11px;
+  }
+
+  @media (max-width: 900px) {
+    body {
+      overflow: auto;
+    }
+
+    .stage {
+      min-height: 100svh;
+      grid-template-columns: 1fr;
+    }
+
+    .image-bay {
+      min-height: 100svh;
+      padding: 54px 16px 18px;
+    }
+
+    .sheet-wrap {
+      width: min(92vw, 68vh);
+    }
+
+    .rail {
+      max-height: none;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 540px) {
+    .plate h1 {
+      font-size: 10px;
+    }
+
+    .plate .mark {
+      width: 22px;
+      height: 22px;
+    }
+
+    .image-bay {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .rail-head,
+    .rail-foot,
+    .entry {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="plate" aria-hidden="true">
+  <span class="mark">1</span>
+  <h1>Position in Queue</h1>
+</div>
+
+<main class="stage">
+  <section class="image-bay" aria-label="Generated zine sketch">
+    <div class="sheet-wrap">
+      <img class="sheet" src="assets/position-in-queue-generated-v2.png" alt="A black-first nine panel bureaucracy horror zine page set in a surreal brutalist post-Soviet office complex with empty counters, concrete corridors, forms, and a final borderless white panel.">
+    </div>
+  </section>
+
+  <aside class="rail" aria-label="Sketch notes">
+    <header class="rail-head">
+      <p class="kicker">image seed</p>
+      <h2>Position in Queue</h2>
+      <p class="meta">A single generated page from a saved text brief. The source stays exact; the bitmap is the sketch.</p>
+      <div class="queue" aria-label="Queue positions">
+        <span>1</span><span>1</span><span>1</span><span>1</span><span>1</span><span>1</span><span>1</span><span>1</span><span>1</span>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Notes tabs">
+      <button type="button" id="tab-reading" aria-selected="true" aria-controls="panel-reading">Reading</button>
+      <button type="button" id="tab-workflow" aria-selected="false" aria-controls="panel-workflow">Workflow</button>
+    </nav>
+
+    <section class="panel" id="panel-reading" role="tabpanel" aria-labelledby="tab-reading">
+      <div class="entry">
+        <h3>Premise</h3>
+        <p>The terror is absence: no one is behind the counter, but the applicant keeps complying.</p>
+      </div>
+      <div class="entry">
+        <h3>Rules</h3>
+        <ul>
+          <li>No bureaucrat.</li>
+          <li>No close-up face.</li>
+          <li>Instant replies are worse than delayed replies.</li>
+          <li>The gutter becomes the queue.</li>
+        </ul>
+      </div>
+      <div class="entry">
+        <h3>Image Check</h3>
+        <p>The second pass is useful where it becomes more office-bound: concrete, fluorescent corridors, institutional furniture, empty counters, and the final white field. Generated text is treated as atmosphere, not canon.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-workflow" role="tabpanel" aria-labelledby="tab-workflow" hidden>
+      <div class="entry">
+        <h3>Files</h3>
+        <p><a class="source-link" href="source.md">source.md</a></p>
+      </div>
+      <div class="entry">
+        <h3>Asset</h3>
+        <p>assets/position-in-queue-generated-v2.png</p>
+      </div>
+      <div class="entry">
+        <h3>Next Test</h3>
+        <p>Generate one image per panel inside the same brutalist office grammar, then assemble the grid in HTML so gutters, captions, and name erosion remain deterministic.</p>
+      </div>
+    </section>
+
+    <footer class="rail-foot">
+      <p class="meta">Position in queue: 1</p>
+    </footer>
+  </aside>
+</main>
+
+<script>
+  const tabs = [
+    {
+      tab: document.getElementById("tab-reading"),
+      panel: document.getElementById("panel-reading")
+    },
+    {
+      tab: document.getElementById("tab-workflow"),
+      panel: document.getElementById("panel-workflow")
+    }
+  ];
+
+  for (const item of tabs) {
+    item.tab.addEventListener("click", () => {
+      for (const other of tabs) {
+        const selected = other === item;
+        other.tab.setAttribute("aria-selected", String(selected));
+        other.panel.hidden = !selected;
+      }
+    });
+  }
+</script>
+</body>
+</html>
