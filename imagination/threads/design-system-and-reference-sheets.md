@@ -4,8 +4,8 @@ type: thread
 title: Design systems and reference sheets
 state: active
 charge: high
-spawned: [26-widget-dashboard, 29-progress-indicators, 30-thinking-states, 31-cli-material-palette, 36-spinning-globe, 37-sentiment-analyzer, 43-style-seed, 57-color-themes, 60-agentic-patterns, 61-hitl-patterns, 63-ube-kaizen, 64-viz-grouped, 65-mode-toggle, 69-clear-channel, 71-index-100days, 73-svg-layouts, 75-layout-playground, 76-layout-depth, 79-idle-states, 82-z-axis, 84-id-card]
-feeds: [techniques/css-vars-live-controls, themes/searching-vs-mapping]
+spawned: [26-widget-dashboard, 29-progress-indicators, 30-thinking-states, 31-cli-material-palette, 36-spinning-globe, 37-sentiment-analyzer, 43-style-seed, 57-color-themes, 60-agentic-patterns, 61-hitl-patterns, 63-ube-kaizen, 64-viz-grouped, 65-mode-toggle, 69-clear-channel, 71-index-100days, 73-svg-layouts, 75-layout-playground, 76-layout-depth, 79-idle-states, 82-z-axis, 84-id-card, 91-retro-primitives]
+feeds: [techniques/css-vars-live-controls, techniques/crt-tube-treatment, themes/searching-vs-mapping]
 sources: [sources/bauhaus-early-computer-graphics]
 date: 2026-06-14
 tags: [design-system, reference, palette, ui]
@@ -24,6 +24,7 @@ A pronounced second-half turn: from one-off generative pieces toward reusable ar
 - [37-sentiment-analyzer](../../37-sentiment-analyzer/) — a named "Data-First Industrial" component style with documented type/spacing tokens.
 - [61-hitl-patterns](../../61-hitl-patterns/) — a reference catalog of four oversight patterns laid out along one axis.
 - [71-index-100days](../../71-index-100days/) — the index doubling as the canonical project registry and visual typology.
+- [91-retro-primitives](../../91-retro-primitives/) — a *palette-swap family*: four sibling pages sharing one shell (`style.css` + `engine.js`), differing only in a `VARIANT` config. The primitive treatment (see [techniques/crt-tube-treatment](../techniques/crt-tube-treatment.md)) is held constant; palette + animation become the axes of a reference sheet.
 
 # Charge
 The dominant energy of the recent practice — productive and clearly where the maker's day-job instincts live. Watch that it doesn't crowd out the wilder generative threads.

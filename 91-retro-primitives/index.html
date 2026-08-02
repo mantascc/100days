@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Sketch · Retro Primitives / phosphor</title>
+<meta name="description" content="Warm orange phosphor tube — subtle breath drift and green rings.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell" aria-label="Retro primitives — phosphor variant">
+  <div class="mast">
+    <div><strong>daily sketch</strong> / retro primitives</div>
+    <div class="idx">ch.01 · phosphor · warm sun / green rings</div>
+  </div>
+
+  <nav class="nav" aria-label="Variants">
+    <a href="index.html"    class="current">phosphor</a>
+    <a href="cryo.html">cryo</a>
+    <a href="signal.html">signal</a>
+    <a href="graphite.html">graphite</a>
+    <span class="sep"></span>
+    <span class="idx">04 / 04</span>
+  </nav>
+
+  <section class="grid" aria-label="Primitive shape grid">
+    <figure class="cell"><canvas data-shape="circle"   aria-label="Glowing circle"></canvas></figure>
+    <figure class="cell"><canvas data-shape="square"   aria-label="Glowing square"></canvas></figure>
+    <figure class="cell"><canvas data-shape="triangle" aria-label="Glowing triangle"></canvas></figure>
+    <figure class="cell"><canvas data-shape="ellipse"  aria-label="Glowing ellipse"></canvas></figure>
+  </section>
+</main>
+
+<script>
+window.VARIANT = {
+  name: 'phosphor',
+  fillMode: 'sun',
+  fillStops: ['#fff6c8', '#ffcb62', '#ff8a3a', '#ff3a20'],
+  ringOuter: '#74ffc0',
+  ringInner: '#c7ffe4',
+  sweepColor: 'rgba(199, 255, 228, 0.55)',
+  animation: 'breathe',
+  grainRGB: [180, 255, 220],
+  grainAlpha: 0.55,
+  readoutDim: 'rgba(116, 255, 192, 0.28)',
+  readoutBright: '#c7ffe4',
+  glossColor: 'rgba(120, 255, 200, 0.05)'
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

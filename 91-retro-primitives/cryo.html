@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Sketch · Retro Primitives / cryo</title>
+<meta name="description" content="Cold cobalt tube — a pale scanning bar sweeps top-to-bottom every few seconds.">
+<link rel="stylesheet" href="style.css">
+<style>
+  :root {
+    --ink: #dcefff;
+    --muted: rgba(220, 239, 255, 0.42);
+    --dim: rgba(220, 239, 255, 0.2);
+    --bg-outer: radial-gradient(circle at 50% 50%, #060b12 0%, #02040a 62%, #000 100%);
+  }
+</style>
+</head>
+<body>
+<main class="shell" aria-label="Retro primitives — cryo variant">
+  <div class="mast">
+    <div><strong>daily sketch</strong> / retro primitives</div>
+    <div class="idx">ch.02 · cryo · cobalt core / scanning sweep</div>
+  </div>
+
+  <nav class="nav" aria-label="Variants">
+    <a href="index.html">phosphor</a>
+    <a href="cryo.html" class="current">cryo</a>
+    <a href="signal.html">signal</a>
+    <a href="graphite.html">graphite</a>
+    <span class="sep"></span>
+    <span class="idx">04 / 04</span>
+  </nav>
+
+  <section class="grid" aria-label="Primitive shape grid">
+    <figure class="cell"><canvas data-shape="circle"   aria-label="Cyan circle"></canvas></figure>
+    <figure class="cell"><canvas data-shape="square"   aria-label="Cyan square"></canvas></figure>
+    <figure class="cell"><canvas data-shape="triangle" aria-label="Cyan triangle"></canvas></figure>
+    <figure class="cell"><canvas data-shape="ellipse"  aria-label="Cyan ellipse"></canvas></figure>
+  </section>
+</main>
+
+<script>
+window.VARIANT = {
+  name: 'cryo',
+  fillMode: 'ice',
+  fillStops: ['#e8fbff', '#7cd8ff', '#2a86d8', '#0a2758'],
+  ringOuter: '#8ecdff',
+  ringInner: '#eaf6ff',
+  sweepColor: 'rgba(234, 246, 255, 0.55)',
+  animation: 'sweep',
+  grainRGB: [200, 230, 255],
+  grainAlpha: 0.45,
+  readoutDim: 'rgba(142, 205, 255, 0.28)',
+  readoutBright: '#eaf6ff',
+  glossColor: 'rgba(142, 205, 255, 0.06)'
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>
