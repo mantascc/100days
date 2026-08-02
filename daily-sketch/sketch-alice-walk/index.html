@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALICE — the curiosity pattern</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0a0a0a; --ink:#e8e8e8; --dim:#5a5a5a; --dimmer:#333; --line:#1e1e1e; --accent:#e0a24e; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:var(--bg); color:var(--ink); font-family:'JetBrains Mono',monospace; }
+  body{ display:flex; justify-content:center; padding:48px 20px 80px; }
+  .page{ width:100%; max-width:720px; }
+
+  .eyebrow{ font-size:11px; letter-spacing:0.22em; color:var(--accent); }
+  h1{ font-size:26px; font-weight:700; letter-spacing:0.02em; margin:8px 0 4px; }
+  .sub{ font-size:12px; color:var(--dim); letter-spacing:0.02em; }
+
+  hr{ border:none; border-top:1px solid var(--line); margin:28px 0; }
+
+  .sig{ display:flex; flex-wrap:wrap; gap:6px; margin:20px 0 0; font-size:12px; letter-spacing:0.08em; }
+  .sig b{ color:var(--accent); font-weight:500; }
+  .sig span{ color:var(--dimmer); }
+
+  .stage{ position:relative; border:1px solid var(--line); background:#080808; margin-top:20px; }
+  canvas{ display:block; width:100%; height:300px; }
+  .hud{ position:absolute; top:12px; left:12px; font-size:10px; line-height:1.7; color:var(--dim); letter-spacing:0.04em; pointer-events:none; }
+  .hud .mode{ color:var(--accent); }
+  .meter{ position:absolute; bottom:12px; left:12px; right:12px; height:1px; background:var(--line); }
+  .meter i{ display:block; height:1px; width:0; background:var(--accent); transition:width .12s linear; }
+
+  .ctrl{ display:flex; align-items:center; gap:14px; margin-top:14px; font-size:11px; color:var(--dim); letter-spacing:0.04em; }
+  .ctrl label{ white-space:nowrap; }
+  .ctrl .val{ color:var(--accent); min-width:22px; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; flex:1; height:1px; background:var(--dimmer); outline:none; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:10px; height:10px; background:var(--accent); border-radius:0; cursor:pointer; }
+  input[type=range]::-moz-range-thumb{ width:10px; height:10px; background:var(--accent); border:none; border-radius:0; cursor:pointer; }
+  .band{ display:flex; justify-content:space-between; font-size:10px; color:var(--dimmer); margin-top:6px; letter-spacing:0.04em; }
+
+  h2{ font-size:11px; letter-spacing:0.18em; color:var(--accent); font-weight:500; margin-bottom:14px; }
+  p{ font-size:13px; line-height:1.75; color:#c8c8c8; margin-bottom:14px; }
+  p .k{ color:var(--accent); }
+  .note{ color:var(--dim); }
+
+  .list{ font-size:12.5px; line-height:1.7; color:#c8c8c8; }
+  .list div{ padding:8px 0; border-top:1px solid var(--line); display:flex; gap:12px; }
+  .list b{ color:var(--accent); font-weight:500; min-width:104px; letter-spacing:0.06em; }
+
+  pre{ background:#060606; border:1px solid var(--line); padding:18px; overflow-x:auto; font-size:11.5px; line-height:1.65; color:#bfbfbf; letter-spacing:0.01em; }
+  pre .c{ color:var(--dim); }
+  pre .kw{ color:var(--accent); }
+
+  footer{ margin-top:32px; font-size:10px; color:var(--dimmer); letter-spacing:0.06em; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="eyebrow">CURIOSITY PATTERN — 01</div>
+  <h1>The Alice Walk</h1>
+  <div class="sub">a foraging motion that never terminates. she relocates instead of arriving.</div>
+
+  <div class="sig">
+    <b>LOCK</b><span>→</span><b>SAMPLE</b><span>→</span><b>SATURATE</b><span>→</span><b>LEAP</b>
+  </div>
+
+  <div class="stage">
+    <canvas id="c"></canvas>
+    <div class="hud">
+      <div class="mode" id="mode">LOCK</div>
+      <div>steps&nbsp;<span id="steps">0</span></div>
+      <div>found&nbsp;<span id="found">0</span></div>
+    </div>
+    <div class="meter"><i id="satbar"></i></div>
+  </div>
+
+  <div class="ctrl">
+    <label>dwell depth</label>
+    <input id="dwell" type="range" min="1" max="30" step="1" value="6">
+    <span class="val" id="dwellval">6</span>
+  </div>
+  <div class="band"><span>← skimming (dissipation)</span><span>fixation (obsession) →</span></div>
+
+  <hr>
+
+  <h2>SUMMARY</h2>
+  <p>Search has a target and stops. The Alice walk has no terminal state — it is a limit cycle, not a path. She <span class="k">locks</span> onto a gradient, <span class="k">samples</span> it with small heavy-tailed steps, and when the place goes quiet she <span class="k">leaps</span> to the next. Curiosity as the consent to fall, repeated forever.</p>
+  <p>The counterintuitive part is the trigger. The leap does not fire when she <span class="k">finds</span> something — it fires when she stops finding. Local information gain flattens, the gradient dies, she goes. A place ends not when it is understood but when it goes silent.</p>
+
+  <h2>THE ONE PARAMETER</h2>
+  <p>That leaves exactly one real dial — <span class="k">dwell depth</span>: how flat the gain must get before she leaps. It has a narrow healthy band. Curiosity <span class="note">is</span> that band, between skimming and fixating.</p>
+  <div class="list">
+    <div><b>too shallow</b><span>skims everything, inherits nothing — her shadow, dissipation.</span></div>
+    <div><b>in band</b><span>forages: samples deeply enough to learn, leaves before it stales.</span></div>
+    <div><b>too deep</b><span>stops relocating, becomes fixation — a different character entirely.</span></div>
+  </div>
+
+  <h2 style="margin-top:28px">WHY IT MATTERS</h2>
+  <p>Render an agent's exploration <span class="k">as</span> an Alice walk and a human can read, at a glance, whether it is foraging or merely dissipating. The walk makes curiosity legible. It is an observability primitive — the interface-epistemology thesis with a moving part.</p>
+
+  <hr>
+
+  <h2>THE CODE</h2>
+  <pre><span class="c">// Alice walk — a curiosity pattern (not a search)</span>
+<span class="c">// signature: LOCK -&gt; SAMPLE -&gt; SATURATE -&gt; LEAP</span>
+<span class="c">// the leap fires when information gain flattens, not on arrival.</span>
+
+<span class="kw">let</span> dwellDepth = 6;      <span class="c">// the one real dial (skim &lt;-&gt; fixate)</span>
+<span class="kw">let</span> sat = 0, gain = 1, mode = 'LOCK';
+
+<span class="kw">function</span> step(){
+  <span class="kw">const</span> d = dist(pos, attractor);
+
+  <span class="kw">if</span> (d &lt; 220){                <span class="c">// SAMPLE: milling near the gradient</span>
+    mode  = 'SAMPLE';
+    sat  += gain;              <span class="c">// accumulate what she is learning</span>
+    gain *= 0.985;            <span class="c">// diminishing returns — gain flattens</span>
+  }
+
+  <span class="kw">if</span> (sat &gt;= dwellDepth){      <span class="c">// SATURATE: the place has gone quiet</span>
+    mode = 'LEAP';
+    attractor = spawn();      <span class="c">// relocate — curiosity never terminates</span>
+    sat = 0; gain = 1;        <span class="c">// reset novelty</span>
+    <span class="kw">return</span> leap(toward(attractor), levy(140)); <span class="c">// heavy-tailed jump</span>
+  }
+
+  <span class="c">// LOCK / SAMPLE: biased, heavy-tailed micro-steps</span>
+  <span class="kw">const</span> bias = d &lt; 220 ? 0.35 : 0.85;
+  <span class="kw">const</span> ang  = toward(attractor) * bias + noise();
+  <span class="kw">return</span> leap(ang, 18 + levy(22));  <span class="c">// mostly small, rarely long</span>
+}
+
+<span class="c">// heavy tail -&gt; mostly small steps, occasional long leaps</span>
+<span class="kw">function</span> levy(s){ <span class="kw">return</span> s * Math.pow(1 - Math.random(), -1/1.5) - s; }</pre>
+
+  <footer>
+    computational minimalist · #0a0a0a · JetBrains Mono · 1px · physics over easing<br>
+    the live panel above runs this exact logic. move the dial and watch the band.
+  </footer>
+
+</div>
+
+<script>
+const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+let W,H,DPR;
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  const r=cv.getBoundingClientRect(); W=r.width; H=r.height;
+  cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize',()=>{resize();});
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const levy=(s)=>s*Math.pow(1-Math.random(),-1/1.5)-s;
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+
+let pos,vel,target,attractor,path,steps,found,mode,sat,gain,flash,clock,dwellDepth;
+function spawn(){const m=44;return{x:rnd(m,W-m),y:rnd(m,H-m)};}
+function reset(){
+  resize();
+  pos={x:W/2,y:H/2}; vel={x:0,y:0}; target={x:W/2,y:H/2};
+  attractor=spawn(); path=[{x:pos.x,y:pos.y}];
+  steps=0; found=0; mode='LOCK'; sat=0; gain=1; flash=0; clock=0;
+  next();
+}
+const dwellEl=document.getElementById('dwell'), dwellValEl=document.getElementById('dwellval');
+dwellDepth=+dwellEl.value;
+dwellEl.addEventListener('input',()=>{dwellDepth=+dwellEl.value; dwellValEl.textContent=dwellDepth;});
+
+function commit(ang,len){
+  let nx=clamp(pos.x+Math.cos(ang)*len,16,W-16);
+  let ny=clamp(pos.y+Math.sin(ang)*len,16,H-16);
+  target={x:nx,y:ny}; path.push({x:nx,y:ny});
+  if(path.length>200)path.shift();
+  steps++;
+  document.getElementById('steps').textContent=steps;
+  document.getElementById('found').textContent=found;
+  document.getElementById('mode').textContent=mode;
+}
+function next(){
+  const dx=attractor.x-pos.x, dy=attractor.y-pos.y;
+  const d=Math.hypot(dx,dy), toward=Math.atan2(dy,dx);
+  if(d<220){ mode='SAMPLE'; sat+=gain; gain*=0.985; } else { mode='LOCK'; }
+  if(sat>=dwellDepth){
+    mode='LEAP'; found++; flash=1; attractor=spawn(); sat=0; gain=1;
+    const nd=Math.atan2(attractor.y-pos.y,attractor.x-pos.x)+gauss()*0.25;
+    return commit(nd,120+Math.abs(levy(120)));
+  }
+  const bias=d<220?0.35:0.85;
+  const ang=toward*bias+(toward+gauss()*(d<220?1.1:0.5))*(1-bias)+gauss()*0.3;
+  let len=18+Math.abs(levy(22)); len=Math.min(len,d+50);
+  commit(ang,len);
+}
+function frame(){
+  clock++;
+  ctx.fillStyle='rgba(8,8,8,0.15)'; ctx.fillRect(0,0,W,H);
+  const dx=target.x-pos.x, dy=target.y-pos.y, d=Math.hypot(dx,dy);
+  vel.x+=(dx/(d||1))*0.22; vel.y+=(dy/(d||1))*0.22; vel.x*=0.92; vel.y*=0.92;
+  pos.x+=vel.x; pos.y+=vel.y;
+  if(d<6) next();
+  ctx.lineWidth=1;
+  for(let i=1;i<path.length;i++){
+    const a=i/path.length;
+    ctx.strokeStyle='rgba(224,162,78,'+(a*0.5).toFixed(3)+')';
+    ctx.beginPath(); ctx.moveTo(path[i-1].x,path[i-1].y); ctx.lineTo(path[i].x,path[i].y); ctx.stroke();
+  }
+  if(flash>0.01){
+    ctx.strokeStyle='rgba(224,162,78,'+flash.toFixed(3)+')';
+    ctx.beginPath(); ctx.arc(pos.x,pos.y,36*(1-flash)+6,0,6.283); ctx.stroke(); flash*=0.9;
+  }
+  ctx.fillStyle='#e0a24e'; ctx.beginPath(); ctx.arc(pos.x,pos.y,2.4,0,6.283); ctx.fill();
+  ctx.strokeStyle='rgba(224,162,78,0.8)'; ctx.beginPath(); ctx.arc(pos.x,pos.y,6,0,6.283); ctx.stroke();
+  const pulse=4+Math.sin(clock*0.025)*2;
+  ctx.strokeStyle='rgba(255,255,255,0.55)';
+  ctx.beginPath(); ctx.arc(attractor.x,attractor.y,pulse,0,6.283); ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,0.9)';
+  ctx.beginPath();
+  ctx.moveTo(attractor.x-8,attractor.y); ctx.lineTo(attractor.x+8,attractor.y);
+  ctx.moveTo(attractor.x,attractor.y-8); ctx.lineTo(attractor.x,attractor.y+8); ctx.stroke();
+  document.getElementById('satbar').style.width=Math.min(100,(sat/dwellDepth)*100)+'%';
+  requestAnimationFrame(frame);
+}
+reset(); frame();
+</script>
+</body>
+</html>

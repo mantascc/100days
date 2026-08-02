@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEVEN WAYS TO WALK — a thread</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0a0a0a; --ink:#e8e8e8; --dim:#5a5a5a; --dimmer:#333; --line:#1e1e1e; --accent:#e0a24e; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:var(--bg); color:var(--ink); font-family:'JetBrains Mono',monospace; }
+  body{ display:flex; justify-content:center; padding:48px 20px 80px; }
+  .page{ width:100%; max-width:720px; }
+
+  .eyebrow{ font-size:11px; letter-spacing:0.22em; color:var(--accent); }
+  h1{ font-size:26px; font-weight:700; letter-spacing:0.02em; margin:8px 0 4px; }
+  .sub{ font-size:12px; color:var(--dim); letter-spacing:0.02em; }
+  hr{ border:none; border-top:1px solid var(--line); margin:28px 0; }
+
+  h2{ font-size:11px; letter-spacing:0.18em; color:var(--accent); font-weight:500; margin-bottom:14px; }
+  p{ font-size:13px; line-height:1.75; color:#c8c8c8; margin-bottom:14px; }
+  p .k{ color:var(--accent); }
+  p .w{ color:#ffffff; }
+  .note{ color:var(--dim); }
+
+  .axis{ display:flex; flex-wrap:wrap; gap:6px 10px; margin:22px 0 0; font-size:11px; letter-spacing:0.08em; }
+  .axis b{ color:var(--accent); font-weight:500; }
+  .axis span{ color:var(--dimmer); }
+
+  .walk{ margin-top:28px; }
+  .walk .head{ display:flex; align-items:baseline; gap:14px; margin-bottom:10px; }
+  .walk .num{ font-size:10px; color:var(--dimmer); letter-spacing:0.12em; }
+  .walk .name{ font-size:13px; font-weight:500; color:var(--ink); letter-spacing:0.14em; }
+  .walk .leave{ margin-left:auto; font-size:10px; color:var(--dim); letter-spacing:0.08em; }
+  .walk .leave b{ color:var(--accent); font-weight:500; }
+  .stage{ position:relative; border:1px solid var(--line); background:#080808; }
+  canvas{ display:block; width:100%; }
+  .walk p{ margin-top:12px; font-size:12.5px; line-height:1.75; }
+
+  .synth{ margin-top:36px; padding:20px; border:1px solid var(--line); background:#0d0d0d; }
+  .synth h2{ margin-bottom:14px; }
+  .synth p:last-child{ margin-bottom:0; }
+
+  footer{ margin-top:40px; font-size:10px; color:var(--dimmer); letter-spacing:0.06em; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="eyebrow">CURIOSITY PATTERNS — a thread</div>
+  <h1>Seven Ways to Walk</h1>
+  <div class="sub">agents differ not by where they go, but by when they leave.</div>
+
+  <div class="axis">
+    <b>never</b><span>·</span><b>arrival</b><span>·</span><b>convergence</b><span>·</span><b>saturation</b><span>·</span><b>salience</b><span>·</span><b>social</b>
+  </div>
+
+  <hr>
+
+  <p>The useful axis for taxonomizing an agent's walk isn't exploration-vs-exploitation. It's the <span class="k">leave condition</span> — what ends a dwell. Every walk below sits somewhere on that axis. Same environment; totally different characters.</p>
+
+  <!-- 01 RANDOM -->
+  <section class="walk">
+    <div class="head"><span class="num">01 / 07</span><span class="name">RANDOM WALK</span><span class="leave">leave: <b>never</b></span></div>
+    <div class="stage"><canvas id="c-random"></canvas></div>
+    <p>Isotropic Gaussian steps. No target, no memory, no reason to leave anywhere — because it never arrives anywhere. Every direction is equally likely at every moment. She never <span class="note">goes to</span> a place, only <span class="note">ends up</span> at one. The purest dissipation.</p>
+  </section>
+
+  <!-- 02 LEVY -->
+  <section class="walk">
+    <div class="head"><span class="num">02 / 07</span><span class="name">LÉVY FLIGHT</span><span class="leave">leave: <b>never</b> · heavy tail</span></div>
+    <div class="stage"><canvas id="c-levy"></canvas></div>
+    <p>Heavy-tailed step distribution: mostly small moves, rare long leaps. Mathematically optimal for foraging when food is sparse and clustered — sharks and albatrosses use it. Still no leave condition, but the tail is doing what a saturation trigger does elsewhere: guaranteeing eventual escape.</p>
+  </section>
+
+  <!-- 03 SEARCH -->
+  <section class="walk">
+    <div class="head"><span class="num">03 / 07</span><span class="name">SEARCH (A*)</span><span class="leave">leave: <b>arrival</b></span></div>
+    <div class="stage"><canvas id="c-search"></canvas></div>
+    <p>A goal, a map, a plan. She sees the target and takes the shortest path. Terminates on arrival, respawns, repeats. The opposite of curiosity — every step is committed to the same known outcome. Useful, but epistemically closed: nothing found that wasn't already sought.</p>
+  </section>
+
+  <!-- 04 GRADIENT -->
+  <section class="walk">
+    <div class="head"><span class="num">04 / 07</span><span class="name">GRADIENT ASCENT</span><span class="leave">leave: <b>convergence</b></span></div>
+    <div class="stage"><canvas id="c-gradient"></canvas></div>
+    <p>Reads the local slope, steps uphill, keeps stepping. Converges to the nearest peak and stays — the leave condition is <span class="note">never</span>, terminal fixation. Random walk's mirror image: one never commits, this one commits totally. The field is visible; the ring marks the moment she stops moving.</p>
+  </section>
+
+  <!-- 05 ALICE -->
+  <section class="walk">
+    <div class="head"><span class="num">05 / 07</span><span class="name">ALICE</span><span class="leave">leave: <b>saturation</b></span></div>
+    <div class="stage"><canvas id="c-alice"></canvas></div>
+    <p>LOCK → SAMPLE → SATURATE → LEAP. The leap fires when local information gain flattens, not on arrival. The only walk here that models its own learning rate — she reads herself reading the world. Curiosity as limit cycle, not path.</p>
+  </section>
+
+  <!-- 06 FLANEUR -->
+  <section class="walk">
+    <div class="head"><span class="num">06 / 07</span><span class="name">FLÂNEUR</span><span class="leave">leave: <b>salience</b></span></div>
+    <div class="stage"><canvas id="c-flaneur"></canvas></div>
+    <p>Ambient attractors, one glowing at a time. She drifts, but attention shifts when something in the environment brightens — a signal she didn't seek, that finds her. The leave condition is <span class="k">external salience change</span>, not internal saturation. Curiosity that trusts the street.</p>
+  </section>
+
+  <!-- 07 ANT -->
+  <section class="walk">
+    <div class="head"><span class="num">07 / 07</span><span class="name">ANT · STIGMERGY</span><span class="leave">leave: <b>social signal</b></span></div>
+    <div class="stage"><canvas id="c-ant"></canvas></div>
+    <p>Reads pheromone density laid down by other agents — or by her past self. The map is the population's collective memory, written into the ground. She leaves when the trail runs cold; by then, a new one has usually formed elsewhere. Curiosity as protocol.</p>
+  </section>
+
+  <div class="synth">
+    <h2>TWO INSIGHTS</h2>
+    <p><span class="k">Random walk and A* are the same walk in disguise.</span> Both refuse the saturation question. One never commits, one commits totally. Alice sits in the interior where the interesting agents live — between dissipation and fixation, on a narrow band.</p>
+    <p><span class="k">Saturation-of-gain is the only leave condition that requires modeling your own learning rate.</span> Every other trigger reads the world: goal (search), gradient (ascent), pheromone (ant), salience (flâneur). Alice reads <span class="w">herself reading the world</span>. That's why she's the observability primitive — she's the only walk that knows when it has stopped knowing.</p>
+  </div>
+
+  <footer>
+    computational minimalist · #0a0a0a · JetBrains Mono · 1px · physics over easing<br>
+    seven parallel loops; no interaction; watch until you see each character.
+  </footer>
+
+</div>
+
+<script>
+const A='224,162,78', WCC='255,255,255';
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const levy=s=>s*Math.pow(1-Math.random(),-1/1.5)-s;
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+
+function panel(id, height){
+  const cv=document.getElementById(id);
+  const ctx=cv.getContext('2d');
+  const DPR=Math.min(window.devicePixelRatio||1,2);
+  const r=cv.getBoundingClientRect();
+  const W=r.width, H=height;
+  cv.width=W*DPR; cv.height=H*DPR;
+  cv.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle='#080808'; ctx.fillRect(0,0,W,H);
+  return {cv,ctx,W,H,DPR};
+}
+function fade(ctx,W,H,a){ ctx.fillStyle='rgba(8,8,8,'+a+')'; ctx.fillRect(0,0,W,H); }
+function trail(ctx, path, maxAlpha){
+  ctx.lineWidth=1;
+  for(let i=1;i<path.length;i++){
+    const a=i/path.length;
+    ctx.strokeStyle='rgba('+A+','+(a*maxAlpha).toFixed(3)+')';
+    ctx.beginPath();
+    ctx.moveTo(path[i-1].x,path[i-1].y);
+    ctx.lineTo(path[i].x,path[i].y);
+    ctx.stroke();
+  }
+}
+function dot(ctx,x,y){
+  ctx.fillStyle='rgb('+A+')';
+  ctx.beginPath(); ctx.arc(x,y,3,0,6.283); ctx.fill();
+  ctx.strokeStyle='rgba('+A+',0.8)';
+  ctx.beginPath(); ctx.arc(x,y,7,0,6.283); ctx.stroke();
+  ctx.strokeStyle='rgba('+A+',0.25)';
+  ctx.beginPath(); ctx.arc(x,y,11,0,6.283); ctx.stroke();
+}
+function whiteMark(ctx,x,y,pulse,alphaPulse,alphaCross){
+  ctx.strokeStyle='rgba('+WCC+','+alphaPulse+')';
+  ctx.beginPath(); ctx.arc(x,y,pulse,0,6.283); ctx.stroke();
+  ctx.strokeStyle='rgba('+WCC+','+alphaCross+')';
+  ctx.beginPath();
+  ctx.moveTo(x-6,y); ctx.lineTo(x+6,y);
+  ctx.moveTo(x,y-6); ctx.lineTo(x,y+6);
+  ctx.stroke();
+}
+
+const PH=160;
+
+// -- 01 RANDOM --
+const wRandom=(()=>{
+  let p,pos,path;
+  function stepOnly(){
+    pos.x=clamp(pos.x+gauss()*3.2,6,p.W-6);
+    pos.y=clamp(pos.y+gauss()*3.2,6,p.H-6);
+    path.push({...pos}); if(path.length>500) path.shift();
+  }
+  return {
+    init(){
+      p=panel('c-random',PH);
+      pos={x:p.W/2,y:p.H/2}; path=[{...pos}];
+      for(let i=0;i<120;i++) stepOnly();
+    },
+    tick(){
+      stepOnly();
+      fade(p.ctx,p.W,p.H,0.05);
+      trail(p.ctx,path,0.55);
+      dot(p.ctx,pos.x,pos.y);
+    }
+  };
+})();
+
+// -- 02 LEVY --
+const wLevy=(()=>{
+  let p,pos,target,path;
+  function pick(){
+    const ang=rnd(0,Math.PI*2);
+    const len=8+Math.abs(levy(80));
+    target={x:clamp(pos.x+Math.cos(ang)*len,6,p.W-6),y:clamp(pos.y+Math.sin(ang)*len,6,p.H-6)};
+  }
+  function stepOnly(){
+    const dx=target.x-pos.x, dy=target.y-pos.y, d=Math.hypot(dx,dy);
+    if(d<1.5){ pick(); return; }
+    const step=Math.min(d,2);
+    pos.x+=dx/d*step; pos.y+=dy/d*step;
+    path.push({...pos}); if(path.length>600) path.shift();
+  }
+  return {
+    init(){
+      p=panel('c-levy',PH); pos={x:p.W/2,y:p.H/2}; target={...pos}; path=[{...pos}]; pick();
+      for(let i=0;i<180;i++) stepOnly();
+    },
+    tick(){
+      stepOnly();
+      fade(p.ctx,p.W,p.H,0.035);
+      trail(p.ctx,path,0.6);
+      dot(p.ctx,pos.x,pos.y);
+    }
+  };
+})();
+
+// -- 03 SEARCH --
+const wSearch=(()=>{
+  let p,pos,goal,path,flash;
+  function stepOnly(){
+    const dx=goal.x-pos.x, dy=goal.y-pos.y, d=Math.hypot(dx,dy);
+    if(d<3){ flash=1; goal={x:rnd(20,p.W-20),y:rnd(20,p.H-20)}; return; }
+    const step=Math.min(d,1.8);
+    pos.x+=dx/(d||1)*step; pos.y+=dy/(d||1)*step;
+    path.push({...pos}); if(path.length>500) path.shift();
+  }
+  return {
+    init(){
+      p=panel('c-search',PH);
+      pos={x:rnd(20,p.W-20),y:rnd(20,p.H-20)};
+      goal={x:rnd(20,p.W-20),y:rnd(20,p.H-20)};
+      path=[{...pos}]; flash=0;
+      for(let i=0;i<220;i++) stepOnly();
+    },
+    tick(){
+      stepOnly();
+      fade(p.ctx,p.W,p.H,0.04);
+      trail(p.ctx,path,0.55);
+      dot(p.ctx,pos.x,pos.y);
+      whiteMark(p.ctx,goal.x,goal.y,4,0.55,0.95);
+      if(flash>0.01){
+        p.ctx.strokeStyle='rgba('+WCC+','+flash.toFixed(3)+')';
+        p.ctx.beginPath(); p.ctx.arc(pos.x,pos.y,22*(1-flash)+4,0,6.283); p.ctx.stroke();
+        flash*=0.9;
+      }
+    }
+  };
+})();
+
+// -- 04 GRADIENT --
+const wGrad=(()=>{
+  let p,pos,path,bumps,fieldCv,fieldCtx,stuck,convergeAlpha;
+  function fld(x,y){ let s=0; for(const b of bumps) s+=Math.exp(-((x-b.x)*(x-b.x)+(y-b.y)*(y-b.y))/(2*b.s*b.s)); return s; }
+  function drawFld(){
+    fieldCtx.fillStyle='#080808'; fieldCtx.fillRect(0,0,p.W,p.H);
+    for(let x=0;x<p.W;x+=3){
+      for(let y=0;y<p.H;y+=3){
+        const v=fld(x,y);
+        if(v>0.06){
+          const a=Math.min(0.32,v*0.36);
+          fieldCtx.fillStyle='rgba('+A+','+a.toFixed(3)+')';
+          fieldCtx.fillRect(x,y,1,1);
+        }
+      }
+    }
+  }
+  function respawn(){
+    pos={x:rnd(20,p.W-20),y:rnd(20,p.H-20)};
+    // ensure not too close to a peak
+    if(fld(pos.x,pos.y)>0.7) pos={x:rnd(20,p.W-20),y:rnd(20,p.H-20)};
+    stuck=0; convergeAlpha=0; path=[{...pos}];
+  }
+  return {
+    init(){
+      p=panel('c-gradient',PH);
+      bumps=[
+        {x:p.W*0.28,y:p.H*0.5,s:38},
+        {x:p.W*0.72,y:p.H*0.38,s:34},
+        {x:p.W*0.55,y:p.H*0.78,s:28}
+      ];
+      fieldCv=document.createElement('canvas');
+      fieldCv.width=p.W*p.DPR; fieldCv.height=p.H*p.DPR;
+      fieldCtx=fieldCv.getContext('2d');
+      fieldCtx.setTransform(p.DPR,0,0,p.DPR,0,0);
+      drawFld();
+      respawn();
+      // pre-run to build a visible climb
+      for(let i=0;i<80;i++){
+        const eps=2;
+        const gx=fld(pos.x+eps,pos.y)-fld(pos.x-eps,pos.y);
+        const gy=fld(pos.x,pos.y+eps)-fld(pos.x,pos.y-eps);
+        const g=Math.hypot(gx,gy);
+        if(g>1e-5){ pos.x=clamp(pos.x+gx/g*0.55,4,p.W-4); pos.y=clamp(pos.y+gy/g*0.55,4,p.H-4); }
+        path.push({...pos}); if(path.length>380) path.shift();
+      }
+    },
+    tick(){
+      const eps=2;
+      const gx=fld(pos.x+eps,pos.y)-fld(pos.x-eps,pos.y);
+      const gy=fld(pos.x,pos.y+eps)-fld(pos.x,pos.y-eps);
+      const g=Math.hypot(gx,gy);
+      if(g>1e-5){
+        pos.x=clamp(pos.x+gx/g*0.55+gauss()*0.15,4,p.W-4);
+        pos.y=clamp(pos.y+gy/g*0.55+gauss()*0.15,4,p.H-4);
+        if(g<0.003) stuck++; else stuck=Math.max(0,stuck-1);
+      } else stuck++;
+      path.push({...pos}); if(path.length>380) path.shift();
+      if(stuck>140){ respawn(); }
+      fade(p.ctx,p.W,p.H,0.09);
+      p.ctx.drawImage(fieldCv,0,0,p.W,p.H);
+      trail(p.ctx,path,0.5);
+      if(stuck>10){
+        convergeAlpha=Math.min(0.55,convergeAlpha+0.008);
+        p.ctx.strokeStyle='rgba('+A+','+convergeAlpha.toFixed(3)+')';
+        p.ctx.beginPath(); p.ctx.arc(pos.x,pos.y,7+Math.min(stuck*0.09,10),0,6.283); p.ctx.stroke();
+      }
+      dot(p.ctx,pos.x,pos.y);
+    }
+  };
+})();
+
+// -- 05 ALICE --
+const wAlice=(()=>{
+  let p,pos,target,attractor,path,sat,gain,flash,clock;
+  const DWELL=5;
+  function spawn(){ return {x:rnd(30,p.W-30),y:rnd(30,p.H-30)}; }
+  function commit(ang,len){
+    const nx=clamp(pos.x+Math.cos(ang)*len,10,p.W-10);
+    const ny=clamp(pos.y+Math.sin(ang)*len,10,p.H-10);
+    target={x:nx,y:ny}; path.push({x:nx,y:ny});
+    if(path.length>200) path.shift();
+  }
+  function next(){
+    const dx=attractor.x-pos.x, dy=attractor.y-pos.y;
+    const d=Math.hypot(dx,dy), toward=Math.atan2(dy,dx);
+    if(d<110){ sat+=gain; gain*=0.985; }
+    if(sat>=DWELL){
+      flash=1; attractor=spawn(); sat=0; gain=1;
+      const nd=Math.atan2(attractor.y-pos.y,attractor.x-pos.x)+gauss()*0.25;
+      return commit(nd, 40+Math.abs(levy(50)));
+    }
+    const bias=d<110?0.35:0.85;
+    const ang=toward*bias + (toward+gauss()*(d<110?1.1:0.5))*(1-bias) + gauss()*0.3;
+    const len=Math.min(d+30, 9+Math.abs(levy(13)));
+    commit(ang,len);
+  }
+  return {
+    init(){
+      p=panel('c-alice',PH);
+      pos={x:p.W/2,y:p.H/2}; target={...pos};
+      attractor=spawn(); path=[{...pos}];
+      sat=0; gain=1; flash=0; clock=0;
+      next();
+      // pre-run so a partial trail is present on load
+      for(let i=0;i<220;i++){
+        const dx=target.x-pos.x, dy=target.y-pos.y;
+        pos.x+=dx*0.4; pos.y+=dy*0.4;
+        if(Math.hypot(target.x-pos.x,target.y-pos.y)<2) next();
+      }
+    },
+    tick(){
+      clock++;
+      const dx=target.x-pos.x, dy=target.y-pos.y;
+      pos.x+=dx*0.14; pos.y+=dy*0.14;
+      if(Math.hypot(target.x-pos.x,target.y-pos.y)<2) next();
+      fade(p.ctx,p.W,p.H,0.09);
+      trail(p.ctx,path,0.5);
+      if(flash>0.01){
+        p.ctx.strokeStyle='rgba('+A+','+flash.toFixed(3)+')';
+        p.ctx.beginPath(); p.ctx.arc(pos.x,pos.y,22*(1-flash)+4,0,6.283); p.ctx.stroke();
+        flash*=0.9;
+      }
+      dot(p.ctx,pos.x,pos.y);
+      const pulse=3+Math.sin(clock*0.025)*1.4;
+      whiteMark(p.ctx,attractor.x,attractor.y,pulse,0.5,0.9);
+      // saturation bar
+      const bw=(p.W-24)*(sat/DWELL);
+      p.ctx.fillStyle='rgba('+A+',0.7)';
+      p.ctx.fillRect(12,p.H-6,Math.min(bw,p.W-24),1);
+      p.ctx.fillStyle='rgba(255,255,255,0.06)';
+      p.ctx.fillRect(12,p.H-6,p.W-24,1);
+    }
+  };
+})();
+
+// -- 06 FLANEUR --
+const wFlan=(()=>{
+  let p,pos,path,attractors,current,cooldown,clock;
+  function makeAttractors(){
+    attractors=[];
+    for(let i=0;i<5;i++) attractors.push({x:rnd(25,p.W-25),y:rnd(25,p.H-25),sal:0.15});
+  }
+  function spike(){
+    let idx=Math.floor(Math.random()*attractors.length);
+    while(idx===current) idx=Math.floor(Math.random()*attractors.length);
+    attractors[idx].sal=1;
+    current=idx;
+    cooldown=200+Math.floor(Math.random()*160);
+  }
+  return {
+    init(){
+      p=panel('c-flaneur',PH);
+      pos={x:p.W/2,y:p.H/2}; path=[{...pos}];
+      makeAttractors(); current=-1; cooldown=0; clock=0;
+      spike();
+      // pre-run drift
+      for(let i=0;i<200;i++){
+        const t=attractors[current];
+        const dx=t.x-pos.x, dy=t.y-pos.y, d=Math.hypot(dx,dy);
+        const step=Math.min(d,1.1);
+        pos.x=clamp(pos.x+dx/(d||1)*step+gauss()*0.35,4,p.W-4);
+        pos.y=clamp(pos.y+dy/(d||1)*step+gauss()*0.35,4,p.H-4);
+        path.push({...pos}); if(path.length>320) path.shift();
+      }
+    },
+    tick(){
+      clock++;
+      cooldown--;
+      if(cooldown<=0) spike();
+      attractors.forEach((a,i)=>{ if(i!==current) a.sal=Math.max(0.15, a.sal*0.995); });
+      const t=attractors[current];
+      const dx=t.x-pos.x, dy=t.y-pos.y, d=Math.hypot(dx,dy);
+      const step=Math.min(d,1.1);
+      pos.x=clamp(pos.x+dx/(d||1)*step+gauss()*0.35,4,p.W-4);
+      pos.y=clamp(pos.y+dy/(d||1)*step+gauss()*0.35,4,p.H-4);
+      path.push({...pos}); if(path.length>320) path.shift();
+      fade(p.ctx,p.W,p.H,0.06);
+      trail(p.ctx,path,0.4);
+      attractors.forEach(a=>{
+        const s=a.sal;
+        p.ctx.strokeStyle='rgba('+WCC+','+(s*0.85).toFixed(3)+')';
+        p.ctx.lineWidth=1;
+        p.ctx.beginPath(); p.ctx.arc(a.x,a.y,2.5+s*3,0,6.283); p.ctx.stroke();
+        if(s>0.55){
+          const pulse=6+s*4+Math.sin(clock*0.06)*1.5;
+          p.ctx.strokeStyle='rgba('+WCC+','+(s*0.35).toFixed(3)+')';
+          p.ctx.beginPath(); p.ctx.arc(a.x,a.y,pulse,0,6.283); p.ctx.stroke();
+        }
+      });
+      dot(p.ctx,pos.x,pos.y);
+    }
+  };
+})();
+
+// -- 07 ANT --
+const wAnt=(()=>{
+  let p,pos,heading,pher,cols,rows,CELL;
+  return {
+    init(){
+      p=panel('c-ant',PH);
+      CELL=6;
+      cols=Math.ceil(p.W/CELL); rows=Math.ceil(p.H/CELL);
+      pher=new Float32Array(cols*rows);
+      // Seed a network of prior trails — the "collective memory" she reads.
+      // Pick 4 hubs, draw noisy strokes between them.
+      const hubs=[];
+      for(let i=0;i<4;i++) hubs.push({x:rnd(p.W*0.15,p.W*0.85),y:rnd(p.H*0.2,p.H*0.8)});
+      function paint(x,y,r,strength){
+        const cx=Math.floor(x/CELL), cy=Math.floor(y/CELL);
+        for(let j=-r;j<=r;j++) for(let k=-r;k<=r;k++){
+          const nx=cx+j, ny=cy+k;
+          if(nx>=0&&nx<cols&&ny>=0&&ny<rows){
+            pher[ny*cols+nx]+=strength*Math.exp(-(j*j+k*k)/(r*r*0.7));
+          }
+        }
+      }
+      // hubs
+      for(const h of hubs) paint(h.x,h.y,4,1.4);
+      // trails between adjacent hubs
+      for(let a=0;a<hubs.length;a++) for(let b=a+1;b<hubs.length;b++){
+        const dx=hubs[b].x-hubs[a].x, dy=hubs[b].y-hubs[a].y;
+        const dist=Math.hypot(dx,dy);
+        if(dist>p.W*0.55) continue; // skip cross-canvas trails
+        const steps=Math.floor(dist/3);
+        for(let t=0;t<=steps;t++){
+          const f=t/steps;
+          const nx=hubs[a].x+dx*f+gauss()*4;
+          const ny=hubs[a].y+dy*f+gauss()*4;
+          paint(nx,ny,2,0.5);
+        }
+      }
+      // start ant on the shortest edge, walking along it
+      pos={x:hubs[0].x,y:hubs[0].y};
+      heading=Math.atan2(hubs[1].y-hubs[0].y, hubs[1].x-hubs[0].x);
+      // brief pre-run so the ant is settled in the map
+      for(let i=0;i<80;i++){
+        for(let k=0;k<pher.length;k++) pher[k]*=0.9998;
+        const cx=Math.floor(pos.x/CELL), cy=Math.floor(pos.y/CELL);
+        if(cx>=0&&cx<cols&&cy>=0&&cy<rows) pher[cy*cols+cx]+=0.4;
+        const senseD=14;
+        const angles=[heading-0.5, heading, heading+0.5];
+        let bestA=heading, bestV=-1;
+        for(const a of angles){
+          const sx=pos.x+Math.cos(a)*senseD, sy=pos.y+Math.sin(a)*senseD;
+          const scx=Math.floor(sx/CELL), scy=Math.floor(sy/CELL);
+          if(scx>=0&&scx<cols&&scy>=0&&scy<rows){
+            const v=pher[scy*cols+scx];
+            if(v>bestV){ bestV=v; bestA=a; }
+          }
+        }
+        heading=bestA+gauss()*0.2;
+        pos.x+=Math.cos(heading)*1.3; pos.y+=Math.sin(heading)*1.3;
+        if(pos.x<0) pos.x+=p.W; if(pos.x>p.W) pos.x-=p.W;
+        if(pos.y<0) pos.y+=p.H; if(pos.y>p.H) pos.y-=p.H;
+      }
+    },
+    tick(){
+      // decay
+      for(let i=0;i<pher.length;i++) pher[i]*=0.9965;
+      // deposit
+      const cx=Math.floor(pos.x/CELL), cy=Math.floor(pos.y/CELL);
+      if(cx>=0&&cx<cols&&cy>=0&&cy<rows) pher[cy*cols+cx]+=0.55;
+      // sense: 3 directions
+      const senseD=12;
+      const angles=[heading-0.5, heading, heading+0.5];
+      let bestA=heading, bestV=-1;
+      for(const a of angles){
+        const sx=pos.x+Math.cos(a)*senseD, sy=pos.y+Math.sin(a)*senseD;
+        const scx=Math.floor(sx/CELL), scy=Math.floor(sy/CELL);
+        if(scx>=0&&scx<cols&&scy>=0&&scy<rows){
+          const v=pher[scy*cols+scx];
+          if(v>bestV){ bestV=v; bestA=a; }
+        }
+      }
+      heading=bestA+gauss()*0.18;
+      pos.x+=Math.cos(heading)*1.3;
+      pos.y+=Math.sin(heading)*1.3;
+      if(pos.x<0) pos.x+=p.W; if(pos.x>p.W) pos.x-=p.W;
+      if(pos.y<0) pos.y+=p.H; if(pos.y>p.H) pos.y-=p.H;
+      // draw
+      p.ctx.fillStyle='#080808'; p.ctx.fillRect(0,0,p.W,p.H);
+      for(let y=0;y<rows;y++){
+        for(let x=0;x<cols;x++){
+          const v=pher[y*cols+x];
+          if(v>0.02){
+            const a=Math.min(0.7,v*0.55);
+            p.ctx.fillStyle='rgba('+A+','+a.toFixed(3)+')';
+            p.ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+          }
+        }
+      }
+      dot(p.ctx,pos.x,pos.y);
+    }
+  };
+})();
+
+const walks=[wRandom,wLevy,wSearch,wGrad,wAlice,wFlan,wAnt];
+function initAll(){ walks.forEach(w=>w.init()); }
+function frame(){ walks.forEach(w=>w.tick()); requestAnimationFrame(frame); }
+let rt;
+window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(initAll,150); });
+initAll();
+frame();
+</script>
+</body>
+</html>
