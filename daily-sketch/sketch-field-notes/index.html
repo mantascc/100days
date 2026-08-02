@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>field notes / not a design system</title>
+<meta name="description" content="Field notes on a house style that was not designed — the 100days aesthetic as observed rather than declared. Between a design system and a moodboard: recurring plumage, tensions kept open, and the exceptions where the rule broke and it worked.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+    /* observed — the void that recurs 59 times across the sketchbook */
+    --void:      #0a0a0a;
+    --base:      #0f0f0f;
+    --raised:    #141414;
+    --surface:   #1a1a1a;
+    --modal:     #242424;
+
+    /* text — the five-tier ramp that stuck */
+    --ink-0:     #ffffff;
+    --ink-1:     #f5f5f7;
+    --ink-2:     #a8aab8;
+    --ink-3:     #666666;
+    --ink-4:     #444444;
+    --ink-5:     #2a2a2a;
+    --ghost:     #333333;
+
+    /* lines */
+    --line-0:    #1a1a1a;
+    --line-1:    #2a2a2a;
+    --line-2:    #3a3d52;
+
+    /* the accent this page picks — pale ube. one is a rule, this is its instance */
+    --accent:    #a48ad4;
+    --accent-dim: rgba(164,138,212,0.14);
+    --accent-mid: rgba(164,138,212,0.40);
+
+    /* other one-per-project accents observed in the corpus */
+    --cyan:      #00ffaa;
+    --amber:     #ffaa00;
+    --magenta:   #ff0066;
+    --blue:      #00a8ff;
+    --green:     #00ff88;
+
+    /* named colors that earned their own name */
+    --ube-violet:   #7b6fa5;
+    --ube-lavender: #9d91b0;
+    --ube-terra:    #9e6240;
+    --cph-yellow:   #ffaa00;
+
+    /* type */
+    --mono:  'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', Monaco, monospace;
+    --serif: 'Instrument Serif', Georgia, serif;
+
+    /* observed sizes */
+    --tiny:   10px;
+    --sm:     11px;
+    --base-s: 13px;
+    --md:     14px;
+    --lg:     16px;
+    --xl:     20px;
+    --2xl:    28px;
+    --disp:   72px;
+    --poster: 112px;
+
+    /* observed spacings — 4px base, no surprises */
+    --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+    --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+
+    /* motion — linear because physics, not theatre */
+    --fast: 120ms;
+    --slow: 300ms;
+    --snap: linear;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--void);
+    color: var(--ink-1);
+    font-family: var(--mono);
+    font-size: var(--base-s);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── PAGE ── */
+.page { max-width: 1120px; margin: 0 auto; padding: 0 var(--s7); }
+@media (max-width: 720px) {
+    .page { padding: 0 var(--s4); }
+    :root { --disp: 44px; --poster: 60px; }
+}
+
+/* ── SLUG ── */
+.slug {
+    padding: var(--s5) 0 var(--s4);
+    border-bottom: 1px solid var(--line-0);
+    font-size: var(--sm);
+    color: var(--ink-3);
+    display: flex; align-items: center; gap: var(--s2);
+    letter-spacing: 0.04em;
+    flex-wrap: wrap;
+}
+.slug .sep    { color: var(--ink-5); }
+.slug .now    { color: var(--ink-2); }
+.slug .strike { color: var(--ink-4); text-decoration: line-through; text-decoration-color: var(--accent-mid); }
+.slug .warn   { margin-left: auto; color: var(--ink-4); font-style: italic; }
+.slug .warn::before { content: '~ '; color: var(--accent); }
+
+/* ── HERO ── */
+.hero {
+    padding: var(--s9) 0 var(--s8);
+    border-bottom: 1px solid var(--line-1);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s7);
+    align-items: end;
+}
+@media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; gap: var(--s6); }
+}
+
+.eyebrow {
+    font-size: var(--tiny);
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: var(--s4);
+    display: flex; align-items: center; gap: var(--s3);
+}
+.eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 22px; height: 1px;
+    background: var(--accent);
+}
+
+.hero-title {
+    font-family: var(--serif);
+    font-size: var(--poster);
+    font-weight: 400;
+    color: var(--ink-0);
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin-bottom: var(--s5);
+}
+.hero-title em {
+    font-style: italic;
+    color: var(--ink-2);
+}
+.hero-title .slash {
+    color: var(--ink-5);
+    font-style: normal;
+    padding: 0 0.08em;
+}
+
+.hero-sub {
+    font-family: var(--mono);
+    font-size: var(--md);
+    color: var(--ink-3);
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: var(--s5);
+    max-width: 640px;
+    line-height: 1.75;
+}
+
+.hero-meta { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); }
+.hero-meta-item {
+    font-size: var(--sm); color: var(--ink-3);
+    display: flex; align-items: center; gap: var(--s2);
+}
+.hero-meta-item .dot {
+    width: 3px; height: 3px; background: var(--accent); flex-shrink: 0;
+}
+
+.hero-strip-wrap {
+    width: 260px;
+    display: flex; flex-direction: column; gap: var(--s2);
+    flex-shrink: 0;
+}
+.hero-strip {
+    height: 200px;
+    border: 1px solid var(--line-1);
+    position: relative;
+    overflow: hidden;
+    background: var(--base);
+}
+.hero-strip canvas {
+    display: block; width: 100%; height: 100%;
+}
+.hero-strip-label {
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    display: flex; justify-content: space-between;
+}
+.hero-strip-label .cite { color: var(--accent); }
+
+/* ── SECTION ── */
+.section {
+    padding: var(--s8) 0;
+    border-bottom: 1px solid var(--line-0);
+}
+.section:last-child { border-bottom: none; }
+
+.section-mark {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: var(--s3);
+    display: flex; align-items: center; gap: var(--s3);
+}
+.section-mark .num  { color: var(--accent); }
+.section-mark .rule { flex: 1; height: 1px; background: var(--line-0); }
+
+.section-title {
+    font-family: var(--mono);
+    font-size: var(--xl);
+    color: var(--ink-0);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
+    margin-bottom: var(--s4);
+}
+
+.section-title.serif {
+    font-family: var(--serif);
+    font-size: var(--2xl);
+    text-transform: none;
+    letter-spacing: -0.02em;
+}
+.section-title.serif em { font-style: italic; color: var(--ink-2); }
+
+.section-desc {
+    font-size: var(--sm);
+    color: var(--ink-2);
+    max-width: 620px;
+    line-height: 1.9;
+    margin-bottom: var(--s6);
+}
+
+.margin-note {
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    line-height: 1.7;
+    max-width: 380px;
+    font-style: italic;
+    margin-top: var(--s3);
+}
+.margin-note::before { content: '~ '; color: var(--accent); font-style: normal; }
+
+/* ── PREAMBLE ── */
+.preamble {
+    padding: var(--s8) 0 var(--s7);
+    border-bottom: 1px solid var(--line-1);
+}
+.preamble p {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--ink-1);
+    line-height: 1.85;
+    max-width: 700px;
+    letter-spacing: -0.005em;
+}
+.preamble p + p { margin-top: var(--s4); }
+.preamble .k { color: var(--accent); font-style: normal; }
+.preamble .dim { color: var(--ink-3); }
+.preamble .strike { color: var(--ink-4); text-decoration: line-through; text-decoration-color: var(--accent-mid); }
+
+/* ── PALETTE / SIGHTING LOG ── */
+.palette-log {
+    display: flex; flex-direction: column; gap: var(--s5);
+}
+.palette-group {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: var(--s5);
+    padding-top: var(--s3);
+    border-top: 1px solid var(--line-0);
+}
+@media (max-width: 720px) {
+    .palette-group { grid-template-columns: 1fr; gap: var(--s3); }
+}
+.palette-key {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-top: var(--s1);
+}
+.palette-key .cnt {
+    display: block;
+    color: var(--ink-4);
+    margin-top: var(--s1);
+    letter-spacing: 0.04em;
+    text-transform: none;
+    font-style: italic;
+}
+.swatch-row { display: flex; flex-direction: column; gap: 1px; }
+.swatch {
+    display: grid;
+    grid-template-columns: 44px 90px 1fr auto;
+    align-items: center;
+    gap: var(--s3);
+    padding: var(--s2) var(--s2);
+    background: transparent;
+    transition: background var(--fast) var(--snap);
+}
+.swatch:hover { background: var(--base); }
+.swatch .chip {
+    width: 32px; height: 20px;
+    border: 1px solid var(--line-0);
+}
+.swatch .tok {
+    font-size: var(--sm);
+    color: var(--ink-1);
+}
+.swatch .role {
+    font-size: var(--sm);
+    color: var(--ink-3);
+    font-weight: 300;
+}
+.swatch .cite {
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.swatch .cite .arr { color: var(--accent); margin-right: var(--s1); }
+
+.palette-caveat {
+    margin-top: var(--s5);
+    padding: var(--s4);
+    border: 1px dashed var(--line-1);
+    border-left: 2px solid var(--accent);
+    font-size: var(--sm);
+    color: var(--ink-2);
+    max-width: 720px;
+    line-height: 1.75;
+}
+.palette-caveat .lbl {
+    display: block;
+    font-size: var(--tiny);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--s2);
+}
+
+/* ── PLUMAGE ── */
+.plumage {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--line-0);
+    border: 1px solid var(--line-0);
+}
+.plume {
+    background: var(--void);
+    padding: var(--s4) var(--s4) var(--s3);
+    display: flex; flex-direction: column; gap: var(--s2);
+    transition: background var(--fast) var(--snap);
+}
+.plume:hover { background: var(--base); }
+.plume-glyph {
+    font-family: var(--mono);
+    font-size: 24px;
+    color: var(--ink-0);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+.plume-glyph .dim { color: var(--ink-4); }
+.plume-name {
+    font-size: var(--sm);
+    color: var(--ink-1);
+    font-weight: 400;
+}
+.plume-desc {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    line-height: 1.7;
+    font-weight: 300;
+}
+.plume-cite {
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.06em;
+    margin-top: auto;
+    padding-top: var(--s2);
+}
+.plume-cite .arr { color: var(--accent); }
+
+/* ── ASCII RAMP GALLERY ── */
+.ramp-gallery {
+    margin-top: var(--s7);
+    border: 1px solid var(--line-0);
+}
+.ramp-hd {
+    padding: var(--s3) var(--s4);
+    border-bottom: 1px solid var(--line-0);
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.ramp-hd .ramp-lbl { color: var(--accent); }
+.ramp-hd .ramp-cnt { font-style: italic; text-transform: none; letter-spacing: 0.04em; }
+.ramps { display: flex; flex-direction: column; }
+.ramp {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: var(--s5);
+    padding: var(--s3) var(--s4);
+    border-bottom: 1px solid var(--line-0);
+    transition: background var(--fast) var(--snap);
+}
+.ramp:last-of-type { border-bottom: none; }
+.ramp:hover { background: var(--base); }
+.ramp-name {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+.ramp-glyphs {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--ink-1);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ramp-cite {
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+.ramp-caveat {
+    padding: var(--s3) var(--s4);
+    border-top: 1px solid var(--line-0);
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    line-height: 1.8;
+    font-style: italic;
+}
+.ramp-caveat code {
+    font-style: normal;
+    color: var(--ink-2);
+    background: var(--base);
+    padding: 1px 4px;
+}
+@media (max-width: 600px) {
+    .ramp { grid-template-columns: 1fr; gap: var(--s2); }
+    .ramp-cite { justify-self: start; }
+    .ramp-glyphs { font-size: 15px; }
+}
+
+/* ── MOVES / LIVE PLATE ── */
+.moves-plate {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line-0);
+    border: 1px solid var(--line-0);
+    margin-top: var(--s5);
+}
+@media (max-width: 720px) {
+    .moves-plate { grid-template-columns: repeat(2, 1fr); }
+}
+.move {
+    background: var(--void);
+    padding: var(--s3);
+    display: flex; flex-direction: column; gap: var(--s2);
+}
+.move-canvas-wrap {
+    aspect-ratio: 1;
+    border: 1px solid var(--line-0);
+    background: var(--base);
+    position: relative;
+}
+.move-canvas-wrap canvas {
+    display: block; width: 100%; height: 100%;
+}
+.move-num {
+    position: absolute;
+    top: 6px; left: 8px;
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.18em;
+}
+.move-name {
+    font-size: var(--sm);
+    color: var(--ink-1);
+    letter-spacing: -0.005em;
+}
+.move-desc {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    line-height: 1.7;
+    font-weight: 300;
+}
+.move-cite {
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    margin-top: var(--s1);
+}
+.move-cite .arr { color: var(--accent); }
+
+/* ── TENSIONS ── */
+.tensions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--line-0);
+    border: 1px solid var(--line-0);
+    margin-top: var(--s3);
+}
+.tension {
+    background: var(--void);
+    padding: var(--s5);
+    display: flex; flex-direction: column; gap: var(--s2);
+}
+.tension-hd {
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--s1);
+}
+.tension-hd .charge { color: var(--accent); }
+.tension-q {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-style: italic;
+    color: var(--ink-1);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--s2);
+}
+.tension-body {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    line-height: 1.85;
+    font-weight: 300;
+}
+.tension-cite {
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    padding-top: var(--s2);
+    border-top: 1px solid var(--line-0);
+    margin-top: var(--s2);
+}
+.tension-cite .arr { color: var(--accent); }
+
+/* ── EXCEPTIONS ── */
+.exceptions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--line-0);
+    border: 1px solid var(--line-0);
+}
+.exception {
+    background: var(--void);
+    padding: var(--s5);
+    display: flex; flex-direction: column; gap: var(--s3);
+    position: relative;
+}
+.exception::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 100%;
+    background: var(--accent);
+    opacity: 0.5;
+}
+.exception-tag {
+    font-size: var(--tiny);
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+}
+.exception-tag .verdict { color: var(--ink-3); }
+.exception-tag .verdict.mixed { color: var(--amber, #ffaa00); }
+.exception-broke {
+    font-size: var(--sm);
+    color: var(--ink-1);
+    line-height: 1.6;
+}
+.exception-broke .rule {
+    font-family: var(--mono);
+    color: var(--ink-3);
+    font-style: italic;
+}
+.exception-why {
+    font-size: var(--tiny);
+    color: var(--ink-3);
+    line-height: 1.85;
+    font-weight: 300;
+}
+.exception-cite {
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    padding-top: var(--s2);
+    border-top: 1px solid var(--line-0);
+    margin-top: auto;
+}
+.exception-cite .arr { color: var(--accent); }
+
+/* ── NOT YET ── */
+.not-yet {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--line-0);
+    margin-top: var(--s3);
+}
+.not-yet-item {
+    padding: var(--s4) var(--s5);
+    border-bottom: 1px solid var(--line-0);
+    display: grid;
+    grid-template-columns: 32px 120px 1fr auto;
+    align-items: baseline;
+    gap: var(--s4);
+}
+@media (max-width: 720px) {
+    .not-yet-item { grid-template-columns: 32px 1fr; row-gap: var(--s2); }
+    .not-yet-item .strategy, .not-yet-item .prompt-cite { grid-column: 2; }
+}
+.not-yet-item:last-child { border-bottom: none; }
+.not-yet-num {
+    font-size: 9px; color: var(--ink-4); letter-spacing: 0.14em;
+}
+.not-yet-item .strategy {
+    font-size: var(--tiny);
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+.not-yet-item .prompt {
+    font-size: var(--sm);
+    color: var(--ink-1);
+    font-weight: 300;
+    line-height: 1.6;
+}
+.not-yet-item .prompt em {
+    color: var(--ink-3);
+    font-style: normal;
+}
+.not-yet-item .prompt-cite {
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+.not-yet-item .prompt-cite .arr { color: var(--accent); }
+
+/* ── OVERHEARD / SIGNATURES ── */
+.overheard {
+    columns: 3;
+    column-gap: var(--s6);
+    column-rule: 1px solid var(--line-0);
+    margin-top: var(--s4);
+}
+@media (max-width: 900px) { .overheard { columns: 2; } }
+@media (max-width: 540px) { .overheard { columns: 1; } }
+
+.quote {
+    break-inside: avoid;
+    padding: var(--s3) 0;
+    display: flex; flex-direction: column; gap: var(--s1);
+}
+.quote-txt {
+    font-family: var(--mono);
+    font-size: var(--sm);
+    color: var(--ink-1);
+    line-height: 1.65;
+    font-weight: 300;
+    letter-spacing: -0.005em;
+}
+.quote-txt.serif {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+.quote-txt .accent { color: var(--accent); }
+.quote-txt .dim { color: var(--ink-4); }
+.quote-cite {
+    font-size: 9px;
+    color: var(--ink-4);
+    letter-spacing: 0.08em;
+}
+.quote-cite .arr { color: var(--accent); margin-right: 4px; }
+
+/* ── FOOTER ── */
+.cite-footer {
+    padding: var(--s7) 0 var(--s8);
+    border-top: 1px solid var(--line-0);
+    margin-top: var(--s7);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s6) var(--s7);
+}
+@media (max-width: 720px) { .cite-footer { grid-template-columns: 1fr; } }
+
+.cite-block {
+    display: flex; flex-direction: column; gap: var(--s2);
+}
+.cite-lbl {
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.cite-body {
+    font-size: var(--sm);
+    color: var(--ink-3);
+    line-height: 1.7;
+    font-weight: 300;
+}
+.cite-body a {
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--line-1);
+    transition: color var(--fast) var(--snap), border-color var(--fast) var(--snap);
+}
+.cite-body a:hover { color: var(--accent); border-color: var(--accent-mid); }
+
+.cycle {
+    grid-column: 1 / -1;
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-0);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--s3);
+    font-family: var(--mono);
+    font-size: var(--sm);
+    color: var(--ink-3);
+    font-weight: 300;
+    justify-content: center;
+}
+.cycle .step { color: var(--ink-2); }
+.cycle .arr  { color: var(--accent); }
+.cycle .now  {
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent-mid);
+    padding-bottom: 1px;
+}
+
+.sig {
+    margin-top: var(--s5);
+    text-align: center;
+    font-size: var(--tiny);
+    color: var(--ink-4);
+    letter-spacing: 0.1em;
+    font-style: italic;
+}
+.sig .accent { color: var(--accent); font-style: normal; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- SLUG -->
+    <div class="slug">
+        <span>clear channel</span>
+        <span class="sep">/</span>
+        <span class="strike">design system</span>
+        <span class="sep">/</span>
+        <span class="now">field notes</span>
+        <span class="warn">observed, not declared</span>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero" id="intro">
+        <div class="hero-left">
+            <div class="eyebrow">a field guide, not a spec</div>
+            <h1 class="hero-title">
+                Field notes<br>
+                on a <em>house style</em><br>
+                that was not <em>designed</em>.
+            </h1>
+            <p class="hero-sub">
+                Sixty-nine wrote it down. Seventy laid it out. Neither is honest about how it got there — the aesthetic fell out of ninety sketches, and the shape it takes today is a shape it can lose tomorrow.
+            </p>
+            <div class="hero-meta">
+                <div class="hero-meta-item"><div class="dot"></div><span>observed across 89 sketches</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>6 principles, 3 exceptions</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>tensions kept open</span></div>
+                <div class="hero-meta-item"><div class="dot"></div><span>ube · this instance</span></div>
+            </div>
+        </div>
+        <div class="hero-strip-wrap">
+            <div class="hero-strip">
+                <canvas id="heroStrip" width="520" height="400"></canvas>
+            </div>
+            <div class="hero-strip-label">
+                <span>specimen strip · live</span>
+                <span class="cite">↳ ambient</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREAMBLE -->
+    <section class="preamble">
+        <p>
+            A design system says <span class="k">this is what we do</span>. A moodboard says <span class="k">this is what I like</span>. Neither is quite right for what happened here. What happened here is closer to <span class="k">what keeps happening</span>.
+        </p>
+        <p class="dim">
+            Between the two: field notes. The kind you write watching birds. You do not declare a plumage; you note that the same one keeps showing up, from which distance, in what light, next to what other birds — and you leave room for the ones you cannot classify yet.
+        </p>
+        <p>
+            So this page treats the sketchbook as the field. Each recurring move is a sighting, cited to the sketches it appeared in. Each rule is followed by the exception that broke it and worked anyway. And each open question — the ones a real design system would <span class="strike">close</span> — stays open, because that is where the next sketch comes from.
+        </p>
+    </section>
+
+    <!-- ═══ §01 PALETTE — SIGHTING LOG ═══ -->
+    <section class="section" id="palette">
+        <div class="section-mark"><span class="num">§01</span><span>palette · sighting log</span><span class="rule"></span></div>
+        <h2 class="section-title serif">Colors as <em>observed</em>, not decreed.</h2>
+        <p class="section-desc">
+            The palette is not a spec — it is a tally. Every hex here appears because it appeared. Counts are actual grep hits across the 89 sketches; some tokens outrank their own names.
+        </p>
+
+        <div class="palette-log">
+
+            <div class="palette-group">
+                <div class="palette-key">ground<span class="cnt">the dark under everything</span></div>
+                <div class="swatch-row">
+                    <div class="swatch">
+                        <div class="chip" style="background:#0a0a0a;"></div>
+                        <div class="tok">--void · #0a0a0a</div>
+                        <div class="role">canvas · not pure black, a hair warmer</div>
+                        <div class="cite"><span class="arr">↳</span>59 sightings · everywhere</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#0f0f0f;"></div>
+                        <div class="tok">--base · #0f0f0f</div>
+                        <div class="role">primary surface</div>
+                        <div class="cite"><span class="arr">↳</span>25 · 26, 69, 79, 87</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#141414;"></div>
+                        <div class="tok">--raised · #141414</div>
+                        <div class="role">elevated panels — elevation via value, not shadow</div>
+                        <div class="cite"><span class="arr">↳</span>17 · widget cards</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#1a1a1a;"></div>
+                        <div class="tok">--surface · #1a1a1a</div>
+                        <div class="role">cards, borders when subtle</div>
+                        <div class="cite"><span class="arr">↳</span>40 · dual-use</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-key">ink<span class="cnt">five tiers of visibility</span></div>
+                <div class="swatch-row">
+                    <div class="swatch">
+                        <div class="chip" style="background:#ffffff; border:1px solid #2a2a2a;"></div>
+                        <div class="tok">--ink-0 · #ffffff</div>
+                        <div class="role">titles, essential geometry</div>
+                        <div class="cite"><span class="arr">↳</span>50 · rare, load-bearing</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#f5f5f7;"></div>
+                        <div class="tok">--ink-1 · #f5f5f7</div>
+                        <div class="role">body — the reading tier</div>
+                        <div class="cite"><span class="arr">↳</span>26</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#a8aab8;"></div>
+                        <div class="tok">--ink-2 · #a8aab8</div>
+                        <div class="role">labels, metadata, secondary chrome</div>
+                        <div class="cite"><span class="arr">↳</span>24</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#666666;"></div>
+                        <div class="tok">--ink-3 · #666666</div>
+                        <div class="role">hints, disabled, subheads</div>
+                        <div class="cite"><span class="arr">↳</span>23</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#333333;"></div>
+                        <div class="tok">--ghost · #333333</div>
+                        <div class="role">structural marks you don't consciously read</div>
+                        <div class="cite"><span class="arr">↳</span>15 · almost invisible on purpose</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-key">one-accent<span class="cnt">pick one · rule with exceptions</span></div>
+                <div class="swatch-row">
+                    <div class="swatch">
+                        <div class="chip" style="background:#00ffaa;"></div>
+                        <div class="tok">cyan · #00ffaa</div>
+                        <div class="role">terminal, growth · Clear Channel's own accent</div>
+                        <div class="cite"><span class="arr">↳</span>69, 70, 62</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#00a8ff;"></div>
+                        <div class="tok">blue · #00a8ff</div>
+                        <div class="role">action, primary · the default when you don't decide</div>
+                        <div class="cite"><span class="arr">↳</span>starter template</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#7b6fa5;"></div>
+                        <div class="tok">ube-violet · #7b6fa5</div>
+                        <div class="role">quiet · the accent that displaces the accent</div>
+                        <div class="cite"><span class="arr">↳</span>53 sightings · 63, 82, this page</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#ffaa00;"></div>
+                        <div class="tok">cph-yellow · #ffaa00</div>
+                        <div class="role">oscilloscope warmth · aida 01 phase portrait</div>
+                        <div class="cite"><span class="arr">↳</span>aida instance</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#ff0066;"></div>
+                        <div class="tok">magenta · #ff0066</div>
+                        <div class="role">error, alert · used sparingly, load-bearing when used</div>
+                        <div class="cite"><span class="arr">↳</span>anti-pattern chrome</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-key">named<span class="cnt">colors that earned a name</span></div>
+                <div class="swatch-row">
+                    <div class="swatch">
+                        <div class="chip" style="background:#9d91b0;"></div>
+                        <div class="tok">ube-lavender · #9d91b0</div>
+                        <div class="role">secondary in the ube triad</div>
+                        <div class="cite"><span class="arr">↳</span>63-ube-kaizen</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#9e6240;"></div>
+                        <div class="tok">ube-terra · #9e6240</div>
+                        <div class="role">warm brown terra cotta · complement to the violets</div>
+                        <div class="cite"><span class="arr">↳</span>63</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#f4bfa0;"></div>
+                        <div class="tok">page-bg · #f4bfa0</div>
+                        <div class="role">peach world · a whole light ground — anti-doctrine</div>
+                        <div class="cite"><span class="arr">↳</span>62-terminal-cli</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#c05020;"></div>
+                        <div class="tok">prompt · #c05020</div>
+                        <div class="role">terracotta prompt on the peach ground</div>
+                        <div class="cite"><span class="arr">↳</span>62</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-key">outlier family<span class="cnt">the second system 69/70 don't admit</span></div>
+                <div class="swatch-row">
+                    <div class="swatch">
+                        <div class="chip" style="background:#14110d;"></div>
+                        <div class="tok">warm-void · #14110d</div>
+                        <div class="role">particles — the void with a red-shift</div>
+                        <div class="cite"><span class="arr">↳</span>74-particles</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#3a3a6a;"></div>
+                        <div class="tok">eixample-indigo · #3a3a6a</div>
+                        <div class="role">indigo field paired with gold — print-shop world</div>
+                        <div class="cite"><span class="arr">↳</span>88-eixample</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#f2c63b;"></div>
+                        <div class="tok">eixample-gold · #f2c63b</div>
+                        <div class="role">edition ink · saturated, held by tracking not restraint</div>
+                        <div class="cite"><span class="arr">↳</span>88</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#050608;"></div>
+                        <div class="tok">id-card-void · #050608</div>
+                        <div class="role">cooler, darker · a credential ground</div>
+                        <div class="cite"><span class="arr">↳</span>84-id-card</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#c9cdd4;"></div>
+                        <div class="tok">id-card-accent · #c9cdd4</div>
+                        <div class="role">near-neutral · the accent that refuses to be one</div>
+                        <div class="cite"><span class="arr">↳</span>84</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-key">the five voices<span class="cnt">candy palette · one-accent fully broken</span></div>
+                <div class="swatch-row">
+                    <div class="swatch">
+                        <div class="chip" style="background:#4dd1ff;"></div>
+                        <div class="tok">pulse · #4dd1ff</div>
+                        <div class="role">one voice of five, none subordinate</div>
+                        <div class="cite"><span class="arr">↳</span>87-attention-distribution</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#ff7ab8;"></div>
+                        <div class="tok">echo · #ff7ab8</div>
+                        <div class="role">pink · forbidden alone, works in a chorus</div>
+                        <div class="cite"><span class="arr">↳</span>87</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#ffc24a;"></div>
+                        <div class="tok">spark · #ffc24a</div>
+                        <div class="role">amber</div>
+                        <div class="cite"><span class="arr">↳</span>87</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#6cf2a3;"></div>
+                        <div class="tok">drift · #6cf2a3</div>
+                        <div class="role">mint</div>
+                        <div class="cite"><span class="arr">↳</span>87</div>
+                    </div>
+                    <div class="swatch">
+                        <div class="chip" style="background:#b89cff;"></div>
+                        <div class="tok">murmur · #b89cff</div>
+                        <div class="role">lilac · the whole voice cast at once</div>
+                        <div class="cite"><span class="arr">↳</span>87</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="palette-caveat">
+            <span class="lbl">margin note · what the "system" doesn't admit</span>
+            "Pick one accent per project" held for sixty-two sketches, then broke three times in different directions. <a href="../../63-ube-kaizen/">63</a> ran a desaturated triad. <a href="../../87-attention-distribution/">87</a> ran five saturated singles at once. <a href="../../62-terminal-cli/">62</a> reversed the ground into peach entirely. Read together, the second-half warm sketches (<a href="../../62-terminal-cli/">62</a>, <a href="../../63-ube-kaizen/">63</a>, <a href="../../74-particles/">74</a>, <a href="../../84-id-card/">84</a>, <a href="../../88-eixample/">88</a>) arguably belong to a <em>separate</em> warm system that 69/70 quietly excluded from their canon. Kept here as pressure to expand.
+        </div>
+    </section>
+
+    <!-- ═══ §02 RECURRING PLUMAGE ═══ -->
+    <section class="section" id="plumage">
+        <div class="section-mark"><span class="num">§02</span><span>recurring plumage</span><span class="rule"></span></div>
+        <h2 class="section-title serif">The small marks the practice <em>keeps making</em>.</h2>
+        <p class="section-desc">
+            Small marks you notice once and then start seeing everywhere — the sketchbook's typographic fingerprints. None was decided in advance. Each turned up in one sketch, was borrowed by the next, and by the fifth became house dialect. Below the plumage: the ASCII ramps that grew their own accent.
+        </p>
+
+        <div class="plumage">
+            <div class="plume">
+                <div class="plume-glyph">§01<span class="dim">·</span></div>
+                <div class="plume-name">section marker</div>
+                <div class="plume-desc">Silcrow + two-digit index + middot. Reads as "chapter" without saying so.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 70, 84, and this page</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">↳</div>
+                <div class="plume-name">citation arrow</div>
+                <div class="plume-desc">The "trace" glyph. Follows a fact with the sketch it came from — like a footnote that fits in one character.</div>
+                <div class="plume-cite"><span class="arr">↳</span> imagination, this page</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">80 · network</div>
+                <div class="plume-name">two-digit prefix</div>
+                <div class="plume-desc">Every sketch gets a two-digit sequence number, middot, lowercase name. Time as a scale bar.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 71-index, 80, 85, 86, 87, 89</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph"><span class="dim">01 —</span> label</div>
+                <div class="plume-name">numeric eyebrow</div>
+                <div class="plume-desc">Small dim number, em dash, uppercase label above a title. Says "part of a sequence" without a heading.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 69, 70, 30-thinking-states</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">tick · tick · tick</div>
+                <div class="plume-name">tick nav</div>
+                <div class="plume-desc">Vertical stack of 1px marks, right edge. Label materialises on hover. A miniature table of contents that never shouts.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 69, 70</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph"><span class="dim">ghost text</span></div>
+                <div class="plume-name">#333 marks</div>
+                <div class="plume-desc">Structural type you shouldn't consciously read — just below the noise floor of the eye. The system's whisper register.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 15 sightings · widget, palette, index</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">▁▂▃▅▇</div>
+                <div class="plume-name">glyph density ramp</div>
+                <div class="plume-desc">Continuous field mapped through an ordered character set — the engine under the whole ASCII vein.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 53, 55, 66, 67, 72, 77, 78</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">fade → →</div>
+                <div class="plume-name">mask-image fade</div>
+                <div class="plume-desc">Horizontal linear mask on hero canvases — starts and ends in nothing. The canvas admits its own edges.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 69, 71, 78</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">a x i s</div>
+                <div class="plume-name">wide-tracked uppercase</div>
+                <div class="plume-desc">Labels get 0.1–0.2em letter-spacing and all-caps. A visual "meta" flag — this is not content, this is the frame.</div>
+                <div class="plume-cite"><span class="arr">↳</span> every reference sheet</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">lowercase.</div>
+                <div class="plume-name">all-lowercase titles</div>
+                <div class="plume-desc">Titles never SHOUT. Mixed case is banned, uppercase is reserved for meta chrome — so lowercase carries the content.</div>
+                <div class="plume-cite"><span class="arr">↳</span> anti-pattern-adjacent · house voice</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">✗ gradient</div>
+                <div class="plume-name">refusal glyph</div>
+                <div class="plume-desc">A small × sitting next to a listed anti-pattern. The rules are shown as a wall of what the practice refuses.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 70, 43-style-seed</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph"><em style="font-family: var(--serif);">Serif drift</em></div>
+                <div class="plume-name">serif for display</div>
+                <div class="plume-desc">Instrument Serif slips in at hero moments — an italic swipe against a mono world. The exception that quietly became house.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 70, 84, this hero</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph"><span style="color:var(--accent);">//</span> title</div>
+                <div class="plume-name">comment-prefix headings</div>
+                <div class="plume-desc">Section titles prefixed with a coloured <code>//</code>. Says "documentation" without saying it — a header that reads like a source-file comment.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 78-ascii-sheets-docs</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph"><span class="dim">I · II · III · IV</span></div>
+                <div class="plume-name">roman corner marks</div>
+                <div class="plume-desc">Cell labels in Roman numerals at 8px, ghost <code>#2a2a2a</code>, tucked into the corner. Visible only if you look.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 66-ascii-field-gallery · 47-2gif</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">Nº 001<span class="dim"> / 256</span></div>
+                <div class="plume-name">edition badge</div>
+                <div class="plume-desc">Print-shop numbering — <code>Nº</code> ligature, edition over run size. A generated artefact framed as a signed plate.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 88-eixample · 84-id-card</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">80 × 80</div>
+                <div class="plume-name">×-not-x dimensions</div>
+                <div class="plume-desc">Multiplication sign, never a lowercase x. <code>80 × 80</code>, <code>16 × 16</code>, <code>128 × 128</code>. Tiny but house-wide.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 78, 87, 88, 89</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">four states.</div>
+                <div class="plume-name">terminal period</div>
+                <div class="plume-desc">The full stop as punctuation on titles. Reads as finished, matter-of-fact, done.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 89-sprite-states · 71 (specimens.)</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph">⎙ · ⟳ · ↓</div>
+                <div class="plume-name">functional glyphs</div>
+                <div class="plume-desc">Print, random, download — icons drawn from Unicode not an icon library. The rule is: only if functional.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 88, 89, 57</div>
+            </div>
+            <div class="plume">
+                <div class="plume-glyph"><span style="color:var(--accent);">§2.3</span> spec</div>
+                <div class="plume-name">fake fine-print</div>
+                <div class="plume-desc">Fabricated specification paragraphs — <code>§2.3</code>, <code>spec/0.4 · root</code>, <code>M1/U1 · consumed</code>. Formal register borrowed to make a joke that isn't a joke.</div>
+                <div class="plume-cite"><span class="arr">↳</span> 84-id-card</div>
+            </div>
+        </div>
+
+        <!-- ASCII RAMP GALLERY — a specimen strip, not a token table -->
+        <div class="ramp-gallery">
+            <div class="ramp-hd">
+                <span class="ramp-lbl">plate · ascii ramps in the wild</span>
+                <span class="ramp-cnt">6 ramps · foraged not designed</span>
+            </div>
+            <div class="ramps">
+                <div class="ramp"><span class="ramp-name">circles</span><span class="ramp-glyphs">·  ∙  ∘  ○  ◌  ◎  ⊙  ●</span><span class="ramp-cite">↳ 66, 78</span></div>
+                <div class="ramp"><span class="ramp-name">blocks</span><span class="ramp-glyphs">░  ░  ▒  ▒  ▓  ▓  █  █</span><span class="ramp-cite">↳ 53, 55, 67</span></div>
+                <div class="ramp"><span class="ramp-name">braille</span><span class="ramp-glyphs">⠂  ⠄  ⠆  ⠇  ⠏  ⠟  ⠿  ⣿</span><span class="ramp-cite">↳ 66, 72</span></div>
+                <div class="ramp"><span class="ramp-name">crystals</span><span class="ramp-glyphs">·  +  ×  ✦  ✧  ⟡  ❋  ✺</span><span class="ramp-cite">↳ 66</span></div>
+                <div class="ramp"><span class="ramp-name">lines</span><span class="ramp-glyphs">╌  ─  ━  ═  ╠  ╬  ╦  ╪</span><span class="ramp-cite">↳ 78</span></div>
+                <div class="ramp"><span class="ramp-name">kanji</span><span class="ramp-glyphs">一  二  三  口  日  目  回  囲</span><span class="ramp-cite">↳ 66 · unfiled</span></div>
+            </div>
+            <div class="ramp-caveat">
+                One rule (map continuous field across ordered glyphs) · six house dialects · plus 55-ascii-loading's three-stage lexicon <code>CHAOS = '!@#$%^&amp;*+=-~&lt;&gt;|/?\;:'</code> → <code>SETTLING = '░▒▓▪▫'</code> → <code>LOCKED = '·'</code>. The move recurred often enough to grow accents.
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ §03 LIVE PLATE / MOVES ═══ -->
+    <section class="section" id="moves">
+        <div class="section-mark"><span class="num">§03</span><span>live plate · owned moves</span><span class="rule"></span></div>
+        <h2 class="section-title serif">Four gestures the sketchbook has <em>learned by heart</em>.</h2>
+        <p class="section-desc">
+            These are not tokens. They are the small techniques that keep coming back — the muscle memory of the practice. Each panel below runs the actual move, at low intensity, and cites the sketches where it was learned.
+        </p>
+
+        <div class="moves-plate">
+            <div class="move">
+                <div class="move-canvas-wrap">
+                    <span class="move-num">M01</span>
+                    <canvas id="mProx" width="280" height="280"></canvas>
+                </div>
+                <div class="move-name">proximity link</div>
+                <div class="move-desc">Draw a line between two agents under a distance threshold, faded by separation. Turns a cloud into a mesh.</div>
+                <div class="move-cite"><span class="arr">↳</span> 07 · 09 · 10 · 11 · 80</div>
+            </div>
+            <div class="move">
+                <div class="move-canvas-wrap">
+                    <span class="move-num">M02</span>
+                    <canvas id="mAscii" width="280" height="280"></canvas>
+                </div>
+                <div class="move-name">glyph density ramp</div>
+                <div class="move-desc">Continuous field quantised across an ordered character set. Sparse to dense · brightness becomes character.</div>
+                <div class="move-cite"><span class="arr">↳</span> 53 · 55 · 66 · 67 · 77 · 78</div>
+            </div>
+            <div class="move">
+                <div class="move-canvas-wrap">
+                    <span class="move-num">M03</span>
+                    <canvas id="mSines" width="280" height="280"></canvas>
+                </div>
+                <div class="move-name">summed sines drift</div>
+                <div class="move-desc">Three or four sines out of phase, summed, sampled on a grid. Pseudo-noise that stays legible as sine.</div>
+                <div class="move-cite"><span class="arr">↳</span> 12 · 39 · 51 · 68</div>
+            </div>
+            <div class="move">
+                <div class="move-canvas-wrap">
+                    <span class="move-num">M04</span>
+                    <canvas id="mCa" width="280" height="280"></canvas>
+                </div>
+                <div class="move-name">per-cell threshold</div>
+                <div class="move-desc">Each grid cell holds a value and flips at its own threshold. Rules stay local · a pattern emerges.</div>
+                <div class="move-cite"><span class="arr">↳</span> 18 · 40 · 52</div>
+            </div>
+        </div>
+
+        <div class="margin-note">
+            Overfamiliar makes a move a fingerprint · and a trap. Proximity-link is the sketchbook's signature; anything drawn through it looks "generative" instantly. A candidate for the /spark break strategy — see §06.
+        </div>
+    </section>
+
+    <!-- ═══ §04 TENSIONS KEPT OPEN ═══ -->
+    <section class="section" id="tensions">
+        <div class="section-mark"><span class="num">§04</span><span>tensions · kept open</span><span class="rule"></span></div>
+        <h2 class="section-title serif">The questions the practice <em>refuses to close</em>.</h2>
+        <p class="section-desc">
+            A design system's job is to answer questions. This one's job is to keep four of them un-answered. Each has been circled repeatedly and never quite resolved — which is the point. They are the pressure that makes the next sketch necessary.
+        </p>
+
+        <div class="tensions">
+            <div class="tension">
+                <div class="tension-hd"><span>tension · 01</span><span class="charge">charge: high</span></div>
+                <div class="tension-q">Can randomness read as <em>choice</em>?</div>
+                <div class="tension-body">
+                    Uniform noise feels like noise. A flat mapping is a gradient, not an exploration. The working answer so far is piecewise, phase-banded — but "authored randomness" stays a paradox worth keeping open: lean too far and you've just hidden a decision behind a dice.
+                </div>
+                <div class="tension-cite"><span class="arr">↳</span> pressed in 01 · 04 · 07 · 56</div>
+            </div>
+            <div class="tension">
+                <div class="tension-hd"><span>tension · 02</span><span class="charge">charge: medium</span></div>
+                <div class="tension-q">Do you <em>show</em> the mechanism, or <em>polish</em> the surface?</div>
+                <div class="tension-body">
+                    An early maxim — "show the mechanism, don't hide it; polish is reduction" — pulls against the later sketches' bloom, glass, and gradients. The two impulses aren't enemies, but they want opposite things: the raw piece that teaches its own logic vs. the resolved object that hides its seams.
+                </div>
+                <div class="tension-cite"><span class="arr">↳</span> pressed in 43 · 47 · 81</div>
+            </div>
+            <div class="tension">
+                <div class="tension-hd"><span>tension · 03</span><span class="charge">charge: medium</span></div>
+                <div class="tension-q">Is a sketchbook a <em>search</em> or a <em>map</em>?</div>
+                <div class="tension-body">
+                    First half searched — one-off pieces looking for a language. Second half maps — reference sheets, palettes, catalogues, indexed thumbnails. The design-system impulse can crowd out the wilder veins if left unchecked. Kept open so the mapping doesn't seal.
+                </div>
+                <div class="tension-cite"><span class="arr">↳</span> pressed in 43 · 57 · 61 · 71 · this page</div>
+            </div>
+            <div class="tension">
+                <div class="tension-hd"><span>tension · 04</span><span class="charge">charge: medium</span></div>
+                <div class="tension-q">Iterating a system <em>or</em> writing new rules?</div>
+                <div class="tension-body">
+                    Every sketch either refines a move already owned (proximity link, glyph ramp) or invents a new mechanism from scratch. Both are legitimate. Neither should be the default. The tension is what stops iteration from becoming autopilot.
+                </div>
+                <div class="tension-cite"><span class="arr">↳</span> pressed across every second sketch</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ §05 EXCEPTIONS ═══ -->
+    <section class="section" id="exceptions">
+        <div class="section-mark"><span class="num">§05</span><span>exceptions · logged</span><span class="rule"></span></div>
+        <h2 class="section-title serif">Three times the rule broke and it <em>worked</em>.</h2>
+        <p class="section-desc">
+            The system is defined as much by its exceptions as by its rules. When a sketch violates a principle and the result holds up, the exception is not filed as damage — it is filed as pressure to rewrite. Two of these are already pushing on their principles. One more and reduction-as-polish should grow an explicit "effect-as-material" clause.
+        </p>
+
+        <div class="exceptions">
+            <div class="exception">
+                <div class="exception-tag"><span>28-liquid-glass</span><span class="verdict">verdict: worked</span></div>
+                <div class="exception-broke">
+                    Broke <span class="rule">reduction-as-polish</span>. A draggable frosted pane stacks <code>backdrop-filter</code> blur, saturate, brightness, contrast, and an SVG <code>feTurbulence → feDisplacementMap</code> liquid distortion. Pure additive richness.
+                </div>
+                <div class="exception-why">
+                    Because the effect <em>is</em> the subject. The sketch is a glass simulator; glass that does not blur, saturate, and warp is not glass. The richness is not decoration applied to content — it <em>is</em> the content. Reduction here would have deleted the entire idea, not polished it.
+                </div>
+                <div class="exception-cite"><span class="arr">↳</span> against principles/reduction-as-polish</div>
+            </div>
+            <div class="exception">
+                <div class="exception-tag"><span>63-ube-kaizen</span><span class="verdict mixed">verdict: mixed</span></div>
+                <div class="exception-broke">
+                    Broke <span class="rule">one accent per project</span>. Ube Kaizen runs three named colors at once — violet, lavender, terra — as a harmonized triad, plus pulsing accent demos. More accent presence than the single-spectral rule allows.
+                </div>
+                <div class="exception-why">
+                    Mostly. The sketch <em>is</em> a color tool — a single accent would defeat the premise. The triad stays quiet because the three are desaturated and harmonized. Suggests the rule is about <em>perceived</em> loudness, not literal accent count. A muted multi-accent can be quieter than one neon single.
+                </div>
+                <div class="exception-cite"><span class="arr">↳</span> against principles/quiet-over-loud</div>
+            </div>
+            <div class="exception">
+                <div class="exception-tag"><span>81-lens-wave</span><span class="verdict">verdict: worked</span></div>
+                <div class="exception-broke">
+                    Same rule, deeper violation. A WebGL shader adds three-ring bloom, chromatic aberration splitting R/G/B, sine-wave warp, non-uniform lens scale. Glow, fringe, gradient-tinted light — three named anti-patterns at once.
+                </div>
+                <div class="exception-why">
+                    The bloom and aberration read as <em>optics</em>, not styling: the text behaves like a luminous material seen through a lens, so the fringe reads as a consequence of physics rather than a chosen color. Second logged break in the same direction. Two exceptions is the recurrence threshold.
+                </div>
+                <div class="exception-cite"><span class="arr">↳</span> against principles/reduction-as-polish · pressure to rewrite</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ §06 NOT YET / ANTI-ECHO ═══ -->
+    <section class="section" id="not-yet">
+        <div class="section-mark"><span class="num">§06</span><span>not yet · anti-echo</span><span class="rule"></span></div>
+        <h2 class="section-title serif">What the sketchbook <em>hasn't</em> done — on purpose.</h2>
+        <p class="section-desc">
+            Every strong practice risks becoming its own echo chamber. These prompts come from the /spark break strategy — the anti-echo move that surfaces the sketch you have been avoiding. They are what the sketchbook is missing, phrased as invitations.
+        </p>
+
+        <div class="not-yet">
+            <div class="not-yet-item">
+                <span class="not-yet-num">01</span>
+                <span class="strategy">break · vein</span>
+                <span class="prompt">A sketch with <em>no</em> emergence — a single, closed, authored image with the mechanism made deliberately illegible. The opposite of every rule-and-let-it-run piece so far.</span>
+                <span class="prompt-cite"><span class="arr">↳</span> vs veins/emergence-from-local-rules</span>
+            </div>
+            <div class="not-yet-item">
+                <span class="not-yet-num">02</span>
+                <span class="strategy">break · move</span>
+                <span class="prompt">A network sketch that <em>refuses</em> the proximity-link mesh. Same particle cloud, different fingerprint — force, gradient, sound, memory. Anything but a faded line under a threshold.</span>
+                <span class="prompt-cite"><span class="arr">↳</span> vs moves/proximity-link-drawing</span>
+            </div>
+            <div class="not-yet-item">
+                <span class="not-yet-num">03</span>
+                <span class="strategy">press · tension</span>
+                <span class="prompt">Take a glassy, finished sketch and strip it back to its raw mechanism · a diptych, polished on one half, exposed on the other. Split the tension in half and show both.</span>
+                <span class="prompt-cite"><span class="arr">↳</span> presses tensions/showing-mechanism-vs-polish</span>
+            </div>
+            <div class="not-yet-item">
+                <span class="not-yet-num">04</span>
+                <span class="strategy">collide</span>
+                <span class="prompt">A reference sheet that <em>generates itself</em> from a single rule — a taxonomy that self-organises. Design-system meets emergence: the map is the search.</span>
+                <span class="prompt-cite"><span class="arr">↳</span> collides veins/design-system × veins/emergence</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ §07 OVERHEARD ═══ -->
+    <section class="section" id="overheard">
+        <div class="section-mark"><span class="num">§07</span><span>overheard · signature copy</span><span class="rule"></span></div>
+        <h2 class="section-title serif">A wall of the sketchbook's <em>own voice</em>.</h2>
+        <p class="section-desc">
+            The tone is as much of the style as the palette. These are actual titles, subheads and small labels lifted from the sketches — the same voice recurring in different mouths. No paraphrase: the practice already knows how it sounds.
+        </p>
+
+        <div class="overheard">
+            <div class="quote">
+                <div class="quote-txt serif">"like watching something think."</div>
+                <div class="quote-cite"><span class="arr">↳</span> 69, 70 · sub</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">working with data as raw material.</div>
+                <div class="quote-cite"><span class="arr">↳</span> 69, 70 · statement</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">quiet systems over loud interfaces</div>
+                <div class="quote-cite"><span class="arr">↳</span> principles · everywhere</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt serif">"the aesthetic is a byproduct of function"</div>
+                <div class="quote-cite"><span class="arr">↳</span> 70 · statement</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">strip, don't add.</div>
+                <div class="quote-cite"><span class="arr">↳</span> reduction-as-polish</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">density creates form.</div>
+                <div class="quote-cite"><span class="arr">↳</span> 70 · motion note</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">100 days — <span class="dim">specimens.</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 71-index title</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">armature · <span class="dim">soft-island ideas</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 73-svg-layouts</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">emergence — <span class="dim">vicsek model</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 02 · sub</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt serif">"one thin layer changes the whole page."</div>
+                <div class="quote-cite"><span class="arr">↳</span> 28-liquid-glass</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">EIXAMPLE — <span class="dim">generative editions</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 88 · title</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">four states.</div>
+                <div class="quote-cite"><span class="arr">↳</span> 89-sprite-states · hero</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">color set kaizen ube</div>
+                <div class="quote-cite"><span class="arr">↳</span> 63 · title (all-lowercase, no punctuation)</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">snapshots — <span class="dim">clear channel</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 72 · title</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">nine ways to read the same simulation</div>
+                <div class="quote-cite"><span class="arr">↳</span> 87 · attention-distribution</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt serif">"the interface recedes. data is foregrounded."</div>
+                <div class="quote-cite"><span class="arr">↳</span> 70 · principle 01</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">visible logic, emergent complexity</div>
+                <div class="quote-cite"><span class="arr">↳</span> principles · everywhere</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">agent-stream · <span class="dim">glyphs</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 85 · title</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">attention arena <span class="dim">·</span> 9 lenses <span class="dim">·</span> 100 agents <span class="dim">·</span> 5 voices</div>
+                <div class="quote-cite"><span class="arr">↳</span> 87 · whole abstract in middle-dots</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt"><span class="dim">§2.3.</span> Output is consumed by the compositor and does not propagate beyond the surface boundary.</div>
+                <div class="quote-cite"><span class="arr">↳</span> 84 · fabricated fine-print</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">A status ribbon for dense operational screens.</div>
+                <div class="quote-cite"><span class="arr">↳</span> 77 · component blurb</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">Small API, large surface area.</div>
+                <div class="quote-cite"><span class="arr">↳</span> 77 · component blurb</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">entry 85 · <span class="dim">agent-stream</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 85 · eyebrow</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">day 89 <span class="accent">·</span> sprite-states <span class="accent">·</span> <span class="dim">generated by create-sprite</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 89 · footer trio</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">at <span class="dim">80 × 80</span></div>
+                <div class="quote-cite"><span class="arr">↳</span> 89 · sub · titles that admit their grid</div>
+            </div>
+            <div class="quote">
+                <div class="quote-txt">CARRER DE L'EIXAMPLE</div>
+                <div class="quote-cite"><span class="arr">↳</span> 88 · print-shop signage</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER · CITE ═══ -->
+    <footer class="cite-footer">
+        <div class="cite-block">
+            <div class="cite-lbl">foraged from</div>
+            <div class="cite-body">
+                <a href="../../69-clear-channel/">69-clear-channel</a> · <a href="../../70-clear-channel-2/">70-clear-channel-2</a> · the <a href="../../design-system/">design-system/</a> bundle — principles, tokens, instances, exceptions.
+            </div>
+        </div>
+        <div class="cite-block">
+            <div class="cite-lbl">read across</div>
+            <div class="cite-body">
+                The full sketchbook, focused on the ASCII vein (53 · 55 · 66 · 67 · 77 · 78), the field vein (01 · 02 · 11 · 12 · 18 · 51 · 52), the network vein (07 · 09 · 16 · 63-constellation · 80), and the reference-sheet vein (26 · 43 · 57 · 61 · 71 · 84).
+            </div>
+        </div>
+        <div class="cite-block">
+            <div class="cite-lbl">generative source</div>
+            <div class="cite-body">
+                The <a href="../../imagination/">imagination/</a> layer — veins, moves, tensions, sources, collisions. Prompts in §06 come from its <em>/spark</em> break strategy.
+            </div>
+        </div>
+        <div class="cite-block">
+            <div class="cite-lbl">what this is not</div>
+            <div class="cite-body">
+                Not a spec. Not a moodboard. Not a replacement for 69 or 70 — those are the inhale, this is a reading of the inhale. Read alongside, not instead.
+            </div>
+        </div>
+
+        <div class="cycle">
+            <span class="step">sketch</span>
+            <span class="arr">→</span>
+            <span class="step">inhale</span>
+            <span class="arr">→</span>
+            <span class="now">field notes</span>
+            <span class="arr">→</span>
+            <span class="step">exhale</span>
+            <span class="arr">→</span>
+            <span class="step">next sketch</span>
+        </div>
+
+        <div class="sig">observed <span class="accent">·</span> not declared <span class="accent">·</span> still becoming</div>
+    </footer>
+
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ══════════════════════════════════════════════════════════════
+    // Utility · DPR-aware canvas fit
+    // ══════════════════════════════════════════════════════════════
+    function fit(canvas) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width  = Math.max(1, Math.floor(rect.width  * dpr));
+        canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { ctx, w: rect.width, h: rect.height };
+    }
+
+    const ACCENT = '#a48ad4';
+    const GHOST  = 'rgba(164,138,212,0.28)';
+    const INK_2  = '#a8aab8';
+    const INK_3  = '#666666';
+    const INK_4  = '#444444';
+    const VOID   = '#0a0a0a';
+
+    // ══════════════════════════════════════════════════════════════
+    // HERO SPECIMEN STRIP — a slow-drifting composite of the moves
+    // ══════════════════════════════════════════════════════════════
+    (function heroStrip() {
+        const canvas = document.getElementById('heroStrip');
+        if (!canvas) return;
+        let { ctx, w, h } = fit(canvas);
+        window.addEventListener('resize', () => ({ ctx, w, h } = fit(canvas)));
+
+        // seeded points that drift with brownian noise
+        const N = 42;
+        const pts = [];
+        for (let i = 0; i < N; i++) {
+            pts.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.15,
+                vy: (Math.random() - 0.5) * 0.15,
+            });
+        }
+
+        function step() {
+            ctx.fillStyle = VOID;
+            ctx.fillRect(0, 0, w, h);
+
+            // proximity mesh
+            for (const p of pts) {
+                p.vx += (Math.random() - 0.5) * 0.04;
+                p.vy += (Math.random() - 0.5) * 0.04;
+                p.vx *= 0.985; p.vy *= 0.985;
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x += w; if (p.x > w) p.x -= w;
+                if (p.y < 0) p.y += h; if (p.y > h) p.y -= h;
+            }
+            ctx.lineWidth = 1;
+            for (let i = 0; i < N; i++) {
+                for (let j = i + 1; j < N; j++) {
+                    const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+                    const d2 = dx*dx + dy*dy;
+                    const T = 80;
+                    if (d2 < T*T) {
+                        const a = (1 - Math.sqrt(d2)/T) * 0.55;
+                        ctx.strokeStyle = 'rgba(164,138,212,' + a.toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.moveTo(pts[i].x, pts[i].y);
+                        ctx.lineTo(pts[j].x, pts[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            // agents
+            ctx.fillStyle = '#f5f5f7';
+            for (const p of pts) {
+                ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+            }
+            requestAnimationFrame(step);
+        }
+        step();
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // M01 · PROXIMITY LINK — the signature mesh
+    // ══════════════════════════════════════════════════════════════
+    (function proximity() {
+        const canvas = document.getElementById('mProx');
+        if (!canvas) return;
+        let { ctx, w, h } = fit(canvas);
+        window.addEventListener('resize', () => ({ ctx, w, h } = fit(canvas)));
+
+        const N = 22;
+        const pts = [];
+        for (let i = 0; i < N; i++) {
+            pts.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+            });
+        }
+
+        function step() {
+            ctx.fillStyle = VOID;
+            ctx.fillRect(0, 0, w, h);
+            for (const p of pts) {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > w) p.vx *= -1;
+                if (p.y < 0 || p.y > h) p.vy *= -1;
+            }
+            const T = Math.min(w, h) * 0.36;
+            ctx.lineWidth = 1;
+            for (let i = 0; i < N; i++) {
+                for (let j = i + 1; j < N; j++) {
+                    const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+                    const d = Math.sqrt(dx*dx + dy*dy);
+                    if (d < T) {
+                        const a = (1 - d/T) * 0.6;
+                        ctx.strokeStyle = 'rgba(164,138,212,' + a.toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.moveTo(pts[i].x, pts[i].y);
+                        ctx.lineTo(pts[j].x, pts[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            ctx.fillStyle = '#f5f5f7';
+            for (const p of pts) ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+            requestAnimationFrame(step);
+        }
+        step();
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // M02 · GLYPH DENSITY RAMP
+    // ══════════════════════════════════════════════════════════════
+    (function ascii() {
+        const canvas = document.getElementById('mAscii');
+        if (!canvas) return;
+        let { ctx, w, h } = fit(canvas);
+        window.addEventListener('resize', () => ({ ctx, w, h } = fit(canvas)));
+
+        const RAMP = ' .:-=+*#%@';
+        const CELL = 10;
+        let t = 0;
+
+        function step() {
+            ctx.fillStyle = VOID;
+            ctx.fillRect(0, 0, w, h);
+            ctx.font = '10px "IBM Plex Mono", monospace';
+            ctx.textBaseline = 'top';
+            const cols = Math.floor(w / CELL);
+            const rows = Math.floor(h / CELL);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    // interference of two travelling waves
+                    const v = 0.5 + 0.5 * (
+                        Math.sin((x - t * 0.6) * 0.35) +
+                        Math.sin((y + t * 0.4) * 0.32)
+                    ) * 0.5;
+                    const idx = Math.min(RAMP.length - 1, Math.max(0, Math.floor(v * RAMP.length)));
+                    const ch = RAMP[idx];
+                    // colour follows brightness
+                    if (idx > 6) ctx.fillStyle = '#f5f5f7';
+                    else if (idx > 3) ctx.fillStyle = INK_2;
+                    else ctx.fillStyle = INK_4;
+                    ctx.fillText(ch, x * CELL, y * CELL);
+                }
+            }
+            t += 0.15;
+            requestAnimationFrame(step);
+        }
+        step();
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // M03 · SUMMED SINES DRIFT
+    // ══════════════════════════════════════════════════════════════
+    (function sines() {
+        const canvas = document.getElementById('mSines');
+        if (!canvas) return;
+        let { ctx, w, h } = fit(canvas);
+        window.addEventListener('resize', () => ({ ctx, w, h } = fit(canvas)));
+
+        let t = 0;
+        function step() {
+            ctx.fillStyle = VOID;
+            ctx.fillRect(0, 0, w, h);
+            const rows = 6;
+            const rowH = h / (rows + 1);
+            for (let r = 0; r < rows; r++) {
+                const y0 = rowH * (r + 1);
+                const alpha = 0.25 + (r / rows) * 0.55;
+                ctx.strokeStyle = 'rgba(164,138,212,' + alpha.toFixed(3) + ')';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += 2) {
+                    const p = x / w * Math.PI * 4;
+                    const y =
+                        y0 +
+                        Math.sin(p * 1.0 + t * 0.9 + r * 0.4) * 8 +
+                        Math.sin(p * 1.7 + t * 0.5 + r * 0.9) * 5 +
+                        Math.sin(p * 2.3 + t * 0.3 + r * 1.3) * 3;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+            t += 0.02;
+            requestAnimationFrame(step);
+        }
+        step();
+    })();
+
+    // ══════════════════════════════════════════════════════════════
+    // M04 · PER-CELL THRESHOLD (Gray-Scott-ish · not a real RD)
+    // ══════════════════════════════════════════════════════════════
+    (function ca() {
+        const canvas = document.getElementById('mCa');
+        if (!canvas) return;
+        let { ctx, w, h } = fit(canvas);
+        window.addEventListener('resize', () => { ({ ctx, w, h } = fit(canvas)); init(); });
+
+        const CELL = 6;
+        let cols, rows, grid, next;
+        function init() {
+            cols = Math.max(2, Math.floor(w / CELL));
+            rows = Math.max(2, Math.floor(h / CELL));
+            grid = new Float32Array(cols * rows);
+            next = new Float32Array(cols * rows);
+            for (let i = 0; i < grid.length; i++) grid[i] = Math.random();
+        }
+        init();
+
+        function idx(x, y) {
+            // wrap
+            if (x < 0) x += cols; if (x >= cols) x -= cols;
+            if (y < 0) y += rows; if (y >= rows) y -= rows;
+            return y * cols + x;
+        }
+
+        function step() {
+            // simple diffusion + threshold flip toward local neighbourhood avg
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const s =
+                        grid[idx(x-1, y)] + grid[idx(x+1, y)] +
+                        grid[idx(x, y-1)] + grid[idx(x, y+1)];
+                    const avg = s / 4;
+                    const cur = grid[idx(x, y)];
+                    // local threshold based on cell x,y — each cell has its own bias
+                    const bias = 0.5 + 0.1 * Math.sin(x * 0.31 + y * 0.19);
+                    let v = cur * 0.6 + avg * 0.4;
+                    v += (v > bias ? 0.02 : -0.02);
+                    if (v < 0) v = 0; else if (v > 1) v = 1;
+                    next[idx(x, y)] = v;
+                }
+            }
+            const tmp = grid; grid = next; next = tmp;
+
+            // draw
+            ctx.fillStyle = VOID;
+            ctx.fillRect(0, 0, w, h);
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const v = grid[idx(x, y)];
+                    if (v > 0.55) {
+                        const a = (v - 0.55) / 0.45;
+                        // interpolate ink from mid to accent as v grows
+                        if (v > 0.85) ctx.fillStyle = ACCENT;
+                        else ctx.fillStyle = 'rgba(168,170,184,' + (a * 0.7).toFixed(3) + ')';
+                        ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
+                    }
+                }
+            }
+            requestAnimationFrame(step);
+        }
+        step();
+    })();
+})();
+</script>
+</body>
+</html>
