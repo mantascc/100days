@@ -1,5 +1,8 @@
 # Imagination — Log
 
+## 2026-08-01
+* **Inhale** — `91-retro-primitives` (promoted from `daily-sketch/sketch-retro-primitives`). Created technique [crt-tube-treatment](techniques/crt-tube-treatment.md) — the bloom/grain/scanlines/tube pipeline that finally reached the reference after a first-pass "pinball" version. Strengthened threads [design-system-and-reference-sheets](threads/design-system-and-reference-sheets.md) (palette-swap family) and [grids-as-compositional-frame](threads/grids-as-compositional-frame.md) (2×2 tube-cell grid); added the sketch to [themes/showing-mechanism-vs-polish](themes/showing-mechanism-vs-polish.md) as a decisive polish datapoint.
+
 ## 2026-06-14
 * **Initialization** — Established the Imagination layer ([SPEC.md](SPEC.md) v0.1): six type folders, `/spark` and `/inhale` rituals.
 * **Harvest** — Retroactive sweep of the existing sketchbook seeded 44 entities: 11 threads, 13 techniques, 6 themes, 9 sources, 5 dormant seeds. `collisions/` left empty — generated forward via `/spark`.

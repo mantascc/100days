@@ -4,7 +4,7 @@ type: thread
 title: Grids as compositional frame
 state: active
 charge: high
-spawned: [01-entropy, 06-orbital, 12-wind-field, 13-image-flow-field, 15-binary-camera-grid, 15b-binary-camera-grid-v2, 18-cellular-automaton, 25-spotlight-grid, 26-widget-dashboard, 40-cube-grid-rules, 42-metaball-grid, 49-grid-trace, 53-ascii-grid, 56-constrained-variation, 58-shapes, 66-ascii-field-gallery, 71-index-100days]
+spawned: [01-entropy, 06-orbital, 12-wind-field, 13-image-flow-field, 15-binary-camera-grid, 15b-binary-camera-grid-v2, 18-cellular-automaton, 25-spotlight-grid, 26-widget-dashboard, 40-cube-grid-rules, 42-metaball-grid, 49-grid-trace, 53-ascii-grid, 56-constrained-variation, 58-shapes, 66-ascii-field-gallery, 71-index-100days, 91-retro-primitives]
 feeds: [techniques/offscreen-canvas-downsample, techniques/glyph-density-ramp]
 sources: []
 date: 2026-06-14
@@ -22,6 +22,7 @@ The regular grid as a silent reference frame against which everything else is me
 - [49-grid-trace](../../49-grid-trace/) — the grid as the path itself.
 - [26-widget-dashboard](../../26-widget-dashboard/) — a 2-column grid with row snapping as the placement substrate for widgets.
 - [71-index-100days](../../71-index-100days/) — a responsive card grid as a specimen wall of generative thumbnails.
+- [91-retro-primitives](../../91-retro-primitives/) — 2×2 grid of identical tube cells, each holding one primitive; the grid enforces the "specimen sheet" reading of the treatment.
 
 # Charge
 Steady and structural — almost a precondition rather than an obsession. Worth deliberately abandoning to see what the work looks like off the lattice.

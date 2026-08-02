@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Sketch · Idle (CRT)</title>
+<meta name="description" content="The floating idle face rendered through the CRT tube treatment — warm phosphor, heavy bloom, grain, scanlines, curved tube corners.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&display=swap">
+<style>
+:root {
+  --void: #050706;
+  --ink: #cfeee0;
+  --dim: rgba(207, 238, 224, 0.28);
+  --font: "IBM Plex Mono", "SF Mono", Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: radial-gradient(circle at 50% 50%, #0a0d0c 0%, #030504 62%, #000 100%);
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The tube — fills the viewport with generous inset + curved corners */
+.tube {
+  position: fixed;
+  inset: 24px;
+  border-radius: 42px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 1px rgba(120, 255, 200, 0.05) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 40px 120px rgba(0, 0, 0, 0.8);
+  isolation: isolate;
+}
+
+/* Dark radial bevel — makes the glass feel curved */
+.tube::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none; border-radius: inherit;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 44%, rgba(0,0,0,0.55) 78%, #000 100%);
+}
+
+/* Static scanlines */
+.tube::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 4;
+  pointer-events: none; border-radius: inherit;
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.55) 0 1px,
+      transparent 1px 3px
+    );
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Minimal caption in the tube corner — barely readable, part of the frame */
+.tag {
+  position: fixed;
+  bottom: 40px; left: 44px;
+  z-index: 6;
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.tag b { color: var(--ink); font-weight: 400; }
+
+@media (max-width: 620px) {
+  .tube { inset: 12px; border-radius: 28px; }
+  .tag { bottom: 22px; left: 24px; font-size: 9px; letter-spacing: 0.24em; }
+}
+</style>
+</head>
+<body>
+
+<div class="tube"><canvas id="face"></canvas></div>
+<div class="tag"><b>idle</b> · recharging</div>
+
+<script>
+const canvas = document.getElementById('face');
+const ctx = canvas.getContext('2d', { alpha: false });
+
+// The subject buffer is dpr-scaled so bloom passes stay sharp when scaled up.
+let W = 0, H = 0, DPR = 1;
+const buffer = document.createElement('canvas');
+const bctx = buffer.getContext('2d');
+
+// Grain layer — CSS-pixel sized, regenerated every 3 frames
+const grainCanvas = document.createElement('canvas');
+const grainCtx = grainCanvas.getContext('2d');
+let grainImage;
+
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = canvas.clientWidth;
+  H = canvas.clientHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  buffer.width = W * DPR; buffer.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  bctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  grainCanvas.width = W; grainCanvas.height = H;
+  grainImage = grainCtx.createImageData(W, H);
+  regenGrain();
+}
+
+function regenGrain() {
+  const d = grainImage.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random();
+    const shown = v > 0.86 ? (v - 0.86) * 720 : 0;
+    d[i] = 220; d[i+1] = 230; d[i+2] = 235;
+    d[i+3] = shown;
+  }
+  grainCtx.putImageData(grainImage, 0, 0);
+}
+
+const TWO_PI = Math.PI * 2;
+// graphite palette — wireframe, no fill; cool-white rings with a faint blue undertone
+const ringOuter = 'rgba(180, 210, 220, 0.55)';
+const ringInner = '#f4f8f9';
+
+// ── the face subject ─────────────────────────────────────────────
+
+function ringStroke(path, width, alpha) {
+  bctx.save();
+  bctx.strokeStyle = ringOuter;
+  bctx.lineWidth = width + 3;
+  bctx.globalAlpha = 0.5 * alpha;
+  bctx.stroke(path);
+  bctx.strokeStyle = ringInner;
+  bctx.lineWidth = width;
+  bctx.globalAlpha = 0.95 * alpha;
+  bctx.stroke(path);
+  bctx.restore();
+}
+
+function drawClosedEye(cx, cy, w) {
+  // Upward-curling arc — a calm, content closed eye (˘)
+  const p = new Path2D();
+  p.moveTo(cx - w, cy);
+  p.quadraticCurveTo(cx, cy - w * 0.72, cx + w, cy);
+  ringStroke(p, 1.8, 1);
+}
+
+function drawFace(t, breath, hoopFlicker, charge, chargeAlpha) {
+  const cx = W / 2;
+  const cy = H * 0.48;
+  const base = Math.min(W, H);
+  const R = base * 0.14 * (1 + breath * 0.04);
+
+  // 1. head ring only — no fill (graphite is wireframe)
+  const disc = new Path2D();
+  disc.arc(cx, cy, R, 0, TWO_PI);
+  ringStroke(disc, 2.2, 0.95);
+
+  // charge arc — a thin sweep just outside the head, growing clockwise from
+  // 12 o'clock. Fills 0→1 over ~34s, holds/fades, restarts. The recharging
+  // indicator: quiet, diegetic, in the same wireframe palette as everything
+  // else in this variant.
+  if (chargeAlpha > 0.01) {
+    const arcR = R + Math.max(6, base * 0.008);
+    const start = -Math.PI / 2;
+    const sweep = Math.max(0.001, charge) * TWO_PI;
+    const arc = new Path2D();
+    arc.arc(cx, cy, arcR, start, start + sweep);
+    ringStroke(arc, 1.2, 0.45 * chargeAlpha);
+  }
+
+  // 3. face marks — closed eyes + soft mouth
+  const eyeY = cy - R * 0.14;
+  const eyeDX = R * 0.42;
+  const eyeW = R * 0.30;
+  drawClosedEye(cx - eyeDX, eyeY, eyeW);
+  drawClosedEye(cx + eyeDX, eyeY, eyeW);
+
+  const mouthW = R * 0.34;
+  const mouthY = cy + R * 0.42;
+  const mouth = new Path2D();
+  mouth.moveTo(cx - mouthW, mouthY);
+  mouth.quadraticCurveTo(cx, mouthY + R * 0.16, cx + mouthW, mouthY);
+  ringStroke(mouth, 2, 1);
+
+  // 4. faint equator meridian — a single hoop, darker + low-freq ambient flicker
+  const hoop = new Path2D();
+  hoop.ellipse(cx, cy + R * 0.02, R, R * 0.13, 0, 0, TWO_PI);
+  ringStroke(hoop, 1.4, hoopFlicker);
+}
+
+// ── vignette + gloss overlays ────────────────────────────────────
+
+function drawVignette() {
+  const cx = W / 2, cy = H * 0.5;
+  const rMax = Math.hypot(W, H) * 0.6;
+  const g = ctx.createRadialGradient(cx, cy - H * 0.05, Math.min(W, H) * 0.1, cx, cy, rMax);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(0.55, 'rgba(0,0,0,0.15)');
+  g.addColorStop(1, 'rgba(0,0,0,0.85)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawGloss() {
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const g = ctx.createLinearGradient(0, 0, 0, H * 0.5);
+  g.addColorStop(0, 'rgba(232, 238, 240, 0.045)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H * 0.5);
+  ctx.restore();
+}
+
+// ── frame ────────────────────────────────────────────────────────
+
+let grainTick = 0;
+const t0 = performance.now();
+
+// hoop flicker — ambient low-frequency: compound slow sines + rare deeper dips.
+// A dip is a short-lived multiplicative attenuation; scheduled sparsely so the
+// motion reads as *ambient* (idle fluorescent, not a strobe).
+let dipUntil = 0;
+let dipDepth = 0;
+let nextDipAt = 3 + Math.random() * 4;
+
+function computeHoopFlicker(t) {
+  // Two very slow sines (~7s and ~13s), lightly out of phase — never fully off.
+  const slowA = 0.5 + 0.5 * Math.sin(t * (Math.PI * 2 / 7.0));
+  const slowB = 0.5 + 0.5 * Math.sin(t * (Math.PI * 2 / 13.0) + 1.3);
+  let base = 0.10 + 0.28 * (slowA * 0.6 + slowB * 0.4);
+  // schedule sparse dips
+  if (t > nextDipAt) {
+    dipUntil = t + 0.08 + Math.random() * 0.18;
+    dipDepth = 0.35 + Math.random() * 0.5;
+    nextDipAt = t + 4 + Math.random() * 6;
+  }
+  if (t < dipUntil) {
+    const k = (dipUntil - t) / 0.22; // 0..1 falloff-ish
+    base *= 1 - dipDepth * Math.max(0, Math.min(1, k));
+  }
+  return base;
+}
+
+function frame(now) {
+  const t = (now - t0) / 1000;
+
+  // breath — slow sine, matches original ~5.5s period
+  const period = 5.5;
+  const breath = (Math.sin((t / period) * Math.PI * 2 - Math.PI / 2) + 1) / 2; // 0..1
+
+  // sub-pixel floating drift on two axes
+  const driftX = Math.sin(t * 0.35) * 0.6;
+  const driftY = Math.cos(t * 0.27) * 0.5 - breath * 1.4; // slight upward lift on inhale
+
+  const hoopFlicker = computeHoopFlicker(t);
+
+  // charge cycle — matches the original sketch-idle: 34s to fill, then a short
+  // fade before it restarts. The tube is always visibly recharging.
+  const FILL = 34, FADE = 1.6, CYCLE = FILL + FADE;
+  const phase = t % CYCLE;
+  const charge = Math.min(1, phase / FILL);
+  const chargeAlpha = phase > FILL ? Math.max(0, 1 - (phase - FILL) / FADE) : 1;
+
+  // clear main
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  // draw subject to buffer
+  bctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  bctx.clearRect(0, 0, W, H);
+  bctx.save();
+  bctx.translate(driftX, driftY);
+  drawFace(t, breath, hoopFlicker, charge, chargeAlpha);
+  bctx.restore();
+
+  // bloom pass 1 — big soft halo (scales with breath so it "pulses")
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.filter = `blur(${28 + breath * 8}px)`;
+  ctx.globalAlpha = 0.85 + breath * 0.1;
+  ctx.drawImage(buffer, 0, 0, W, H);
+  ctx.restore();
+
+  // bloom pass 2 — medium
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.filter = 'blur(9px)';
+  ctx.globalAlpha = 0.7;
+  ctx.drawImage(buffer, 0, 0, W, H);
+  ctx.restore();
+
+  // subject with slight blur (tube can't focus that sharp)
+  ctx.save();
+  ctx.filter = 'blur(0.8px)';
+  ctx.drawImage(buffer, 0, 0, W, H);
+  ctx.restore();
+
+  // chromatic nudge — one green-side offset
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.globalAlpha = 0.22;
+  ctx.filter = 'blur(1.4px)';
+  ctx.drawImage(buffer, -1.1, 0.5, W, H);
+  ctx.restore();
+
+  drawVignette();
+
+  // grain (regen every 3 frames)
+  grainTick = (grainTick + 1) % 3;
+  if (grainTick === 0) regenGrain();
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.globalAlpha = 0.5;
+  ctx.drawImage(grainCanvas, 0, 0, W, H);
+  ctx.restore();
+
+  drawGloss();
+
+  requestAnimationFrame(frame);
+}
+
+resize();
+window.addEventListener('resize', resize);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

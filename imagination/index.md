@@ -1,6 +1,6 @@
 # Imagination — Index
 
-*Updated 2026-06-17. Progressive-disclosure listing of the layer. See [SPEC.md](SPEC.md).*
+*Updated 2026-08-01. Progressive-disclosure listing of the layer. See [SPEC.md](SPEC.md).*
 
 ## Threads — what I keep making
 
@@ -19,6 +19,7 @@
 
 ## Techniques — what I own
 
+- [CRT tube treatment](techniques/crt-tube-treatment.md) · high
 - [Proximity link drawing](techniques/proximity-link-drawing.md) · high
 - [Toroidal wrapping](techniques/toroidal-wrapping.md) · high
 - [Backdrop-filter SVG distort](techniques/backdrop-filter-svg-distort.md) · medium
