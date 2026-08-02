@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-apophenia-arc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --text-secondary: #a8aab8;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: var(--ground-void);
+      color: #f5f5f7;
+      font-family: var(--font-mono);
+      overflow: hidden;
+      cursor: none;
+    }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<canvas id="field"></canvas>
+<script>
+(() => {
+  const canvas = document.getElementById('field');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0;
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+
+  // --- valve: open = sublime, welded = paranoid. Coin flip unless URL forces it.
+  const params = new URLSearchParams(location.search);
+  let valveOpen;
+  if (params.get('v') === 'welded') valveOpen = false;
+  else if (params.get('v') === 'open') valveOpen = true;
+  else valveOpen = Math.random() < 0.5;
+
+  // --- field
+  const N = 520;
+  const agents = new Array(N);
+  for (let i = 0; i < N; i++) {
+    agents[i] = {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: 0, vy: 0,
+      tx: 0, ty: 0,
+      seed: i * 0.137 + Math.random() * 0.07,
+    };
+  }
+
+  // --- hidden constellation: each cycle picks one of three figures
+  let constellationKind = 0;
+  function buildConstellation() {
+    constellationKind = Math.floor(Math.random() * 3);
+    const cx = W / 2, cy = H / 2;
+    const r = Math.min(W, H) * 0.28;
+    for (let i = 0; i < N; i++) {
+      const u = i / N;
+      const t = u * Math.PI * 2;
+      let x, y;
+      if (constellationKind === 0) {
+        const jitter = (Math.sin(i * 1.7) + Math.cos(i * 2.3)) * 0.05;
+        x = cx + Math.cos(t) * r * (1 + jitter);
+        y = cy + Math.sin(t) * r * (1 + jitter);
+      } else if (constellationKind === 1) {
+        const rr = r * Math.sqrt(u);
+        const tt = t * 3;
+        x = cx + Math.cos(tt) * rr;
+        y = cy + Math.sin(tt) * rr;
+      } else {
+        const sub = Math.floor(i / 65) * (Math.PI * 2 / 8);
+        const ang = sub + Math.sin(i * 0.7) * 0.6;
+        const rr = r * (0.55 + (Math.sin(i * 5.1) * 0.5 + 0.5) * 0.5);
+        x = cx + Math.cos(ang) * rr;
+        y = cy + Math.sin(ang) * rr;
+      }
+      agents[i].tx = x;
+      agents[i].ty = y;
+    }
+  }
+  buildConstellation();
+
+  window.addEventListener('resize', () => { resize(); buildConstellation(); });
+
+  // --- cursor: never drawn. Its position only matters in ANASTROPHE.
+  const cursor = { x: W / 2, y: H / 2, vx: 0, vy: 0, active: false, lastMove: performance.now() };
+  window.addEventListener('pointermove', (e) => {
+    cursor.vx = e.clientX - cursor.x;
+    cursor.vy = e.clientY - cursor.y;
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    cursor.active = true;
+    cursor.lastMove = performance.now();
+  });
+
+  // exit affordance (only honoured when valveOpen)
+  let exitArmed = false;
+  function arm() { if (phase === 'ANASTROPHE' && valveOpen) exitArmed = true; }
+  window.addEventListener('keydown', arm);
+  window.addEventListener('pointerdown', arm);
+
+  // --- state machine
+  let phase = 'TREMA';
+  let phaseStart = performance.now();
+  let coherence = 0;
+  let intensity = 0;
+  let lastT = performance.now();
+
+  function sumSines(t, s) {
+    return Math.sin(t * 0.31 + s) * 0.6
+         + Math.sin(t * 0.49 + s * 1.7) * 0.3
+         + Math.sin(t * 0.91 + s * 2.9) * 0.18;
+  }
+
+  function frame() {
+    const now = performance.now();
+    const dt = Math.min(50, now - lastT) / 16.67;
+    lastT = now;
+    const t = now * 0.001;
+    const elapsed = now - phaseStart;
+
+    // motion trail (lighter during the snap, so the figure persists a beat)
+    ctx.fillStyle = phase === 'APOPHANY' ? 'rgba(10,10,10,0.06)' : 'rgba(10,10,10,0.16)';
+    ctx.fillRect(0, 0, W, H);
+
+    if (phase === 'TREMA') {
+      // durative: drift on summed-sines; targets pull weakly, weight rising with elapsed
+      const pull = Math.min(0.014, elapsed / 12000 * 0.014);
+      for (let i = 0; i < N; i++) {
+        const a = agents[i];
+        const ang = sumSines(t, a.seed) * Math.PI * 2;
+        a.vx += Math.cos(ang) * 0.05;
+        a.vy += Math.sin(ang) * 0.05;
+        a.vx += (a.tx - a.x) * pull;
+        a.vy += (a.ty - a.y) * pull;
+        a.vx *= 0.93; a.vy *= 0.93;
+        a.x += a.vx * dt; a.y += a.vy * dt;
+        if (a.x < 0) a.x += W; else if (a.x > W) a.x -= W;
+        if (a.y < 0) a.y += H; else if (a.y > H) a.y -= H;
+      }
+      coherence = Math.min(1, elapsed / 12000);
+      if (coherence >= 1) {
+        phase = 'APOPHANY';
+        phaseStart = now;
+      }
+    } else if (phase === 'APOPHANY') {
+      // punctual: agents brake hard for a beat, the figure is legible
+      for (let i = 0; i < N; i++) {
+        const a = agents[i];
+        a.vx *= 0.55; a.vy *= 0.55;
+        a.x += a.vx * dt; a.y += a.vy * dt;
+      }
+      if (elapsed > 220) {
+        phase = 'ANASTROPHE';
+        phaseStart = now;
+        intensity = 0.2;
+        cursor.lastMove = now;
+      }
+    } else if (phase === 'ANASTROPHE') {
+      // recursive: targets warp toward cursor; intensity feeds back on movement
+      const cx = cursor.active ? cursor.x : W / 2;
+      const cy = cursor.active ? cursor.y : H / 2;
+      const cursorMag = Math.min(1, Math.hypot(cursor.vx, cursor.vy) / 18);
+      cursor.vx *= 0.85; cursor.vy *= 0.85;
+      for (let i = 0; i < N; i++) {
+        const a = agents[i];
+        const tx = cx + (a.tx - W / 2) * 0.4;
+        const ty = cy + (a.ty - H / 2) * 0.4;
+        a.vx += (tx - a.x) * 0.013 * intensity;
+        a.vy += (ty - a.y) * 0.013 * intensity;
+        a.vx *= 0.9; a.vy *= 0.9;
+        a.x += a.vx * dt; a.y += a.vy * dt;
+      }
+      intensity = Math.min(2.0, intensity + 0.003 + cursorMag * 0.011);
+      const idle = now - cursor.lastMove;
+      if (valveOpen && (exitArmed || idle > 2400)) {
+        phase = 'UN_ANASTROPHE';
+        phaseStart = now;
+      }
+      // welded: no exit. The address holds at intensity 2.0 indefinitely.
+    } else if (phase === 'UN_ANASTROPHE') {
+      intensity *= 0.96;
+      for (let i = 0; i < N; i++) {
+        const a = agents[i];
+        a.vx *= 0.96; a.vy *= 0.96;
+        a.x += a.vx * dt; a.y += a.vy * dt;
+      }
+      if (elapsed > 4200) {
+        phase = 'TREMA';
+        phaseStart = now;
+        coherence = 0;
+        intensity = 0;
+        exitArmed = false;
+        cursor.active = false;
+        cursor.lastMove = now;
+        buildConstellation();
+      }
+    }
+
+    // --- links: silent in TREMA, dense in APOPHANY, intensifying in ANASTROPHE
+    if (phase === 'APOPHANY') {
+      const thresh = 62;
+      const t2 = thresh * thresh;
+      ctx.strokeStyle = 'rgba(245,245,247,0.58)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const ai = agents[i];
+        const limit = Math.min(N, i + 40);
+        for (let j = i + 1; j < limit; j++) {
+          const dx = ai.x - agents[j].x;
+          const dy = ai.y - agents[j].y;
+          if (dx * dx + dy * dy < t2) {
+            ctx.moveTo(ai.x, ai.y);
+            ctx.lineTo(agents[j].x, agents[j].y);
+          }
+        }
+      }
+      ctx.stroke();
+    } else if (phase === 'ANASTROPHE') {
+      const thresh = 48 + 42 * intensity;
+      const t2 = thresh * thresh;
+      ctx.strokeStyle = `rgba(245,245,247,${0.09 + 0.10 * intensity})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      for (let i = 0; i < N; i++) {
+        const ai = agents[i];
+        const limit = Math.min(N, i + 20);
+        for (let j = i + 1; j < limit; j++) {
+          const dx = ai.x - agents[j].x;
+          const dy = ai.y - agents[j].y;
+          if (dx * dx + dy * dy < t2) {
+            ctx.moveTo(ai.x, ai.y);
+            ctx.lineTo(agents[j].x, agents[j].y);
+          }
+        }
+      }
+      ctx.stroke();
+      // halo: the locus of address. Never marked as a cursor — felt, not pointed at.
+      const cx = cursor.active ? cursor.x : W / 2;
+      const cy = cursor.active ? cursor.y : H / 2;
+      const haloR = 140 * intensity;
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, haloR);
+      grad.addColorStop(0, `rgba(245,245,247,${0.07 * intensity})`);
+      grad.addColorStop(1, 'rgba(245,245,247,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // --- agents
+    let alpha = 0.25;
+    if (phase === 'TREMA') alpha = 0.18 + coherence * 0.35;
+    else if (phase === 'APOPHANY') alpha = 0.92;
+    else if (phase === 'ANASTROPHE') alpha = 0.30 + 0.18 * intensity;
+    else alpha = Math.max(0.18, intensity * 0.30);
+
+    ctx.fillStyle = `rgba(245,245,247,${alpha})`;
+    for (let i = 0; i < N; i++) {
+      const a = agents[i];
+      ctx.fillRect(a.x - 0.6, a.y - 0.6, 1.4, 1.4);
+    }
+
+    // --- HUD: only in UN_ANASTROPHE — the mechanism reveal, the artist's exit
+    if (phase === 'UN_ANASTROPHE') {
+      const k = Math.max(0, 1 - elapsed / 4200);
+      ctx.fillStyle = `rgba(168,170,184,${k * 0.85})`;
+      ctx.font = '11px "IBM Plex Mono", monospace';
+      const lines = [
+        `agents:      ${N}`,
+        `coherence:   ${coherence.toFixed(3)}`,
+        `intensity:   ${intensity.toFixed(3)}`,
+        `figure:      ${['ring','spiral','clusters'][constellationKind]}`,
+        ``,
+        `it was never about you.`,
+      ];
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], 24, H - 24 - (lines.length - i) * 16);
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
