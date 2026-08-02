@@ -5,8 +5,11 @@ It separates a slow-moving core from forkable instances, writes principles as
 tensions rather than laws, and gives every token and principle a status
 lifecycle so permanence is earned, not declared.
 
-Like [Imagination](../imagination/SPEC.md), this is just markdown with YAML
-frontmatter. `cat` a file to read it; no database, no build.
+This file is the friendly introduction. The normative document is
+[SPEC.md](SPEC.md) — read that for entity types, frontmatter schema,
+conformance, and versioning. Like [Imagination](../imagination/SPEC.md), this
+is just markdown with YAML frontmatter. `cat` a file to read it; no database,
+no build.
 
 ---
 
