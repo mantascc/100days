@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>92 · Tube Tolerance</title>
+<meta name="description" content="A texture instrument for the CRT tube treatment. Nine tubes, one identical signal; sweep any axis of the pipeline across its full range, or cross two of them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --void: #050706;
+    --ink: #cfeee0;
+    --muted: rgba(207, 238, 224, 0.42);
+    --dim: rgba(207, 238, 224, 0.20);
+    --hair: rgba(207, 238, 224, 0.10);
+    --tile: 190px;
+    --gap: 18px;
+    --font: "IBM Plex Mono", "SF Mono", Monaco, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+
+  body {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 36px 20px 52px;
+    background: radial-gradient(circle at 50% 36%, #0a0d0c 0%, #030504 62%, #000 100%);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+    width: min(100%, calc(3 * var(--tile) + 2 * var(--gap)));
+  }
+
+  /* ---------- masthead ---------- */
+
+  .mast {
+    width: 100%;
+    display: flex; align-items: end; justify-content: space-between; gap: 18px;
+    color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    font-size: 10px; line-height: 1.5;
+  }
+  .mast strong { color: var(--ink); font-weight: 400; }
+  .mast .idx { color: var(--dim); text-align: right; }
+
+  /* ---------- rig ---------- */
+
+  .rig {
+    width: 100%;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 0;
+    border-top: 1px solid var(--hair);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  button {
+    font: inherit; font-size: 10px;
+    letter-spacing: 0.20em; text-transform: uppercase;
+    color: var(--muted); background: transparent;
+    border: 1px solid var(--hair);
+    padding: 6px 10px; cursor: pointer;
+    transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+  }
+  button:hover { color: var(--ink); border-color: var(--dim); }
+  button:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  button.on {
+    color: var(--ink);
+    border-color: var(--ink);
+    background: rgba(207, 238, 224, 0.07);
+  }
+
+  .seg { display: flex; gap: 0; }
+  .seg button { border-right-width: 0; }
+  .seg button:last-child { border-right-width: 1px; }
+
+  .knob { display: flex; align-items: center; gap: 9px; }
+  .spacer { flex: 1; min-width: 6px; }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 140px; height: 18px; background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--dim); }
+  input[type="range"]::-moz-range-track { height: 1px; background: var(--dim); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 3px; height: 13px; margin-top: -6px;
+    background: var(--ink); border: 0; border-radius: 0;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 3px; height: 13px; background: var(--ink); border: 0; border-radius: 0;
+  }
+  input[type="range"]:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+
+  .val { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* ---------- axis pickers ---------- */
+
+  .picker {
+    width: 100%;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .picker .lede { width: 52px; flex: none; }
+  .picker button { padding: 5px 8px; letter-spacing: 0.12em; }
+  .picker[hidden] { display: none; }
+
+  .legend {
+    width: 100%;
+    display: flex; justify-content: space-between; gap: 16px;
+    padding-bottom: 2px;
+    font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .legend .b { color: var(--muted); }
+
+  /* ---------- grid ---------- */
+
+  .grid { display: grid; grid-template-columns: repeat(3, var(--tile)); gap: var(--gap); }
+
+  .unit { display: grid; gap: 7px; }
+
+  .cell {
+    position: relative;
+    width: var(--tile); height: var(--tile);
+    overflow: hidden; border-radius: 22px; background: #000;
+    box-shadow:
+      0 0 0 1px rgba(120, 255, 200, 0.05) inset,
+      0 0 0 1px rgba(0, 0, 0, 0.6),
+      0 18px 44px rgba(0, 0, 0, 0.7);
+    isolation: isolate;
+  }
+  .cell:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+  .cell::before {
+    content: ""; position: absolute; inset: 0; z-index: 3;
+    pointer-events: none; border-radius: inherit;
+    background: radial-gradient(120% 90% at 50% 42%, transparent 44%, rgba(0,0,0,0.55) 78%, #000 100%);
+  }
+  .cell::after {
+    content: ""; position: absolute; inset: 0; z-index: 4;
+    pointer-events: none; border-radius: inherit;
+    opacity: 0.26; mix-blend-mode: multiply;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.55) 0 1px, transparent 1px 3px);
+  }
+
+  canvas { display: block; width: 100%; height: 100%; }
+
+  /* datasheet, on the tube itself */
+  .osd {
+    position: absolute; inset: 0; z-index: 5;
+    display: grid; align-content: center; gap: 3px;
+    padding: 0 14px; border-radius: inherit;
+    background: rgba(3, 6, 5, 0.84);
+    color: #b9f5d8;
+    font-size: 8.5px; letter-spacing: 0.04em; text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(120, 255, 200, 0.5);
+    opacity: 0; transition: opacity 130ms ease; pointer-events: none;
+  }
+  .cell:hover .osd, .cell:focus-visible .osd { opacity: 1; }
+
+  .osd .row {
+    position: relative;
+    display: flex; justify-content: space-between; gap: 6px;
+    align-items: baseline; white-space: nowrap;
+  }
+  .osd .row.head {
+    color: #e6fff4;
+    border-bottom: 1px solid rgba(185, 245, 216, 0.22);
+    padding-bottom: 5px; margin-bottom: 4px;
+  }
+  .osd .row.on { color: #fff; }
+  .osd .row.on::before { content: "▸"; position: absolute; left: -9px; }
+  .osd .row .v { font-variant-numeric: tabular-nums; }
+
+  .cap {
+    display: flex; justify-content: space-between; gap: 8px;
+    font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .cap .a { color: var(--dim); }
+  .cap .b { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .note {
+    width: 100%;
+    font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim); line-height: 1.7; max-width: 62ch;
+  }
+
+  @media (max-width: 700px) {
+    :root { --tile: min(44vw, 190px); --gap: 12px; }
+    body { place-items: start center; padding: 20px 12px 40px; }
+    .grid { grid-template-columns: repeat(3, var(--tile)); }
+    .shell { width: min(100%, calc(3 * var(--tile) + 2 * var(--gap))); }
+    .picker .lede { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<main class="shell" aria-label="Tube tolerance — nine tubes, one signal">
+
+  <div class="mast">
+    <div><strong>92</strong> / tube tolerance</div>
+    <div class="idx">crt texture instrument<br>one signal · nine tubes</div>
+  </div>
+
+  <div class="rig">
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="mBatch" type="button" class="on">batch</button>
+      <button id="mSweep" type="button">sweep</button>
+      <button id="mCross" type="button">cross</button>
+    </div>
+    <button id="reseed" type="button">reseed</button>
+    <span class="spacer"></span>
+    <label class="knob" for="range">range
+      <input id="range" type="range" min="0" max="200" value="100" step="1"
+             aria-label="Range, percent of the full parameter span">
+      <span id="rangeVal" class="val">100%</span>
+    </label>
+  </div>
+
+  <div class="picker" id="pickX" hidden>
+    <span class="lede" id="ledeX">axis</span>
+  </div>
+  <div class="picker" id="pickY" hidden>
+    <span class="lede">down</span>
+  </div>
+
+  <div class="legend"><span id="legendL"></span><span class="b" id="legendR"></span></div>
+
+  <section class="grid" id="grid" aria-label="Nine tubes"></section>
+
+  <p class="note">One test card, drawn once per frame into a single buffer and shared by all nine
+     tubes — every difference on screen is the tube, not the signal. Hover for a readout.</p>
+
+</main>
+
+<script>
+(() => {
+"use strict";
+
+/* ────────────────────────────────────────────────────────────
+   Tube tolerance — a range instrument.
+
+   The CRT pipeline from 91-retro-primitives, with every knob pulled
+   out of the config object and given a full, sweepable span. One
+   signal, nine tubes, three ways to look at the space:
+
+     batch  — nine samples drawn from a bell around nominal
+     sweep  — one axis stepped across its whole range
+     cross  — two axes as a 3×3 cross-product
+
+   `range` scales all of it. At 0 the nine tubes are pixel-identical.
+   ──────────────────────────────────────────────────────────── */
+
+const TILE   = parseInt(getComputedStyle(document.documentElement)
+                 .getPropertyValue('--tile')) || 190;
+const SCALE  = Math.min(window.devicePixelRatio || 1, 1.5);
+const PX     = Math.round(TILE * SCALE);
+const STRIPS = 12;
+const GUNS   = ['#ff0000', '#00ff00', '#0000ff'];
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- axes ---------- */
+
+const sign = (v, d) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d);
+
+// Every axis is a normalised 0..1 position mapped onto a deliberately
+// wide physical span — wider than a real tube would ever ship, because
+// the far ends are the interesting part. `nom` is where a *good* tube
+// sits on that span, which is rarely the middle of it.
+const AXES = [
+  { key: 'spot',     label: 'spot',     nom: 0.149,
+    at: n => 0.15 + n * 4.35,        fmt: v => v.toFixed(2) + 'px' },
+  { key: 'converge', label: 'converge', nom: 0.5,
+    at: n => (n - 0.5) * 14,         fmt: v => sign(v, 2) + 'px' },
+  { key: 'geometry', label: 'geometry', nom: 0.5,
+    at: n => (n - 0.5) * 32,         fmt: v => sign(v, 1) + '%' },
+  { key: 'persist',  label: 'persist',  nom: 0.277,
+    at: n => 4 * Math.pow(150, n),   fmt: v => (v < 10 ? v.toFixed(1) : Math.round(v)) + 'ms' },
+  { key: 'noise',    label: 'noise',    nom: 0.35,
+    at: n => n,                      fmt: v => Math.round(v * 100) + '%' },
+  { key: 'emission', label: 'emission', nom: 0.4375,
+    at: n => 0.30 + n * 1.60,        fmt: v => Math.round(v * 100) + '%' },
+  { key: 'bloom',    label: 'bloom',    nom: 0.474,
+    at: n => 0.10 + n * 1.90,        fmt: v => Math.round(v * 100) + '%' },
+  { key: 'phosphor', label: 'phosphor', nom: 0.55,
+    at: n => 15 + n * 195,           fmt: v => Math.round(v) + '°' }
+];
+const AX = Object.fromEntries(AXES.map((a, i) => [a.key, i]));
+
+/* ---------- seeded randomness ---------- */
+
+function mulberry32(a) {
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const gauss = rnd => (rnd() + rnd() + rnd() - 1.5) * 1.65;
+const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+const clamp01 = v => clamp(v, 0, 1);
+
+/* ---------- state ---------- */
+
+const state = {
+  mode: 'batch',
+  x: AX.converge,      // swept axis / across
+  y: AX.bloom,         // down, in cross mode
+  range: 1,
+  seed: 1
+};
+
+// Turn a set of normalised axis positions into everything the pipeline
+// needs. This is the only place readings become render parameters.
+function compile(norm, seed) {
+  const v = {};
+  AXES.forEach((a, i) => { v[a.key] = a.at(norm[i]); });
+
+  const u = { norm, v, seed, serial: (seed % 0xFFFF).toString(16).toUpperCase().padStart(4, '0') };
+
+  u.focus    = v.spot;
+  u.pin      = (v.geometry / 100) * 1.7;
+  u.rot      = v.geometry * 0.0006;
+  u.overscan = 1 + v.geometry * 0.0016;
+  u.fade     = clamp(1 - Math.exp(-16.7 / v.persist), 0.012, 1);
+  u.grain    = v.noise;
+  u.emis     = v.emission;
+  u.bloom    = v.bloom;
+  u.hue      = v.phosphor;
+
+  // convergence: an offset plus a per-channel scale, so the error grows
+  // toward the edges the way a real misconverged tube does
+  const a = (seed % 360) * Math.PI / 180, c = v.converge;
+  u.chOff = [
+    { x:  Math.cos(a) * c,        y:  Math.sin(a) * c * 0.7 },
+    { x: 0, y: 0 },
+    { x: -Math.cos(a) * c * 0.85, y: -Math.sin(a) * c * 0.6 }
+  ];
+  u.chScale = [1 + c * 0.0028, 1, 1 - c * 0.0024];
+  return u;
+}
+
+// Where a good tube sits. The phosphor "nominal" is the batch's own
+// coating colour, so a family shares a hue instead of nine unrelated ones.
+const nomOf = k => k === AX.phosphor ? state.batchHue : AXES[k].nom;
+
+// Range interpolates from nominal (0%) out to the full span (100%), so
+// range 0 gives nine identical, correct tubes in every mode.
+const spread = (k, target, r) => clamp01(nomOf(k) + (target - nomOf(k)) * r);
+
+function buildUnits() {
+  const R = state.range;
+  const out = [];
+
+  for (let i = 0; i < 9; i++) {
+    const seed = (state.seed * 2654435761 + i * 40503) >>> 0;
+    const rnd = mulberry32(seed);
+    let norm, lead = -1;
+
+    if (state.mode === 'batch') {
+      // a bell around nominal, with one axis pushed out — a tube is
+      // mostly nominal with one thing pronounced
+      const drift = AXES.map((a, k) => gauss(rnd) * (k === AX.phosphor ? 0.06 : 0.11));
+      drift[Math.floor(rnd() * AXES.length)] += gauss(rnd) * 0.20;
+      norm = drift.map((d, k) => clamp01(nomOf(k) + d * R));
+      for (let k = 0; k < norm.length; k++)
+        if (lead < 0 || Math.abs(norm[k] - nomOf(k)) > Math.abs(norm[lead] - nomOf(lead))) lead = k;
+
+    } else if (state.mode === 'sweep') {
+      const r = Math.min(R, 1);
+      norm = AXES.map((a, k) => nomOf(k));
+      norm[state.x] = spread(state.x, i / 8, r);
+      lead = state.x;
+
+    } else {
+      const r = Math.min(R, 1);
+      norm = AXES.map((a, k) => nomOf(k));
+      norm[state.x] = spread(state.x, (i % 3) / 2, r);
+      norm[state.y] = spread(state.y, Math.floor(i / 3) / 2, r);
+      lead = state.x;
+    }
+
+    const u = compile(norm, seed);
+    u.index = i; u.lead = lead;
+    out.push(u);
+  }
+  return out;
+}
+
+/* ---------- the signal (identical for every tube) ---------- */
+
+const pattern = document.createElement('canvas');
+pattern.width = pattern.height = PX;
+const pctx = pattern.getContext('2d');
+
+const gun = GUNS.map(() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = PX;
+  return { canvas: c, ctx: c.getContext('2d') };
+});
+
+// A test card: it exists to make deviation legible, which is the whole job.
+function drawTestCard(ctx, t) {
+  const S = TILE, c = S / 2;
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  ctx.clearRect(0, 0, S, S);
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.30)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  const pad = S * 0.10, span = S - pad * 2, n = 6;
+  for (let i = 0; i <= n; i++) {
+    const p = pad + (span * i) / n;
+    ctx.moveTo(pad, p); ctx.lineTo(S - pad, p);
+    ctx.moveTo(p, pad); ctx.lineTo(p, S - pad);
+  }
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.arc(c, c, S * 0.375, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(c, c, S * 0.125, 0, Math.PI * 2); ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  ctx.beginPath();
+  ctx.moveTo(c - S * 0.05, c); ctx.lineTo(c + S * 0.05, c);
+  ctx.moveTo(c, c - S * 0.05); ctx.lineTo(c, c + S * 0.05);
+  ctx.stroke();
+
+  // resolution wedge — converging bars, the focus test
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  let x = c - S * 0.155;
+  for (let i = 0; i < 7; i++) {
+    const w = 3.2 - i * 0.36;
+    ctx.fillRect(x, c - S * 0.30, Math.max(w, 0.7), S * 0.075);
+    x += w + Math.max(w, 0.7) * 0.95 + 1.4;
+  }
+
+  // grey step wedge — reads emission
+  const wy = c + S * 0.245, ww = S * 0.40, wh = S * 0.048;
+  for (let i = 0; i < 6; i++) {
+    ctx.fillStyle = `rgba(255,255,255,${0.16 + (i / 5) * 0.84})`;
+    ctx.fillRect(c - ww / 2 + (ww / 6) * i, wy, ww / 6 - 0.6, wh);
+  }
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+  ctx.lineWidth = 1.4;
+  const m = S * 0.055, e = S * 0.045;
+  for (const [sx, sy] of [[1,1],[-1,1],[1,-1],[-1,-1]]) {
+    const px = c - sx * (c - m), py = c - sy * (c - m);
+    ctx.beginPath();
+    ctx.moveTo(px + sx * e, py); ctx.lineTo(px, py); ctx.lineTo(px, py + sy * e);
+    ctx.stroke();
+  }
+
+  // the persistence probe — its comet length is the decay, made visible
+  const a = t * 1.05;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(c + Math.cos(a) * S * 0.375, c + Math.sin(a) * S * 0.375, 3.4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Split the white card into three gun copies once per frame, so
+// convergence can be composited per gun.
+function buildGuns() {
+  for (let i = 0; i < 3; i++) {
+    const { ctx } = gun[i];
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, PX, PX);
+    ctx.drawImage(pattern, 0, 0);
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = GUNS[i];
+    ctx.fillRect(0, 0, PX, PX);
+    ctx.globalCompositeOperation = 'destination-in';   // restore the card's alpha
+    ctx.drawImage(pattern, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+}
+
+/* ---------- grain ---------- */
+
+const grain = document.createElement('canvas');
+grain.width = grain.height = TILE;
+const gctx = grain.getContext('2d');
+const gimg = gctx.createImageData(TILE, TILE);
+
+function regenGrain() {
+  const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random();
+    d[i] = 232; d[i + 1] = 244; d[i + 2] = 238;
+    d[i + 3] = v > 0.84 ? (v - 0.84) * 640 : 0;
+  }
+  gctx.putImageData(gimg, 0, 0);
+}
+regenGrain();
+
+/* ---------- the tube pipeline ---------- */
+
+function drawWarped(dst, src, u, ch) {
+  const S = TILE, o = u.chOff[ch], k = u.overscan * u.chScale[ch];
+  dst.save();
+  dst.translate(S / 2, S / 2);
+  dst.rotate(u.rot);
+  dst.scale(k, k);
+  dst.translate(o.x, o.y);
+  for (let i = 0; i < STRIPS; i++) {
+    const sh = S / STRIPS, y0 = i * sh;
+    const yc = ((y0 + sh / 2) / S) * 2 - 1;
+    const w  = S * (1 + u.pin * (yc * yc - 1 / 3));
+    dst.drawImage(src,
+      0, y0 * SCALE, S * SCALE, sh * SCALE,
+      -w / 2, y0 - S / 2, w, sh + 0.6);
+  }
+  dst.restore();
+}
+
+function renderUnit(u) {
+  const S = TILE;
+
+  // phosphor: fade what is on the screen, then add this frame
+  const p = u.phos;
+  p.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  p.globalCompositeOperation = 'source-over';
+  p.fillStyle = `rgba(0,0,0,${u.fade})`;
+  p.fillRect(0, 0, S, S);
+  p.globalCompositeOperation = 'lighter';
+  for (let ch = 0; ch < 3; ch++) drawWarped(p, gun[ch].canvas, u, ch);
+  p.globalCompositeOperation = 'source-over';
+
+  const ctx = u.ctx;
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, S, S);
+
+  // bloom, bloom, subject — nothing renders crisp
+  const b = u.bloom;
+  ctx.globalCompositeOperation = 'screen';
+  ctx.filter = `blur(${(4 + 14 * b).toFixed(1)}px)`;
+  ctx.globalAlpha = clamp(0.52 * b, 0, 1) * clamp(u.emis, 0, 1.2);
+  ctx.drawImage(u.phosCanvas, 0, 0, S, S);
+  ctx.filter = `blur(${(1.6 + 5 * b).toFixed(1)}px)`;
+  ctx.globalAlpha = clamp(0.42 * b, 0, 1) * clamp(u.emis, 0, 1.2);
+  ctx.drawImage(u.phosCanvas, 0, 0, S, S);
+  ctx.filter = `blur(${u.focus.toFixed(2)}px)`;
+  ctx.globalAlpha = clamp(u.emis, 0, 1);
+  ctx.drawImage(u.phosCanvas, 0, 0, S, S);
+  // over-emission burns a second pass rather than clipping to white
+  if (u.emis > 1) {
+    ctx.globalAlpha = clamp(u.emis - 1, 0, 1);
+    ctx.drawImage(u.phosCanvas, 0, 0, S, S);
+  }
+  ctx.filter = 'none';
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+
+  // vignette
+  const g = ctx.createRadialGradient(S / 2, S * 0.47, S * 0.07, S / 2, S / 2, S * 0.70);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(0.55, 'rgba(0,0,0,0.15)');
+  g.addColorStop(1, 'rgba(0,0,0,0.80)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, S, S);
+
+  // grain — one shared field, each tube at its own level
+  ctx.globalCompositeOperation = 'screen';
+  ctx.globalAlpha = u.grain;
+  ctx.drawImage(grain, 0, 0, S, S);
+  ctx.globalAlpha = 1;
+
+  // phosphor colour: hue and saturation from the coating, luminosity
+  // from the picture. Applied last, so it colours the grain too — and
+  // partially, so gun misregistration still fringes through.
+  ctx.globalCompositeOperation = 'color';
+  ctx.globalAlpha = 0.62;
+  ctx.fillStyle = `hsl(${u.hue}, 74%, 55%)`;
+  ctx.fillRect(0, 0, S, S);
+  ctx.globalAlpha = 1;
+
+  // top gloss
+  ctx.globalCompositeOperation = 'screen';
+  const gl = ctx.createLinearGradient(0, 0, 0, S * 0.5);
+  gl.addColorStop(0, 'rgba(200,240,225,0.055)');
+  gl.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = gl;
+  ctx.fillRect(0, 0, S, S * 0.5);
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+/* ---------- the sheet ---------- */
+
+const $ = id => document.getElementById(id);
+const gridEl = $('grid');
+let units = [], cells = [];
+
+function makeCells() {
+  gridEl.innerHTML = '';
+  cells = [];
+  for (let i = 0; i < 9; i++) {
+    const fig = document.createElement('figure');
+    fig.className = 'unit';
+
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.tabIndex = 0;
+    cell.setAttribute('role', 'img');
+
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = PX;
+    cell.appendChild(cv);
+
+    const osd = document.createElement('div');
+    osd.className = 'osd';
+    cell.appendChild(osd);
+
+    const cap = document.createElement('figcaption');
+    cap.className = 'cap';
+
+    fig.append(cell, cap);
+    gridEl.appendChild(fig);
+
+    const ph = document.createElement('canvas');
+    ph.width = ph.height = PX;
+    const pctx2 = ph.getContext('2d');
+    pctx2.fillStyle = '#000';
+    pctx2.fillRect(0, 0, PX, PX);
+
+    cells.push({ cell, cap, osd, ctx: cv.getContext('2d', { alpha: false }),
+                 phosCanvas: ph, phos: pctx2 });
+  }
+}
+
+function paintLabels() {
+  const ax = AXES[state.x], ay = AXES[state.y];
+
+  if (state.mode === 'batch') {
+    $('legendL').textContent = 'nine tubes drawn from the same bell';
+    $('legendR').textContent = 'lead axis per tube';
+  } else if (state.mode === 'sweep') {
+    $('legendL').textContent = `across ▸ ${ax.label}`;
+    $('legendR').textContent =
+      `${ax.fmt(units[0].v[ax.key])} … ${ax.fmt(units[8].v[ax.key])}`;
+  } else {
+    $('legendL').textContent = `across ▸ ${ax.label}   ·   down ▾ ${ay.label}`;
+    $('legendR').textContent =
+      `${ax.fmt(units[0].v[ax.key])} … ${ax.fmt(units[2].v[ax.key])}  ×  ` +
+      `${ay.fmt(units[0].v[ay.key])} … ${ay.fmt(units[6].v[ay.key])}`;
+  }
+
+  units.forEach((u, i) => {
+    const c = cells[i];
+
+    c.osd.innerHTML =
+      `<div class="row head"><span>${state.mode === 'batch'
+        ? 'tube ' + String(i + 1).padStart(2, '0') : AXES[state.x].label}</span>
+        <span class="v">${state.mode === 'batch' ? 'sn ' + u.serial : '#' + (i + 1)}</span></div>` +
+      AXES.map((a, k) => {
+        const on = k === state.x && state.mode !== 'batch' ? true
+                 : k === state.y && state.mode === 'cross' ? true
+                 : k === u.lead && state.mode === 'batch';
+        return `<div class="row${on ? ' on' : ''}">
+          <span>${a.label}</span><span class="v">${a.fmt(u.v[a.key])}</span></div>`;
+      }).join('');
+
+    let left, right;
+    if (state.mode === 'batch') {
+      left = u.serial; right = AXES[u.lead].label;
+    } else if (state.mode === 'sweep') {
+      left = String(i + 1).padStart(2, '0'); right = ax.fmt(u.v[ax.key]);
+    } else {
+      left = ax.fmt(u.v[ax.key]); right = ay.fmt(u.v[ay.key]);
+    }
+    c.cap.innerHTML = `<span class="a">${left}</span><span class="b">${right}</span>`;
+
+    c.cell.setAttribute('aria-label',
+      `Tube ${i + 1}. ` + AXES.map(a => `${a.label} ${a.fmt(u.v[a.key])}`).join(', ') + '.');
+
+    u.ctx = c.ctx; u.phos = c.phos; u.phosCanvas = c.phosCanvas;
+  });
+}
+
+function refresh() {
+  units = buildUnits();
+  paintLabels();
+}
+
+/* ---------- controls ---------- */
+
+function buildPickers() {
+  for (const [id, which] of [['pickX', 'x'], ['pickY', 'y']]) {
+    const host = $(id);
+    for (const a of AXES) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = a.label;
+      b.dataset.axis = AX[a.key];
+      b.addEventListener('click', () => {
+        state[which] = +b.dataset.axis;
+        if (state.x === state.y) state[which === 'x' ? 'y' : 'x'] =
+          (+b.dataset.axis + 1) % AXES.length;
+        syncUI(); refresh();
+      });
+      host.appendChild(b);
+    }
+  }
+}
+
+function syncUI() {
+  for (const [id, m] of [['mBatch', 'batch'], ['mSweep', 'sweep'], ['mCross', 'cross']])
+    $(id).classList.toggle('on', state.mode === m);
+
+  $('pickX').hidden = state.mode === 'batch';
+  $('pickY').hidden = state.mode !== 'cross';
+  $('ledeX').textContent = state.mode === 'cross' ? 'across' : 'axis';
+
+  for (const [id, which] of [['pickX', 'x'], ['pickY', 'y']])
+    for (const b of $(id).querySelectorAll('button'))
+      b.classList.toggle('on', +b.dataset.axis === state[which]);
+}
+
+function setMode(m) {
+  state.mode = m;
+  syncUI();
+  refresh();
+}
+
+$('mBatch').addEventListener('click', () => setMode('batch'));
+$('mSweep').addEventListener('click', () => setMode('sweep'));
+$('mCross').addEventListener('click', () => setMode('cross'));
+
+$('reseed').addEventListener('click', () => {
+  state.seed = (Math.random() * 0xFFFFFF) | 0;
+  state.batchHue = Math.random();
+  refresh();
+});
+
+$('range').addEventListener('input', e => {
+  state.range = e.target.value / 100;
+  $('rangeVal').textContent = e.target.value + '%';
+  refresh();
+});
+
+/* ---------- loop ---------- */
+
+let tick = 0, frozen = 0;
+
+function frame(now) {
+  const t = REDUCE ? 2.4 : now * 0.001;
+
+  tick = (tick + 1) % 3;
+  if (tick === 0 && !REDUCE) regenGrain();
+
+  drawTestCard(pctx, t);
+  buildGuns();
+  for (const u of units) renderUnit(u);
+
+  if (REDUCE && ++frozen > 90) return;
+  requestAnimationFrame(frame);
+}
+
+state.batchHue = Math.random();
+state.seed = (Math.random() * 0xFFFFFF) | 0;
+buildPickers();
+makeCells();
+syncUI();
+refresh();
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
