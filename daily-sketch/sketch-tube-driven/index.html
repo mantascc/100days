@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sketch-tube-driven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --ground-void: #0a0a0a;
+    --ground-base: #0f0f0f;
+    --ground-raised: #141414;
+    --ground-surface: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-default: #f5f5f7;
+    --text-secondary: #a8aab8;
+    --text-tertiary: #666666;
+    --text-ghost: #333333;
+    --border-subtle: #1a1a1a;
+    --border-default: #2a2a2a;
+    --accent: #00a8ff;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-16: 16px;
+    --space-24: 24px;
+    --tube: min(74vmin, 560px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%; background: var(--ground-void); color: var(--text-default);
+    font-family: var(--font-mono); overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    position: fixed; top: var(--space-24); left: var(--space-24);
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-secondary); z-index: 10; pointer-events: none;
+  }
+  header small {
+    display: block; margin-top: 6px; letter-spacing: 0.08em;
+    text-transform: none; color: var(--text-tertiary); font-size: 10px;
+    max-width: 30ch;
+  }
+
+  main {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ---------- the tube ---------- */
+
+  .cell {
+    position: relative; width: var(--tube); height: var(--tube);
+    overflow: hidden; border-radius: 30px; background: #000;
+    box-shadow:
+      0 0 0 1px rgba(120, 255, 200, 0.05) inset,
+      0 0 0 1px rgba(0, 0, 0, 0.6),
+      0 22px 60px rgba(0, 0, 0, 0.75);
+    isolation: isolate;
+  }
+  .cell::before {
+    content: ""; position: absolute; inset: 0; z-index: 3;
+    pointer-events: none; border-radius: inherit;
+    background: radial-gradient(120% 90% at 50% 42%, transparent 44%, rgba(0,0,0,0.55) 78%, #000 100%);
+  }
+  .cell::after {
+    content: ""; position: absolute; inset: 0; z-index: 4;
+    pointer-events: none; border-radius: inherit;
+    opacity: 0.26; mix-blend-mode: multiply;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.55) 0 1px, transparent 1px 3px);
+  }
+  canvas { display: block; width: 100%; height: 100%; }
+
+  /* ---------- the tube's condition ---------- */
+
+  .cond {
+    position: fixed; top: var(--space-24); right: var(--space-24);
+    z-index: 10; width: 208px; display: flex; flex-direction: column; gap: 7px;
+    font-size: 10px; color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums; pointer-events: none;
+  }
+  .cond h2 {
+    font-size: 9px; font-weight: 400; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-ghost); margin-bottom: 1px;
+  }
+  .ax { display: grid; grid-template-columns: 58px 1fr 52px; gap: 8px; align-items: center; }
+  .ax .n { color: var(--text-secondary); }
+  .ax .v { text-align: right; color: var(--text-default); }
+  .bar { position: relative; height: 3px; background: var(--ground-surface); }
+  .bar i {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--text-default); transform-origin: left;
+  }
+  /* where a good tube sits — deviation is only legible against it */
+  .bar u {
+    position: absolute; top: -2px; bottom: -2px; width: 1px;
+    background: var(--text-ghost);
+  }
+  .cond.bypassed .bar i { background: var(--text-ghost); }
+
+  /* ---------- controls ---------- */
+
+  .rig {
+    position: fixed; left: var(--space-24); bottom: var(--space-24);
+    z-index: 10; display: flex; gap: var(--space-16);
+    align-items: flex-end; flex-wrap: wrap;
+  }
+  .grp { display: flex; flex-direction: column; gap: 6px; }
+  .grp > span {
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+  .row { display: flex; gap: var(--space-4); }
+
+  button {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
+    background: var(--ground-raised); border: 1px solid var(--border-default);
+    padding: 6px 11px; cursor: pointer; letter-spacing: 0.04em;
+    transition: color 120ms, border-color 120ms, background 120ms;
+  }
+  button:hover:not(:disabled) { color: var(--text-default); border-color: #3a3a3a; }
+  button[aria-pressed="true"] {
+    color: var(--ground-void); background: var(--text-default); border-color: var(--text-default);
+  }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  .status {
+    position: fixed; right: var(--space-24); bottom: var(--space-24);
+    z-index: 10; max-width: 290px; text-align: right;
+    font-size: 10px; line-height: 1.7; color: var(--text-ghost);
+  }
+  .status.warn { color: var(--text-secondary); }
+
+  @media (max-width: 860px) {
+    .cond { display: none; }
+    header small { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  sketch-tube-driven
+  <small>the subject never reacts to the sound. only the tube does.</small>
+</header>
+
+<main>
+  <div class="cell"><canvas id="c"></canvas></div>
+</main>
+
+<div class="cond" id="cond">
+  <h2>tube condition</h2>
+</div>
+
+<div class="rig">
+  <div class="grp">
+    <span>signal</span>
+    <div class="row">
+      <button id="run" aria-pressed="false">start</button>
+      <button id="mic">mic</button>
+      <button id="mon" aria-pressed="false" disabled>hear it</button>
+    </div>
+  </div>
+  <div class="grp">
+    <span>proof</span>
+    <div class="row">
+      <button id="bypass" aria-pressed="false">bypass</button>
+    </div>
+  </div>
+</div>
+
+<p class="status" id="status">
+  Nothing is playing, so the tube sits at nominal — a correct tube.
+  Press <b>start</b>.
+</p>
+
+<script>
+/* ================================================================
+   Audio drives the tube, not the picture.
+
+   The standing complaint against audio-reactive work is that the sound
+   gets drawn: bars, rings, a waveform that wiggles. Here the subject is
+   a test card and one probe dot orbiting at a fixed rate, and it is
+   *never* touched by the signal — same geometry at silence and at full
+   scale. What the sound moves is the tube's physical condition:
+
+     bass     → emission and bloom      the beam is driven harder, the halo swells
+     bass²    → persistence             an overdriven phosphor lets go slowly
+     mid      → spot                    focus wanders under load
+     treble   → grain and convergence   HF trash in the supply; the guns drift apart
+     level    → geometry                a little high-voltage sag pulls the raster
+
+   Silence returns every axis to nominal, so the reference is always one
+   quiet moment away. `bypass` freezes the tube at nominal while the
+   audio keeps running — that is the control that makes the claim
+   falsifiable: if the picture still moves, the picture was reacting.
+
+   Pipeline inherited from 91-retro-primitives / 92-tube-tolerance.
+   ================================================================ */
+
+const $ = id => document.getElementById(id);
+const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- axes (nominal = where a good tube sits) ---------- */
+
+const AXES = [
+  { key: 'spot',     nom: 0.149, at: n => 0.15 + n * 4.35,      fmt: v => v.toFixed(2) + 'px' },
+  { key: 'converge', nom: 0.5,   at: n => (n - 0.5) * 14,       fmt: v => (v >= 0 ? '+' : '') + v.toFixed(2) + 'px' },
+  { key: 'geometry', nom: 0.5,   at: n => (n - 0.5) * 32,       fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%' },
+  { key: 'persist',  nom: 0.277, at: n => 4 * Math.pow(150, n), fmt: v => (v < 10 ? v.toFixed(1) : Math.round(v)) + 'ms' },
+  { key: 'noise',    nom: 0.35,  at: n => n,                    fmt: v => Math.round(v * 100) + '%' },
+  { key: 'emission', nom: 0.4375,at: n => 0.30 + n * 1.60,      fmt: v => Math.round(v * 100) + '%' },
+  { key: 'bloom',    nom: 0.474, at: n => 0.10 + n * 1.90,      fmt: v => Math.round(v * 100) + '%' },
+  // the coating is not a signal — it does not move
+  { key: 'phosphor', nom: 0.44,  at: n => 15 + n * 195,         fmt: v => Math.round(v) + '°' }
+];
+
+/* ---------- condition readout ---------- */
+
+const bars = {};
+AXES.forEach(a => {
+  const el = document.createElement('div');
+  el.className = 'ax';
+  el.innerHTML = `<span class="n">${a.key}</span>` +
+    `<span class="bar"><i></i><u style="left:${(a.nom * 100).toFixed(1)}%"></u></span>` +
+    `<span class="v">—</span>`;
+  $('cond').appendChild(el);
+  bars[a.key] = { fill: el.querySelector('i'), val: el.querySelector('.v') };
+});
+
+/* ---------- canvas + buffers ---------- */
+
+const cv   = $('c');
+const ctx  = cv.getContext('2d', { alpha: false });
+const SCALE  = Math.min(window.devicePixelRatio || 1, 1.5);
+const STRIPS = 12;
+const GUNS   = ['#ff0000', '#00ff00', '#0000ff'];
+
+const buf = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+
+let TILE = 0, PX = 0;
+let pattern, pctx, gun, phosCanvas, phos, grain, gctx, gimg;
+
+// Layout is not necessarily settled when this script first runs — a pending
+// stylesheet is enough to hand back a zero-width cell, and every buffer below
+// is sized from it. Fall back to the expression the stylesheet uses, and
+// re-measure on load and resize.
+// Never returns zero: a zero-size buffer throws on createImageData and takes
+// the whole script down, so floor it and let the resize pass correct later.
+function measure() {
+  const w = document.querySelector('.cell').clientWidth
+         || Math.min(0.74 * Math.min(innerWidth, innerHeight), 560);
+  return Math.max(160, Math.round(w));
+}
+
+function allocate() {
+  TILE = measure();
+  PX   = Math.round(TILE * SCALE);
+
+  cv.width = cv.height = PX;
+
+  pattern    = buf(PX, PX);
+  pctx       = pattern.getContext('2d');
+  gun        = [0, 1, 2].map(() => { const c = buf(PX, PX); return { canvas: c, ctx: c.getContext('2d') }; });
+  phosCanvas = buf(PX, PX);
+  phos       = phosCanvas.getContext('2d');
+  phos.fillStyle = '#000';
+  phos.fillRect(0, 0, PX, PX);
+
+  grain = buf(TILE, TILE);
+  gctx  = grain.getContext('2d');
+  gimg  = gctx.createImageData(TILE, TILE);
+  regenGrain();
+}
+
+/* ---------- the subject: a test card, indifferent to the signal ---------- */
+
+function drawCard(g, t) {
+  const S = TILE, c = S / 2;
+  g.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  g.clearRect(0, 0, S, S);
+  g.strokeStyle = '#ffffff';
+  g.fillStyle   = '#ffffff';
+  g.lineCap = 'butt';
+
+  // circles — geometry reads instantly against a shape you know is round
+  g.lineWidth = 1.4;
+  [0.40, 0.22].forEach(r => {
+    g.beginPath(); g.arc(c, c, S * r, 0, Math.PI * 2); g.stroke();
+  });
+
+  // crosshatch — convergence and pincushion
+  g.lineWidth = 0.9;
+  g.globalAlpha = 0.75;
+  const N = 6, step = S * 0.72 / N, o = c - S * 0.36;
+  for (let i = 0; i <= N; i++) {
+    g.beginPath(); g.moveTo(o + i * step, o); g.lineTo(o + i * step, o + S * 0.72); g.stroke();
+    g.beginPath(); g.moveTo(o, o + i * step); g.lineTo(o + S * 0.72, o + i * step); g.stroke();
+  }
+  g.globalAlpha = 1;
+
+  // grey step wedge — reads emission
+  for (let i = 0; i < 6; i++) {
+    g.globalAlpha = 0.16 + i * 0.168;
+    g.fillRect(c - S * 0.21 + i * S * 0.07, c + S * 0.30, S * 0.066, S * 0.045);
+  }
+  g.globalAlpha = 1;
+
+  // corner registration marks — overscan, rotation
+  g.lineWidth = 1.2;
+  const m = S * 0.055, e = S * 0.085;
+  [[e, e, 1, 1], [S - e, e, -1, 1], [e, S - e, 1, -1], [S - e, S - e, -1, -1]]
+    .forEach(([x, y, sx, sy]) => {
+      g.beginPath();
+      g.moveTo(x + sx * m, y); g.lineTo(x, y); g.lineTo(x, y + sy * m);
+      g.stroke();
+    });
+
+  // the persistence probe — constant angular rate, always. Its comet is
+  // drawn by the phosphor buffer, never by this function.
+  const a = t * 0.0016;
+  g.beginPath();
+  g.arc(c + Math.cos(a) * S * 0.40, c + Math.sin(a) * S * 0.40, S * 0.017, 0, Math.PI * 2);
+  g.fill();
+}
+
+function buildGuns() {
+  for (let i = 0; i < 3; i++) {
+    const g = gun[i].ctx;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'source-over';
+    g.clearRect(0, 0, PX, PX);
+    g.drawImage(pattern, 0, 0);
+    g.globalCompositeOperation = 'multiply';
+    g.fillStyle = GUNS[i];
+    g.fillRect(0, 0, PX, PX);
+    g.globalCompositeOperation = 'destination-in';   // restore the card's alpha
+    g.drawImage(pattern, 0, 0);
+    g.globalCompositeOperation = 'source-over';
+  }
+}
+
+/* ---------- grain ---------- */
+
+function regenGrain() {
+  const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random();
+    d[i] = 232; d[i + 1] = 244; d[i + 2] = 238;
+    d[i + 3] = v > 0.84 ? (v - 0.84) * 640 : 0;
+  }
+  gctx.putImageData(gimg, 0, 0);
+}
+
+/* ---------- the pipeline ---------- */
+
+function compile(norm) {
+  const v = {};
+  AXES.forEach((a, i) => { v[a.key] = a.at(norm[i]); });
+
+  const u = { v };
+  u.focus    = v.spot;
+  u.pin      = (v.geometry / 100) * 1.7;
+  u.rot      = v.geometry * 0.0006;
+  u.overscan = 1 + v.geometry * 0.0016;
+  u.fade     = clamp(1 - Math.exp(-16.7 / v.persist), 0.012, 1);
+  u.grain    = v.noise;
+  u.emis     = v.emission;
+  u.bloom    = v.bloom;
+  u.hue      = v.phosphor;
+
+  const a = 0.7, c = v.converge;
+  u.chOff = [
+    { x:  Math.cos(a) * c,        y:  Math.sin(a) * c * 0.7 },
+    { x: 0, y: 0 },
+    { x: -Math.cos(a) * c * 0.85, y: -Math.sin(a) * c * 0.6 }
+  ];
+  u.chScale = [1 + c * 0.0028, 1, 1 - c * 0.0024];
+  return u;
+}
+
+function drawWarped(dst, src, u, ch) {
+  const S = TILE, o = u.chOff[ch], k = u.overscan * u.chScale[ch];
+  dst.save();
+  dst.translate(S / 2, S / 2);
+  dst.rotate(u.rot);
+  dst.scale(k, k);
+  dst.translate(o.x, o.y);
+  for (let i = 0; i < STRIPS; i++) {
+    const sh = S / STRIPS, y0 = i * sh;
+    const yc = ((y0 + sh / 2) / S) * 2 - 1;
+    const w  = S * (1 + u.pin * (yc * yc - 1 / 3));
+    dst.drawImage(src, 0, y0 * SCALE, S * SCALE, sh * SCALE, -w / 2, y0 - S / 2, w, sh + 0.6);
+  }
+  dst.restore();
+}
+
+function render(u) {
+  const S = TILE;
+
+  // phosphor: fade what is there, then add this frame. Longer persist =
+  // smaller fade = the probe smears into a comet.
+  phos.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  phos.globalCompositeOperation = 'source-over';
+  phos.fillStyle = `rgba(0,0,0,${u.fade})`;
+  phos.fillRect(0, 0, S, S);
+  phos.globalCompositeOperation = 'lighter';
+  for (let ch = 0; ch < 3; ch++) drawWarped(phos, gun[ch].canvas, u, ch);
+  phos.globalCompositeOperation = 'source-over';
+
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, S, S);
+
+  // bloom, bloom, subject — nothing renders crisp
+  const b = u.bloom;
+  ctx.globalCompositeOperation = 'screen';
+  ctx.filter = `blur(${(4 + 14 * b).toFixed(1)}px)`;
+  ctx.globalAlpha = clamp(0.52 * b, 0, 1) * clamp(u.emis, 0, 1.2);
+  ctx.drawImage(phosCanvas, 0, 0, S, S);
+  ctx.filter = `blur(${(1.6 + 5 * b).toFixed(1)}px)`;
+  ctx.globalAlpha = clamp(0.42 * b, 0, 1) * clamp(u.emis, 0, 1.2);
+  ctx.drawImage(phosCanvas, 0, 0, S, S);
+  ctx.filter = `blur(${u.focus.toFixed(2)}px)`;
+  ctx.globalAlpha = clamp(u.emis, 0, 1);
+  ctx.drawImage(phosCanvas, 0, 0, S, S);
+  if (u.emis > 1) {                       // overexposure spreads, never clips flat
+    ctx.globalAlpha = clamp(u.emis - 1, 0, 1);
+    ctx.drawImage(phosCanvas, 0, 0, S, S);
+  }
+  ctx.filter = 'none';
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+
+  const g = ctx.createRadialGradient(S / 2, S * 0.47, S * 0.07, S / 2, S / 2, S * 0.70);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(0.55, 'rgba(0,0,0,0.15)');
+  g.addColorStop(1, 'rgba(0,0,0,0.80)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, S, S);
+
+  ctx.globalCompositeOperation = 'screen';
+  ctx.globalAlpha = u.grain;
+  ctx.drawImage(grain, 0, 0, S, S);
+  ctx.globalAlpha = 1;
+
+  // coating last, so it tints the grain too — that is what sells emitted light
+  ctx.globalCompositeOperation = 'color';
+  ctx.globalAlpha = 0.62;
+  ctx.fillStyle = `hsl(${u.hue}, 74%, 55%)`;
+  ctx.fillRect(0, 0, S, S);
+  ctx.globalAlpha = 1;
+
+  ctx.globalCompositeOperation = 'screen';
+  const gl = ctx.createLinearGradient(0, 0, 0, S * 0.5);
+  gl.addColorStop(0, 'rgba(200,240,225,0.055)');
+  gl.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = gl;
+  ctx.fillRect(0, 0, S, S * 0.5);
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+/* ================================================================
+   the signal
+   ================================================================ */
+
+let ac = null, analyser = null, freq = null, monGain = null;
+let genBus = null, micStream = null, source = 'internal';
+let running = false, schedTimer = 0;
+
+function ensureAudio() {
+  if (ac) return;
+  ac = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = ac.createAnalyser();
+  analyser.fftSize = 2048;
+  analyser.smoothingTimeConstant = 0.55;
+  freq = new Uint8Array(analyser.frequencyBinCount);
+
+  monGain = ac.createGain();
+  monGain.gain.value = 0;                 // silent by default
+  analyser.connect(monGain);
+  monGain.connect(ac.destination);
+
+  genBus = ac.createGain();
+  genBus.gain.value = 0.9;
+  genBus.connect(analyser);
+}
+
+/* ---------- an internal generator, so the sketch works without a mic ----------
+   Routed through the same analyser as the mic, so there is exactly one
+   analysis path. Silent unless "hear it" is on. */
+
+let step = 0, nextTime = 0;
+const BPM = 96, SPB = 60 / BPM / 2;        // eighth notes
+const CHORDS = [[110, 164.81, 220], [98, 146.83, 196], [123.47, 185, 246.94], [87.31, 130.81, 174.61]];
+let padVoices = [], padFilter = null, chordIx = -1;
+
+function kick(t) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(128, t);
+  o.frequency.exponentialRampToValueAtTime(44, t + 0.11);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(1.0, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+  o.connect(g); g.connect(genBus);
+  o.start(t); o.stop(t + 0.36);
+}
+
+function hat(t, accent) {
+  const len = 0.055;
+  const b = ac.createBuffer(1, Math.ceil(ac.sampleRate * len), ac.sampleRate);
+  const d = b.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+  const s = ac.createBufferSource(); s.buffer = b;
+  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6500;
+  const g = ac.createGain(); g.gain.value = accent ? 0.5 : 0.2;
+  s.connect(hp); hp.connect(g); g.connect(genBus);
+  s.start(t);
+}
+
+function setChord(t, ix) {
+  padVoices.forEach(v => { try { v.stop(t + 0.4); } catch (e) {} });
+  padVoices = [];
+  if (!padFilter) {
+    padFilter = ac.createBiquadFilter();
+    padFilter.type = 'lowpass';
+    padFilter.frequency.value = 900;
+    padFilter.Q.value = 3;
+    const lfo = ac.createOscillator(), la = ac.createGain();
+    lfo.frequency.value = 0.06; la.gain.value = 480;
+    lfo.connect(la); la.connect(padFilter.frequency); lfo.start();
+    padFilter.connect(genBus);
+  }
+  CHORDS[ix].forEach((f, k) => {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sawtooth';
+    o.frequency.value = f;
+    o.detune.value = (k - 1) * 7;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.10, t + 1.2);
+    o.connect(g); g.connect(padFilter);
+    o.start(t);
+    padVoices.push(o);
+  });
+}
+
+function schedule() {
+  const AHEAD = 0.12;
+  while (nextTime < ac.currentTime + AHEAD) {
+    const s = step % 16;
+    if (s % 4 === 0 || s === 10) kick(nextTime);
+    if (s % 2 === 1) hat(nextTime, s % 8 === 3);
+    if (s === 0) {
+      const ix = Math.floor(step / 16) % CHORDS.length;
+      if (ix !== chordIx) { chordIx = ix; setChord(nextTime, ix); }
+    }
+    nextTime += SPB;
+    step++;
+  }
+}
+
+/* ---------- band split ---------- */
+
+function bandAvg(lo, hi) {
+  const hz = ac.sampleRate / analyser.fftSize;
+  const a = Math.max(0, Math.floor(lo / hz)), b = Math.min(freq.length - 1, Math.ceil(hi / hz));
+  let s = 0;
+  for (let i = a; i <= b; i++) s += freq[i];
+  return (s / (b - a + 1)) / 255;
+}
+
+// attack/release envelopes — each parameter settles at its own physical rate
+const env = { bass: 0, bassSlow: 0, mid: 0, treb: 0, level: 0 };
+const follow = (cur, tgt, atk, rel) => cur + (tgt - cur) * (tgt > cur ? atk : rel);
+
+function readSignal() {
+  if (!analyser) return;
+  analyser.getByteFrequencyData(freq);
+  const bass = bandAvg(20, 160), mid = bandAvg(160, 2000), treb = bandAvg(2000, 12000);
+  const level = (bass + mid + treb) / 3;
+
+  env.bass     = follow(env.bass,     bass,  0.50, 0.13);
+  env.bassSlow = follow(env.bassSlow, bass,  0.07, 0.020);   // phosphor lags badly
+  env.mid      = follow(env.mid,      mid,   0.36, 0.11);
+  env.treb     = follow(env.treb,     treb,  0.60, 0.24);
+  env.level    = follow(env.level,    level, 0.30, 0.08);
+}
+
+// Nominal plus a signed push. Silence → every axis home → a correct tube.
+function conditionNorm() {
+  const N = AXES.map(a => a.nom);
+  if (bypass || !running) return N;
+  const c01 = v => clamp(v, 0, 1);
+  N[0] = c01(AXES[0].nom + env.mid      * 0.26);                   // spot
+  N[1] = c01(AXES[1].nom + env.treb     * 0.30);                   // converge
+  N[2] = c01(AXES[2].nom + (env.level - 0.15) * 0.16);             // geometry
+  N[3] = c01(AXES[3].nom + env.bassSlow * 0.36);                   // persist
+  N[4] = c01(AXES[4].nom + env.treb     * 0.42);                   // noise
+  N[5] = c01(AXES[5].nom + env.bass     * 0.46);                   // emission
+  N[6] = c01(AXES[6].nom + env.bass     * 0.40);                   // bloom
+  return N;                                                        // phosphor stays put
+}
+
+/* ---------- loop ---------- */
+
+let bypass = false, frame = 0, clock = 0, last = performance.now();
+
+function tick(now) {
+  const dt = Math.min(now - last, 50); last = now;
+  if (!REDUCED) clock += dt;
+
+  if (running && source === 'internal') schedule();
+  readSignal();
+
+  const norm = conditionNorm();
+  const u = compile(norm);
+
+  drawCard(pctx, clock);
+  buildGuns();
+  render(u);
+
+  if (!REDUCED && frame % 3 === 0) regenGrain();
+  if (frame % 4 === 0) paintCondition(norm, u);
+  frame++;
+  requestAnimationFrame(tick);
+}
+
+function paintCondition(norm, u) {
+  AXES.forEach((a, i) => {
+    const b = bars[a.key];
+    b.fill.style.transform = `scaleX(${norm[i].toFixed(3)})`;
+    b.fill.style.width = '100%';
+    b.val.textContent = a.fmt(u.v[a.key]);
+  });
+}
+
+/* ---------- controls ---------- */
+
+function setStatus(msg, warn) {
+  $('status').innerHTML = msg;
+  $('status').classList.toggle('warn', !!warn);
+}
+
+$('run').addEventListener('click', async () => {
+  ensureAudio();
+  if (ac.state === 'suspended') await ac.resume();
+  running = !running;
+  $('run').setAttribute('aria-pressed', String(running));
+  $('run').textContent = running ? 'stop' : 'start';
+  $('mon').disabled = !running || source === 'mic';
+  if (running && source === 'internal') { nextTime = ac.currentTime + 0.05; step = 0; chordIx = -1; }
+  if (!running) {
+    padVoices.forEach(v => { try { v.stop(); } catch (e) {} });
+    padVoices = [];
+    setStatus('Stopped. Every axis walks home to nominal — that is the reference.');
+  } else {
+    setStatus(source === 'mic'
+      ? 'Live mic. Watch <b>persist</b> lag behind the beat — the phosphor is the slowest part of the tube.'
+      : 'Internal signal, silent unless you press <b>hear it</b>. The card is not moving; the tube is.');
+  }
+});
+
+$('mic').addEventListener('click', async () => {
+  ensureAudio();
+  if (source === 'mic') return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setStatus('No mic API here — <b>getUserMedia</b> needs https or localhost. Serve the folder and reload.', true);
+    return;
+  }
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, autoGainControl: false, noiseSuppression: false }
+    });
+  } catch (err) {
+    setStatus(`Mic unavailable (${err.name}). Staying on the internal signal.`, true);
+    return;
+  }
+  if (ac.state === 'suspended') await ac.resume();
+
+  // one analyser, two possible sources — swap the input, keep the path
+  try { genBus.disconnect(); } catch (e) {}
+  padVoices.forEach(v => { try { v.stop(); } catch (e) {} });
+  padVoices = [];
+  monGain.gain.value = 0;                        // never monitor a live mic
+  $('mon').setAttribute('aria-pressed', 'false');
+  $('mon').disabled = true;
+
+  ac.createMediaStreamSource(micStream).connect(analyser);
+  source = 'mic';
+  running = true;
+  $('mic').setAttribute('aria-pressed', 'true');
+  $('run').setAttribute('aria-pressed', 'true');
+  $('run').textContent = 'stop';
+  setStatus('Live mic. Speak, and watch the guns drift apart on the consonants.');
+});
+
+$('mon').addEventListener('click', () => {
+  if (!ac || source === 'mic') return;
+  const on = monGain.gain.value === 0;
+  monGain.gain.value = on ? 0.28 : 0;
+  $('mon').setAttribute('aria-pressed', String(on));
+});
+
+$('bypass').addEventListener('click', () => {
+  bypass = !bypass;
+  $('bypass').setAttribute('aria-pressed', String(bypass));
+  $('cond').classList.toggle('bypassed', bypass);
+  setStatus(bypass
+    ? 'Tube frozen at nominal, audio still running. The picture does not move — that is the claim.'
+    : 'Released. The signal is back in the optics, not in the drawing.');
+});
+
+/* ---------- start ---------- */
+
+allocate();
+
+// The first measurement can land before the stylesheet does; re-check once the
+// page is fully loaded, and whenever the tube changes size.
+let sizeTimer = 0;
+addEventListener('load',   () => { if (measure() !== TILE) allocate(); });
+addEventListener('resize', () => {
+  clearTimeout(sizeTimer);
+  sizeTimer = setTimeout(() => { if (measure() !== TILE) allocate(); }, 120);
+});
+
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>

@@ -11,6 +11,8 @@ imagination/
 ├── SPEC.md        the format definition (v0.1)
 ├── index.md       at-a-glance listing of every entity, by charge
 ├── log.md         chronological history of the layer
+├── coverage.md    which sketches the layer has read — and what came of it
+├── coverage.py    regenerates the ledger, prints the pending backlog
 ├── rituals/       the /spark and /inhale prompts
 ├── threads/         what you keep making (11)
 ├── techniques/         techniques you own (13)
@@ -33,11 +35,20 @@ A breathing cycle. Two steps, both lightweight.
   habit. Pick one, or free-sketch.
 - **Make the sketch.** Write its `interface.md` as usual. The layer stays
   out of the way.
-- **Evening — `/inhale` (harvest).** Run it on the new sketch. It proposes
-  small diffs: a new technique, a thread gaining a member, a charge ticking
-  up. Approve and it updates the files.
+- **Evening — `/inhale` (harvest).** Run it. It checks
+  [`coverage.md`](coverage.md) for every sketch the layer has not read yet —
+  not just today's — and proposes small diffs, one cluster at a time: a new
+  technique, a thread gaining a member, a charge ticking up. Approve and it
+  updates the files. A sketch that yields nothing is marked `no-signal`
+  rather than mined for an entity that isn't there.
 - **Weekly — skim `index.md`.** See the shape of the field. Notice what's
   gone quiet, what keeps resurfacing unmade.
+
+To see the backlog without harvesting anything:
+
+```
+python3 imagination/coverage.py --check
+```
 
 ## Using the rituals as slash commands
 

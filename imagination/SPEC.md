@@ -87,6 +87,7 @@ root. It is **not** duplicated per sketch.
 │   ├── SPEC.md              # this document
 │   ├── index.md             # progressive-disclosure listing (see §8)
 │   ├── log.md               # optional chronological history
+│   ├── coverage.md          # optional inhale ledger (see §8.1)
 │   ├── seeds/
 │   ├── threads/
 │   ├── techniques/
@@ -223,12 +224,34 @@ the shape of what you abandoned is itself information.
 
 Run after a sketch, or in a weekly pass.
 
-1. Read the new `interface.md`(s), focusing on the *Notes* section.
-2. For each weak signal, decide its type (§4) and either **create** a new
+1. Read the coverage ledger (§8.1) to find every sketch the layer has not
+   yet read. The default scope of an inhale is *all of them*.
+2. Read each pending `interface.md`, focusing on the *Notes* section.
+3. For each weak signal, decide its type (§4) and either **create** a new
    entity or **strengthen** an existing one (append to `Trace`, raise
    `charge`, add the sketch to `spawned`).
-3. Promote nothing prematurely. A signal seen once is a note; a signal
-   seen twice is a Thread.
+4. Promote nothing prematurely. A signal seen once is a note; a signal
+   seen twice is a Thread. Because the promotion rule assumes signals
+   accrue over *time*, a backlog SHOULD be harvested in clusters rather
+   than in one pass — thirty sketches read at once make every recurring
+   motif cross the threshold simultaneously.
+5. **Extract nothing that is not there.** A sketch that yields no signal is
+   recorded as `no-signal`, not given an invented entity. Coverage measures
+   what has been *read*, not what has been *mined*.
+6. Record the outcome for every sketch read (§8.1). A sketch silently
+   skipped is the failure the ledger exists to prevent.
+
+### 7.1.1 Retroactive attachment
+
+`no-signal` closes the **read**, not the sketch. A sketch that surfaces
+nothing today may turn out to be the *first* sighting of a signal that a
+later sketch makes legible. When a Thread or Technique is created, earlier
+`no-signal` sketches that belong to it SHOULD be added to its `spawned`
+retroactively. Their ledger outcome becomes `harvested`.
+
+This mirrors §6: nothing in Imagination is closed, only quiet. A sketch
+whose meaning arrives late is a normal event in a divergent practice, not a
+bookkeeping error.
 
 ### 7.2 Exhale — `/spark`
 
@@ -272,7 +295,7 @@ afraid to make.
 
 ---
 
-## 8. Index and log
+## 8. Index, log, and coverage
 
 An `index.md` MAY sit at `imagination/` root for progressive disclosure —
 a human or agent reads it to see the shape of the layer before opening
@@ -283,6 +306,39 @@ A `log.md` MAY record the layer's own history — entities created, charges
 shifted, Seeds spent — newest first, under ISO-8601 date headings. It is
 the diary of the practice's evolution, distinct from the sketches
 themselves.
+
+`index.md`, `log.md`, and `coverage.md` are **reserved** filenames. They
+carry no frontmatter and are exempt from §11 rule 1.
+
+### 8.1 The coverage ledger
+
+A `coverage.md` MAY sit at `imagination/` root recording which sketches the
+layer has read. It is the precondition for an inhale that can claim
+completeness.
+
+Coverage **cannot be derived from the entity graph.** Because §7.1 leaves a
+once-seen signal as a note, a correctly-inhaled sketch may produce zero
+entities and zero `spawned` entries — indistinguishable, from the graph
+alone, from a sketch never opened. *Inhaled* is a property of an event, not
+of the graph, and so requires its own record.
+
+One row per sketch, with an outcome drawn from:
+
+| Outcome | Meaning |
+|---------|---------|
+| `harvested` | Read; entities created or strengthened. |
+| `no-signal` | Read; nothing surfaced. Reversible — see §7.1.1. |
+| `covered-by <piece>` | A daily sketch promoted to an indexed piece. Harvest the piece; listing both in `spawned` double-counts one work as two. |
+| `blocked` | No `interface.md` yet — nothing to read. |
+| `pending` | Not yet read. The actionable backlog. |
+
+The row set SHOULD be generated from the filesystem, and the outcome column
+SHOULD be written by the inhale. `covered-by` and `blocked` are facts about
+the filesystem and are recomputed on each pass; `harvested` and `no-signal`
+are records and MUST survive regeneration.
+
+A conforming reader MUST tolerate a missing `coverage.md`; a bundle without
+one simply cannot report its own coverage.
 
 ---
 
@@ -327,10 +383,11 @@ markdown-knowledge family.
 An Imagination bundle is conformant with v0.1 if:
 
 1. Every non-reserved `.md` file under `imagination/` has a parseable YAML
-   frontmatter block with non-empty `id` and `type`.
+   frontmatter block with non-empty `id` and `type`. The reserved names are
+   `SPEC.md`, `README.md`, `index.md`, `log.md`, and `coverage.md`.
 2. `type` is one of the six defined types, or a producer-defined type a
    reader treats as generic.
-3. `index.md` and `log.md`, when present, follow §8.
+3. `index.md`, `log.md`, and `coverage.md`, when present, follow §8.
 
 Readers SHOULD treat all else as soft guidance and MUST NOT reject a
 bundle for missing optional keys, unknown keys, broken links, or absent

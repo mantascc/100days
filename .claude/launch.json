@@ -116,6 +116,18 @@
       "port": 8833
     },
     {
+      "name": "sketch-torus-sheet",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8851", "--directory", "daily-sketch/sketch-torus-sheet"],
+      "port": 8851
+    },
+    {
+      "name": "sketch-tube-driven",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8852", "--directory", "daily-sketch/sketch-tube-driven"],
+      "port": 8852
+    },
+    {
       "name": "imagination-snapshots",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8840", "--directory", "/Users/mantas/Desktop/min7is/100days/imagination/snapshots"],
