@@ -1,5 +1,10 @@
 [
   {
+    "id": "93-imagination-layers",
+    "path": "100days/93-imagination-layers",
+    "description": "Imagination Layers — the imagination/ context layer as a stack of planes, one per entity type, with the inhale coverage ledger as the ground; select anything and filaments run between an entity and the sketches it spawned"
+  },
+  {
     "id": "91-retro-primitives",
     "path": "100days/91-retro-primitives",
     "description": "Retro Primitives \u2014 CRT tube treatment as a palette-swap family across four variants (phosphor \u00b7 cryo \u00b7 signal \u00b7 graphite); each runs circle/square/triangle/ellipse in a 2\u00d72 tube grid with bloom, live grain, and static scanlines"

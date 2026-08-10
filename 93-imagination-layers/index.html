@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>93-imagination-layers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --ground-surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #8f919d;
+      --text-ghost: #80828d;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #00a8ff;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --space-4: 4px;
+      --space-8: 8px;
+      --space-16: 16px;
+      --space-24: 24px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: var(--ground-void); color: var(--text-default); font-family: var(--font-mono); overflow: hidden; }
+    body { font-weight: 300; -webkit-font-smoothing: antialiased; }
+
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
+    canvas.dragging { cursor: grabbing; }
+
+    header {
+      position: fixed; top: var(--space-24); left: var(--space-24);
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-secondary); z-index: 10; pointer-events: none;
+    }
+    header .sub {
+      display: block; margin-top: 6px; letter-spacing: 0.12em;
+      color: var(--text-tertiary); font-size: 10px; text-transform: none;
+    }
+
+    /* ---- layer rail ---------------------------------------------------- */
+    #rail {
+      position: fixed; top: 96px; left: var(--space-24); z-index: 10;
+      display: flex; flex-direction: column; gap: 2px; width: 190px;
+    }
+    .rail-row {
+      display: grid; grid-template-columns: 10px 1fr auto;
+      align-items: center; gap: var(--space-8);
+      padding: 6px var(--space-8); border-left: 1px solid transparent;
+      font-size: 10.5px; letter-spacing: 0.08em; color: var(--text-tertiary);
+      cursor: pointer; user-select: none; transition: color .18s, background .18s, border-color .18s;
+    }
+    .rail-row:hover { color: var(--text-secondary); background: var(--ground-base); }
+    .rail-row.on { color: var(--text-primary); background: var(--ground-raised); border-left-color: currentColor; }
+    .rail-row .swatch { width: 7px; height: 7px; }
+    .rail-row .n { color: var(--text-ghost); font-size: 10px; }
+    .rail-row.on .n { color: var(--text-tertiary); }
+    .rail-row .name { text-transform: uppercase; white-space: nowrap; }
+    #rail .rail-sep { height: 1px; background: var(--border-subtle); margin: 6px 0; }
+    #rail .legend { margin-top: var(--space-16); border-top: 1px solid var(--border-subtle); padding-top: var(--space-8); }
+    .leg-row {
+      display: grid; grid-template-columns: 8px 1fr auto; gap: var(--space-8);
+      align-items: center; padding: 3px var(--space-8);
+      font-size: 9.5px; letter-spacing: 0.06em; color: var(--text-tertiary);
+    }
+    .leg-row .leg-mark { width: 7px; height: 7px; }
+    .leg-row .n { font-size: 9.5px; }
+
+    /* ---- bottom-left hud ------------------------------------------------ */
+    #hud {
+      position: fixed; bottom: var(--space-24); left: var(--space-24); z-index: 10;
+      font-size: 10px; line-height: 1.9; color: var(--text-tertiary); letter-spacing: 0.06em;
+      pointer-events: none;
+    }
+    #hud b { color: var(--text-default); font-weight: 400; }
+    #hud kbd {
+      font: inherit; color: var(--text-tertiary);
+      border: 1px solid var(--border-default); padding: 0 4px; margin-right: 2px;
+    }
+
+    /* ---- detail panel ---------------------------------------------------- */
+    #panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 400px; z-index: 20;
+      background: var(--ground-base); border-left: 1px solid var(--border-default);
+      padding: var(--space-24) var(--space-24) 64px;
+      overflow-y: auto; overflow-x: hidden;
+      transform: translateX(100%); transition: transform .34s cubic-bezier(.2,.8,.2,1);
+    }
+    #panel.open { transform: translateX(0); }
+    #panel::-webkit-scrollbar { width: 3px; }
+    #panel::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+    #panel .close {
+      position: absolute; top: var(--space-16); right: var(--space-16);
+      font: inherit; font-size: 11px; color: var(--text-tertiary);
+      background: none; border: none; cursor: pointer; padding: 4px 6px;
+    }
+    #panel .close:hover { color: var(--text-primary); }
+
+    .p-kind { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
+    .p-title { font-size: 18px; font-weight: 400; color: var(--text-primary); margin: var(--space-8) 0 var(--space-16); line-height: 1.3; }
+    .p-meta { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-bottom: var(--space-16); }
+    .chip {
+      font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-tertiary); border: 1px solid var(--border-default);
+      padding: 3px 6px; white-space: nowrap;
+    }
+    .chip.hot { color: var(--text-default); border-color: var(--border-default); }
+    .p-file { font-size: 9.5px; color: var(--text-ghost); margin-bottom: var(--space-24); word-break: break-all; }
+
+    .p-sec { margin-bottom: var(--space-24); }
+    .p-sec h4 {
+      font-size: 9.5px; font-weight: 400; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--text-ghost); margin-bottom: var(--space-8);
+      border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px;
+    }
+    .p-sec p { font-size: 12px; line-height: 1.75; color: var(--text-secondary); margin-bottom: var(--space-8); }
+    .p-sec ul { list-style: none; }
+    .p-sec li {
+      font-size: 11.5px; line-height: 1.7; color: var(--text-secondary);
+      padding-left: 14px; text-indent: -14px; margin-bottom: 5px;
+    }
+    .p-sec li::before { content: '· '; color: var(--text-tertiary); }
+    .p-sec a { color: var(--text-default); text-decoration: none; border-bottom: 1px solid var(--border-default); }
+    .p-sec a:hover { color: var(--accent); border-color: var(--accent); }
+
+    .link-row {
+      display: grid; grid-template-columns: 10px 1fr auto; gap: var(--space-8);
+      align-items: center; padding: 5px 0; cursor: pointer; font-size: 11.5px;
+      color: var(--text-secondary); border-bottom: 1px solid var(--border-subtle);
+    }
+    .link-row:hover { color: var(--text-primary); }
+    .link-row .swatch { width: 7px; height: 7px; }
+    .link-row .rel { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-ghost); }
+
+    .spawn-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+    .spawn {
+      font-size: 10px; color: var(--text-tertiary); border: 1px solid var(--border-subtle);
+      padding: 3px 5px; cursor: default; transition: color .15s, border-color .15s;
+    }
+    .spawn:hover { color: var(--text-primary); border-color: var(--border-default); }
+
+    #tooltip {
+      position: fixed; z-index: 15; pointer-events: none; opacity: 0;
+      background: var(--ground-raised); border: 1px solid var(--border-default);
+      padding: 7px var(--space-8); max-width: 260px;
+      font-size: 10.5px; line-height: 1.6; color: var(--text-default);
+      transition: opacity .12s;
+    }
+    #tooltip .t-kind { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; display: block; margin-bottom: 3px; }
+    #tooltip .t-sub { color: var(--text-ghost); font-size: 9.5px; }
+
+    /* ---- media ----------------------------------------------------------- */
+    .p-media {
+      position: relative; width: 100%; aspect-ratio: 1; overflow: hidden;
+      background: var(--ground-void); border: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-16);
+    }
+    .p-media img, .p-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .p-media .badge {
+      position: absolute; left: 0; bottom: 0;
+      background: var(--ground-void); color: var(--text-tertiary);
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; padding: 4px 6px;
+    }
+    .p-media.none {
+      display: grid; place-items: center; aspect-ratio: 16/5;
+      color: var(--text-ghost); font-size: 10px; letter-spacing: 0.12em;
+    }
+
+    /* ---- gallery overlay -------------------------------------------------- */
+    #gallery {
+      position: fixed; inset: 0; z-index: 25; background: var(--ground-void);
+      display: none; grid-template-rows: auto 1fr;
+    }
+    #gallery.open { display: grid; }
+    .g-head {
+      display: flex; align-items: center; gap: var(--space-16); flex-wrap: wrap;
+      padding: var(--space-24); border-bottom: 1px solid var(--border-subtle);
+    }
+    .g-head .g-title {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-secondary);
+    }
+    .g-filters { display: flex; gap: 4px; flex-wrap: wrap; }
+    .g-chip {
+      font: inherit; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-tertiary); background: none; border: 1px solid var(--border-default);
+      padding: 4px 7px; cursor: pointer; display: flex; align-items: center; gap: 5px;
+    }
+    .g-chip:hover { color: var(--text-default); }
+    .g-chip.on { color: var(--text-primary); border-color: var(--border-default); background: var(--ground-raised); }
+    .g-chip .n { color: var(--text-ghost); }
+    .g-chip .dot { width: 6px; height: 6px; }
+    .g-head .g-close {
+      margin-left: auto; font: inherit; font-size: 10px; color: var(--text-tertiary);
+      background: none; border: none; cursor: pointer;
+    }
+    .g-head .g-close:hover { color: var(--text-primary); }
+
+    .g-grid {
+      overflow-y: auto; padding: var(--space-16) var(--space-24) 64px;
+      display: grid; gap: var(--space-8);
+      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+      align-content: start;
+    }
+    .g-grid::-webkit-scrollbar { width: 3px; }
+    .g-grid::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+    .g-tile { cursor: pointer; }
+    .g-media {
+      position: relative; aspect-ratio: 1; overflow: hidden;
+      background: var(--ground-base); border: 1px solid var(--border-subtle);
+      transition: border-color .15s;
+    }
+    .g-tile:hover .g-media { border-color: var(--border-default); }
+    .g-media img, .g-media video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .g-media video { opacity: 0; transition: opacity .2s; }
+    .g-tile.playing .g-media video { opacity: 1; }
+    .g-media.empty { display: grid; place-items: center; }
+    .g-media.empty span {
+      font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-ghost);
+    }
+    .g-tile.dim .g-media { opacity: 0.45; }
+    .g-cap {
+      display: flex; align-items: center; gap: 5px; padding: 5px 1px 0;
+      font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.04em;
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    }
+    .g-tile:hover .g-cap { color: var(--text-default); }
+    .g-cap .dot { width: 5px; height: 5px; flex: none; }
+    .g-cap .lbl { overflow: hidden; text-overflow: ellipsis; }
+
+    #rail .g-open {
+      margin-top: var(--space-8); width: 100%; text-align: left;
+      font: inherit; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-tertiary); background: none;
+      border: 1px solid var(--border-default); padding: 6px var(--space-8); cursor: pointer;
+    }
+    #rail .g-open:hover { color: var(--text-primary); border-color: var(--border-default); }
+
+    #err {
+      position: fixed; inset: 0; display: none; place-items: center; z-index: 30;
+      background: var(--ground-void); padding: 40px; text-align: center;
+      font-size: 12px; line-height: 2; color: var(--text-secondary);
+    }
+    #err code { color: var(--accent); }
+
+    @media (max-width: 860px) {
+      #panel { width: 100%; }
+      #rail { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  93-imagination-layers
+  <span class="sub">entity graph above, coverage ledger on the floor — drag to orbit, click anything</span>
+</header>
+
+<canvas id="c"></canvas>
+
+<nav id="rail"></nav>
+
+<div id="hud"></div>
+
+<aside id="panel"><button class="close" aria-label="close">esc ✕</button><div id="panel-body"></div></aside>
+
+<div id="tooltip"></div>
+
+<div id="gallery">
+  <div class="g-head">
+    <span class="g-title">sketchbook</span>
+    <div class="g-filters"></div>
+    <button class="g-close">esc ✕</button>
+  </div>
+  <div class="g-grid"></div>
+</div>
+
+<div id="err">
+  <div>
+    <b>data.js not found.</b><br>
+    run <code>python3 93-imagination-layers/build.py</code><br>
+    to bake <code>imagination/</code> into this sketch.
+  </div>
+</div>
+
+<script src="data.js" onerror="document.getElementById('err').style.display='grid'"></script>
+<script>
+const DATA = window.IMAGINATION;
+if (!DATA) { document.getElementById('err').style.display = 'grid'; }
+else (function () {
+
+/* ------------------------------------------------------------------ model */
+// Bottom-to-top: what's outside the practice, what it owns, what it keeps
+// asking, and — floating clear of the floor because none of it has been made —
+// what it still wants. The sketchbook is the ground the whole layer stands on.
+const LAYERS = [
+  { type: 'sketch',    name: 'sketchbook', color: '#4a4d55', blurb: 'what got made' },
+  { type: 'source',    name: 'sources',    color: '#7f8794', blurb: 'what feeds it' },
+  { type: 'technique', name: 'techniques', color: '#4ee39b', blurb: 'what I own' },
+  { type: 'thread',    name: 'threads',    color: '#00a8ff', blurb: 'what I keep making' },
+  { type: 'theme',     name: 'themes',     color: '#b98cff', blurb: 'what I keep asking' },
+  { type: 'seed',      name: 'seeds',      color: '#ffb454', blurb: 'what I want' },
+  { type: 'collision', name: 'collisions', color: '#ff5c7a', blurb: 'what I dodged' },
+];
+const LAYER_OF = {}; LAYERS.forEach((l, i) => { LAYER_OF[l.type] = i; l.index = i; });
+
+// Planes are wide and shallow, and the gap between them is tuned so that at the
+// default tilt a plane's on-screen depth is about the on-screen gap — any
+// shallower and the layers interleave into one soup.
+const GAP = 310;                       // world units between planes
+const PW = 1500, PD = 560;             // plane extent (x, depth)
+const CHARGE_A = { high: 1, medium: 0.62, low: 0.32 };
+
+const nodes = DATA.nodes.map(n => ({ ...n, kind: 'entity',
+  layer: LAYER_OF[n.type] ?? 1, x: 0, z: 0 }));
+const byId = new Map(nodes.map(n => [n.id, n]));
+
+// Coverage is what the ledger adds: not "did this sketch produce an entity"
+// (that's `spawned`, and SPEC §7.1 lets a correctly-read sketch produce none)
+// but "has the layer read it at all". Amber is deliberately the seeds colour —
+// unread work and unmade desire are the same kind of debt.
+const COVER = {
+  harvested:    { color: '#7f8794', fill: true,  size: 1.00, label: 'harvested' },
+  'no-signal':  { color: '#50555e', fill: true,  size: 0.85, label: 'read · no signal' },
+  pending:      { color: '#ffb454', fill: false, size: 1.00, label: 'pending' },
+  'covered-by': { color: '#4a4d55', fill: false, size: 0.70, label: 'covered by an indexed piece' },
+  blocked:      { color: '#3a3d44', fill: true,  size: 0.50, label: 'blocked · no interface.md' },
+  unknown:      { color: '#3a3d44', fill: false, size: 0.70, label: 'not in the ledger' },
+};
+
+// The floor is the coverage ledger: two bands, indexed pieces above daily
+// sketches, each in making order.
+const FD = 940, COLS = 14, ROW = 68, BAND_GAP = 104;
+const TIERS = [
+  { key: 'indexed', name: 'indexed pieces' },
+  { key: 'daily',   name: 'daily sketches' },
+];
+const floor = [];
+(function layoutFloor() {
+  // +z projects upward on screen, so rows run down from the far edge — making
+  // order then reads top-left to bottom-right, like a contact sheet.
+  let z = FD / 2 - 40;
+  for (const tier of TIERS) {
+    const rows = DATA.sketches.filter(s => s.tier === tier.key);
+    tier.zTop = z;
+    tier.rows = rows.length;
+    rows.forEach((s, i) => floor.push({
+      ...s, kind: 'sketch', i: floor.length, tier: tier.key,
+      cover: COVER[s.state] || COVER.unknown,
+      x: -PW / 2 + (i % COLS + 0.5) * (PW / COLS),
+      z: z - (Math.floor(i / COLS) + 0.5) * ROW,
+    }));
+    tier.zBot = z - Math.ceil(rows.length / COLS) * ROW;
+    z = tier.zBot - BAND_GAP;
+  }
+})();
+const floorById = new Map();
+floor.forEach(f => { floorById.set(f.id, f); floorById.set(f.id.split('/').pop(), f); });
+const coverTally = t => {
+  const c = {};
+  for (const f of floor) if (!t || f.tier === t) c[f.state] = (c[f.state] || 0) + 1;
+  return c;
+};
+
+const links = DATA.links
+  .map(l => ({ ...l, a: byId.get(l.source), b: byId.get(l.target) }))
+  .filter(l => l.a && l.b);
+
+// adjacency, for highlighting and for the panel's connection list
+const adj = new Map(nodes.map(n => [n.id, []]));
+links.forEach(l => {
+  adj.get(l.a.id).push({ node: l.b, kind: l.kind });
+  adj.get(l.b.id).push({ node: l.a, kind: l.kind });
+});
+
+/* ----------------------------------------------------------- plane layout */
+// Deterministic relaxation inside each plane. Two pulls do the real work:
+// linked entities drift over each other so filaments read near-vertical, and
+// every entity is dragged toward the centre of mass of the sketches it spawned,
+// so a node literally hovers above its own output on the floor.
+(function layout() {
+  let seed = 20260809;
+  const rnd = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
+
+  const R = Math.hypot(PW, PD) / 2;
+  nodes.forEach(n => {
+    n.x = (rnd() - 0.5) * PW * 0.9;
+    n.z = (rnd() - 0.5) * PD * 0.9;
+    const spots = n.spawned.map(s => floorById.get(s) ||
+                                      floorById.get(s.split('/').pop())).filter(Boolean);
+    if (!spots.length) { n.anchor = null; n.pin = 0; return; }
+    // the floor is deeper than the planes, so squeeze its z into plane range
+    const SQ = (PD / FD) * 0.92;
+    const ax = spots.reduce((s, p) => s + p.x, 0) / spots.length;
+    const az = spots.reduce((s, p) => s + p.z, 0) / spots.length * SQ;
+    n.anchor = { x: ax, z: az };
+    // A centroid only means something when the output is clustered. An entity
+    // that spawned sketches across the whole sketchbook has its centroid in the
+    // middle by arithmetic, not by meaning — so let it float free instead.
+    const spread = spots.reduce((s, p) => s + Math.hypot(p.x - ax, p.z * SQ - az), 0) / spots.length;
+    n.pin = 0.075 * Math.max(0, 1 - spread / (R * 0.55));
+  });
+
+  const MIN = 128;
+  for (let it = 0; it < 900; it++) {
+    const cool = 1 - it / 900;
+    for (const l of links) {                                   // linked → align
+      const dx = l.b.x - l.a.x, dz = l.b.z - l.a.z;
+      l.a.x += dx * 0.006; l.a.z += dz * 0.006;
+      l.b.x -= dx * 0.006; l.b.z -= dz * 0.006;
+    }
+    for (const n of nodes) {                                   // → own output
+      if (n.pin > 0) {
+        n.x += (n.anchor.x - n.x) * n.pin;
+        n.z += (n.anchor.z - n.z) * n.pin;
+      }
+    }
+    for (let i = 0; i < nodes.length; i++) {                   // same plane → apart
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        if (a.layer !== b.layer) continue;
+        let dx = b.x - a.x, dz = b.z - a.z;
+        let d = Math.hypot(dx, dz) || 0.01;
+        if (d >= MIN) continue;
+        const push = (MIN - d) / d * 0.5 * (0.5 + cool);
+        dx *= push; dz *= push;
+        a.x -= dx; a.z -= dz; b.x += dx; b.z += dz;
+      }
+    }
+    for (const n of nodes) {
+      n.x = Math.max(-PW / 2 + 50, Math.min(PW / 2 - 50, n.x));
+      n.z = Math.max(-PD / 2 + 34, Math.min(PD / 2 - 34, n.z));
+    }
+  }
+
+  // Relaxation leaves each plane as a tight knot in the middle — link
+  // attraction always wins over repulsion at this node count. Stretch every
+  // plane out to its own frame afterwards: an affine map, so the relative
+  // arrangement (and with it the near-vertical filaments) is preserved, but the
+  // plane is actually used. Capped, or a two-node plane would fly apart.
+  const CAP = 4.2;
+  for (let i = 1; i < LAYERS.length; i++) {
+    const set = nodes.filter(n => n.layer === i);
+    if (set.length < 3) continue;
+    for (const [axis, ext, pad] of [['x', PW, 100], ['z', PD, 46]]) {
+      const lo = Math.min(...set.map(n => n[axis]));
+      const hi = Math.max(...set.map(n => n[axis]));
+      const span = hi - lo;
+      if (span < 1) continue;
+      const k = Math.min(CAP, (ext - pad * 2) / span);
+      const mid = (lo + hi) / 2;
+      set.forEach(n => { n[axis] = (n[axis] - mid) * k; });
+    }
+  }
+})();
+
+/* ------------------------------------------------------------------ camera */
+const cam = {
+  yaw: -0.52, tilt: 0.52,       // tilt: 0 = pure side-on, PI/2 = straight down
+  zoom: 0.46, lookY: 3 * GAP, shift: 0,
+  tYaw: -0.52, tTilt: 0.52, tZoom: 0.46, tLookY: 3 * GAP, tShift: 0,
+  spin: true,
+};
+const FOCAL = 2100, DIST = 2100;
+let focus = -1;                 // focused layer index, -1 = whole stack
+let flat = false;
+let hovered = null, selected = null, hoverSpawn = null;
+
+function project(x, y, z) {
+  const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+  const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
+  const yy = y - cam.lookY;
+  const ct = Math.cos(cam.tilt), st = Math.sin(cam.tilt);
+  const yv = yy * ct + z1 * st;
+  const zv = -yy * st + z1 * ct;
+  const s = FOCAL / Math.max(220, FOCAL + zv + DIST) * cam.zoom * VS;
+  return { x: W / 2 + cam.shift + x1 * s, y: H / 2 - yv * s, s, depth: zv };
+}
+
+/* ------------------------------------------------------------------ canvas */
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1, VS = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = cv.clientWidth; H = cv.clientHeight;
+  // the stack has a fixed world size, so the whole view scales with the
+  // viewport rather than stranding it in the middle of a large window
+  VS = Math.max(0.55, Math.min(2.4, Math.min(W / 1420, H / 800)));
+  cv.width = W * DPR; cv.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+// Marks and labels are different roles. A 3px tick can be #4a4d55; the same
+// value as 9px type is 2.3:1 and unreadable, so labels get a legible stand-in.
+// See design-system/tokens/color.md — no text below 4.5:1.
+const TEXT_OF = {
+  '#4a4d55': '#8f919d',   // sketchbook / harvested / covered-by
+  '#50555e': '#8f919d',   // no-signal
+  '#3a3d44': '#80828d',   // blocked / unknown
+  '#7f8794': '#a8aab8',   // sources — passes, but sits next to brighter peers
+};
+const textColor = c => TEXT_OF[c] || c;
+const TEXT_MIN = 0.80;    // alpha floor for type; below it we drop, not fade
+
+const hex = (h, a) => {
+  const n = parseInt(h.slice(1), 16);
+  return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`;
+};
+const layerY = i => i * GAP;
+
+// how strongly a layer is "on" right now — drives every alpha below
+function layerWeight(i) {
+  if (focus < 0) return 1;
+  if (i === focus) return 1;
+  return flat ? 0.05 : 0.16;
+}
+
+function isLit(n) {
+  const a = selected || hovered;
+  if (!a) return false;
+  if (a.kind === 'sketch') return a.spawned_by.includes(n.id);
+  if (n === a) return true;
+  return adj.get(a.id).some(e => e.node === n);
+}
+function anyLit() { return !!(selected || hovered); }
+
+/* -------------------------------------------------------------------- draw */
+function draw() {
+  // ease camera
+  for (const k of ['yaw', 'tilt', 'zoom', 'lookY', 'shift']) {
+    const t = 't' + k[0].toUpperCase() + k.slice(1);
+    cam[k] += (cam[t] - cam[k]) * 0.11;
+  }
+  if (cam.spin) { cam.tYaw += 0.0011; }
+
+  ctx.clearRect(0, 0, W, H);
+
+  const active = selected || hovered;
+  const litFloor = new Set();
+  if (active && active.kind === 'sketch') litFloor.add(active.id);
+  if (active && active.kind === 'entity') {
+    active.spawned.forEach(id => {
+      const f = floorById.get(id) || floorById.get(id.split('/').pop());
+      if (f) litFloor.add(f.id);
+    });
+  }
+  if (hoverSpawn) litFloor.add(hoverSpawn);
+
+  drawFloor(litFloor);
+
+  // planes, far (bottom) to near (top) — we always look down on the stack
+  for (let i = 1; i < LAYERS.length; i++) drawPlaneFrame(i);
+  drawSpawnFilaments(active);
+  drawLinks();
+  for (let i = 1; i < LAYERS.length; i++) drawPlaneNodes(i);
+  flushLabels();
+
+  requestAnimationFrame(draw);
+}
+
+function drawPlaneFrame(i) {
+  const w = layerWeight(i);
+  if (w < 0.06) return;
+  const L = LAYERS[i], y = layerY(i);
+  const c = [[-PW / 2, -PD / 2], [PW / 2, -PD / 2], [PW / 2, PD / 2], [-PW / 2, PD / 2]]
+    .map(p => project(p[0], y, p[1]));
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = hex(L.color, 0.10 * w + (i === focus ? 0.16 : 0));
+  ctx.beginPath();
+  c.forEach((p, k) => k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  ctx.closePath(); ctx.stroke();
+
+  // corner ticks — reads as a drafted plane, not a filled slab
+  ctx.strokeStyle = hex(L.color, 0.42 * w);
+  const T = 16;
+  c.forEach((p, k) => {
+    const a = c[(k + 1) % 4], b = c[(k + 3) % 4];
+    [a, b].forEach(q => {
+      const d = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + (q.x - p.x) / d * T, p.y + (q.y - p.y) / d * T); ctx.stroke();
+    });
+  });
+
+  // label at the near-left corner
+  const near = c.reduce((m, p) => p.y > m.y ? p : m, c[0]);
+  const count = nodes.filter(n => n.layer === i).length;
+  labels.push({
+    text: L.name.toUpperCase() + '  ' + String(count).padStart(2, '0'),
+    x: near.x + 10, y: near.y + 12, color: L.color,
+    alpha: 0.5 * w + (i === focus ? 0.5 : 0.1), rank: 9000 + i,
+  });
+}
+
+function drawPlaneNodes(i) {
+  const w = layerWeight(i);
+  if (w < 0.05) return;
+  const L = LAYERS[i], y = layerY(i);
+  const showLabels = (i === focus) || cam.zoom > 0.72;
+
+  for (const n of nodes) {
+    if (n.layer !== i) continue;
+    const p = project(n.x, y, n.z);
+    n.sx = p.x; n.sy = p.y; n.ss = p.s;
+
+    const lit = isLit(n);
+    const dim = anyLit() && !lit ? 0.22 : 1;
+    const a = CHARGE_A[n.charge] * w * dim;
+    const r = (3.2 + Math.sqrt(n.spawned.length) * 1.9) * p.s / 0.46;
+
+    if (lit && n === active_()) {                    // selection halo
+      ctx.strokeStyle = hex(L.color, 0.5);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r + 9, 0, 6.284); ctx.stroke();
+    }
+    ctx.lineWidth = 1;
+    if (n.state === 'dormant') {                     // dormant reads as hollow
+      ctx.strokeStyle = hex(L.color, a);
+      ctx.strokeRect(p.x - r, p.y - r, r * 2, r * 2);
+    } else {
+      ctx.fillStyle = hex(L.color, a);
+      ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+    }
+
+    if (showLabels || lit) {
+      const la = (lit ? 0.95 : 0.42) * w * (anyLit() && !lit ? 0.4 : 1);
+      labels.push({
+        text: n.title, x: p.x + r + 6, y: p.y,
+        color: lit ? '#ffffff' : L.color, alpha: lit ? la : la * 0.9,
+        // lit nodes, then the productive ones, get the room
+        rank: (lit ? 1000 : 0) + n.spawned.length + (n.charge === 'high' ? 6 : 0),
+      });
+    }
+  }
+}
+function active_() { return selected || hovered; }
+
+// Labels are queued, not drawn inline: a focused plane has more titles than
+// room, so they get placed by rank and anything that would collide is dropped
+// rather than smeared over its neighbour.
+let labels = [];
+function flushLabels() {
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  const placed = [];
+  for (const l of labels.sort((a, b) => b.rank - a.rank)) {
+    // Fading type toward the ground is the same bug as a too-dark token: it
+    // ends up unreadable. Either the label is legible or it is not drawn.
+    if (l.alpha < 0.26) continue;
+    const px = l.size || 10;
+    ctx.font = `300 ${px}px "IBM Plex Mono", monospace`;
+    const w = ctx.measureText(l.text).width;
+    const box = { x: l.x - 2, y: l.y - px * 0.62, w: w + 4, h: px * 1.24 };
+    if (placed.some(q => box.x < q.x + q.w && box.x + box.w > q.x &&
+                         box.y < q.y + q.h && box.y + box.h > q.y)) continue;
+    placed.push(box);
+    ctx.fillStyle = hex('#0a0a0a', 0.84);
+    ctx.fillRect(box.x, box.y, box.w, box.h);
+    ctx.fillStyle = hex(textColor(l.color), Math.max(TEXT_MIN, l.alpha));
+    ctx.fillText(l.text, l.x, l.y);
+  }
+  labels = [];
+}
+
+function drawLinks() {
+  const act = active_();
+  for (const l of links) {
+    const wa = layerWeight(l.a.layer), wb = layerWeight(l.b.layer);
+    const w = Math.min(wa, wb);
+    if (w < 0.05) continue;
+    const lit = act && (act.kind === 'sketch'
+      ? (isLit(l.a) && isLit(l.b)) : (l.a === act || l.b === act));
+    if (anyLit() && !lit && w < 1) continue;
+    const p = project(l.a.x, layerY(l.a.layer), l.a.z);
+    const q = project(l.b.x, layerY(l.b.layer), l.b.z);
+    ctx.strokeStyle = lit
+      ? hex(LAYERS[l.a.layer].color, 0.75)
+      : hex('#ffffff', (anyLit() ? 0.035 : 0.10) * w);
+    ctx.lineWidth = lit ? 1.4 : 1;
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  }
+}
+
+// Filaments between an entity and the sketches it produced. Selecting an
+// entity draws them downward; selecting a sketch draws the same edges upward,
+// which is the only way to see what a single piece of work actually fed.
+function drawSpawnFilaments(act) {
+  if (!act) return;
+  const pairs = act.kind === 'sketch'
+    ? act.spawned_by.map(id => [byId.get(id), act])
+    : act.spawned.map(id => [act, floorById.get(id) || floorById.get(id.split('/').pop())]);
+  for (const [e, f] of pairs) {
+    if (!e || !f) continue;
+    const c = LAYERS[e.layer].color;
+    const p = project(e.x, layerY(e.layer), e.z);
+    const q = project(f.x, 0, f.z);
+    const g = ctx.createLinearGradient(p.x, p.y, q.x, q.y);
+    g.addColorStop(0, hex(c, 0.55)); g.addColorStop(1, hex(c, 0.10));
+    ctx.strokeStyle = g; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  }
+}
+
+function drawFloor(lit) {
+  const w = focus < 0 ? 1 : (focus === 0 ? 1 : (flat ? 0.05 : 0.3));
+  if (w < 0.05) return;
+  const onFloor = focus === 0;
+
+  for (const t of TIERS) {                            // band frames + counts
+    const c = [[-PW / 2, t.zTop + 14], [PW / 2, t.zTop + 14],
+               [PW / 2, t.zBot - 6], [-PW / 2, t.zBot - 6]].map(q => project(q[0], 0, q[1]));
+    ctx.strokeStyle = hex('#4a4d55', 0.09 * w + (onFloor ? 0.13 : 0));
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    c.forEach((q, k) => k ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y));
+    ctx.closePath(); ctx.stroke();
+    const near = c.reduce((m, q) => q.y > m.y ? q : m, c[0]);
+    const tal = coverTally(t.key);
+    labels.push({
+      text: `${t.name.toUpperCase()}  ${t.rows}  ·  ${tal.harvested || 0} READ`
+          + `  ·  ${tal.pending || 0} PENDING`,
+      x: near.x + 10, y: near.y + 12, color: '#7f8794',
+      alpha: 0.42 * w + (onFloor ? 0.4 : 0), rank: 8900,
+    });
+  }
+
+  for (const f of floor) {
+    const p = project(f.x, 0, f.z);
+    f.sx = p.x; f.sy = p.y;
+    const on = lit.has(f.id);
+    const c = f.cover;
+    const r = (on ? 4.4 : 2.9 * c.size) * p.s / 0.46;
+    // Pending is the one state that should catch the eye when nothing is
+    // selected — it is the only actionable one.
+    const a = (on ? 1 : (f.state === 'pending' ? 0.85 : 0.55)) * (lit.size && !on ? 0.5 : 1) * w;
+    ctx.lineWidth = 1;
+    if (on) {
+      ctx.fillStyle = hex('#ffffff', 0.95);
+      ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+    } else if (c.fill) {
+      ctx.fillStyle = hex(c.color, a);
+      ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+    } else {
+      ctx.strokeStyle = hex(c.color, a);
+      ctx.strokeRect(p.x - r, p.y - r, r * 2, r * 2);
+    }
+    if (on || onFloor) {
+      labels.push({
+        text: f.id.split('/').pop(), x: p.x + r + 4, y: p.y,
+        color: on ? '#ffffff' : c.color, alpha: on ? 0.85 : 0.4, size: 9,
+        rank: (on ? 500 : 0) + (f.state === 'pending' ? 4 : 0) - f.i * 0.01,
+      });
+    }
+  }
+}
+
+/* -------------------------------------------------------------- interaction */
+let drag = null;
+cv.addEventListener('pointerdown', e => {
+  drag = { x: e.clientX, y: e.clientY, yaw: cam.tYaw, tilt: cam.tTilt, moved: 0 };
+  cam.spin = false; cv.classList.add('dragging'); cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove', e => {
+  if (drag) {
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    drag.moved = Math.max(drag.moved, Math.hypot(dx, dy));
+    cam.tYaw = drag.yaw - dx * 0.005;
+    cam.tTilt = Math.max(0.08, Math.min(1.50, drag.tilt + dy * 0.004));
+    if ((cam.tTilt > 1.42) !== flat) {   // don't fight the drag — flag only
+      flat = cam.tTilt > 1.42;
+      drawHud();
+    }
+    return;
+  }
+  pick(e.clientX, e.clientY);
+});
+cv.addEventListener('pointerup', e => {
+  cv.classList.remove('dragging');
+  const wasClick = drag && drag.moved < 4;
+  drag = null;
+  if (!wasClick) return;
+  pick(e.clientX, e.clientY);
+  if (hovered) select(hovered);
+  else if (selected) select(null);
+});
+cv.addEventListener('wheel', e => {
+  e.preventDefault(); cam.spin = false;
+  cam.tZoom = Math.max(0.18, Math.min(2.4, cam.tZoom * (e.deltaY > 0 ? 0.92 : 1.087)));
+}, { passive: false });
+
+const tip = document.getElementById('tooltip');
+function pick(mx, my) {
+  let best = null, bestD = 22;
+  for (const n of nodes) {
+    if (layerWeight(n.layer) < 0.4) continue;
+    if (n.sx === undefined) continue;
+    const d = Math.hypot(n.sx - mx, n.sy - my);
+    if (d < bestD) { bestD = d; best = n; }
+  }
+  if (!best && (focus < 0 || focus === 0)) {          // then the floor
+    let fd = 13;
+    for (const f of floor) {
+      if (f.sx === undefined) continue;
+      const d = Math.hypot(f.sx - mx, f.sy - my);
+      if (d < fd) { fd = d; best = f; }
+    }
+  }
+  if (best !== hovered) {
+    hovered = best;
+    if (best && !selected) {
+      tip.innerHTML = best.kind === 'sketch'
+        ? `<span class="t-kind" style="color:${best.cover.color}">${best.tier} sketch</span>`
+          + `${esc(best.id.split('/').pop())}<br><span class="t-sub">${esc(best.cover.label)}`
+          + `${best.inhaled ? ' · ' + best.inhaled : ''}`
+          + ` · ${best.spawned_by.length} entit${best.spawned_by.length === 1 ? 'y' : 'ies'}</span>`
+        : `<span class="t-kind" style="color:${LAYERS[best.layer].color}">${best.type}</span>`
+          + `${esc(best.title)}<br><span class="t-sub">${best.charge} charge · ${best.state}`
+          + ` · ${best.spawned.length} spawned · ${adj.get(best.id).length} links</span>`;
+      tip.style.opacity = 1;
+    } else tip.style.opacity = 0;
+  }
+  if (best && !selected) {
+    tip.style.left = Math.min(W - 280, mx + 16) + 'px';
+    tip.style.top = (my + 16) + 'px';
+  }
+}
+
+function setFocus(i) {
+  focus = (focus === i) ? -1 : i;
+  cam.spin = false;
+  cam.tLookY = focus < 0 ? 3 * GAP : layerY(focus);
+  cam.tZoom = focus < 0 ? 0.46 : 0.74;
+  drawRail();
+}
+function setFlat(on) {
+  flat = on;
+  cam.tTilt = on ? 1.50 : 0.52;
+  // square the plane to the screen too — a flattened layer you still have to
+  // read at an angle isn't flat, it's just squashed
+  cam.tYaw = on ? Math.round(cam.tYaw / (Math.PI * 2)) * Math.PI * 2 : cam.tYaw;
+  cam.spin = false;
+  if (on && focus < 0) setFocus(3);
+  drawHud();
+}
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'g' || e.key === 'G') { showGallery(!gal.classList.contains('open')); return; }
+  if (gal.classList.contains('open')) {
+    if (e.key === 'Escape') showGallery(false);
+    return;
+  }
+  if (e.key === 'Escape') { select(null); focus = -1; cam.tLookY = 3 * GAP; cam.tZoom = 0.46; cam.tTilt = 0.52; flat = false; drawRail(); }
+  else if (e.key === 'f' || e.key === 'F') setFlat(!flat);
+  else if (e.key === 'ArrowUp') setFocus(Math.min(LAYERS.length - 1, (focus < 0 ? 2 : focus) + 1));
+  else if (e.key === 'ArrowDown') setFocus(Math.max(0, (focus < 0 ? 4 : focus) - 1));
+  else if (e.key === ' ') { e.preventDefault(); cam.spin = !cam.spin; }
+});
+
+/* ------------------------------------------------------------------- panel */
+const panel = document.getElementById('panel');
+const pbody = document.getElementById('panel-body');
+panel.querySelector('.close').onclick = () => select(null);
+
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+// just enough markdown for the bodies these files actually contain
+function md(t) {
+  const lines = t.split('\n'); let out = '', ul = false;
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { if (ul) { out += '</ul>'; ul = false; } continue; }
+    const inline = esc(line)
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/\*([^*]+)\*/g, '<i>$1</i>');
+    if (line.startsWith('- ')) {
+      if (!ul) { out += '<ul>'; ul = true; }
+      out += '<li>' + inline.slice(2) + '</li>';
+    } else {
+      if (ul) { out += '</ul>'; ul = false; }
+      out += '<p>' + inline + '</p>';
+    }
+  }
+  return out + (ul ? '</ul>' : '');
+}
+
+function select(n) {
+  selected = n;
+  tip.style.opacity = 0;
+  if (!n) { panel.classList.remove('open'); cam.tShift = 0; return; }
+  cam.tShift = W > 860 ? -190 : 0;
+  if (n.kind === 'sketch') return selectSketch(n);
+  if (focus >= 0 && focus !== n.layer) setFocus(n.layer);
+
+  const L = LAYERS[n.layer];
+  const conns = adj.get(n.id);
+  const secOrder = ['what', 'why unmade', 'charge', 'prompts', 'trace'];
+
+  pbody.innerHTML = `
+    <div class="p-kind" style="color:${L.color}">${esc(n.type)}</div>
+    <div class="p-title">${esc(n.title)}</div>
+    <div class="p-meta">
+      <span class="chip ${n.charge === 'high' ? 'hot' : ''}">charge ${esc(n.charge)}</span>
+      <span class="chip">${esc(n.state)}</span>
+      ${n.date ? `<span class="chip">${esc(n.date)}</span>` : ''}
+      ${n.tags.map(t => `<span class="chip">${esc(t)}</span>`).join('')}
+    </div>
+    <div class="p-file">${esc(n.file)}</div>
+    ${secOrder.filter(k => n.sections[k]).map(k => `
+      <div class="p-sec"><h4>${k}</h4>${md(n.sections[k])}</div>`).join('')}
+    ${conns.length ? `<div class="p-sec"><h4>connects — ${conns.length}</h4>
+      ${conns.map(e => `<div class="link-row" data-id="${esc(e.node.id)}">
+        <span class="swatch" style="background:${LAYERS[e.node.layer].color}"></span>
+        <span>${esc(e.node.title)}</span>
+        <span class="rel">${esc(e.kind === 'pair' ? '×' : e.kind)}</span>
+      </div>`).join('')}</div>` : ''}
+    ${n.spawned.length ? `<div class="p-sec"><h4>spawned — ${n.spawned.length}</h4>
+      <div class="spawn-grid">${n.spawned.map(s => {
+        const f = floorById.get(s) || floorById.get(s.split('/').pop());
+        const c = f ? f.cover.color : '#3a3d44';
+        return `<span class="spawn" data-sketch="${esc(s)}"
+          style="border-color:${c}44;color:${f && f.state === 'pending' ? c : ''}"
+          title="${f ? esc(f.cover.label) : 'not in the ledger'}"
+          >${esc(s.split('/').pop())}</span>`;
+      }).join('')}
+      </div></div>` : ''}
+  `;
+  pbody.querySelectorAll('.link-row').forEach(el =>
+    el.onclick = () => select(byId.get(el.dataset.id)));
+  pbody.querySelectorAll('.spawn').forEach(el => {
+    const f = floorById.get(el.dataset.sketch) ||
+              floorById.get(el.dataset.sketch.split('/').pop());
+    el.onmouseenter = () => { hoverSpawn = f ? f.id : null; };
+    el.onmouseleave = () => { hoverSpawn = null; };
+    if (f) { el.style.cursor = 'pointer'; el.onclick = () => select(f); }
+  });
+  panel.classList.add('open');
+  panel.scrollTop = 0;
+}
+
+// A sketch's panel is the ledger row plus the graph's answer to it: what the
+// layer read, when, and what — if anything — it took away.
+function selectSketch(f) {
+  if (focus > 0) setFocus(0);
+  const c = f.cover;
+  const ents = f.spawned_by.map(id => byId.get(id)).filter(Boolean);
+  const missing = f.touched.filter(id => !f.spawned_by.includes(id));
+  pbody.innerHTML = `
+    ${mediaBlock(f)}
+    <div class="p-kind" style="color:${c.color}">${esc(f.tier)} sketch</div>
+    <div class="p-title">${esc(f.id.split('/').pop())}</div>
+    <div class="p-meta">
+      <span class="chip ${f.state === 'pending' ? 'hot' : ''}">${esc(c.label)}</span>
+      ${f.inhaled ? `<span class="chip">inhaled ${esc(f.inhaled)}</span>` : ''}
+    </div>
+    ${f.desc ? `<div class="p-sec"><p>${esc(f.desc)}</p></div>` : ''}
+    ${f.detail ? `<div class="p-sec"><h4>ledger note</h4><p>${esc(f.detail)}</p></div>` : ''}
+    <div class="p-sec"><h4>coverage</h4>${md(coverageProse(f))}</div>
+    ${ents.length ? `<div class="p-sec"><h4>fed — ${ents.length}</h4>
+      ${ents.map(e => `<div class="link-row" data-id="${esc(e.id)}">
+        <span class="swatch" style="background:${LAYERS[e.layer].color}"></span>
+        <span>${esc(e.title)}</span>
+        <span class="rel">${esc(e.type)}</span>
+      </div>`).join('')}</div>` : ''}
+    ${missing.length ? `<div class="p-sec"><h4>ledger only</h4>
+      <p>Named in the ledger row but absent from any <code>spawned:</code>
+      list — ${missing.map(esc).join(', ')}.</p></div>` : ''}
+  `;
+  pbody.querySelectorAll('.link-row').forEach(el =>
+    el.onclick = () => select(byId.get(el.dataset.id)));
+  panel.classList.add('open');
+  panel.scrollTop = 0;
+}
+
+// The loop from 83-video-index, if that pipeline has shot this sketch. It plays
+// on its own here — the panel is already a deliberate act of attention.
+function mediaBlock(f) {
+  if (f.video) return `<div class="p-media">
+    <video src="${esc(f.video)}" poster="${esc(f.poster)}"
+           autoplay muted loop playsinline></video>
+    ${f.media_disabled ? '<span class="badge">poster only — not drivable headless</span>' : ''}
+  </div>`;
+  if (f.poster) return `<div class="p-media">
+    <img src="${esc(f.poster)}" alt="">
+    <span class="badge">poster only</span>
+  </div>`;
+  return `<div class="p-media none">no capture yet</div>`;
+}
+
+function coverageProse(f) {
+  const n = f.spawned_by.length;
+  switch (f.state) {
+    case 'harvested': return n
+      ? `Read on ${f.inhaled}. ${n} entit${n === 1 ? 'y' : 'ies'} name it in \`spawned\`.`
+      : `Read on ${f.inhaled}, but no entity names it in \`spawned\`. Per SPEC §7.1 a signal seen once stays a note — this is a legitimate outcome, not a gap.`;
+    case 'no-signal': return 'Read; nothing surfaced. Per §7.1.1 this closes the *read*, not the sketch — a later entity may still claim it retroactively.';
+    case 'pending': return 'Not yet read. This is the actionable backlog — `/inhale` starts here.';
+    case 'covered-by': return 'Promoted to an indexed piece. Harvesting both halves would enter one piece of work into `spawned` twice, so only the indexed piece is read.';
+    case 'blocked': return 'No `interface.md`, so there is nothing for the inhale to read. Write the note first.';
+    default: return 'Not present in the coverage ledger.';
+  }
+}
+
+/* ----------------------------------------------------------------- gallery */
+// A flat contact sheet of every sketch the ledger knows about. The stack answers
+// "how does the corpus connect"; this answers the plainer question the stack
+// cannot — "what does the work actually look like".
+const gal = document.getElementById('gallery');
+const galGrid = gal.querySelector('.g-grid');
+const galFilters = gal.querySelector('.g-filters');
+let galFilter = 'all';
+
+const FILTERS = () => {
+  const t = coverTally();
+  return [
+    { key: 'all', label: 'all', n: floor.length, color: '#7f8794' },
+    ...['harvested', 'no-signal', 'pending', 'covered-by', 'blocked']
+      .filter(k => t[k]).map(k => ({ key: k, label: COVER[k].label, n: t[k], color: COVER[k].color })),
+    { key: 'noloop', label: 'no loop', color: '#3a3d44',
+      n: floor.filter(f => !f.video).length },
+  ];
+};
+
+function galMatch(f) {
+  if (galFilter === 'all') return true;
+  if (galFilter === 'noloop') return !f.video;
+  return f.state === galFilter;
+}
+
+function drawGallery() {
+  galFilters.innerHTML = FILTERS().map(x => `
+    <button class="g-chip ${galFilter === x.key ? 'on' : ''}" data-k="${x.key}">
+      <span class="dot" style="background:${x.color}"></span>${esc(x.label)}
+      <span class="n">${x.n}</span></button>`).join('');
+  galFilters.querySelectorAll('.g-chip').forEach(el => el.onclick = () => {
+    galFilter = el.dataset.k; drawGallery();
+  });
+
+  const shown = floor.filter(galMatch);
+  gal.querySelector('.g-title').textContent =
+    `sketchbook — ${shown.length}${shown.length !== floor.length ? ' of ' + floor.length : ''}`;
+  galGrid.innerHTML = shown.map(f => `
+    <figure class="g-tile ${f.media_disabled ? 'dim' : ''}" data-id="${esc(f.id)}">
+      <div class="g-media${f.poster ? '' : ' empty'}">
+        ${f.poster ? `<img src="${esc(f.poster)}" alt="" loading="lazy">` : ''}
+        ${f.video ? `<video data-src="${esc(f.video)}" muted loop playsinline preload="none"></video>` : ''}
+        ${f.poster ? '' : `<span>${esc(f.cover.label)}</span>`}
+      </div>
+      <figcaption class="g-cap">
+        <span class="dot" style="background:${f.cover.color}"></span>
+        <span class="lbl">${esc(f.id.split('/').pop())}</span>
+      </figcaption>
+    </figure>`).join('');
+
+  galGrid.querySelectorAll('.g-tile').forEach(el => {
+    const f = floorById.get(el.dataset.id);
+    const v = el.querySelector('video');
+    if (v) {
+      // fetch the loop only once the pointer asks for it — 130 tiles otherwise
+      el.onmouseenter = () => {
+        if (!v.src) v.src = v.dataset.src;
+        el.classList.add('playing');
+        v.play().catch(() => {});
+      };
+      el.onmouseleave = () => { el.classList.remove('playing'); v.pause(); };
+    }
+    el.onclick = () => { showGallery(false); if (f) select(f); };
+  });
+}
+
+gal.querySelector('.g-close').onclick = () => showGallery(false);
+
+function showGallery(on) {
+  gal.classList.toggle('open', on);
+  if (on) { drawGallery(); tip.style.opacity = 0; }
+  else galGrid.querySelectorAll('video').forEach(v => v.pause());
+  drawHud();
+}
+
+/* --------------------------------------------------------------------- hud */
+const rail = document.getElementById('rail');
+function drawRail() {
+  rail.innerHTML = LAYERS.slice().reverse().map(L => {
+    const count = L.index === 0 ? floor.length : nodes.filter(n => n.layer === L.index).length;
+    return `<div class="rail-row ${focus === L.index ? 'on' : ''}" data-i="${L.index}"
+              style="${focus === L.index ? 'color:' + L.color : ''}">
+      <span class="swatch" style="background:${L.color}"></span>
+      <span class="name">${L.name}</span>
+      <span class="n">${String(count).padStart(2, '0')}</span>
+    </div>` + (L.index === 1 ? '<div class="rail-sep"></div>' : '');
+  }).join('')
+    + (DATA.has_media ? '<button class="g-open">▦ gallery</button>' : '')
+    + (DATA.has_ledger ? `<div class="legend">${
+    ['harvested', 'no-signal', 'pending', 'covered-by', 'blocked']
+      .filter(k => coverTally()[k])
+      .map(k => `<div class="leg-row"><span class="leg-mark"
+        style="${COVER[k].fill ? 'background' : 'border:1px solid'}:${COVER[k].color}"></span>
+        <span>${COVER[k].label}</span><span class="n">${coverTally()[k]}</span></div>`).join('')
+  }</div>` : '');
+  rail.querySelectorAll('.rail-row').forEach(el =>
+    el.onclick = () => setFocus(+el.dataset.i));
+  const g = rail.querySelector('.g-open');
+  if (g) g.onclick = () => showGallery(true);
+}
+function drawHud() {
+  const spawnTotal = nodes.reduce((s, n) => s + n.spawned.length, 0);
+  const t = coverTally();
+  const read = (t.harvested || 0) + (t['no-signal'] || 0);
+  document.getElementById('hud').innerHTML = `
+    <div><b>${nodes.length}</b> entities · <b>${links.length}</b> links ·
+         <b>${spawnTotal}</b> spawn edges onto <b>${floor.length}</b> sketches</div>
+    <div><b>${nodes.filter(n => n.charge === 'high').length}</b> high charge ·
+         <b>${nodes.filter(n => n.state === 'dormant').length}</b> dormant (hollow)</div>
+    ${DATA.has_ledger ? `<div><b>${read}/${floor.length}</b> read ·
+         <b>${t.pending || 0}</b> pending · <b>${t.blocked || 0}</b> blocked —
+         coverage is a ledger, not a graph property</div>` : ''}
+    <div style="margin-top:10px">
+      <kbd>drag</kbd>orbit <kbd>scroll</kbd>zoom <kbd>↑↓</kbd>layer
+      <kbd>F</kbd>${flat ? 'un' : ''}flatten
+      ${DATA.has_media ? '<kbd>G</kbd>gallery ' : ''}<kbd>esc</kbd>reset
+    </div>
+    <div style="margin-top:4px">baked ${DATA.generated}${
+      DATA.root ? ' · ' + esc(DATA.root) : ''}</div>`;
+}
+drawRail(); drawHud();
+draw();
+
+})();
+</script>
+
+</body>
+</html>
