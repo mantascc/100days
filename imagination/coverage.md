@@ -149,7 +149,7 @@ indexed piece instead · `blocked` no `interface.md` yet · `pending` backlog.
 | `sketch-sticky-banner` | — | pending | — |
 | `sketch-terminal-cli` | — | covered-by 62-terminal-cli | — |
 | `sketch-theme` | — | blocked: no interface.md | — |
-| `sketch-torus-sheet` | — | pending | — |
+| `sketch-torus-sheet` | 2026-08-09 | no-signal | — |
 | `sketch-tube-driven` | — | pending | — |
 | `sketch-ube-field-audio` | — | pending | — |
 | `sketch-walks-thread` | — | pending | — |
