@@ -4,7 +4,7 @@ type: thread
 title: Agents and particle systems
 state: active
 charge: high
-spawned: [02-vicsek-model, 03-chaos-agent, 04-random-walk, 05-fall, 07-apophenia, 08-graph-clusters, 09-planar-graph, 10-audio-reactive-agents, 11-brownian-tree, 14-dna-mutations, 20-schelling-model, 24-rock-paper-scissors, 34-particle-text-morph, 45-gravity-pills, 51-resonant-lattice, 74-particles]
+spawned: [02-vicsek-model, 03-chaos-agent, 04-random-walk, 05-fall, 07-apophenia, 08-graph-clusters, 09-planar-graph, 10-audio-reactive-agents, 11-brownian-tree, 14-dna-mutations, 20-schelling-model, 24-rock-paper-scissors, 34-particle-text-morph, 45-gravity-pills, 51-resonant-lattice, 74-particles, daily-sketch/sketch-apophenia-arc, daily-sketch/sketch-alice-walk, daily-sketch/sketch-walks-thread, daily-sketch/sketch-audio-agents-grid]
 feeds: [techniques/toroidal-wrapping, techniques/proximity-link-drawing]
 sources: [sources/vicsek-flocking, sources/brownian-markov]
 date: 2026-06-14
@@ -21,6 +21,10 @@ The workhorse substrate of the practice: a population of small things, each with
 - [34-particle-text-morph](../../34-particle-text-morph/) — particles snap to letterforms.
 - [74-particles](../../74-particles/) — the system as pure aesthetic object.
 - [51-resonant-lattice](../../51-resonant-lattice/) — agents coupled into a vibrating mesh.
+- [sketch-apophenia-arc](../../daily-sketch/sketch-apophenia-arc/) — the dot field as a four-phase instrument.
+- [sketch-alice-walk](../../daily-sketch/sketch-alice-walk/) — a single agent defined by when it leaves.
+- [sketch-walks-thread](../../daily-sketch/sketch-walks-thread/) — seven agents, one environment, seven leave conditions.
+- [sketch-audio-agents-grid](../../daily-sketch/sketch-audio-agents-grid/) — nine movement rules under one shared signal.
 
 # Charge
 Fully owned and slightly invisible — it's the air the work breathes. Worth occasionally building something that has *no* agents at all.

@@ -4,7 +4,7 @@ type: source
 title: Brownian motion & Markov processes
 state: active
 charge: high
-spawned: [04-random-walk, 05-fall, 11-brownian-tree, 12-wind-field]
+spawned: [04-random-walk, 05-fall, 11-brownian-tree, 12-wind-field, daily-sketch/sketch-alice-walk, daily-sketch/sketch-walks-thread]
 date: 2026-06-14
 tags: [stochastic, brownian, markov, noise]
 ---
@@ -17,6 +17,8 @@ The mathematics of memoryless motion. A Markov process depends only on its curre
 - [11-brownian-tree](../../11-brownian-tree/) — diffusion-limited aggregation into structure.
 - [05-fall](../../05-fall/) — biased random motion as descent.
 - [12-wind-field](../../12-wind-field/) — fBm extending the same lineage into fields.
+- [sketch-alice-walk](../../daily-sketch/sketch-alice-walk/) — heavy-tailed steps, Lévy-flavoured.
+- [sketch-walks-thread](../../daily-sketch/sketch-walks-thread/) — Random and Lévy as two of the seven.
 
 # Charge
 A high-charge, deep-running source under the entire stochastic thread. Foundational and frequently drawn from.

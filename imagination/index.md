@@ -1,37 +1,41 @@
 # Imagination — Index
 
-*Updated 2026-08-01. Progressive-disclosure listing of the layer. See [SPEC.md](SPEC.md).*
+*Updated 2026-08-09. Progressive-disclosure listing of the layer. See [SPEC.md](SPEC.md).*
 
 ## Threads — what I keep making
 
 - [ASCII and text rendering](threads/ascii-and-text-rendering.md) · high
 - [Agents and particle systems](threads/agents-and-particle-systems.md) · high
 - [Audio reactivity](threads/audio-reactivity.md) · high
+- [Curiosity and leave conditions](threads/curiosity-and-leave-conditions.md) · high
 - [Design systems and reference sheets](threads/design-system-and-reference-sheets.md) · high
 - [Emergence from local rules](threads/emergence-from-local-rules.md) · high
 - [Generative typography and text](threads/generative-typography-and-text.md) · high
 - [Grids as compositional frame](threads/grids-as-compositional-frame.md) · high
 - [Networks and graphs](threads/networks-and-graphs.md) · high
 - [Stochastic and noise](threads/stochastic-and-noise.md) · high
+- [The sketchbook as its own subject](threads/the-sketchbook-as-its-own-subject.md) · high
 - [Cellular automata and pattern formation](threads/cellular-automata-and-pattern-formation.md) · medium
 - [Language and NLP interpretability](threads/language-and-nlp-interpretability.md) · medium
 - [Physics simulation](threads/physics-simulation.md) · medium
 
 ## Techniques — what I own
 
+- [Asymmetric audio envelope](techniques/asymmetric-audio-envelope.md) · high
 - [CRT tube treatment](techniques/crt-tube-treatment.md) · high
+- [Glyph density ramp](techniques/glyph-density-ramp.md) · high
+- [Live specimen documentation](techniques/live-specimen-documentation.md) · high
 - [Proximity link drawing](techniques/proximity-link-drawing.md) · high
+- [Summed sines pseudo-noise](techniques/summed-sines-pseudo-noise.md) · high
 - [Toroidal wrapping](techniques/toroidal-wrapping.md) · high
 - [Backdrop-filter SVG distort](techniques/backdrop-filter-svg-distort.md) · medium
 - [CSS vars as live controls](techniques/css-vars-live-controls.md) · medium
 - [D3 force simulation](techniques/d3-force-simulation.md) · medium
 - [DOM over canvas rendering](techniques/dom-over-canvas-rendering.md) · medium
-- [Glyph density ramp](techniques/glyph-density-ramp.md) · medium
 - [Offscreen canvas downsample](techniques/offscreen-canvas-downsample.md) · medium
 - [Parametric Lissajous orbits](techniques/parametric-lissajous-orbits.md) · medium
 - [Per-cell threshold crystallization](techniques/per-cell-threshold-crystallization.md) · medium
 - [Perlin / fBm displacement](techniques/perlin-fbm-displacement.md) · medium
-- [Summed sines pseudo-noise](techniques/summed-sines-pseudo-noise.md) · medium
 - [Typewriter output with jitter](techniques/typewriter-jitter-output.md) · medium
 - [Agent-authored Playwright capture](techniques/agent-authored-playwright-capture.md) · low
 - [Drag-reorder with collision packing](techniques/drag-reorder-collision-packing.md) · low
@@ -41,8 +45,9 @@
 
 ## Themes — what I keep asking
 
+- [Audio-reactive without the gimmick](themes/audio-reactive-without-gimmick.md) · high
 - [Randomness feeling intentional](themes/randomness-feeling-intentional.md) · high
-- [Audio-reactive without the gimmick](themes/audio-reactive-without-gimmick.md) · medium
+- [Declared vs observed systems](themes/declared-vs-observed-systems.md) · medium
 - [Iteration vs original rules](themes/iteration-vs-original-rules.md) · medium
 - [Searching vs mapping](themes/searching-vs-mapping.md) · medium
 - [Showing mechanism vs polish](themes/showing-mechanism-vs-polish.md) · medium
@@ -60,10 +65,11 @@
 - [Turing patterns & Gray-Scott](sources/turing-gray-scott.md) · medium
 - [Slit-scan & the 2001 star-gate](sources/slit-scan-2001.md) · low
 
-## Seeds — dormant ideas
+## Seeds — ideas not yet made
 
-- [ASCII sheet web component](seeds/ascii-sheet-web-component.md) · medium
+- [Apophenia arc as instrument](seeds/apophenia-arc-instrument.md) · high · **spent**
 - [Computed, not curated, thumbnails](seeds/computed-not-curated-thumbnails.md) · high · active
+- [ASCII sheet web component](seeds/ascii-sheet-web-component.md) · medium
 - [Whiff — CLI data-viz tool](seeds/whiff-cli-dataviz.md) · medium
 - [2gif tiered roadmap](seeds/2gif-tiered-roadmap.md) · low
 - [3D rule engine](seeds/3d-rule-engine.md) · low
@@ -71,4 +77,5 @@
 
 ## Collisions — proposed pairings
 
-- [vicsek-flocking-x-typography.md](collisions/vicsek-flocking-x-typography.md) · high
+- [Vicsek flocking × typography](collisions/vicsek-flocking-x-typography.md) · high · spawned `sketch-word-flock`
+- [Kuramoto sync × bundled tool calls](collisions/kuramoto-x-bundled-tool-calls.md) · medium · dodged once

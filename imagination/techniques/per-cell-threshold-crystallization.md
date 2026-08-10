@@ -4,7 +4,7 @@ type: technique
 title: Per-cell threshold crystallization
 state: active
 charge: medium
-spawned: [55-ascii-loading, 62-terminal-cli]
+spawned: [55-ascii-loading, 62-terminal-cli, daily-sketch/sketch-field-notes]
 feeds: [threads/ascii-and-text-rendering]
 sources: []
 date: 2026-06-14
@@ -17,6 +17,7 @@ Resolve an image from noise by giving each cell its own reveal threshold and cro
 # Trace
 - [55-ascii-loading](../../55-ascii-loading/) — the crystallization study this technique originates from.
 - [62-terminal-cli](../../62-terminal-cli/) — the ASCII cat resolving from noise, foreground cells settling before background.
+- [sketch-field-notes](../../daily-sketch/sketch-field-notes/) — cited as a house move.
 
 # Charge
 Medium and proven — it has now travelled from its origin sketch into a second piece, which is the signal it has become a real owned technique rather than a one-off effect.

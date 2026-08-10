@@ -4,7 +4,7 @@ type: technique
 title: Proximity link drawing
 state: active
 charge: high
-spawned: [07-apophenia, 09-planar-graph, 10-audio-reactive-agents, 11-brownian-tree, 80-network]
+spawned: [07-apophenia, 09-planar-graph, 10-audio-reactive-agents, 11-brownian-tree, 80-network, daily-sketch/sketch-field-notes, daily-sketch/sketch-apophenia-arc]
 feeds: [threads/networks-and-graphs, threads/agents-and-particle-systems]
 sources: []
 date: 2026-06-14
@@ -19,6 +19,8 @@ Draw an edge between two agents whenever they fall under a distance threshold, w
 - [07-apophenia](../../07-apophenia/) — links as pattern the eye invents.
 - [10-audio-reactive-agents](../../10-audio-reactive-agents/) — threshold pulsing with sound.
 - [11-brownian-tree](../../11-brownian-tree/) — proximity used to detect accretion.
+- [sketch-field-notes](../../daily-sketch/sketch-field-notes/) — cited as a house move, running in place.
+- [sketch-apophenia-arc](../../daily-sketch/sketch-apophenia-arc/) — the punctual link bloom; constellation resolves for ~220ms.
 
 # Charge
 High but overfamiliar — it makes anything look "generative" instantly, which is precisely the trap. A strong candidate for the Break strategy.
