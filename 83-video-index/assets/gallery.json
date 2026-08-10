@@ -9,6 +9,15 @@
     "disabled": false
   },
   {
+    "slug": "92-tube-tolerance",
+    "title": "Tube Tolerance",
+    "tier": "indexed",
+    "href": "../92-tube-tolerance/",
+    "poster": "assets/posters/92-tube-tolerance.jpg",
+    "video": "assets/videos/92-tube-tolerance.mp4",
+    "disabled": false
+  },
+  {
     "slug": "91-retro-primitives",
     "title": "Retro Primitives",
     "tier": "indexed",
@@ -1149,6 +1158,24 @@
     "href": "../daily-sketch/sketch-theme/",
     "poster": "assets/posters/sketch-theme.jpg",
     "video": "assets/videos/sketch-theme.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-torus-sheet",
+    "title": "Torus Sheet",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-torus-sheet/",
+    "poster": "assets/posters/sketch-torus-sheet.jpg",
+    "video": "assets/videos/sketch-torus-sheet.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-tube-driven",
+    "title": "Tube Driven",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-tube-driven/",
+    "poster": "assets/posters/sketch-tube-driven.jpg",
+    "video": "assets/videos/sketch-tube-driven.mp4",
     "disabled": false
   },
   {

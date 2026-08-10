@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sketch-torus-sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --ground-void: #0a0a0a;
+    --ground-base: #0f0f0f;
+    --ground-raised: #141414;
+    --ground-surface: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-default: #f5f5f7;
+    --text-secondary: #a8aab8;
+    --text-tertiary: #8f919d;
+    --text-ghost: #80828d;
+    --border-subtle: #1a1a1a;
+    --border-default: #2a2a2a;
+    --accent: #00a8ff;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-16: 16px;
+    --space-24: 24px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%; background: var(--ground-void); color: var(--text-default);
+    font-family: var(--font-mono); overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    position: fixed; top: var(--space-24); left: var(--space-24);
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-secondary); z-index: 10; pointer-events: none;
+  }
+  header small {
+    display: block; margin-top: 6px; letter-spacing: 0.08em;
+    text-transform: none; color: var(--text-tertiary); font-size: 10px;
+  }
+
+  main { width: 100%; height: 100%; }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  canvas.dragging { cursor: grabbing; }
+
+  /* the sheet runs under the chrome, so the chrome needs its own ground */
+  .scrim {
+    position: fixed; inset: 0; z-index: 5; pointer-events: none;
+    background:
+      linear-gradient(to bottom, rgba(10,10,10,0.94) 0, rgba(10,10,10,0.82) 62px, rgba(10,10,10,0) 132px),
+      linear-gradient(to top,    rgba(10,10,10,0.94) 0, rgba(10,10,10,0.82) 62px, rgba(10,10,10,0) 132px);
+  }
+
+  /* ---------- readout ---------- */
+
+  .hud {
+    position: fixed; top: var(--space-24); right: var(--space-24);
+    z-index: 10; text-align: right; font-size: 10px; line-height: 1.9;
+    color: var(--text-tertiary); pointer-events: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .hud b { color: var(--text-default); font-weight: 400; }
+  .hud .id {
+    font-size: 22px; line-height: 1.1; color: var(--text-primary);
+    letter-spacing: 0.06em; margin-bottom: 6px;
+  }
+  .hud .lap.wrapped b { color: var(--accent); }
+
+  /* ---------- controls ---------- */
+
+  .rig {
+    position: fixed; left: var(--space-24); bottom: var(--space-24);
+    z-index: 10; display: flex; gap: var(--space-16); align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .grp { display: flex; flex-direction: column; gap: 6px; }
+  .grp > span {
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+  .row { display: flex; gap: var(--space-4); }
+
+  button {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
+    background: var(--ground-raised); border: 1px solid var(--border-default);
+    padding: 6px 11px; cursor: pointer; letter-spacing: 0.04em;
+    transition: color 120ms, border-color 120ms, background 120ms;
+  }
+  button:hover { color: var(--text-default); border-color: #3a3a3a; }
+  button[aria-pressed="true"], button.on {
+    color: var(--ground-void); background: var(--text-default); border-color: var(--text-default);
+  }
+  button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  .note {
+    position: fixed; right: var(--space-24); bottom: var(--space-24);
+    z-index: 10; max-width: 300px; text-align: right;
+    font-size: 10px; line-height: 1.7; color: var(--text-ghost);
+    pointer-events: none;
+  }
+
+  @media (max-width: 760px) {
+    header small, .note { display: none; }
+    .rig { gap: var(--space-8); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  sketch-torus-sheet
+  <small>a reference sheet with no edges — drag to pan</small>
+</header>
+
+<main><canvas id="c"></canvas></main>
+<div class="scrim"></div>
+
+<div class="hud">
+  <div class="id" id="id">—</div>
+  <div>φ <b id="phi">—</b> · ψ <b id="psi">—</b></div>
+  <div class="lap" id="lapline">lap <b id="lap">0, 0</b></div>
+  <div><b id="total">—</b> specimens, no first</div>
+</div>
+
+<div class="rig">
+  <div class="grp">
+    <span>period</span>
+    <div class="row" id="periods"></div>
+  </div>
+  <div class="grp">
+    <span>overlay</span>
+    <div class="row">
+      <button id="seam" aria-pressed="false">seam</button>
+      <button id="origin" aria-pressed="false">origin</button>
+    </div>
+  </div>
+  <div class="grp">
+    <span>go</span>
+    <div class="row">
+      <button id="lapx">walk a lap</button>
+      <button id="reset">reset</button>
+    </div>
+  </div>
+</div>
+
+<p class="note">
+  Both axes are angles, so the lattice closes on itself. Walk far enough in any
+  direction and the same specimen returns — but there is no edge to tell you
+  where the sheet began.
+</p>
+
+<script>
+/* ================================================================
+   A specimen sheet on a torus.
+
+   A reference sheet normally has a first cell and a last one: you read
+   it from a corner, and the corner is a claim about where the space
+   starts. Here both parameters are *angles* — a phase and a second
+   phase — so the parameter space is genuinely periodic in both
+   directions. The lattice that samples it has to be a torus, and a
+   torus has no corner to start from.
+
+   The wrapping is not a scroll trick. Cell (i, j) draws from
+   (i mod P, j mod P), so returning to the same residue draws a
+   byte-identical specimen. The lap counter is the only evidence you
+   ever moved.
+   ================================================================ */
+
+const cv  = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const $   = id => document.getElementById(id);
+
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const CELL    = 124;          // px per specimen, including its gutter
+const PERIODS = [8, 12, 16];
+
+const state = {
+  P: 12,                      // specimens per lap, on both axes
+  x: 0, y: 0,                 // pan offset in px
+  vx: 0, vy: 0,               // inertia
+  seam: false,
+  origin: false
+};
+
+let W = 0, H = 0, DPR = 1;
+
+/* ---------- geometry ---------- */
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width  = Math.round(W * DPR);
+  cv.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  draw();
+}
+
+// positive modulo — the whole sketch depends on this never going negative
+const mod = (n, m) => ((n % m) + m) % m;
+
+/* ---------- the specimen ---------- */
+
+// Two harmonics, each with its own phase. Both phases are circular, which
+// is the entire argument for the torus: there is no "highest" phase.
+function specimen(g, cx, cy, R, phi, psi) {
+  const k = 3, m = 5, a = 0.30, b = 0.19;
+  g.beginPath();
+  for (let s = 0; s <= 180; s++) {
+    const t = (s / 180) * Math.PI * 2;
+    const r = R * (1 + a * Math.cos(k * t + phi) + b * Math.cos(m * t + psi));
+    const px = cx + Math.cos(t) * r, py = cy + Math.sin(t) * r;
+    s ? g.lineTo(px, py) : g.moveTo(px, py);
+  }
+  g.closePath();
+  g.stroke();
+}
+
+/* ---------- render ---------- */
+
+function draw() {
+  const P = state.P, S = CELL;
+
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, W, H);
+
+  // which lattice cells the viewport currently covers
+  const i0 = Math.floor(-state.x / S) - 1, i1 = Math.ceil((W - state.x) / S) + 1;
+  const j0 = Math.floor(-state.y / S) - 1, j1 = Math.ceil((H - state.y) / S) + 1;
+
+  const R  = S * 0.29;
+  const big = S >= 96;
+
+  for (let j = j0; j <= j1; j++) {
+    for (let i = i0; i <= i1; i++) {
+      const cx = state.x + i * S + S / 2;
+      const cy = state.y + j * S + S / 2;
+
+      // residue on the torus — this, and only this, decides what is drawn
+      const ri = mod(i, P), rj = mod(j, P);
+      const phi = (ri / P) * Math.PI * 2;
+      const psi = (rj / P) * Math.PI * 2;
+
+      // cell hairline
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(
+        Math.round(state.x + i * S) + 0.5, Math.round(state.y + j * S) + 0.5, S, S);
+
+      // the origin residue, marked only when asked — it is arbitrary
+      if (state.origin && ri === 0 && rj === 0) {
+        ctx.fillStyle = 'rgba(0, 168, 255, 0.07)';
+        ctx.fillRect(state.x + i * S, state.y + j * S, S, S);
+      }
+
+      ctx.strokeStyle = '#f5f5f7';
+      ctx.lineWidth = 1;
+      specimen(ctx, cx, cy, R, phi, psi);
+
+      // a fainter inner echo, so the figure reads as a specimen not an icon
+      ctx.strokeStyle = 'rgba(168, 170, 184, 0.22)';
+      specimen(ctx, cx, cy, R * 0.62, phi + Math.PI, psi);
+
+      if (big) {
+        ctx.fillStyle = '#333333';
+        ctx.font = '9px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(label(ri, rj), state.x + i * S + 9, state.y + j * S + S - 9);
+      }
+    }
+  }
+
+  if (state.seam) drawSeam();
+  drawCrosshair();
+  syncHUD();
+}
+
+// The period boundary. Invisible unless asked for — that is the point:
+// a torus has a seam only where you decide to cut it.
+function drawSeam() {
+  const P = state.P, S = CELL, span = P * S;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0, 168, 255, 0.5)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 5]);
+
+  for (let x = mod(state.x, span); x < W + span; x += span) {
+    ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0);
+    ctx.lineTo(Math.round(x) + 0.5, H); ctx.stroke();
+  }
+  for (let y = mod(state.y, span); y < H + span; y += span) {
+    ctx.beginPath(); ctx.moveTo(0, Math.round(y) + 0.5);
+    ctx.lineTo(W, Math.round(y) + 0.5); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawCrosshair() {
+  const S = CELL;
+  const i = Math.floor((W / 2 - state.x) / S), j = Math.floor((H / 2 - state.y) / S);
+  const x = state.x + i * S, y = state.y + j * S;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(245, 245, 247, 0.5)';
+  ctx.lineWidth = 1;
+  const L = 9;
+  [[x, y, 1, 1], [x + S, y, -1, 1], [x, y + S, 1, -1], [x + S, y + S, -1, -1]]
+    .forEach(([px, py, sx, sy]) => {
+      ctx.beginPath();
+      ctx.moveTo(px + sx * L, py); ctx.lineTo(px, py); ctx.lineTo(px, py + sy * L);
+      ctx.stroke();
+    });
+  ctx.restore();
+}
+
+/* ---------- readout ---------- */
+
+// Row letter + column number. Two distant cells sharing an id are not
+// similar specimens — they are the same specimen, seen again.
+const label = (ri, rj) =>
+  String.fromCharCode(65 + (rj % 26)) + String(ri).padStart(2, '0');
+
+function syncHUD() {
+  const P = state.P, S = CELL;
+  const i = Math.floor((W / 2 - state.x) / S), j = Math.floor((H / 2 - state.y) / S);
+  const ri = mod(i, P), rj = mod(j, P);
+
+  $('id').textContent  = label(ri, rj);
+  $('phi').textContent = Math.round((ri / P) * 360) + '°';
+  $('psi').textContent = Math.round((rj / P) * 360) + '°';
+
+  const lx = Math.floor(i / P), ly = Math.floor(j / P);
+  $('lap').textContent = `${lx >= 0 ? '+' : ''}${lx}, ${ly >= 0 ? '+' : ''}${ly}`;
+  $('lapline').classList.toggle('wrapped', lx !== 0 || ly !== 0);
+  $('total').textContent = P * P;
+}
+
+/* ---------- panning ---------- */
+
+let dragging = false, lastX = 0, lastY = 0, raf = 0;
+
+function glide() {
+  state.vx *= 0.92; state.vy *= 0.92;
+  state.x += state.vx; state.y += state.vy;
+  draw();
+  raf = (Math.abs(state.vx) > 0.15 || Math.abs(state.vy) > 0.15)
+    ? requestAnimationFrame(glide) : 0;
+}
+
+cv.addEventListener('pointerdown', e => {
+  dragging = true; lastX = e.clientX; lastY = e.clientY;
+  state.vx = state.vy = 0;
+  cancelAnimationFrame(raf); raf = 0;
+  cv.classList.add('dragging');
+  cv.setPointerCapture(e.pointerId);
+});
+
+cv.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  lastX = e.clientX; lastY = e.clientY;
+  state.x += dx; state.y += dy;
+  state.vx = dx; state.vy = dy;
+  draw();
+});
+
+function endDrag() {
+  if (!dragging) return;
+  dragging = false;
+  cv.classList.remove('dragging');
+  if (!REDUCED && !raf) raf = requestAnimationFrame(glide);
+}
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  state.x -= e.deltaX; state.y -= e.deltaY;
+  draw();
+}, { passive: false });
+
+addEventListener('keydown', e => {
+  const step = e.shiftKey ? CELL * state.P : CELL;
+  const map = { ArrowLeft: [step, 0], ArrowRight: [-step, 0],
+                ArrowUp: [0, step], ArrowDown: [0, -step] };
+  if (!map[e.key]) return;
+  e.preventDefault();
+  state.x += map[e.key][0]; state.y += map[e.key][1];
+  draw();
+});
+
+/* ---------- controls ---------- */
+
+PERIODS.forEach(p => {
+  const b = document.createElement('button');
+  b.textContent = p;
+  b.setAttribute('aria-pressed', String(p === state.P));
+  b.addEventListener('click', () => {
+    state.P = p;
+    [...$('periods').children].forEach(o =>
+      o.setAttribute('aria-pressed', String(o === b)));
+    draw();
+  });
+  $('periods').appendChild(b);
+});
+
+function toggle(id, key) {
+  $(id).addEventListener('click', () => {
+    state[key] = !state[key];
+    $(id).setAttribute('aria-pressed', String(state[key]));
+    draw();
+  });
+}
+toggle('seam', 'seam');
+toggle('origin', 'origin');
+
+// Walk exactly one lap along x. You end where you started; only the lap
+// counter knows, which is the whole demonstration.
+$('lapx').addEventListener('click', () => {
+  const dist = state.P * CELL;
+  if (REDUCED) { state.x -= dist; draw(); return; }
+  const from = state.x, t0 = performance.now(), dur = 1400;
+  (function step(now) {
+    const k = Math.min(1, (now - t0) / dur);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    state.x = from - dist * e;
+    draw();
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+});
+
+$('reset').addEventListener('click', () => {
+  cancelAnimationFrame(raf); raf = 0;
+  state.x = state.y = state.vx = state.vy = 0;
+  draw();
+});
+
+addEventListener('resize', resize);
+resize();
+</script>
+
+</body>
+</html>
