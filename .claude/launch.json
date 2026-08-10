@@ -2,6 +2,19 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "imagination-layers-root",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8842"],
+      "port": 8842,
+      "url": "http://localhost:8842"
+    },
+    {
+      "name": "sketch-imagination-layers",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8841", "--directory", "daily-sketch/sketch-imagination-layers"],
+      "port": 8841
+    },
+    {
       "name": "100days",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8000", "--directory", "/Users/mantas/Desktop/min7is/100days"],
