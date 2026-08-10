@@ -4,7 +4,7 @@
 owns the outcome column. Reserved file — no frontmatter, see [SPEC.md](SPEC.md) §8.*
 
 **Indexed pieces** — 93 sketches · **85 harvested** · 1 blocked · **7 pending**
-**Daily sketches** — 42 sketches · **1 harvested** · 6 covered-by · 8 blocked · **27 pending**
+**Daily sketches** — 42 sketches · **1 harvested** · 2 no-signal · 6 covered-by · 8 blocked · **25 pending**
 
 `harvested` read, entities created or strengthened · `no-signal` read, nothing
 surfaced — closes the read, not the sketch · `covered-by` promoted; harvest the
@@ -150,7 +150,7 @@ indexed piece instead · `blocked` no `interface.md` yet · `pending` backlog.
 | `sketch-terminal-cli` | — | covered-by 62-terminal-cli | — |
 | `sketch-theme` | — | blocked: no interface.md | — |
 | `sketch-torus-sheet` | 2026-08-09 | no-signal | — |
-| `sketch-tube-driven` | — | pending | — |
+| `sketch-tube-driven` | 2026-08-09 | no-signal | — |
 | `sketch-ube-field-audio` | — | pending | — |
 | `sketch-walks-thread` | — | pending | — |
 | `sketch-word-flock` | 2026-06-14 | harvested | `collisions/vicsek-flocking-x-typography` |
