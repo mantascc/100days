@@ -28,10 +28,26 @@ upward from a sketch to the entities it fed.
 
 ## notes
 
-**The stack, bottom to top.** `sketchbook · sources · techniques · threads ·
-themes · seeds · collisions` — a gradient from *what got made* through *what the
-practice owns* to *what it still wants*. Seeds and collisions float clear of the
-floor because nothing has dropped from them yet; that gap is the point.
+**The stack, bottom to top.** `sketchbook · collisions · seeds · sources ·
+themes · techniques · threads` — a gradient from *speculative* to *established*.
+
+The order is an editorial decision, and it was wrong at first. The original ran
+made → owned → wanted, which put collisions and seeds on top. But the camera
+looks down, so the top of the stack is the nearest and most-read position, and
+those are the two thinnest layers in the corpus: 2 and 7 entities, 8 spawn
+edges between them, most of it dormant. Threads — 12 entities, **130** of the
+249 spawn edges, and the terminus of nearly every link in the graph — sat
+buried mid-stack and fourth in the rail.
+
+So the fringe sinks to the bottom, furthest from the eye and partly occluded by
+everything above it, and the layers that carry the practice take the near
+positions. The cost is that a thread's filaments now fall the full height of
+the stack to reach the floor. That turned out to be a gain: you watch an
+obsession pass through every other layer on its way to the work it made.
+
+Layer indices are derived from this array rather than hardcoded — `MID_LAYER`
+for the camera's rest position, `HOME_LAYER` for where focus and flatten start —
+so reordering again is a one-line change.
 
 **The floor is the coverage ledger, not a contact sheet.** SPEC §8.1 is explicit
 that coverage cannot be derived from the graph: §7.1 leaves a once-seen signal as

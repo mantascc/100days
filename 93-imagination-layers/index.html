@@ -313,16 +313,26 @@ else (function () {
 // Bottom-to-top: what's outside the practice, what it owns, what it keeps
 // asking, and — floating clear of the floor because none of it has been made —
 // what it still wants. The sketchbook is the ground the whole layer stands on.
+// Bottom to top: speculative -> established. The camera looks down, so the top
+// of the stack is the nearest, most-read position — it belongs to the layers
+// that carry the practice. Threads alone accounts for 130 of the 249 spawn
+// edges and terminates nearly every link in the graph; collisions and seeds
+// hold 8 between them, most of it dormant, so they sink to the bottom where
+// they are furthest from the eye and partly occluded by everything above.
 const LAYERS = [
   { type: 'sketch',    name: 'sketchbook', color: '#4a4d55', blurb: 'what got made' },
+  { type: 'collision', name: 'collisions', color: '#ff5c7a', blurb: 'what I dodged' },
+  { type: 'seed',      name: 'seeds',      color: '#ffb454', blurb: 'what I want' },
   { type: 'source',    name: 'sources',    color: '#7f8794', blurb: 'what feeds it' },
+  { type: 'theme',     name: 'themes',     color: '#b98cff', blurb: 'what I keep asking' },
   { type: 'technique', name: 'techniques', color: '#4ee39b', blurb: 'what I own' },
   { type: 'thread',    name: 'threads',    color: '#00a8ff', blurb: 'what I keep making' },
-  { type: 'theme',     name: 'themes',     color: '#b98cff', blurb: 'what I keep asking' },
-  { type: 'seed',      name: 'seeds',      color: '#ffb454', blurb: 'what I want' },
-  { type: 'collision', name: 'collisions', color: '#ff5c7a', blurb: 'what I dodged' },
 ];
 const LAYER_OF = {}; LAYERS.forEach((l, i) => { LAYER_OF[l.type] = i; l.index = i; });
+// Derived, not hardcoded — the stack order is an editorial decision and these
+// should follow it rather than have to be chased when it changes.
+const MID_LAYER = (LAYERS.length - 1) / 2;      // vertical centre of the stack
+const HOME_LAYER = LAYER_OF.thread;             // where focus and flatten start
 
 // Planes are wide and shallow, and the gap between them is tuned so that at the
 // default tilt a plane's on-screen depth is about the on-screen gap — any
@@ -477,8 +487,8 @@ links.forEach(l => {
 /* ------------------------------------------------------------------ camera */
 const cam = {
   yaw: -0.52, tilt: 0.52,       // tilt: 0 = pure side-on, PI/2 = straight down
-  zoom: 0.46, lookY: 3 * GAP, shift: 0,
-  tYaw: -0.52, tTilt: 0.52, tZoom: 0.46, tLookY: 3 * GAP, tShift: 0,
+  zoom: 0.46, lookY: MID_LAYER * GAP, shift: 0,
+  tYaw: -0.52, tTilt: 0.52, tZoom: 0.46, tLookY: MID_LAYER * GAP, tShift: 0,
   spin: true,
 };
 const FOCAL = 2100, DIST = 2100;
@@ -849,7 +859,7 @@ function pick(mx, my) {
 function setFocus(i) {
   focus = (focus === i) ? -1 : i;
   cam.spin = false;
-  cam.tLookY = focus < 0 ? 3 * GAP : layerY(focus);
+  cam.tLookY = focus < 0 ? MID_LAYER * GAP : layerY(focus);
   cam.tZoom = focus < 0 ? 0.46 : 0.74;
   drawRail();
 }
@@ -860,7 +870,7 @@ function setFlat(on) {
   // read at an angle isn't flat, it's just squashed
   cam.tYaw = on ? Math.round(cam.tYaw / (Math.PI * 2)) * Math.PI * 2 : cam.tYaw;
   cam.spin = false;
-  if (on && focus < 0) setFocus(3);
+  if (on && focus < 0) setFocus(HOME_LAYER);
   drawHud();
 }
 
@@ -870,10 +880,12 @@ window.addEventListener('keydown', e => {
     if (e.key === 'Escape') showGallery(false);
     return;
   }
-  if (e.key === 'Escape') { select(null); focus = -1; cam.tLookY = 3 * GAP; cam.tZoom = 0.46; cam.tTilt = 0.52; flat = false; drawRail(); }
+  if (e.key === 'Escape') { select(null); focus = -1; cam.tLookY = MID_LAYER * GAP; cam.tZoom = 0.46; cam.tTilt = 0.52; flat = false; drawRail(); }
   else if (e.key === 'f' || e.key === 'F') setFlat(!flat);
-  else if (e.key === 'ArrowUp') setFocus(Math.min(LAYERS.length - 1, (focus < 0 ? 2 : focus) + 1));
-  else if (e.key === 'ArrowDown') setFocus(Math.max(0, (focus < 0 ? 4 : focus) - 1));
+  else if (e.key === 'ArrowUp')
+    setFocus(Math.min(LAYERS.length - 1, (focus < 0 ? HOME_LAYER - 1 : focus) + 1));
+  else if (e.key === 'ArrowDown')
+    setFocus(Math.max(0, (focus < 0 ? HOME_LAYER + 1 : focus) - 1));
   else if (e.key === ' ') { e.preventDefault(); cam.spin = !cam.spin; }
 });
 
@@ -1130,7 +1142,7 @@ function drawRail() {
       <span class="swatch" style="background:${L.color}"></span>
       <span class="name">${L.name}</span>
       <span class="n">${String(count).padStart(2, '0')}</span>
-    </div>` + (L.index === 1 ? '<div class="rail-sep"></div>' : '');
+    </div>` + (L.index === LAYER_OF.source ? '<div class="rail-sep"></div>' : '');
   }).join('')
     + (DATA.has_media ? '<button class="g-open">▦ gallery</button>' : '')
     + (DATA.has_ledger ? `<div class="legend">${
