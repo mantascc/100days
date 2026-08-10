@@ -175,7 +175,11 @@ async function writeGalleryJson(scenarios) {
         .map((s) => ({
             slug: s.meta.slug,
             title: s.meta.title,
-            href: `../${s.meta.slug}/`,
+            // `indexed` is a numbered piece, `daily` a daily-sketch folder.
+            // The gallery on this page shows only the former; downstream
+            // consumers can take the whole manifest.
+            tier: s.meta.tier ?? 'indexed',
+            href: `../${s.meta.path ?? s.meta.slug}/`,
             poster: `assets/posters/${s.meta.slug}.jpg`,
             video: existsSync(path.join(VIDEO_OUT, `${s.meta.slug}.mp4`))
                 ? `assets/videos/${s.meta.slug}.mp4`
@@ -184,10 +188,11 @@ async function writeGalleryJson(scenarios) {
         }));
     // Newest first: descending by leading number in slug.
     entries.sort((a, b) => {
+        if (a.tier !== b.tier) return a.tier === 'indexed' ? -1 : 1;
         const na = parseInt(a.slug.match(/^(\d+)/)?.[1] ?? '0', 10);
         const nb = parseInt(b.slug.match(/^(\d+)/)?.[1] ?? '0', 10);
         if (na !== nb) return nb - na;
-        return b.slug.localeCompare(a.slug);
+        return a.tier === 'daily' ? a.slug.localeCompare(b.slug) : b.slug.localeCompare(a.slug);
     });
     await writeFile(GALLERY_JSON, JSON.stringify(entries, null, 2) + '\n');
 }

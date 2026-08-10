@@ -104,9 +104,12 @@ used while `coverage.md` still lived on a different branch.
   runs, but straight lines make the "hovers above its own output" claim legible.
 - Nothing yet visualises `log.md` — the exhale history is the one part of the
   layer this view cannot see.
-- The capture pipeline only covers indexed pieces, so all 40 daily sketches sit
-  in the gallery as bare `pending` placeholders. They are the larger half of the
-  backlog and the half with nothing to look at.
+- The capture pipeline now covers daily sketches too — 130 of 135 rows have a
+  loop. The five without are honest gaps: `43-style-seed` is a written document
+  with no page, `cat-sprite` has no `index.html`, and `92-tube-tolerance` /
+  `sketch-torus-sheet` / `sketch-tube-driven` live on branches this one has not
+  merged. Most daily scenarios are a generic mouse arc rather than a considered
+  interaction; they prove the sketch exists more than they show what it does.
 - Gallery tiles are square crops of a 720×720 capture; the wide sketches
   (reference sheets, layout studies) lose their proportions. A 16:9 variant per
   tier might read better than one grid.

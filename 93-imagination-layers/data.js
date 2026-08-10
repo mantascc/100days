@@ -4095,8 +4095,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "agent stream glyphs",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-agent-stream-glyphs.jpg",
+   "video": "../83-video-index/assets/videos/sketch-agent-stream-glyphs.mp4",
    "media_disabled": false
   },
   {
@@ -4109,8 +4109,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "agent stream markov map",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-agent-stream-markov-map.jpg",
+   "video": "../83-video-index/assets/videos/sketch-agent-stream-markov-map.mp4",
    "media_disabled": false
   },
   {
@@ -4123,8 +4123,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "agent stream scrub",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-agent-stream-scrub.jpg",
+   "video": "../83-video-index/assets/videos/sketch-agent-stream-scrub.mp4",
    "media_disabled": false
   },
   {
@@ -4137,8 +4137,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "agent streaming patterns",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-agent-streaming-patterns.jpg",
+   "video": "../83-video-index/assets/videos/sketch-agent-streaming-patterns.mp4",
    "media_disabled": false
   },
   {
@@ -4151,8 +4151,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "agent tool call",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-agent-tool-call.jpg",
+   "video": "../83-video-index/assets/videos/sketch-agent-tool-call.mp4",
    "media_disabled": false
   },
   {
@@ -4165,8 +4165,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "alice walk",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-alice-walk.jpg",
+   "video": "../83-video-index/assets/videos/sketch-alice-walk.mp4",
    "media_disabled": false
   },
   {
@@ -4179,8 +4179,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "anna portfolio",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-anna-portfolio.jpg",
+   "video": "../83-video-index/assets/videos/sketch-anna-portfolio.mp4",
    "media_disabled": false
   },
   {
@@ -4193,8 +4193,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "antistyle",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-antistyle.jpg",
+   "video": "../83-video-index/assets/videos/sketch-antistyle.mp4",
    "media_disabled": false
   },
   {
@@ -4207,8 +4207,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "apophenia arc",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-apophenia-arc.jpg",
+   "video": "../83-video-index/assets/videos/sketch-apophenia-arc.mp4",
    "media_disabled": false
   },
   {
@@ -4221,8 +4221,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "ascii field gallery",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-ascii-field-gallery.jpg",
+   "video": "../83-video-index/assets/videos/sketch-ascii-field-gallery.mp4",
    "media_disabled": false
   },
   {
@@ -4235,8 +4235,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "ascii sheet signal",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-ascii-sheet-signal.jpg",
+   "video": "../83-video-index/assets/videos/sketch-ascii-sheet-signal.mp4",
    "media_disabled": false
   },
   {
@@ -4249,8 +4249,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "ascii sheets variance",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-ascii-sheets-variance.jpg",
+   "video": "../83-video-index/assets/videos/sketch-ascii-sheets-variance.mp4",
    "media_disabled": false
   },
   {
@@ -4263,8 +4263,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "audio agents grid",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-audio-agents-grid.jpg",
+   "video": "../83-video-index/assets/videos/sketch-audio-agents-grid.mp4",
    "media_disabled": false
   },
   {
@@ -4277,8 +4277,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "audio reactive agents v2",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-audio-reactive-agents-v2.jpg",
+   "video": "../83-video-index/assets/videos/sketch-audio-reactive-agents-v2.mp4",
    "media_disabled": false
   },
   {
@@ -4291,8 +4291,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "character field",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-character-field.jpg",
+   "video": "../83-video-index/assets/videos/sketch-character-field.mp4",
    "media_disabled": false
   },
   {
@@ -4305,8 +4305,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "character sandbox",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-character-sandbox.jpg",
+   "video": "../83-video-index/assets/videos/sketch-character-sandbox.mp4",
    "media_disabled": false
   },
   {
@@ -4319,8 +4319,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "color explorer v2",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-color-explorer-v2.jpg",
+   "video": "../83-video-index/assets/videos/sketch-color-explorer-v2.mp4",
    "media_disabled": false
   },
   {
@@ -4333,8 +4333,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "data forms",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-data-forms.jpg",
+   "video": "../83-video-index/assets/videos/sketch-data-forms.mp4",
    "media_disabled": false
   },
   {
@@ -4347,8 +4347,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "eixample",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-eixample.jpg",
+   "video": "../83-video-index/assets/videos/sketch-eixample.mp4",
    "media_disabled": false
   },
   {
@@ -4361,8 +4361,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "eixample fullscreen grid",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-eixample-fullscreen-grid.jpg",
+   "video": "../83-video-index/assets/videos/sketch-eixample-fullscreen-grid.mp4",
    "media_disabled": false
   },
   {
@@ -4375,8 +4375,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "field notes",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-field-notes.jpg",
+   "video": "../83-video-index/assets/videos/sketch-field-notes.mp4",
    "media_disabled": false
   },
   {
@@ -4389,8 +4389,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "geo",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-geo.jpg",
+   "video": "../83-video-index/assets/videos/sketch-geo.mp4",
    "media_disabled": false
   },
   {
@@ -4403,8 +4403,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "idle",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-idle.jpg",
+   "video": "../83-video-index/assets/videos/sketch-idle.mp4",
    "media_disabled": false
   },
   {
@@ -4417,8 +4417,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "idle crt",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-idle-crt.jpg",
+   "video": "../83-video-index/assets/videos/sketch-idle-crt.mp4",
    "media_disabled": false
   },
   {
@@ -4431,8 +4431,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "interaction stack",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-interaction-stack.jpg",
+   "video": "../83-video-index/assets/videos/sketch-interaction-stack.mp4",
    "media_disabled": false
   },
   {
@@ -4445,8 +4445,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "jetbrains mono",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-jetbrains-mono.jpg",
+   "video": "../83-video-index/assets/videos/sketch-jetbrains-mono.mp4",
    "media_disabled": false
   },
   {
@@ -4459,8 +4459,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "mesa",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-mesa.jpg",
+   "video": "../83-video-index/assets/videos/sketch-mesa.mp4",
    "media_disabled": false
   },
   {
@@ -4473,8 +4473,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "mode toggle",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-mode-toggle.jpg",
+   "video": "../83-video-index/assets/videos/sketch-mode-toggle.mp4",
    "media_disabled": false
   },
   {
@@ -4487,8 +4487,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "moog phase grid",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-moog-phase-grid.jpg",
+   "video": "../83-video-index/assets/videos/sketch-moog-phase-grid.mp4",
    "media_disabled": false
   },
   {
@@ -4501,8 +4501,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "position in queue",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-position-in-queue.jpg",
+   "video": "../83-video-index/assets/videos/sketch-position-in-queue.mp4",
    "media_disabled": false
   },
   {
@@ -4515,8 +4515,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "pretext canvas",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-pretext-canvas.jpg",
+   "video": "../83-video-index/assets/videos/sketch-pretext-canvas.mp4",
    "media_disabled": false
   },
   {
@@ -4529,8 +4529,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "pretext dom",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-pretext-dom.jpg",
+   "video": "../83-video-index/assets/videos/sketch-pretext-dom.mp4",
    "media_disabled": false
   },
   {
@@ -4543,8 +4543,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "sprig",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-sprig.jpg",
+   "video": "../83-video-index/assets/videos/sketch-sprig.mp4",
    "media_disabled": false
   },
   {
@@ -4557,8 +4557,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "sticky banner",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-sticky-banner.jpg",
+   "video": "../83-video-index/assets/videos/sketch-sticky-banner.mp4",
    "media_disabled": false
   },
   {
@@ -4571,8 +4571,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "terminal cli",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-terminal-cli.jpg",
+   "video": "../83-video-index/assets/videos/sketch-terminal-cli.mp4",
    "media_disabled": false
   },
   {
@@ -4585,8 +4585,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "theme",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-theme.jpg",
+   "video": "../83-video-index/assets/videos/sketch-theme.mp4",
    "media_disabled": false
   },
   {
@@ -4627,8 +4627,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "ube field audio",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-ube-field-audio.jpg",
+   "video": "../83-video-index/assets/videos/sketch-ube-field-audio.mp4",
    "media_disabled": false
   },
   {
@@ -4641,8 +4641,8 @@ window.IMAGINATION = {
    "touched_more": 0,
    "desc": "walks thread",
    "spawned_by": [],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-walks-thread.jpg",
+   "video": "../83-video-index/assets/videos/sketch-walks-thread.mp4",
    "media_disabled": false
   },
   {
@@ -4659,8 +4659,8 @@ window.IMAGINATION = {
    "spawned_by": [
     "collisions/vicsek-flocking-x-typography"
    ],
-   "poster": "",
-   "video": "",
+   "poster": "../83-video-index/assets/posters/sketch-word-flock.jpg",
+   "video": "../83-video-index/assets/videos/sketch-word-flock.mp4",
    "media_disabled": false
   }
  ]
