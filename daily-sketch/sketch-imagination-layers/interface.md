@@ -63,11 +63,24 @@ in the panel. Spawn chips and connection rows both navigate, so you can walk
 graph→floor→graph without touching the camera.
 
 **A third view: the gallery.** `G` (or the rail button) opens a flat contact
-sheet of every sketch the ledger knows — poster on load, the loop on hover,
-lazily fetched so 135 tiles don't pull 135 videos. Filter chips cut it by
-coverage state, so `pending` becomes a visual backlog rather than a list of
-slugs. Click a tile and it selects that sketch back in the stack. The panel
-leads with the same loop, autoplaying, whenever a sketch is open.
+sheet of every sketch — poster on load, the loop on hover, lazily fetched so
+136 tiles don't pull 136 videos. Filter chips cut it by coverage state, so
+`pending` becomes a visual backlog rather than a list of slugs. Click a tile
+and it selects that sketch back in the stack. The panel leads with the same
+loop, autoplaying, whenever a sketch is open.
+
+It runs **newest first**, opposite to the floor. The floor is a contact sheet
+of the work in the order it was made and its layout depends on that; the
+gallery is for looking at what exists now, and that wants the most recent
+first. Indexed pieces sort on their `NN-` prefix. Daily sketches have no
+number, so `build.py` lifts the dates out of the daily-sketch index for them.
+Tiers stay grouped under headings rather than interleaved — a numbered piece
+and a daily sketch made the same week are not the same kind of thing.
+
+The floor also carries sketches the ledger has not caught up to. A piece can be
+made and captured before `coverage.py` next runs, and the gallery would
+otherwise be missing the newest thing in it — including, at the time of
+writing, this piece.
 
 Media is borrowed, not duplicated: `build.py` reads
 `83-video-index/assets/gallery.json` and stores paths **relative to this page**,

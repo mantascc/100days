@@ -2169,6 +2169,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Interactive entropy visualization with animated particles",
+   "made": "",
    "spawned_by": [
     "techniques/dom-over-canvas-rendering",
     "techniques/parametric-lissajous-orbits",
@@ -2193,6 +2194,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Vicsek model flocking behavior simulation",
+   "made": "",
    "spawned_by": [
     "sources/vicsek-flocking",
     "techniques/toroidal-wrapping",
@@ -2217,6 +2219,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Particle clustering with chaotic agents",
+   "made": "",
    "spawned_by": [
     "sources/vicsek-flocking",
     "techniques/toroidal-wrapping",
@@ -2241,6 +2244,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Stochastic random walk patterns on canvas",
+   "made": "",
    "spawned_by": [
     "sources/brownian-markov",
     "techniques/toroidal-wrapping",
@@ -2266,6 +2270,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Gravity and particle physics with falling objects",
+   "made": "",
    "spawned_by": [
     "sources/brownian-markov",
     "techniques/toroidal-wrapping",
@@ -2290,6 +2295,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Celestial mechanics with orbital planets",
+   "made": "",
    "spawned_by": [
     "techniques/parametric-lissajous-orbits",
     "threads/grids-as-compositional-frame",
@@ -2312,6 +2318,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Apophenia proximity links on grid",
+   "made": "",
    "spawned_by": [
     "techniques/proximity-link-drawing",
     "techniques/toroidal-wrapping",
@@ -2338,6 +2345,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Cluster detection with parameter tuning",
+   "made": "",
    "spawned_by": [
     "sources/graph-theory-algorithms",
     "threads/agents-and-particle-systems",
@@ -2361,6 +2369,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Linked agents network visualization",
+   "made": "",
    "spawned_by": [
     "sources/graph-theory-algorithms",
     "techniques/proximity-link-drawing",
@@ -2385,6 +2394,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Audio-reactive agents with spatial positioning",
+   "made": "",
    "spawned_by": [
     "sources/vicsek-flocking",
     "techniques/proximity-link-drawing",
@@ -2410,6 +2420,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Interactive message storage system (Node.js/Express)",
+   "made": "",
    "spawned_by": [
     "sources/brownian-markov",
     "techniques/proximity-link-drawing",
@@ -2436,6 +2447,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Perlin noise wind simulation",
+   "made": "",
    "spawned_by": [
     "sources/brownian-markov",
     "sources/perlin-noise",
@@ -2462,6 +2474,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Wave pattern generation with ripple effects",
+   "made": "",
    "spawned_by": [
     "sources/perlin-noise",
     "techniques/offscreen-canvas-downsample",
@@ -2486,6 +2499,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Dynamic cluster visualization with signals",
+   "made": "",
    "spawned_by": [
     "sources/kuramoto-fireflies",
     "techniques/toroidal-wrapping",
@@ -2508,6 +2522,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Interactive 2D grid navigation with zoom",
+   "made": "",
    "spawned_by": [
     "techniques/offscreen-canvas-downsample",
     "threads/grids-as-compositional-frame"
@@ -2529,6 +2544,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Grid camera variant",
+   "made": "",
    "spawned_by": [
     "techniques/offscreen-canvas-downsample",
     "themes/iteration-vs-original-rules",
@@ -2551,6 +2567,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Force graph visualization",
+   "made": "",
    "spawned_by": [
     "sources/graph-theory-algorithms",
     "techniques/d3-force-simulation",
@@ -2573,6 +2590,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Text-to-speech with animated typography",
+   "made": "",
    "spawned_by": [
     "techniques/d3-force-simulation",
     "themes/audio-reactive-without-gimmick",
@@ -2596,6 +2614,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Conway's Game of Life variant",
+   "made": "",
    "spawned_by": [
     "techniques/imagedata-double-buffer",
     "themes/iteration-vs-original-rules",
@@ -2620,6 +2639,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Force-directed graph of coworker interactions (React/D3)",
+   "made": "",
    "spawned_by": [
     "techniques/d3-force-simulation",
     "threads/networks-and-graphs"
@@ -2641,6 +2661,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Schelling model of segregation simulation",
+   "made": "",
    "spawned_by": [
     "sources/schelling-segregation",
     "techniques/imagedata-double-buffer",
@@ -2662,6 +2683,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "30-day agent interaction heatmap",
+   "made": "",
    "spawned_by": [
     "threads/networks-and-graphs"
    ],
@@ -2681,6 +2703,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Graph network visualization",
+   "made": "",
    "spawned_by": [
     "techniques/d3-force-simulation",
     "threads/networks-and-graphs"
@@ -2701,6 +2724,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Touch/mouse event handler demo",
+   "made": "",
    "spawned_by": [
     "techniques/dom-over-canvas-rendering",
     "threads/generative-typography-and-text"
@@ -2722,6 +2746,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Rock paper scissors game",
+   "made": "",
    "spawned_by": [
     "techniques/toroidal-wrapping",
     "threads/agents-and-particle-systems",
@@ -2745,6 +2770,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Density and color-controlled particle effect",
+   "made": "",
    "spawned_by": [
     "techniques/css-vars-live-controls",
     "techniques/dom-over-canvas-rendering",
@@ -2767,6 +2793,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Dynamic widget dashboard layout",
+   "made": "",
    "spawned_by": [
     "techniques/css-vars-live-controls",
     "techniques/drag-reorder-collision-packing",
@@ -2788,6 +2815,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Muse v0 - music/creative tool prototype",
+   "made": "",
    "spawned_by": [
     "themes/desktop-only-vs-responsive"
    ],
@@ -2808,6 +2836,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Liquid glass morphism effect",
+   "made": "",
    "spawned_by": [
     "techniques/backdrop-filter-svg-distort",
     "techniques/css-vars-live-controls",
@@ -2828,6 +2857,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Text generation UI showing thinking states",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -2847,6 +2877,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Experimental loading indicators exploring thinking metaphors",
+   "made": "",
    "spawned_by": [
     "themes/iteration-vs-original-rules",
     "threads/design-system-and-reference-sheets"
@@ -2867,6 +2898,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "CLI material color palette",
+   "made": "",
    "spawned_by": [
     "sources/bauhaus-early-computer-graphics",
     "threads/design-system-and-reference-sheets"
@@ -2886,6 +2918,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Chaotic entropy pattern generation",
+   "made": "",
    "spawned_by": [
     "threads/stochastic-and-noise"
    ],
@@ -2906,6 +2939,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Temporal slitscan imaging effect",
+   "made": "",
    "spawned_by": [
     "sources/slit-scan-2001",
     "techniques/offscreen-canvas-downsample",
@@ -2928,6 +2962,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Text morphing with particle transitions",
+   "made": "",
    "spawned_by": [
     "themes/desktop-only-vs-responsive",
     "threads/agents-and-particle-systems",
@@ -2949,6 +2984,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Great circle flight path animation (Leaflet/Turf.js)",
+   "made": "",
    "spawned_by": [
     "techniques/geodesic-great-circle-path",
     "themes/desktop-only-vs-responsive"
@@ -2970,6 +3006,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Vite React TypeScript project",
+   "made": "",
    "spawned_by": [
     "themes/desktop-only-vs-responsive",
     "threads/design-system-and-reference-sheets",
@@ -2992,6 +3029,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Real-time text sentiment analysis with industrial visualization (React/TypeScript)",
+   "made": "",
    "spawned_by": [
     "themes/desktop-only-vs-responsive",
     "threads/design-system-and-reference-sheets",
@@ -3012,6 +3050,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Generative Baltic pattern",
+   "made": "",
    "spawned_by": [
     "threads/stochastic-and-noise"
    ],
@@ -3030,6 +3069,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Morphing wave patterns",
+   "made": "",
    "spawned_by": [
     "threads/audio-reactivity"
    ],
@@ -3050,6 +3090,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Cube grid rules engine",
+   "made": "",
    "spawned_by": [
     "seeds/3d-rule-engine",
     "threads/cellular-automata-and-pattern-formation",
@@ -3071,6 +3112,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Metaball physics and animation",
+   "made": "",
    "spawned_by": [
     "threads/physics-simulation"
    ],
@@ -3090,6 +3132,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Grid-based metaball effects",
+   "made": "",
    "spawned_by": [
     "threads/grids-as-compositional-frame",
     "threads/physics-simulation"
@@ -3111,6 +3154,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Sketch project",
+   "made": "",
    "spawned_by": [
     "sources/bauhaus-early-computer-graphics",
     "techniques/css-vars-live-controls",
@@ -3132,6 +3176,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Whiff project",
+   "made": "",
    "spawned_by": [
     "seeds/whiff-cli-dataviz"
    ],
@@ -3151,6 +3196,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Gravity pills particle simulation",
+   "made": "",
    "spawned_by": [
     "threads/agents-and-particle-systems",
     "threads/physics-simulation"
@@ -3170,6 +3216,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "OKLCH vs HSL gradient comparison",
+   "made": "",
    "spawned_by": [
     "sources/bauhaus-early-computer-graphics"
    ],
@@ -3189,6 +3236,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Sketch project",
+   "made": "",
    "spawned_by": [
     "seeds/2gif-tiered-roadmap",
     "themes/showing-mechanism-vs-polish"
@@ -3209,6 +3257,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Grid Trace - Interactive grid path visualization with Geist Pixel font",
+   "made": "",
    "spawned_by": [
     "threads/generative-typography-and-text",
     "threads/grids-as-compositional-frame"
@@ -3228,6 +3277,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Execution Trace Graph - AI response visualized as a traversal through a skill graph",
+   "made": "",
    "spawned_by": [
     "threads/networks-and-graphs"
    ],
@@ -3248,6 +3298,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes",
+   "made": "",
    "spawned_by": [
     "threads/agents-and-particle-systems",
     "threads/emergence-from-local-rules",
@@ -3270,6 +3321,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls",
+   "made": "",
    "spawned_by": [
     "sources/turing-gray-scott",
     "techniques/imagedata-double-buffer",
@@ -3294,6 +3346,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes",
+   "made": "",
    "spawned_by": [
     "techniques/dom-over-canvas-rendering",
     "techniques/glyph-density-ramp",
@@ -3316,6 +3369,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Interactive force-directed graph visualizing relationships between projects and data concepts",
+   "made": "",
    "spawned_by": [
     "threads/emergence-from-local-rules",
     "threads/networks-and-graphs"
@@ -3337,6 +3391,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "ASCII Loading",
+   "made": "",
    "spawned_by": [
     "techniques/dom-over-canvas-rendering",
     "techniques/glyph-density-ramp",
@@ -3360,6 +3415,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Constrained Variation",
+   "made": "",
    "spawned_by": [
     "themes/randomness-feeling-intentional",
     "themes/searching-vs-mapping",
@@ -3382,6 +3438,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Five chapters, three palettes: Peach, Clay, and Aus",
+   "made": "",
    "spawned_by": [
     "techniques/css-vars-live-controls",
     "themes/searching-vs-mapping",
@@ -3403,6 +3460,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Geometric shapes explorer",
+   "made": "",
    "spawned_by": [
     "techniques/parametric-lissajous-orbits",
     "threads/grids-as-compositional-frame"
@@ -3422,6 +3480,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Font Explorer",
+   "made": "",
    "spawned_by": [
     "threads/generative-typography-and-text"
    ],
@@ -3440,6 +3499,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Agentic Patterns",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3460,6 +3520,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Human in the Loop",
+   "made": "",
    "spawned_by": [
     "techniques/dom-over-canvas-rendering",
     "techniques/scripted-await-timeline",
@@ -3482,6 +3543,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Terminal REPL",
+   "made": "",
    "spawned_by": [
     "techniques/css-vars-live-controls",
     "techniques/dom-over-canvas-rendering",
@@ -3504,6 +3566,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Ube Kaizen",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3520,6 +3583,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Constellation",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/63-constellation-map.jpg",
    "video": "../../83-video-index/assets/videos/63-constellation-map.mp4",
@@ -3536,6 +3600,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Viz Grouped",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3555,6 +3620,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Mode Toggle",
+   "made": "",
    "spawned_by": [
     "themes/searching-vs-mapping",
     "threads/design-system-and-reference-sheets"
@@ -3576,6 +3642,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "ASCII Field Gallery",
+   "made": "",
    "spawned_by": [
     "techniques/glyph-density-ramp",
     "threads/ascii-and-text-rendering",
@@ -3597,6 +3664,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Audio Reactive ASCII Field",
+   "made": "",
    "spawned_by": [
     "threads/ascii-and-text-rendering",
     "threads/audio-reactivity"
@@ -3617,6 +3685,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Moog Phase",
+   "made": "",
    "spawned_by": [
     "themes/audio-reactive-without-gimmick",
     "threads/audio-reactivity"
@@ -3637,6 +3706,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Clear Channel",
+   "made": "",
    "spawned_by": [
     "techniques/css-vars-live-controls",
     "threads/design-system-and-reference-sheets"
@@ -3656,6 +3726,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Clear Channel",
+   "made": "",
    "spawned_by": [
     "themes/iteration-vs-original-rules"
    ],
@@ -3676,6 +3747,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Index",
+   "made": "",
    "spawned_by": [
     "seeds/computed-not-curated-thumbnails",
     "threads/ascii-and-text-rendering",
@@ -3698,6 +3770,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Snapshots v2",
+   "made": "",
    "spawned_by": [
     "techniques/glyph-density-ramp",
     "threads/ascii-and-text-rendering"
@@ -3717,6 +3790,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "SVG Layouts",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3736,6 +3810,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Particles",
+   "made": "",
    "spawned_by": [
     "techniques/summed-sines-pseudo-noise",
     "threads/agents-and-particle-systems"
@@ -3755,6 +3830,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Layout Playground",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3773,6 +3849,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Layout Depth",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3793,6 +3870,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "ASCII Sheet Documentation",
+   "made": "",
    "spawned_by": [
     "techniques/backdrop-filter-svg-distort",
     "techniques/glyph-density-ramp",
@@ -3815,6 +3893,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "ASCII Sheets",
+   "made": "",
    "spawned_by": [
     "seeds/ascii-sheet-web-component",
     "techniques/backdrop-filter-svg-distort",
@@ -3839,6 +3918,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Idle States",
+   "made": "",
    "spawned_by": [
     "techniques/parametric-lissajous-orbits",
     "techniques/summed-sines-pseudo-noise",
@@ -3861,6 +3941,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Network",
+   "made": "",
    "spawned_by": [
     "techniques/proximity-link-drawing",
     "threads/networks-and-graphs"
@@ -3882,6 +3963,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Lens Wave",
+   "made": "",
    "spawned_by": [
     "seeds/lens-wave-extensions",
     "techniques/summed-sines-pseudo-noise",
@@ -3904,6 +3986,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Z-Axis",
+   "made": "",
    "spawned_by": [
     "techniques/css-vars-live-controls",
     "threads/design-system-and-reference-sheets"
@@ -3924,6 +4007,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Video Index",
+   "made": "",
    "spawned_by": [
     "techniques/agent-authored-playwright-capture",
     "themes/desktop-only-vs-responsive"
@@ -3943,6 +4027,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "ID Card",
+   "made": "",
    "spawned_by": [
     "threads/design-system-and-reference-sheets"
    ],
@@ -3959,6 +4044,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Agent-Stream Glyphs",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/85-agent-stream-glyphs.jpg",
    "video": "../../83-video-index/assets/videos/85-agent-stream-glyphs.mp4",
@@ -3973,6 +4059,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Agent-Stream Scrub",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/86-agent-stream-scrub.jpg",
    "video": "../../83-video-index/assets/videos/86-agent-stream-scrub.mp4",
@@ -3987,6 +4074,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Attention Distribution",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/87-attention-distribution.jpg",
    "video": "../../83-video-index/assets/videos/87-attention-distribution.mp4",
@@ -4001,6 +4089,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Eixample",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/88-eixample.jpg",
    "video": "../../83-video-index/assets/videos/88-eixample.mp4",
@@ -4015,6 +4104,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Sprite States",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/89-sprite-states.jpg",
    "video": "../../83-video-index/assets/videos/89-sprite-states.mp4",
@@ -4029,6 +4119,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "AIDA001",
+   "made": "",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/90-aida001.jpg",
    "video": "../../83-video-index/assets/videos/90-aida001.mp4",
@@ -4047,6 +4138,7 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "Retro Primitives",
+   "made": "",
    "spawned_by": [
     "techniques/crt-tube-treatment",
     "themes/showing-mechanism-vs-polish",
@@ -4066,6 +4158,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "Tube Tolerance",
+   "made": "",
    "spawned_by": [],
    "poster": "",
    "video": "",
@@ -4080,6 +4173,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "cat sprite",
+   "made": "2026-08-01",
    "spawned_by": [],
    "poster": "",
    "video": "",
@@ -4094,6 +4188,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "agent stream glyphs",
+   "made": "2026-06-16",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-agent-stream-glyphs.jpg",
    "video": "../../83-video-index/assets/videos/sketch-agent-stream-glyphs.mp4",
@@ -4108,6 +4203,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "agent stream markov map",
+   "made": "2026-06-16",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-agent-stream-markov-map.jpg",
    "video": "../../83-video-index/assets/videos/sketch-agent-stream-markov-map.mp4",
@@ -4122,6 +4218,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "agent stream scrub",
+   "made": "2026-06-16",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-agent-stream-scrub.jpg",
    "video": "../../83-video-index/assets/videos/sketch-agent-stream-scrub.mp4",
@@ -4136,6 +4233,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "agent streaming patterns",
+   "made": "2026-06-16",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-agent-streaming-patterns.jpg",
    "video": "../../83-video-index/assets/videos/sketch-agent-streaming-patterns.mp4",
@@ -4150,6 +4248,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "agent tool call",
+   "made": "2026-04-20",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-agent-tool-call.jpg",
    "video": "../../83-video-index/assets/videos/sketch-agent-tool-call.mp4",
@@ -4164,6 +4263,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "alice walk",
+   "made": "2026-08-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-alice-walk.jpg",
    "video": "../../83-video-index/assets/videos/sketch-alice-walk.mp4",
@@ -4178,6 +4278,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "anna portfolio",
+   "made": "2026-04-20",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-anna-portfolio.jpg",
    "video": "../../83-video-index/assets/videos/sketch-anna-portfolio.mp4",
@@ -4192,6 +4293,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "antistyle",
+   "made": "2026-06-07",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-antistyle.jpg",
    "video": "../../83-video-index/assets/videos/sketch-antistyle.mp4",
@@ -4206,6 +4308,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "apophenia arc",
+   "made": "2026-08-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-apophenia-arc.jpg",
    "video": "../../83-video-index/assets/videos/sketch-apophenia-arc.mp4",
@@ -4220,6 +4323,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "ascii field gallery",
+   "made": "2026-04-20",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-ascii-field-gallery.jpg",
    "video": "../../83-video-index/assets/videos/sketch-ascii-field-gallery.mp4",
@@ -4234,6 +4338,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "ascii sheet signal",
+   "made": "2026-05-19",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-ascii-sheet-signal.jpg",
    "video": "../../83-video-index/assets/videos/sketch-ascii-sheet-signal.mp4",
@@ -4248,6 +4353,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "ascii sheets variance",
+   "made": "2026-05-19",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-ascii-sheets-variance.jpg",
    "video": "../../83-video-index/assets/videos/sketch-ascii-sheets-variance.mp4",
@@ -4262,6 +4368,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "audio agents grid",
+   "made": "2026-08-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-audio-agents-grid.jpg",
    "video": "../../83-video-index/assets/videos/sketch-audio-agents-grid.mp4",
@@ -4276,6 +4383,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "audio reactive agents v2",
+   "made": "2026-07-15",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-audio-reactive-agents-v2.jpg",
    "video": "../../83-video-index/assets/videos/sketch-audio-reactive-agents-v2.mp4",
@@ -4290,6 +4398,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "character field",
+   "made": "2026-08-01",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-character-field.jpg",
    "video": "../../83-video-index/assets/videos/sketch-character-field.mp4",
@@ -4304,6 +4413,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "character sandbox",
+   "made": "2026-08-01",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-character-sandbox.jpg",
    "video": "../../83-video-index/assets/videos/sketch-character-sandbox.mp4",
@@ -4318,6 +4428,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "color explorer v2",
+   "made": "2026-04-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-color-explorer-v2.jpg",
    "video": "../../83-video-index/assets/videos/sketch-color-explorer-v2.mp4",
@@ -4332,6 +4443,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "data forms",
+   "made": "2026-03-31",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-data-forms.jpg",
    "video": "../../83-video-index/assets/videos/sketch-data-forms.mp4",
@@ -4346,6 +4458,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "eixample",
+   "made": "2026-06-29",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-eixample.jpg",
    "video": "../../83-video-index/assets/videos/sketch-eixample.mp4",
@@ -4360,6 +4473,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "eixample fullscreen grid",
+   "made": "2026-06-29",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-eixample-fullscreen-grid.jpg",
    "video": "../../83-video-index/assets/videos/sketch-eixample-fullscreen-grid.mp4",
@@ -4374,6 +4488,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "field notes",
+   "made": "2026-08-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-field-notes.jpg",
    "video": "../../83-video-index/assets/videos/sketch-field-notes.mp4",
@@ -4388,6 +4503,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "geo",
+   "made": "2026-03-31",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-geo.jpg",
    "video": "../../83-video-index/assets/videos/sketch-geo.mp4",
@@ -4402,6 +4518,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "idle",
+   "made": "2026-08-01",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-idle.jpg",
    "video": "../../83-video-index/assets/videos/sketch-idle.mp4",
@@ -4416,6 +4533,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "idle crt",
+   "made": "2026-08-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-idle-crt.jpg",
    "video": "../../83-video-index/assets/videos/sketch-idle-crt.mp4",
@@ -4430,6 +4548,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "interaction stack",
+   "made": "2026-05-19",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-interaction-stack.jpg",
    "video": "../../83-video-index/assets/videos/sketch-interaction-stack.mp4",
@@ -4444,6 +4563,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "jetbrains mono",
+   "made": "2026-03-09",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-jetbrains-mono.jpg",
    "video": "../../83-video-index/assets/videos/sketch-jetbrains-mono.mp4",
@@ -4458,6 +4578,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "mesa",
+   "made": "2026-03-01",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-mesa.jpg",
    "video": "../../83-video-index/assets/videos/sketch-mesa.mp4",
@@ -4472,6 +4593,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "mode toggle",
+   "made": "2026-04-06",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-mode-toggle.jpg",
    "video": "../../83-video-index/assets/videos/sketch-mode-toggle.mp4",
@@ -4486,6 +4608,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "moog phase grid",
+   "made": "2026-07-14",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-moog-phase-grid.jpg",
    "video": "../../83-video-index/assets/videos/sketch-moog-phase-grid.mp4",
@@ -4500,6 +4623,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "position in queue",
+   "made": "2026-08-01",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-position-in-queue.jpg",
    "video": "../../83-video-index/assets/videos/sketch-position-in-queue.mp4",
@@ -4514,6 +4638,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "pretext canvas",
+   "made": "2026-04-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-pretext-canvas.jpg",
    "video": "../../83-video-index/assets/videos/sketch-pretext-canvas.mp4",
@@ -4528,6 +4653,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "pretext dom",
+   "made": "2026-04-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-pretext-dom.jpg",
    "video": "../../83-video-index/assets/videos/sketch-pretext-dom.mp4",
@@ -4542,6 +4668,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "sprig",
+   "made": "2026-03-01",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-sprig.jpg",
    "video": "../../83-video-index/assets/videos/sketch-sprig.mp4",
@@ -4556,6 +4683,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "sticky banner",
+   "made": "2026-05-19",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-sticky-banner.jpg",
    "video": "../../83-video-index/assets/videos/sketch-sticky-banner.mp4",
@@ -4570,6 +4698,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "terminal cli",
+   "made": "2026-03-31",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-terminal-cli.jpg",
    "video": "../../83-video-index/assets/videos/sketch-terminal-cli.mp4",
@@ -4584,6 +4713,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "theme",
+   "made": "2026-03-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-theme.jpg",
    "video": "../../83-video-index/assets/videos/sketch-theme.mp4",
@@ -4598,6 +4728,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "torus sheet",
+   "made": "",
    "spawned_by": [],
    "poster": "",
    "video": "",
@@ -4612,6 +4743,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "tube driven",
+   "made": "",
    "spawned_by": [],
    "poster": "",
    "video": "",
@@ -4626,6 +4758,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "ube field audio",
+   "made": "2026-04-20",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-ube-field-audio.jpg",
    "video": "../../83-video-index/assets/videos/sketch-ube-field-audio.mp4",
@@ -4640,6 +4773,7 @@ window.IMAGINATION = {
    "touched": [],
    "touched_more": 0,
    "desc": "walks thread",
+   "made": "2026-08-02",
    "spawned_by": [],
    "poster": "../../83-video-index/assets/posters/sketch-walks-thread.jpg",
    "video": "../../83-video-index/assets/videos/sketch-walks-thread.mp4",
@@ -4656,11 +4790,27 @@ window.IMAGINATION = {
    ],
    "touched_more": 0,
    "desc": "word flock",
+   "made": "2026-08-01",
    "spawned_by": [
     "collisions/vicsek-flocking-x-typography"
    ],
    "poster": "../../83-video-index/assets/posters/sketch-word-flock.jpg",
    "video": "../../83-video-index/assets/videos/sketch-word-flock.mp4",
+   "media_disabled": false
+  },
+  {
+   "id": "93-imagination-layers",
+   "tier": "indexed",
+   "state": "unknown",
+   "inhaled": "",
+   "detail": "",
+   "touched": [],
+   "touched_more": 0,
+   "made": "",
+   "desc": "",
+   "spawned_by": [],
+   "poster": "../../83-video-index/assets/posters/93-imagination-layers.jpg",
+   "video": "../../83-video-index/assets/videos/93-imagination-layers.mp4",
    "media_disabled": false
   }
  ]

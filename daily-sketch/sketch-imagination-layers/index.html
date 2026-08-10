@@ -211,6 +211,16 @@
     .g-grid::-webkit-scrollbar { width: 3px; }
     .g-grid::-webkit-scrollbar-thumb { background: var(--border-default); }
 
+    .g-band {
+      grid-column: 1 / -1; display: flex; align-items: baseline; gap: var(--space-8);
+      margin: var(--space-8) 0 2px; padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .g-band:first-child { margin-top: 0; }
+    .g-band span { color: var(--text-ghost); letter-spacing: 0.1em; }
+
     .g-tile { cursor: pointer; }
     .g-media {
       position: relative; aspect-ratio: 1; overflow: hidden;
@@ -1032,6 +1042,21 @@ const FILTERS = () => {
   ];
 };
 
+// Newest first. Indexed pieces sort on their NN- prefix; daily sketches have
+// no number, so they sort on the date the daily index records for them. Tiers
+// stay grouped rather than interleaved — a numbered piece and a daily sketch
+// made the same week are not the same kind of thing.
+function galOrder() {
+  return floor.slice().sort((a, b) => {
+    if (a.tier !== b.tier) return a.tier === 'indexed' ? -1 : 1;
+    if (a.tier === 'indexed') {
+      const na = parseInt(a.id, 10) || 0, nb = parseInt(b.id, 10) || 0;
+      return nb - na || b.id.localeCompare(a.id);
+    }
+    return (b.made || '').localeCompare(a.made || '') || a.id.localeCompare(b.id);
+  });
+}
+
 function galMatch(f) {
   if (galFilter === 'all') return true;
   if (galFilter === 'noloop') return !f.video;
@@ -1047,10 +1072,16 @@ function drawGallery() {
     galFilter = el.dataset.k; drawGallery();
   });
 
-  const shown = floor.filter(galMatch);
+  const shown = galOrder().filter(galMatch);
   gal.querySelector('.g-title').textContent =
     `sketchbook — ${shown.length}${shown.length !== floor.length ? ' of ' + floor.length : ''}`;
-  galGrid.innerHTML = shown.map(f => `
+  let tier = null;
+  galGrid.innerHTML = shown.map(f => {
+    const head = f.tier !== tier
+      ? `<div class="g-band">${esc(f.tier === 'indexed' ? 'indexed pieces' : 'daily sketches')}
+         <span>${shown.filter(x => x.tier === f.tier).length}</span></div>` : '';
+    tier = f.tier;
+    return head + `
     <figure class="g-tile ${f.media_disabled ? 'dim' : ''}" data-id="${esc(f.id)}">
       <div class="g-media${f.poster ? '' : ' empty'}">
         ${f.poster ? `<img src="${esc(f.poster)}" alt="" loading="lazy">` : ''}
@@ -1061,7 +1092,8 @@ function drawGallery() {
         <span class="dot" style="background:${f.cover.color}"></span>
         <span class="lbl">${esc(f.id.split('/').pop())}</span>
       </figcaption>
-    </figure>`).join('');
+    </figure>`;
+  }).join('');
 
   galGrid.querySelectorAll('.g-tile').forEach(el => {
     const f = floorById.get(el.dataset.id);

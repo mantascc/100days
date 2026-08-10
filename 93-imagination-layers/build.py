@@ -144,6 +144,16 @@ if os.path.exists(pj):
         if sid:
             blurbs[sid] = p.get("description", "").split("—")[0].strip()
 
+# Daily sketches have no number to sort by, so recency comes from the dates in
+# the daily-sketch index. Indexed pieces don't need this — their NN- prefix is
+# already the making order.
+daily_dates = {}
+di = os.path.join(ROOT, "daily-sketch", "index.html")
+if os.path.exists(di):
+    for m in re.finditer(r"\['(\d{4}-\d{2}-\d{2})',\s*'([a-z0-9-]+)'",
+                         open(di, encoding="utf-8").read()):
+        daily_dates[m.group(2)] = m.group(1)
+
 
 def parse_coverage(path):
     """coverage.md -> ordered [(tier, id, inhaled, outcome, [entity ids])].
@@ -201,10 +211,18 @@ else:
 
 for s in sketches:
     s["desc"] = blurbs.get(s["id"], s["id"].replace("sketch-", "").replace("-", " "))
+    s["made"] = daily_dates.get(s["id"].split("/")[-1], "")
 
 # `spawned:` sometimes carries a `daily-sketch/` prefix the ledger keys without,
 # so every id is matched on its last path segment.
 stem = lambda s: s.split("/")[-1]
+
+# Read the capture manifest early — it is a second, independent list of which
+# sketches exist, and the ledger can lag behind it.
+VIDEO_PIECE = "83-video-index"
+LOCAL = find_root(HERE)
+_gj = os.path.join(LOCAL, VIDEO_PIECE, "assets", "gallery.json")
+gallery_pre = json.load(open(_gj, encoding="utf-8")) if os.path.exists(_gj) else []
 
 # Anything an entity claims to have spawned that the ledger doesn't list still
 # needs a slot, or its filament has nowhere to land.
@@ -212,7 +230,21 @@ known = {stem(s["id"]) for s in sketches}
 for extra in sorted({x for n in nodes for x in n["spawned"] if stem(x) not in known}):
     sketches.append({"id": extra, "tier": "daily", "state": "unknown",
                      "inhaled": "", "detail": "", "touched": [], "touched_more": 0,
+                     "made": daily_dates.get(stem(extra), ""),
                      "desc": stem(extra).replace("sketch-", "")})
+
+# A sketch can exist and be captured before coverage.py has generated its row —
+# a piece added since the ledger was last regenerated. Show it rather than
+# silently dropping it; `unknown` already reads as "not in the ledger".
+for g in sorted(gallery_pre, key=lambda x: x["slug"]):
+    if stem(g["slug"]) in known:
+        continue
+    known.add(stem(g["slug"]))
+    sketches.append({"id": g["slug"], "tier": g.get("tier", "indexed"),
+                     "state": "unknown", "inhaled": "", "detail": "",
+                     "touched": [], "touched_more": 0,
+                     "made": daily_dates.get(stem(g["slug"]), ""),
+                     "desc": blurbs.get(g["slug"], "")})
 
 # Reverse index: which entities name each sketch in `spawned`. The ledger's
 # `touched` column is truncated for readability, so the graph fills it back in.
@@ -224,16 +256,10 @@ for s in sketches:
 # Poster / loop per sketch, borrowed from the 83-video-index capture pipeline
 # rather than duplicated. Paths are stored relative to THIS page so the same
 # data.js works from daily-sketch/<name>/ and from the numbered piece.
-VIDEO_PIECE = "83-video-index"
 # Media resolves against the checkout this page is served from, not the data
 # root — the page can only load files that sit under its own tree.
-LOCAL = find_root(HERE)
 media_base = os.path.relpath(os.path.join(LOCAL, VIDEO_PIECE), HERE).replace(os.sep, "/")
-gallery = {}
-gj = os.path.join(LOCAL, VIDEO_PIECE, "assets", "gallery.json")
-if os.path.exists(gj):
-    for g in json.load(open(gj, encoding="utf-8")):
-        gallery[g["slug"]] = g
+gallery = {g["slug"]: g for g in gallery_pre}
 
 for s in sketches:
     g = gallery.get(s["id"]) or gallery.get(stem(s["id"]))
