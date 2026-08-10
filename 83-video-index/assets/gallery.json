@@ -1,5 +1,93 @@
 [
   {
+    "slug": "93-imagination-layers",
+    "title": "Imagination Layers",
+    "href": "../93-imagination-layers/",
+    "poster": "assets/posters/93-imagination-layers.jpg",
+    "video": "assets/videos/93-imagination-layers.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "91-retro-primitives",
+    "title": "Retro Primitives",
+    "href": "../91-retro-primitives/",
+    "poster": "assets/posters/91-retro-primitives.jpg",
+    "video": "assets/videos/91-retro-primitives.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "90-aida001",
+    "title": "AIDA001",
+    "href": "../90-aida001/",
+    "poster": "assets/posters/90-aida001.jpg",
+    "video": "assets/videos/90-aida001.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "89-sprite-states",
+    "title": "Sprite States",
+    "href": "../89-sprite-states/",
+    "poster": "assets/posters/89-sprite-states.jpg",
+    "video": "assets/videos/89-sprite-states.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "88-eixample",
+    "title": "Eixample",
+    "href": "../88-eixample/",
+    "poster": "assets/posters/88-eixample.jpg",
+    "video": "assets/videos/88-eixample.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "87-attention-distribution",
+    "title": "Attention Distribution",
+    "href": "../87-attention-distribution/",
+    "poster": "assets/posters/87-attention-distribution.jpg",
+    "video": "assets/videos/87-attention-distribution.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "86-agent-stream-scrub",
+    "title": "Agent-Stream Scrub",
+    "href": "../86-agent-stream-scrub/",
+    "poster": "assets/posters/86-agent-stream-scrub.jpg",
+    "video": "assets/videos/86-agent-stream-scrub.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "85-agent-stream-glyphs",
+    "title": "Agent-Stream Glyphs",
+    "href": "../85-agent-stream-glyphs/",
+    "poster": "assets/posters/85-agent-stream-glyphs.jpg",
+    "video": "assets/videos/85-agent-stream-glyphs.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "84-id-card",
+    "title": "ID Card",
+    "href": "../84-id-card/",
+    "poster": "assets/posters/84-id-card.jpg",
+    "video": "assets/videos/84-id-card.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "83-video-index",
+    "title": "Video Index",
+    "href": "../83-video-index/",
+    "poster": "assets/posters/83-video-index.jpg",
+    "video": "assets/videos/83-video-index.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "82-z-axis",
+    "title": "Z-Axis",
+    "href": "../82-z-axis/",
+    "poster": "assets/posters/82-z-axis.jpg",
+    "video": "assets/videos/82-z-axis.mp4",
+    "disabled": false
+  },
+  {
     "slug": "81-lens-wave",
     "title": "Lens Wave",
     "href": "../81-lens-wave/",
@@ -272,6 +360,14 @@
     "disabled": false
   },
   {
+    "slug": "47-2gif",
+    "title": "2GIF",
+    "href": "../47-2gif/",
+    "poster": "assets/posters/47-2gif.jpg",
+    "video": "assets/videos/47-2gif.mp4",
+    "disabled": true
+  },
+  {
     "slug": "46-oklch-vs-hsl",
     "title": "Oklch Vs Hsl",
     "href": "../46-oklch-vs-hsl/",
@@ -286,6 +382,14 @@
     "poster": "assets/posters/45-gravity-pills.jpg",
     "video": "assets/videos/45-gravity-pills.mp4",
     "disabled": false
+  },
+  {
+    "slug": "44-whiff",
+    "title": "Whiff",
+    "href": "../44-whiff/",
+    "poster": "assets/posters/44-whiff.jpg",
+    "video": "assets/videos/44-whiff.mp4",
+    "disabled": true
   },
   {
     "slug": "42-metaball-grid",

@@ -94,9 +94,12 @@ async function loadScenarios() {
 }
 
 async function captureOne(scenario) {
-    const sketchPath = path.join(REPO_ROOT, scenario.meta.slug, 'index.html');
+    // A few sketches keep their page in a subfolder (a bundled app, a variant
+    // hub); meta.path is the repo-relative directory to load instead of the slug.
+    const dir = scenario.meta.path ?? scenario.meta.slug;
+    const sketchPath = path.join(REPO_ROOT, dir, 'index.html');
     if (!existsSync(sketchPath)) throw new Error(`missing sketch: ${sketchPath}`);
-    const url = `http://127.0.0.1:${SERVE_PORT}/${scenario.meta.slug}/`;
+    const url = `http://127.0.0.1:${SERVE_PORT}/${dir}/`;
 
     // Fresh raw dir per run for predictable file lookup.
     const scenarioRawDir = path.join(RAW_DIR, scenario.meta.slug);
