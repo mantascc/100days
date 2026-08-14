@@ -1,6 +1,7 @@
 ---
 id: collisions/vicsek-flocking-x-typography
 type: collision
+title: Vicsek flocking × typography
 state: active
 charge: high
 pair: [sources/vicsek-flocking, threads/generative-typography-and-text]

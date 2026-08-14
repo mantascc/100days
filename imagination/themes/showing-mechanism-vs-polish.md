@@ -4,7 +4,7 @@ type: theme
 title: Showing mechanism vs polish
 state: active
 charge: medium
-spawned: [43-style-seed, 47-2gif, 81-lens-wave, 91-retro-primitives]
+spawned: [43-style-seed, 47-2gif, 81-lens-wave, 91-retro-primitives, daily-sketch/sketch-field-notes, daily-sketch/sketch-apophenia-arc]
 feeds: [threads/design-system-and-reference-sheets, techniques/backdrop-filter-svg-distort, techniques/crt-tube-treatment]
 sources: []
 date: 2026-06-14
@@ -16,6 +16,8 @@ Do you expose the workings or finish the surface? An early maxim — "show the m
 
 # Trace
 - [91-retro-primitives](../../91-retro-primitives/) — the first pass read as "cheap pinball animation"; the second was reworked toward heavier bloom, grain, and a curved tube shell to reach the reference. Polish decisively won over legibility of the underlying shapes — the pipeline hides its seams by design (see [techniques/crt-tube-treatment](../techniques/crt-tube-treatment.md)).
+- [sketch-field-notes](../../daily-sketch/sketch-field-notes/) — every rule followed by the exception where it broke.
+- [sketch-apophenia-arc](../../daily-sketch/sketch-apophenia-arc/) — un-anastrophe deflates and shows the HUD: "it was never about you".
 
 # Charge
 A persistent values question, currently leaning one way — which is precisely why it's worth keeping in view. The theme keeps the polish honest.

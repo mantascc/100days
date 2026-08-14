@@ -2,10 +2,10 @@
 id: seeds/apophenia-arc-instrument
 type: seed
 title: Apophenia arc as instrument (Trema → Apophany → Anastrophe → Un-anastrophe)
-state: active
+state: spent
 charge: high
-spawned: []
-feeds: [veins/agents-and-particle-systems, veins/stochastic-and-noise, tensions/randomness-feeling-intentional, tensions/showing-mechanism-vs-polish, moves/proximity-link-drawing, moves/summed-sines-pseudo-noise]
+spawned: [daily-sketch/sketch-apophenia-arc]
+feeds: [threads/agents-and-particle-systems, threads/stochastic-and-noise, themes/randomness-feeling-intentional, themes/showing-mechanism-vs-polish, techniques/proximity-link-drawing, techniques/summed-sines-pseudo-noise]
 sources: []
 date: 2026-06-14
 tags: [apophenia, instrument, valve, address, paranoid, sublime]
@@ -18,11 +18,17 @@ Each phase has its own clock: Trema is **durative** (swell, atmospheric), Apopha
 
 # Trace
 - Returns to [07-apophenia](../../07-apophenia/) — the first pass at the pattern. The instrument framing wasn't there yet.
+- **Spent by** [sketch-apophenia-arc](../../daily-sketch/sketch-apophenia-arc/) — all four phases at distinct clocks, the valve as the sublime/paranoid switch, the HUD exit. Built 2026-08-02.
 
 # Charge
-High and live. The brief landed all four phases at distinct clocks, the valve as the single sublime/paranoid switch, and the un-anastrophe gesture as the artist's exit. Ready to make.
+Still high, though the seed is spent. Two of the three prompts below were
+realised exactly: the single dot field with a phase-specific clock each, and
+the coin-flip valve (`?v=open` / `?v=welded`, otherwise random per load). The
+third — the diptych — was not, and it is the one that turns the piece from an
+instrument into an argument. A spent Seed with a live prompt left in it is a
+re-seed candidate, not a closed file.
 
 # Prompts
-- Single canvas dot field: summed-sines drift in Trema; proximity-link snap in Apophany; cursor becomes attractor in Anastrophe; HUD reveals mechanism in Un-anastrophe.
-- Coin-flip valve on load — viewer doesn't know whether the exit is welded. Same URL, two truths.
-- A diptych: two iframes side by side, both unlabeled, one open one welded. The viewer finds out which one they're in by trying to leave.
+- ~~Single canvas dot field: summed-sines drift in Trema; proximity-link snap in Apophany; cursor becomes attractor in Anastrophe; HUD reveals mechanism in Un-anastrophe.~~ — made.
+- ~~Coin-flip valve on load — viewer doesn't know whether the exit is welded. Same URL, two truths.~~ — made.
+- A diptych: two iframes side by side, both unlabeled, one open one welded. The viewer finds out which one they're in by trying to leave. **Still unmade.**

@@ -4,7 +4,7 @@ type: thread
 title: Stochastic and noise
 state: active
 charge: high
-spawned: [01-entropy, 04-random-walk, 05-fall, 07-apophenia, 11-brownian-tree, 12-wind-field, 13-image-flow-field, 18-cellular-automaton, 32-genart-cards, 38-baltic-pattern, 52-reaction-diffusion]
+spawned: [01-entropy, 04-random-walk, 05-fall, 07-apophenia, 11-brownian-tree, 12-wind-field, 13-image-flow-field, 18-cellular-automaton, 32-genart-cards, 38-baltic-pattern, 52-reaction-diffusion, daily-sketch/sketch-alice-walk, daily-sketch/sketch-apophenia-arc]
 feeds: [techniques/perlin-fbm-displacement, techniques/summed-sines-pseudo-noise, themes/randomness-feeling-intentional]
 sources: [sources/brownian-markov, sources/perlin-noise]
 date: 2026-06-14
@@ -20,6 +20,8 @@ Randomness treated as a first-class material rather than a fallback. Random walk
 - [12-wind-field](../../12-wind-field/) — Perlin/fBm as an invisible breeze.
 - [38-baltic-pattern](../../38-baltic-pattern/) — controlled noise as ornament.
 - [32-genart-cards](../../32-genart-cards/) — seed-per-card uniqueness as product.
+- [sketch-alice-walk](../../daily-sketch/sketch-alice-walk/) — heavy-tailed micro-steps under an attractor.
+- [sketch-apophenia-arc](../../daily-sketch/sketch-apophenia-arc/) — summed-sines drift as the durative phase.
 
 # Charge
 Deeply alive and entangled with the intentionality theme — the question of when randomness *reads* as choice is one of the practice's best open problems.

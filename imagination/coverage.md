@@ -4,7 +4,7 @@
 owns the outcome column. Reserved file — no frontmatter, see [SPEC.md](SPEC.md) §8.*
 
 **Indexed pieces** — 93 sketches · **85 harvested** · 1 blocked · **7 pending**
-**Daily sketches** — 42 sketches · **1 harvested** · 2 no-signal · 6 covered-by · 8 blocked · **25 pending**
+**Daily sketches** — 43 sketches · **6 harvested** · 2 no-signal · 6 covered-by · 8 blocked · **21 pending**
 
 `harvested` read, entities created or strengthened · `no-signal` read, nothing
 surfaced — closes the read, not the sketch · `covered-by` promoted; harvest the
@@ -118,14 +118,14 @@ indexed piece instead · `blocked` no `interface.md` yet · `pending` backlog.
 | `sketch-agent-stream-scrub` | — | covered-by 86-agent-stream-scrub | — |
 | `sketch-agent-streaming-patterns` | — | pending | — |
 | `sketch-agent-tool-call` | — | pending | — |
-| `sketch-alice-walk` | — | pending | — |
+| `sketch-alice-walk` | 2026-08-09 | harvested | `sources/brownian-markov`, `threads/agents-and-particle-systems`, `threads/curiosity-and-leave-conditions` +1 |
 | `sketch-anna-portfolio` | — | pending | — |
 | `sketch-antistyle` | — | pending | — |
-| `sketch-apophenia-arc` | — | pending | — |
+| `sketch-apophenia-arc` | 2026-08-09 | harvested | `seeds/apophenia-arc-instrument`, `techniques/proximity-link-drawing`, `techniques/summed-sines-pseudo-noise` +4 |
 | `sketch-ascii-field-gallery` | — | covered-by 66-ascii-field-gallery | — |
 | `sketch-ascii-sheet-signal` | — | blocked: no interface.md | — |
 | `sketch-ascii-sheets-variance` | — | pending | — |
-| `sketch-audio-agents-grid` | — | pending | — |
+| `sketch-audio-agents-grid` | 2026-08-09 | harvested | `techniques/asymmetric-audio-envelope`, `themes/audio-reactive-without-gimmick`, `threads/agents-and-particle-systems` +2 |
 | `sketch-audio-reactive-agents-v2` | — | pending | — |
 | `sketch-character-field` | — | pending | — |
 | `sketch-character-sandbox` | — | pending | — |
@@ -133,7 +133,7 @@ indexed piece instead · `blocked` no `interface.md` yet · `pending` backlog.
 | `sketch-data-forms` | — | pending | — |
 | `sketch-eixample` | — | covered-by 88-eixample | — |
 | `sketch-eixample-fullscreen-grid` | — | pending | — |
-| `sketch-field-notes` | — | pending | — |
+| `sketch-field-notes` | 2026-08-09 | harvested | `techniques/glyph-density-ramp`, `techniques/live-specimen-documentation`, `techniques/per-cell-threshold-crystallization` +6 |
 | `sketch-geo` | — | blocked: no interface.md | — |
 | `sketch-idle` | — | pending | — |
 | `sketch-idle-crt` | — | pending | — |
@@ -142,6 +142,7 @@ indexed piece instead · `blocked` no `interface.md` yet · `pending` backlog.
 | `sketch-mesa` | — | blocked: no interface.md | — |
 | `sketch-mode-toggle` | — | covered-by 65-mode-toggle | — |
 | `sketch-moog-phase-grid` | — | pending | — |
+| `sketch-phrasing` | — | pending | — |
 | `sketch-position-in-queue` | — | pending | — |
 | `sketch-pretext-canvas` | — | blocked: no interface.md | — |
 | `sketch-pretext-dom` | — | blocked: no interface.md | — |
@@ -152,5 +153,5 @@ indexed piece instead · `blocked` no `interface.md` yet · `pending` backlog.
 | `sketch-torus-sheet` | 2026-08-09 | no-signal | — |
 | `sketch-tube-driven` | 2026-08-09 | no-signal | — |
 | `sketch-ube-field-audio` | — | pending | — |
-| `sketch-walks-thread` | — | pending | — |
+| `sketch-walks-thread` | 2026-08-09 | harvested | `sources/brownian-markov`, `techniques/live-specimen-documentation`, `threads/agents-and-particle-systems` +1 |
 | `sketch-word-flock` | 2026-06-14 | harvested | `collisions/vicsek-flocking-x-typography` |

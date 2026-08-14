@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sketch-phrasing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root {
+      --ground-void: #0a0a0a;
+      --ground-base: #0f0f0f;
+      --ground-raised: #141414;
+      --text-primary: #ffffff;
+      --text-default: #f5f5f7;
+      --text-secondary: #a8aab8;
+      --text-tertiary: #666666;
+      --text-ghost: #333333;
+      --border-subtle: #1a1a1a;
+      --border-default: #2a2a2a;
+      --accent: #ffaa00;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      min-height: 100%;
+      background: var(--ground-void);
+      color: var(--text-default);
+      font-family: var(--font-mono);
+      font-weight: 300;
+    }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    header {
+      padding: 24px 24px 0;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    header .seed { color: var(--text-tertiary); }
+    header .seed b { color: var(--accent); font-weight: 400; }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 24px;
+      gap: 4px;
+      min-height: 0;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 148px 1fr;
+      align-items: stretch;
+      gap: 16px;
+    }
+    .row.impulse { margin-bottom: 12px; }
+
+    .label { padding-top: 2px; user-select: none; }
+    .label .name {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-default);
+    }
+    .row.impulse .label .name { color: var(--text-tertiary); }
+    .label .note {
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+    .label .note em { color: var(--text-secondary); font-style: normal; }
+
+    canvas { display: block; width: 100%; height: 100%; }
+    .lane { border-bottom: 1px solid var(--border-subtle); height: 96px; }
+    .lane.thin { border-bottom: none; height: 18px; }
+
+    footer {
+      padding: 0 24px 24px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .ctrl { display: flex; flex-direction: column; gap: 6px; min-width: 150px; }
+    .ctrl label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .ctrl label b { color: var(--accent); font-weight: 400; }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 1px;
+      background: var(--border-default);
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 9px; height: 9px;
+      background: var(--accent);
+      cursor: pointer;
+      border-radius: 0;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 9px; height: 9px;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+      border-radius: 0;
+    }
+
+    button {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid var(--border-default);
+      padding: 7px 12px;
+      cursor: pointer;
+      transition: color 100ms linear, border-color 100ms linear;
+    }
+    button:hover { color: var(--accent); border-color: var(--accent); }
+
+    .caption {
+      font-size: 10px;
+      line-height: 1.6;
+      color: var(--text-ghost);
+      max-width: 34em;
+      padding: 0 24px 24px;
+    }
+    .caption em { color: var(--text-tertiary); font-style: normal; }
+
+    @media (max-width: 720px) {
+      .row { grid-template-columns: 1fr; gap: 4px; }
+      .label .note { display: none; }
+      .lane { height: 72px; }
+      footer { gap: 18px; }
+      .ctrl { min-width: 120px; flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span>sketch-phrasing</span>
+  <span class="seed">seed <b id="seedOut">—</b> · one event stream, three readings</span>
+</header>
+
+<main>
+  <div class="row impulse">
+    <div class="label"><div class="name">impulses</div></div>
+    <div class="lane thin"><canvas id="cImp"></canvas></div>
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <div class="name">raw</div>
+      <div class="note">uniform amplitude.<br>what actually happened.</div>
+    </div>
+    <div class="lane"><canvas id="cRaw"></canvas></div>
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <div class="name">mapped</div>
+      <div class="note">piecewise amplitude.<br>changes <em>what</em>, not <em>when</em>.</div>
+    </div>
+    <div class="lane"><canvas id="cMap"></canvas></div>
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <div class="name">phrased</div>
+      <div class="note">attack / release.<br>changes <em>when it is still happening</em>.</div>
+    </div>
+    <div class="lane"><canvas id="cEnv"></canvas></div>
+  </div>
+</main>
+
+<footer>
+  <div class="ctrl">
+    <label>attack <b id="aOut">1 ms</b></label>
+    <input type="range" id="aIn" min="0" max="100" value="0" step="1">
+  </div>
+  <div class="ctrl">
+    <label>release <b id="rOut">420 ms</b></label>
+    <input type="range" id="rIn" min="0" max="100" value="69" step="1">
+  </div>
+  <div class="ctrl">
+    <label>density <b id="dOut">6 / s</b></label>
+    <input type="range" id="dIn" min="1" max="30" value="6" step="1">
+  </div>
+  <button id="collapse">collapse release</button>
+  <button id="reseed">reseed</button>
+</footer>
+
+<p class="caption">
+  All three lanes are the <em>same events at the same instants</em> — the impulse row above is
+  the shared truth. Only the response differs. Drop release to zero and the phrased lane
+  becomes the raw lane exactly, which is the point: nothing was added to the randomness,
+  only a memory of it.
+</p>
+
+<script>
+// ─── deterministic noise ──────────────────────────────────────────────────
+// xmur3 → mulberry32, the house PRNG pair. Same seed, same stream, always.
+function xmur3(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return (h ^= h >>> 16) >>> 0;
+  };
+}
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ─── state ────────────────────────────────────────────────────────────────
+const STEP_MS = 12;      // one simulation step == one drawn column
+const COL_W   = 3;       // px per column
+
+const canvases = {
+  imp: document.getElementById('cImp'),
+  raw: document.getElementById('cRaw'),
+  map: document.getElementById('cMap'),
+  env: document.getElementById('cEnv'),
+};
+
+let cols = 0;
+let buf = null;          // { imp, raw, map, env } — parallel ring buffers
+let head = 0;            // next write index
+let rand = null;
+let seed = 0;
+let env = 0;             // the running envelope, the only stateful lane
+let acc = 0, last = performance.now();
+
+const P = { attack: 1, release: 420, density: 6 };
+
+// slider position (0-100) → milliseconds, exponential so the low end is usable
+const toMs = (v, lo, hi) => lo * Math.pow(hi / lo, v / 100);
+const attackFromSlider  = v => toMs(v, 0.4, 120);
+const releaseFromSlider = v => v === 0 ? 0 : toMs(v, 8, 2400);
+
+function reseed(n) {
+  seed = n !== undefined ? n : Math.floor(Math.random() * 9000 + 1000);
+  rand = mulberry32(xmur3('phrasing-' + seed)());
+  env = 0;
+  document.getElementById('seedOut').textContent = seed;
+  if (buf) { buf.imp.fill(0); buf.raw.fill(0); buf.map.fill(0); buf.env.fill(0); }
+}
+
+// The practice's standing answer to `randomness-feeling-intentional`:
+// carve the amplitude range into bands so a run reads as phases, not a gradient.
+function piecewise(a) {
+  if (a < 0.50) return 0.16;
+  if (a < 0.80) return 0.46;
+  if (a < 0.95) return 0.78;
+  return 1.0;
+}
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = canvases.raw.clientWidth;
+  const next = Math.max(40, Math.floor(w / COL_W));
+  if (next !== cols) {
+    cols = next;
+    buf = {
+      imp: new Float32Array(cols), raw: new Float32Array(cols),
+      map: new Float32Array(cols), env: new Float32Array(cols),
+    };
+    head = 0;
+  }
+  for (const c of Object.values(canvases)) {
+    c.width  = Math.max(1, Math.round(c.clientWidth  * dpr));
+    c.height = Math.max(1, Math.round(c.clientHeight * dpr));
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+}
+
+// ─── simulation ───────────────────────────────────────────────────────────
+function step() {
+  const dt = STEP_MS;
+
+  // one uniform event stream — this is the ONLY place randomness enters
+  let amp = 0;
+  if (rand() < (P.density * dt) / 1000) amp = rand();
+
+  // classic one-pole attack/release follower, lifted straight off the audio work
+  const target = amp;
+  const tau = target > env ? P.attack : P.release;
+  const coef = tau <= 0 ? 0 : Math.exp(-dt / tau);
+  env = target + (env - target) * coef;
+
+  buf.imp[head] = amp > 0 ? 1 : 0;
+  buf.raw[head] = amp;
+  buf.map[head] = amp > 0 ? piecewise(amp) : 0;
+  buf.env[head] = env;
+  head = (head + 1) % cols;
+}
+
+// ─── render ───────────────────────────────────────────────────────────────
+function drawLane(canvas, data, thin) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+
+  const bw = Math.max(1, COL_W - 1);
+  ctx.fillStyle = '#ffffff';
+
+  for (let i = 0; i < cols; i++) {
+    const v = data[(head + i) % cols];      // oldest → newest, left → right
+    if (v <= 0.001) continue;
+    const x = i * COL_W;
+    if (thin) {
+      ctx.globalAlpha = 0.55;
+      ctx.fillRect(x, 0, bw, h);
+    } else {
+      const bh = Math.max(1, v * (h - 2));
+      ctx.globalAlpha = 0.30 + 0.70 * v;
+      ctx.fillRect(x, h - bh, bw, bh);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function frame(now) {
+  acc += Math.min(now - last, 250);          // clamp, so a hidden tab can't burst
+  last = now;
+  while (acc >= STEP_MS) { step(); acc -= STEP_MS; }
+
+  drawLane(canvases.imp, buf.imp, true);
+  drawLane(canvases.raw, buf.raw, false);
+  drawLane(canvases.map, buf.map, false);
+  drawLane(canvases.env, buf.env, false);
+  requestAnimationFrame(frame);
+}
+
+// ─── controls ─────────────────────────────────────────────────────────────
+const aIn = document.getElementById('aIn'), aOut = document.getElementById('aOut');
+const rIn = document.getElementById('rIn'), rOut = document.getElementById('rOut');
+const dIn = document.getElementById('dIn'), dOut = document.getElementById('dOut');
+
+const fmt = ms => ms < 10 ? ms.toFixed(1) + ' ms' : Math.round(ms) + ' ms';
+
+function syncAttack() {
+  P.attack = attackFromSlider(+aIn.value);
+  aOut.textContent = fmt(P.attack);
+}
+function syncRelease() {
+  P.release = releaseFromSlider(+rIn.value);
+  rOut.textContent = P.release === 0 ? 'none' : fmt(P.release);
+}
+function syncDensity() {
+  P.density = +dIn.value;
+  dOut.textContent = P.density + ' / s';
+}
+
+aIn.addEventListener('input', syncAttack);
+rIn.addEventListener('input', syncRelease);
+dIn.addEventListener('input', syncDensity);
+document.getElementById('reseed').addEventListener('click', () => reseed());
+document.getElementById('collapse').addEventListener('click', () => {
+  rIn.value = 0; syncRelease();
+});
+
+window.addEventListener('resize', resize);
+
+// ─── go ───────────────────────────────────────────────────────────────────
+resize();
+syncAttack(); syncRelease(); syncDensity();
+reseed(4127);
+requestAnimationFrame(frame);
+</script>
+
+</body>
+</html>

@@ -3,8 +3,8 @@ id: techniques/summed-sines-pseudo-noise
 type: technique
 title: Summed sines pseudo-noise
 state: active
-charge: medium
-spawned: [74-particles, 79-idle-states, 78-ascii-sheets-docs, 81-lens-wave]
+charge: high
+spawned: [74-particles, 79-idle-states, 78-ascii-sheets-docs, 81-lens-wave, daily-sketch/sketch-field-notes, daily-sketch/sketch-apophenia-arc]
 feeds: [threads/stochastic-and-noise]
 sources: []
 date: 2026-06-14
@@ -19,6 +19,8 @@ Noise without a noise library: sum a chord of sines at mutually-prime frequencie
 - [79-idle-states](../../79-idle-states/) — summed sines as restful drift.
 - [74-particles](../../74-particles/) — pseudo-noise steering the swarm.
 - [81-lens-wave](../../81-lens-wave/) — overlapping waves as a lens field.
+- [sketch-field-notes](../../daily-sketch/sketch-field-notes/) — selected into the reference sheet as canon.
+- [sketch-apophenia-arc](../../daily-sketch/sketch-apophenia-arc/) — the drift underneath Trema.
 
 # Charge
 Charming and frequently reached for — the "good enough noise" that keeps sketches lean. Ripe for being pushed somewhere more structural.

@@ -4,7 +4,7 @@ type: thread
 title: Audio reactivity
 state: active
 charge: high
-spawned: [10-audio-reactive-agents, 17-audio-reactive-network, 39-wave-morph, 67-audio-reactive-ascii, 68-moog-phase]
+spawned: [10-audio-reactive-agents, 17-audio-reactive-network, 39-wave-morph, 67-audio-reactive-ascii, 68-moog-phase, daily-sketch/sketch-audio-agents-grid]
 feeds: [themes/audio-reactive-without-gimmick]
 sources: []
 date: 2026-06-14
@@ -20,6 +20,7 @@ Sound driving image directly: mic RMS and FFT bins mapped onto motion, force, gl
 - [39-wave-morph](../../39-wave-morph/) — waveform as deformable geometry.
 - [67-audio-reactive-ascii](../../67-audio-reactive-ascii/) — FFT mapped onto a glyph ramp.
 - [68-moog-phase](../../68-moog-phase/) — sound as a phase portrait, not a bar chart.
+- [sketch-audio-agents-grid](../../daily-sketch/sketch-audio-agents-grid/) — nine miniature worlds off one microphone.
 
 # Charge
 Reliably exciting to build, but shadowed by the gimmick theme — the work is best when the motion is a *consequence of optics*, not a reaction bolted on.

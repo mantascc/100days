@@ -3,8 +3,8 @@ id: themes/audio-reactive-without-gimmick
 type: theme
 title: Audio-reactive without the gimmick
 state: active
-charge: medium
-spawned: [10-audio-reactive-agents, 17-audio-reactive-network, 68-moog-phase]
+charge: high
+spawned: [10-audio-reactive-agents, 17-audio-reactive-network, 68-moog-phase, daily-sketch/sketch-audio-agents-grid]
 feeds: [threads/audio-reactivity]
 sources: []
 date: 2026-06-14

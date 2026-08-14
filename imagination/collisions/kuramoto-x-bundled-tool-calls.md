@@ -4,7 +4,7 @@ type: collision
 title: Kuramoto sync × bundled tool calls
 state: dormant
 charge: medium
-pair: [sources/kuramoto-fireflies, veins/design-system-and-reference-sheets]
+pair: [sources/kuramoto-fireflies, threads/design-system-and-reference-sheets]
 proposed: [2026-06-16]
 date: 2026-06-16
 tags: [agents, streaming, sync, oscillators, bundling]

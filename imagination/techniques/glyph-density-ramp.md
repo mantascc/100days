@@ -3,8 +3,8 @@ id: techniques/glyph-density-ramp
 type: technique
 title: Glyph density ramp
 state: active
-charge: medium
-spawned: [53-ascii-grid, 55-ascii-loading, 66-ascii-field-gallery, 72-snapshots-v2, 77-ascii-sheet-documentation, 78-ascii-sheets-docs]
+charge: high
+spawned: [53-ascii-grid, 55-ascii-loading, 66-ascii-field-gallery, 72-snapshots-v2, 77-ascii-sheet-documentation, 78-ascii-sheets-docs, daily-sketch/sketch-field-notes]
 feeds: [threads/ascii-and-text-rendering]
 sources: []
 date: 2026-06-14
@@ -19,6 +19,7 @@ Map a continuous 0..1 field across an ordered set of glyphs — from sparse (` .
 - [66-ascii-field-gallery](../../66-ascii-field-gallery/) — one ramp across many fields.
 - [72-snapshots-v2](../../72-snapshots-v2/) — ramp applied to captured frames.
 - [77-ascii-sheet-documentation](../../77-ascii-sheet-documentation/) — ramp as documented primitive.
+- [sketch-field-notes](../../daily-sketch/sketch-field-notes/) — selected into the reference sheet as canon.
 
 # Charge
 The quiet workhorse of the ASCII house style — refined and reusable, bordering on a personal standard.

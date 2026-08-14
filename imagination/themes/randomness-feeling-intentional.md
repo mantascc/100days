@@ -4,7 +4,7 @@ type: theme
 title: Randomness feeling intentional
 state: active
 charge: high
-spawned: [01-entropy, 04-random-walk, 07-apophenia, 56-constrained-variation]
+spawned: [01-entropy, 04-random-walk, 07-apophenia, 56-constrained-variation, daily-sketch/sketch-apophenia-arc]
 feeds: [threads/stochastic-and-noise]
 sources: []
 date: 2026-06-14
