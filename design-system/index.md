@@ -12,7 +12,7 @@ Start at the [README](README.md) for the model and the status lifecycle.
 
 ## Tokens
 
-- [color](tokens/color.md) — grounds, text, structural, accent, named colors, overlay (with provenance + status).
+- [color](tokens/color.md) — grounds, text, structural, accent, named colors, overlay (with provenance + status). *Text ramp revised 2026-08-09: every text token now clears 4.5:1.*
 - [typography](tokens/typography.md) — mono families, 6-step scale, rhythm, case rules.
 - [spacing](tokens/spacing.md) — 4px-base scale, 1 → 16.
 - [geometry](tokens/geometry.md) — primitives only, stroke weights, grid.

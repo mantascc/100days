@@ -1,7 +1,116 @@
 [
   {
+    "slug": "93-imagination-layers",
+    "title": "Imagination Layers",
+    "tier": "indexed",
+    "href": "../93-imagination-layers/",
+    "poster": "assets/posters/93-imagination-layers.jpg",
+    "video": "assets/videos/93-imagination-layers.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "92-tube-tolerance",
+    "title": "Tube Tolerance",
+    "tier": "indexed",
+    "href": "../92-tube-tolerance/",
+    "poster": "assets/posters/92-tube-tolerance.jpg",
+    "video": "assets/videos/92-tube-tolerance.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "91-retro-primitives",
+    "title": "Retro Primitives",
+    "tier": "indexed",
+    "href": "../91-retro-primitives/",
+    "poster": "assets/posters/91-retro-primitives.jpg",
+    "video": "assets/videos/91-retro-primitives.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "90-aida001",
+    "title": "AIDA001",
+    "tier": "indexed",
+    "href": "../90-aida001/",
+    "poster": "assets/posters/90-aida001.jpg",
+    "video": "assets/videos/90-aida001.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "89-sprite-states",
+    "title": "Sprite States",
+    "tier": "indexed",
+    "href": "../89-sprite-states/",
+    "poster": "assets/posters/89-sprite-states.jpg",
+    "video": "assets/videos/89-sprite-states.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "88-eixample",
+    "title": "Eixample",
+    "tier": "indexed",
+    "href": "../88-eixample/",
+    "poster": "assets/posters/88-eixample.jpg",
+    "video": "assets/videos/88-eixample.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "87-attention-distribution",
+    "title": "Attention Distribution",
+    "tier": "indexed",
+    "href": "../87-attention-distribution/",
+    "poster": "assets/posters/87-attention-distribution.jpg",
+    "video": "assets/videos/87-attention-distribution.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "86-agent-stream-scrub",
+    "title": "Agent-Stream Scrub",
+    "tier": "indexed",
+    "href": "../86-agent-stream-scrub/",
+    "poster": "assets/posters/86-agent-stream-scrub.jpg",
+    "video": "assets/videos/86-agent-stream-scrub.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "85-agent-stream-glyphs",
+    "title": "Agent-Stream Glyphs",
+    "tier": "indexed",
+    "href": "../85-agent-stream-glyphs/",
+    "poster": "assets/posters/85-agent-stream-glyphs.jpg",
+    "video": "assets/videos/85-agent-stream-glyphs.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "84-id-card",
+    "title": "ID Card",
+    "tier": "indexed",
+    "href": "../84-id-card/",
+    "poster": "assets/posters/84-id-card.jpg",
+    "video": "assets/videos/84-id-card.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "83-video-index",
+    "title": "Video Index",
+    "tier": "indexed",
+    "href": "../83-video-index/",
+    "poster": "assets/posters/83-video-index.jpg",
+    "video": "assets/videos/83-video-index.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "82-z-axis",
+    "title": "Z-Axis",
+    "tier": "indexed",
+    "href": "../82-z-axis/",
+    "poster": "assets/posters/82-z-axis.jpg",
+    "video": "assets/videos/82-z-axis.mp4",
+    "disabled": false
+  },
+  {
     "slug": "81-lens-wave",
     "title": "Lens Wave",
+    "tier": "indexed",
     "href": "../81-lens-wave/",
     "poster": "assets/posters/81-lens-wave.jpg",
     "video": "assets/videos/81-lens-wave.mp4",
@@ -10,6 +119,7 @@
   {
     "slug": "80-network",
     "title": "Network",
+    "tier": "indexed",
     "href": "../80-network/",
     "poster": "assets/posters/80-network.jpg",
     "video": "assets/videos/80-network.mp4",
@@ -18,6 +128,7 @@
   {
     "slug": "79-idle-states",
     "title": "Idle States",
+    "tier": "indexed",
     "href": "../79-idle-states/",
     "poster": "assets/posters/79-idle-states.jpg",
     "video": "assets/videos/79-idle-states.mp4",
@@ -26,6 +137,7 @@
   {
     "slug": "78-ascii-sheets-docs",
     "title": "Ascii Sheets Docs",
+    "tier": "indexed",
     "href": "../78-ascii-sheets-docs/",
     "poster": "assets/posters/78-ascii-sheets-docs.jpg",
     "video": "assets/videos/78-ascii-sheets-docs.mp4",
@@ -34,6 +146,7 @@
   {
     "slug": "77-ascii-sheet-documentation",
     "title": "Ascii Sheet Documentation",
+    "tier": "indexed",
     "href": "../77-ascii-sheet-documentation/",
     "poster": "assets/posters/77-ascii-sheet-documentation.jpg",
     "video": "assets/videos/77-ascii-sheet-documentation.mp4",
@@ -42,6 +155,7 @@
   {
     "slug": "76-layout-depth",
     "title": "Layout Depth",
+    "tier": "indexed",
     "href": "../76-layout-depth/",
     "poster": "assets/posters/76-layout-depth.jpg",
     "video": "assets/videos/76-layout-depth.mp4",
@@ -50,6 +164,7 @@
   {
     "slug": "75-layout-playground",
     "title": "Layout Playground",
+    "tier": "indexed",
     "href": "../75-layout-playground/",
     "poster": "assets/posters/75-layout-playground.jpg",
     "video": "assets/videos/75-layout-playground.mp4",
@@ -58,6 +173,7 @@
   {
     "slug": "74-particles",
     "title": "Particles",
+    "tier": "indexed",
     "href": "../74-particles/",
     "poster": "assets/posters/74-particles.jpg",
     "video": "assets/videos/74-particles.mp4",
@@ -66,6 +182,7 @@
   {
     "slug": "73-svg-layouts",
     "title": "Svg Layouts",
+    "tier": "indexed",
     "href": "../73-svg-layouts/",
     "poster": "assets/posters/73-svg-layouts.jpg",
     "video": "assets/videos/73-svg-layouts.mp4",
@@ -74,6 +191,7 @@
   {
     "slug": "72-snapshots-v2",
     "title": "Snapshots V2",
+    "tier": "indexed",
     "href": "../72-snapshots-v2/",
     "poster": "assets/posters/72-snapshots-v2.jpg",
     "video": "assets/videos/72-snapshots-v2.mp4",
@@ -82,6 +200,7 @@
   {
     "slug": "71-index-100days",
     "title": "Index 100days",
+    "tier": "indexed",
     "href": "../71-index-100days/",
     "poster": "assets/posters/71-index-100days.jpg",
     "video": "assets/videos/71-index-100days.mp4",
@@ -90,6 +209,7 @@
   {
     "slug": "70-clear-channel-2",
     "title": "Clear Channel 2",
+    "tier": "indexed",
     "href": "../70-clear-channel-2/",
     "poster": "assets/posters/70-clear-channel-2.jpg",
     "video": "assets/videos/70-clear-channel-2.mp4",
@@ -98,6 +218,7 @@
   {
     "slug": "69-clear-channel",
     "title": "Clear Channel",
+    "tier": "indexed",
     "href": "../69-clear-channel/",
     "poster": "assets/posters/69-clear-channel.jpg",
     "video": "assets/videos/69-clear-channel.mp4",
@@ -106,6 +227,7 @@
   {
     "slug": "68-moog-phase",
     "title": "Moog Phase",
+    "tier": "indexed",
     "href": "../68-moog-phase/",
     "poster": "assets/posters/68-moog-phase.jpg",
     "video": "assets/videos/68-moog-phase.mp4",
@@ -114,6 +236,7 @@
   {
     "slug": "67-audio-reactive-ascii",
     "title": "Audio Reactive Ascii",
+    "tier": "indexed",
     "href": "../67-audio-reactive-ascii/",
     "poster": "assets/posters/67-audio-reactive-ascii.jpg",
     "video": "assets/videos/67-audio-reactive-ascii.mp4",
@@ -122,6 +245,7 @@
   {
     "slug": "66-ascii-field-gallery",
     "title": "Ascii Field Gallery",
+    "tier": "indexed",
     "href": "../66-ascii-field-gallery/",
     "poster": "assets/posters/66-ascii-field-gallery.jpg",
     "video": "assets/videos/66-ascii-field-gallery.mp4",
@@ -130,6 +254,7 @@
   {
     "slug": "65-mode-toggle",
     "title": "Mode Toggle",
+    "tier": "indexed",
     "href": "../65-mode-toggle/",
     "poster": "assets/posters/65-mode-toggle.jpg",
     "video": "assets/videos/65-mode-toggle.mp4",
@@ -138,6 +263,7 @@
   {
     "slug": "64-viz-grouped",
     "title": "Viz Grouped",
+    "tier": "indexed",
     "href": "../64-viz-grouped/",
     "poster": "assets/posters/64-viz-grouped.jpg",
     "video": "assets/videos/64-viz-grouped.mp4",
@@ -146,6 +272,7 @@
   {
     "slug": "63-ube-kaizen",
     "title": "Ube Kaizen",
+    "tier": "indexed",
     "href": "../63-ube-kaizen/",
     "poster": "assets/posters/63-ube-kaizen.jpg",
     "video": "assets/videos/63-ube-kaizen.mp4",
@@ -154,6 +281,7 @@
   {
     "slug": "63-constellation-map",
     "title": "Constellation Map",
+    "tier": "indexed",
     "href": "../63-constellation-map/",
     "poster": "assets/posters/63-constellation-map.jpg",
     "video": "assets/videos/63-constellation-map.mp4",
@@ -162,6 +290,7 @@
   {
     "slug": "62-terminal-cli",
     "title": "Terminal Cli",
+    "tier": "indexed",
     "href": "../62-terminal-cli/",
     "poster": "assets/posters/62-terminal-cli.jpg",
     "video": "assets/videos/62-terminal-cli.mp4",
@@ -170,6 +299,7 @@
   {
     "slug": "61-hitl-patterns",
     "title": "Hitl Patterns",
+    "tier": "indexed",
     "href": "../61-hitl-patterns/",
     "poster": "assets/posters/61-hitl-patterns.jpg",
     "video": "assets/videos/61-hitl-patterns.mp4",
@@ -178,6 +308,7 @@
   {
     "slug": "60-agentic-patterns",
     "title": "Agentic Patterns",
+    "tier": "indexed",
     "href": "../60-agentic-patterns/",
     "poster": "assets/posters/60-agentic-patterns.jpg",
     "video": "assets/videos/60-agentic-patterns.mp4",
@@ -186,6 +317,7 @@
   {
     "slug": "59-font-explorer",
     "title": "Font Explorer",
+    "tier": "indexed",
     "href": "../59-font-explorer/",
     "poster": "assets/posters/59-font-explorer.jpg",
     "video": "assets/videos/59-font-explorer.mp4",
@@ -194,6 +326,7 @@
   {
     "slug": "58-shapes",
     "title": "Shapes",
+    "tier": "indexed",
     "href": "../58-shapes/",
     "poster": "assets/posters/58-shapes.jpg",
     "video": "assets/videos/58-shapes.mp4",
@@ -202,6 +335,7 @@
   {
     "slug": "57-color-themes",
     "title": "Color Themes",
+    "tier": "indexed",
     "href": "../57-color-themes/",
     "poster": "assets/posters/57-color-themes.jpg",
     "video": "assets/videos/57-color-themes.mp4",
@@ -210,6 +344,7 @@
   {
     "slug": "56-constrained-variation",
     "title": "Constrained Variation",
+    "tier": "indexed",
     "href": "../56-constrained-variation/",
     "poster": "assets/posters/56-constrained-variation.jpg",
     "video": "assets/videos/56-constrained-variation.mp4",
@@ -218,6 +353,7 @@
   {
     "slug": "55-ascii-loading",
     "title": "Ascii Loading",
+    "tier": "indexed",
     "href": "../55-ascii-loading/",
     "poster": "assets/posters/55-ascii-loading.jpg",
     "video": "assets/videos/55-ascii-loading.mp4",
@@ -226,6 +362,7 @@
   {
     "slug": "54-concept-graph",
     "title": "Concept Graph",
+    "tier": "indexed",
     "href": "../54-concept-graph/",
     "poster": "assets/posters/54-concept-graph.jpg",
     "video": "assets/videos/54-concept-graph.mp4",
@@ -234,6 +371,7 @@
   {
     "slug": "53-ascii-grid",
     "title": "Ascii Grid",
+    "tier": "indexed",
     "href": "../53-ascii-grid/",
     "poster": "assets/posters/53-ascii-grid.jpg",
     "video": "assets/videos/53-ascii-grid.mp4",
@@ -242,6 +380,7 @@
   {
     "slug": "52-reaction-diffusion",
     "title": "Reaction Diffusion",
+    "tier": "indexed",
     "href": "../52-reaction-diffusion/",
     "poster": "assets/posters/52-reaction-diffusion.jpg",
     "video": "assets/videos/52-reaction-diffusion.mp4",
@@ -250,6 +389,7 @@
   {
     "slug": "51-resonant-lattice",
     "title": "Resonant Lattice",
+    "tier": "indexed",
     "href": "../51-resonant-lattice/",
     "poster": "assets/posters/51-resonant-lattice.jpg",
     "video": "assets/videos/51-resonant-lattice.mp4",
@@ -258,6 +398,7 @@
   {
     "slug": "50-execution-trace-graph",
     "title": "Execution Trace Graph",
+    "tier": "indexed",
     "href": "../50-execution-trace-graph/",
     "poster": "assets/posters/50-execution-trace-graph.jpg",
     "video": "assets/videos/50-execution-trace-graph.mp4",
@@ -266,14 +407,25 @@
   {
     "slug": "49-grid-trace",
     "title": "Grid Trace",
+    "tier": "indexed",
     "href": "../49-grid-trace/",
     "poster": "assets/posters/49-grid-trace.jpg",
     "video": "assets/videos/49-grid-trace.mp4",
     "disabled": false
   },
   {
+    "slug": "47-2gif",
+    "title": "2GIF",
+    "tier": "indexed",
+    "href": "../47-2gif/2gif/",
+    "poster": "assets/posters/47-2gif.jpg",
+    "video": "assets/videos/47-2gif.mp4",
+    "disabled": true
+  },
+  {
     "slug": "46-oklch-vs-hsl",
     "title": "Oklch Vs Hsl",
+    "tier": "indexed",
     "href": "../46-oklch-vs-hsl/",
     "poster": "assets/posters/46-oklch-vs-hsl.jpg",
     "video": "assets/videos/46-oklch-vs-hsl.mp4",
@@ -282,14 +434,25 @@
   {
     "slug": "45-gravity-pills",
     "title": "Gravity Pills",
+    "tier": "indexed",
     "href": "../45-gravity-pills/",
     "poster": "assets/posters/45-gravity-pills.jpg",
     "video": "assets/videos/45-gravity-pills.mp4",
     "disabled": false
   },
   {
+    "slug": "44-whiff",
+    "title": "Whiff",
+    "tier": "indexed",
+    "href": "../44-whiff/canvas-app/",
+    "poster": "assets/posters/44-whiff.jpg",
+    "video": "assets/videos/44-whiff.mp4",
+    "disabled": true
+  },
+  {
     "slug": "42-metaball-grid",
     "title": "Metaball Grid",
+    "tier": "indexed",
     "href": "../42-metaball-grid/",
     "poster": "assets/posters/42-metaball-grid.jpg",
     "video": "assets/videos/42-metaball-grid.mp4",
@@ -298,6 +461,7 @@
   {
     "slug": "41-metaball",
     "title": "Metaball",
+    "tier": "indexed",
     "href": "../41-metaball/",
     "poster": "assets/posters/41-metaball.jpg",
     "video": "assets/videos/41-metaball.mp4",
@@ -306,6 +470,7 @@
   {
     "slug": "40-cube-grid-rules",
     "title": "Cube Grid Rules",
+    "tier": "indexed",
     "href": "../40-cube-grid-rules/",
     "poster": "assets/posters/40-cube-grid-rules.jpg",
     "video": "assets/videos/40-cube-grid-rules.mp4",
@@ -314,6 +479,7 @@
   {
     "slug": "39-wave-morph",
     "title": "Wave Morph",
+    "tier": "indexed",
     "href": "../39-wave-morph/",
     "poster": "assets/posters/39-wave-morph.jpg",
     "video": "assets/videos/39-wave-morph.mp4",
@@ -322,6 +488,7 @@
   {
     "slug": "38-baltic-pattern",
     "title": "Baltic Pattern",
+    "tier": "indexed",
     "href": "../38-baltic-pattern/",
     "poster": "assets/posters/38-baltic-pattern.jpg",
     "video": "assets/videos/38-baltic-pattern.mp4",
@@ -330,6 +497,7 @@
   {
     "slug": "37-sentiment-analyzer",
     "title": "Sentiment Analyzer",
+    "tier": "indexed",
     "href": "../37-sentiment-analyzer/",
     "poster": "assets/posters/37-sentiment-analyzer.jpg",
     "video": "assets/videos/37-sentiment-analyzer.mp4",
@@ -338,6 +506,7 @@
   {
     "slug": "36-spinning-globe",
     "title": "Sentiment + Explanations",
+    "tier": "indexed",
     "href": "../36-spinning-globe/",
     "poster": "assets/posters/36-spinning-globe.jpg",
     "video": "assets/videos/36-spinning-globe.mp4",
@@ -346,6 +515,7 @@
   {
     "slug": "35-flight-path-viz",
     "title": "Flight Path Viz",
+    "tier": "indexed",
     "href": "../35-flight-path-viz/",
     "poster": "assets/posters/35-flight-path-viz.jpg",
     "video": "assets/videos/35-flight-path-viz.mp4",
@@ -354,6 +524,7 @@
   {
     "slug": "34-particle-text-morph",
     "title": "Particle Text Morph",
+    "tier": "indexed",
     "href": "../34-particle-text-morph/",
     "poster": "assets/posters/34-particle-text-morph.jpg",
     "video": "assets/videos/34-particle-text-morph.mp4",
@@ -362,6 +533,7 @@
   {
     "slug": "33-three-body-problem",
     "title": "Three-body Problem",
+    "tier": "indexed",
     "href": "../33-three-body-problem/",
     "poster": "assets/posters/33-three-body-problem.jpg",
     "video": "assets/videos/33-three-body-problem.mp4",
@@ -370,6 +542,7 @@
   {
     "slug": "32-genart-cards",
     "title": "Entropy Patterns",
+    "tier": "indexed",
     "href": "../32-genart-cards/",
     "poster": "assets/posters/32-genart-cards.jpg",
     "video": "assets/videos/32-genart-cards.mp4",
@@ -378,6 +551,7 @@
   {
     "slug": "31-cli-material-palette",
     "title": "CLI Material Palette",
+    "tier": "indexed",
     "href": "../31-cli-material-palette/",
     "poster": "assets/posters/31-cli-material-palette.jpg",
     "video": "assets/videos/31-cli-material-palette.mp4",
@@ -386,6 +560,7 @@
   {
     "slug": "30-thinking-states",
     "title": "Thinking States",
+    "tier": "indexed",
     "href": "../30-thinking-states/",
     "poster": "assets/posters/30-thinking-states.jpg",
     "video": "assets/videos/30-thinking-states.mp4",
@@ -394,6 +569,7 @@
   {
     "slug": "29-progress-indicators",
     "title": "100 Progress Indicators",
+    "tier": "indexed",
     "href": "../29-progress-indicators/",
     "poster": "assets/posters/29-progress-indicators.jpg",
     "video": "assets/videos/29-progress-indicators.mp4",
@@ -402,6 +578,7 @@
   {
     "slug": "28-liquid-glass",
     "title": "Liquid Glass",
+    "tier": "indexed",
     "href": "../28-liquid-glass/",
     "poster": "assets/posters/28-liquid-glass.jpg",
     "video": "assets/videos/28-liquid-glass.mp4",
@@ -410,6 +587,7 @@
   {
     "slug": "27-muse",
     "title": "Muse",
+    "tier": "indexed",
     "href": "../27-muse/",
     "poster": "assets/posters/27-muse.jpg",
     "video": "assets/videos/27-muse.mp4",
@@ -418,6 +596,7 @@
   {
     "slug": "26-widget-dashboard",
     "title": "Widget Dashboard",
+    "tier": "indexed",
     "href": "../26-widget-dashboard/",
     "poster": "assets/posters/26-widget-dashboard.jpg",
     "video": "assets/videos/26-widget-dashboard.mp4",
@@ -426,6 +605,7 @@
   {
     "slug": "25-spotlight-grid",
     "title": "Spotlight Grid",
+    "tier": "indexed",
     "href": "../25-spotlight-grid/",
     "poster": "assets/posters/25-spotlight-grid.jpg",
     "video": "assets/videos/25-spotlight-grid.mp4",
@@ -434,6 +614,7 @@
   {
     "slug": "24-rock-paper-scissors",
     "title": "Rock Paper Scissors",
+    "tier": "indexed",
     "href": "../24-rock-paper-scissors/",
     "poster": "assets/posters/24-rock-paper-scissors.jpg",
     "video": "assets/videos/24-rock-paper-scissors.mp4",
@@ -442,6 +623,7 @@
   {
     "slug": "23-interactive-typography",
     "title": "Interactive Typography",
+    "tier": "indexed",
     "href": "../23-interactive-typography/",
     "poster": "assets/posters/23-interactive-typography.jpg",
     "video": "assets/videos/23-interactive-typography.mp4",
@@ -450,6 +632,7 @@
   {
     "slug": "22-directed-network",
     "title": "Directed Network",
+    "tier": "indexed",
     "href": "../22-directed-network/",
     "poster": "assets/posters/22-directed-network.jpg",
     "video": "assets/videos/22-directed-network.mp4",
@@ -458,6 +641,7 @@
   {
     "slug": "21-interaction-heatmap",
     "title": "Interaction Heatmap",
+    "tier": "indexed",
     "href": "../21-interaction-heatmap/",
     "poster": "assets/posters/21-interaction-heatmap.jpg",
     "video": "assets/videos/21-interaction-heatmap.mp4",
@@ -466,6 +650,7 @@
   {
     "slug": "20-schelling-model",
     "title": "Schelling Model",
+    "tier": "indexed",
     "href": "../20-schelling-model/",
     "poster": "assets/posters/20-schelling-model.jpg",
     "video": "assets/videos/20-schelling-model.mp4",
@@ -474,6 +659,7 @@
   {
     "slug": "19-coworker-network",
     "title": "Coworker Network",
+    "tier": "indexed",
     "href": "../19-coworker-network/",
     "poster": "assets/posters/19-coworker-network.jpg",
     "video": "assets/videos/19-coworker-network.mp4",
@@ -482,6 +668,7 @@
   {
     "slug": "18-cellular-automaton",
     "title": "Cellular Automaton",
+    "tier": "indexed",
     "href": "../18-cellular-automaton/",
     "poster": "assets/posters/18-cellular-automaton.jpg",
     "video": "assets/videos/18-cellular-automaton.mp4",
@@ -490,6 +677,7 @@
   {
     "slug": "17-audio-reactive-network",
     "title": "Audio-reactive Network",
+    "tier": "indexed",
     "href": "../17-audio-reactive-network/",
     "poster": "assets/posters/17-audio-reactive-network.jpg",
     "video": "assets/videos/17-audio-reactive-network.mp4",
@@ -498,6 +686,7 @@
   {
     "slug": "16-hub-spoke-network",
     "title": "Hub Spoke Network",
+    "tier": "indexed",
     "href": "../16-hub-spoke-network/",
     "poster": "assets/posters/16-hub-spoke-network.jpg",
     "video": "assets/videos/16-hub-spoke-network.mp4",
@@ -506,6 +695,7 @@
   {
     "slug": "15b-binary-camera-grid-v2",
     "title": "Binary Camera Grid v2",
+    "tier": "indexed",
     "href": "../15b-binary-camera-grid-v2/",
     "poster": "assets/posters/15b-binary-camera-grid-v2.jpg",
     "video": "assets/videos/15b-binary-camera-grid-v2.mp4",
@@ -514,6 +704,7 @@
   {
     "slug": "15-binary-camera-grid",
     "title": "Binary Camera Grid",
+    "tier": "indexed",
     "href": "../15-binary-camera-grid/",
     "poster": "assets/posters/15-binary-camera-grid.jpg",
     "video": "assets/videos/15-binary-camera-grid.mp4",
@@ -522,6 +713,7 @@
   {
     "slug": "14-dna-mutations",
     "title": "DNA Mutations",
+    "tier": "indexed",
     "href": "../14-dna-mutations/",
     "poster": "assets/posters/14-dna-mutations.jpg",
     "video": "assets/videos/14-dna-mutations.mp4",
@@ -530,6 +722,7 @@
   {
     "slug": "13-image-flow-field",
     "title": "Image Flow Field",
+    "tier": "indexed",
     "href": "../13-image-flow-field/",
     "poster": "assets/posters/13-image-flow-field.jpg",
     "video": "assets/videos/13-image-flow-field.mp4",
@@ -538,6 +731,7 @@
   {
     "slug": "12-wind-field",
     "title": "Wind Field",
+    "tier": "indexed",
     "href": "../12-wind-field/",
     "poster": "assets/posters/12-wind-field.jpg",
     "video": "assets/videos/12-wind-field.mp4",
@@ -546,6 +740,7 @@
   {
     "slug": "11-brownian-tree",
     "title": "Ambient Clock",
+    "tier": "indexed",
     "href": "../11-brownian-tree/",
     "poster": "assets/posters/11-brownian-tree.jpg",
     "video": "assets/videos/11-brownian-tree.mp4",
@@ -554,6 +749,7 @@
   {
     "slug": "10-audio-reactive-agents",
     "title": "Audio-reactive Agents",
+    "tier": "indexed",
     "href": "../10-audio-reactive-agents/",
     "poster": "assets/posters/10-audio-reactive-agents.jpg",
     "video": "assets/videos/10-audio-reactive-agents.mp4",
@@ -562,6 +758,7 @@
   {
     "slug": "09-planar-graph",
     "title": "Planar Graph",
+    "tier": "indexed",
     "href": "../09-planar-graph/",
     "poster": "assets/posters/09-planar-graph.jpg",
     "video": "assets/videos/09-planar-graph.mp4",
@@ -570,6 +767,7 @@
   {
     "slug": "08-graph-clusters",
     "title": "Graph Clusters",
+    "tier": "indexed",
     "href": "../08-graph-clusters/",
     "poster": "assets/posters/08-graph-clusters.jpg",
     "video": "assets/videos/08-graph-clusters.mp4",
@@ -578,6 +776,7 @@
   {
     "slug": "07-apophenia",
     "title": "Apophenia",
+    "tier": "indexed",
     "href": "../07-apophenia/",
     "poster": "assets/posters/07-apophenia.jpg",
     "video": "assets/videos/07-apophenia.mp4",
@@ -586,6 +785,7 @@
   {
     "slug": "06-orbital",
     "title": "Orbital",
+    "tier": "indexed",
     "href": "../06-orbital/",
     "poster": "assets/posters/06-orbital.jpg",
     "video": "assets/videos/06-orbital.mp4",
@@ -594,6 +794,7 @@
   {
     "slug": "05-fall",
     "title": "Fall",
+    "tier": "indexed",
     "href": "../05-fall/",
     "poster": "assets/posters/05-fall.jpg",
     "video": "assets/videos/05-fall.mp4",
@@ -602,6 +803,7 @@
   {
     "slug": "04-random-walk",
     "title": "Random Walk",
+    "tier": "indexed",
     "href": "../04-random-walk/",
     "poster": "assets/posters/04-random-walk.jpg",
     "video": "assets/videos/04-random-walk.mp4",
@@ -610,6 +812,7 @@
   {
     "slug": "03-chaos-agent",
     "title": "Chaos Agent",
+    "tier": "indexed",
     "href": "../03-chaos-agent/",
     "poster": "assets/posters/03-chaos-agent.jpg",
     "video": "assets/videos/03-chaos-agent.mp4",
@@ -618,6 +821,7 @@
   {
     "slug": "02-vicsek-model",
     "title": "Vicsek Model",
+    "tier": "indexed",
     "href": "../02-vicsek-model/",
     "poster": "assets/posters/02-vicsek-model.jpg",
     "video": "assets/videos/02-vicsek-model.mp4",
@@ -626,9 +830,379 @@
   {
     "slug": "01-entropy",
     "title": "Entropy",
+    "tier": "indexed",
     "href": "../01-entropy/",
     "poster": "assets/posters/01-entropy.jpg",
     "video": "assets/videos/01-entropy.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-agent-stream-glyphs",
+    "title": "Agent Stream Glyphs",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-agent-stream-glyphs/",
+    "poster": "assets/posters/sketch-agent-stream-glyphs.jpg",
+    "video": "assets/videos/sketch-agent-stream-glyphs.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-agent-stream-markov-map",
+    "title": "Agent Stream Markov Map",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-agent-stream-markov-map/",
+    "poster": "assets/posters/sketch-agent-stream-markov-map.jpg",
+    "video": "assets/videos/sketch-agent-stream-markov-map.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-agent-stream-scrub",
+    "title": "Agent Stream Scrub",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-agent-stream-scrub/",
+    "poster": "assets/posters/sketch-agent-stream-scrub.jpg",
+    "video": "assets/videos/sketch-agent-stream-scrub.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-agent-streaming-patterns",
+    "title": "Agent Streaming Patterns",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-agent-streaming-patterns/",
+    "poster": "assets/posters/sketch-agent-streaming-patterns.jpg",
+    "video": "assets/videos/sketch-agent-streaming-patterns.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-agent-tool-call",
+    "title": "Agent Tool Call",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-agent-tool-call/",
+    "poster": "assets/posters/sketch-agent-tool-call.jpg",
+    "video": "assets/videos/sketch-agent-tool-call.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-alice-walk",
+    "title": "Alice Walk",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-alice-walk/",
+    "poster": "assets/posters/sketch-alice-walk.jpg",
+    "video": "assets/videos/sketch-alice-walk.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-anna-portfolio",
+    "title": "Anna Portfolio",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-anna-portfolio/",
+    "poster": "assets/posters/sketch-anna-portfolio.jpg",
+    "video": "assets/videos/sketch-anna-portfolio.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-antistyle",
+    "title": "Antistyle",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-antistyle/",
+    "poster": "assets/posters/sketch-antistyle.jpg",
+    "video": "assets/videos/sketch-antistyle.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-apophenia-arc",
+    "title": "Apophenia Arc",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-apophenia-arc/",
+    "poster": "assets/posters/sketch-apophenia-arc.jpg",
+    "video": "assets/videos/sketch-apophenia-arc.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-ascii-field-gallery",
+    "title": "Ascii Field Gallery",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-ascii-field-gallery/",
+    "poster": "assets/posters/sketch-ascii-field-gallery.jpg",
+    "video": "assets/videos/sketch-ascii-field-gallery.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-ascii-sheet-signal",
+    "title": "Ascii Sheet Signal",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-ascii-sheet-signal/",
+    "poster": "assets/posters/sketch-ascii-sheet-signal.jpg",
+    "video": "assets/videos/sketch-ascii-sheet-signal.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-ascii-sheets-variance",
+    "title": "Ascii Sheets Variance",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-ascii-sheets-variance/",
+    "poster": "assets/posters/sketch-ascii-sheets-variance.jpg",
+    "video": "assets/videos/sketch-ascii-sheets-variance.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-audio-agents-grid",
+    "title": "Audio Agents Grid",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-audio-agents-grid/",
+    "poster": "assets/posters/sketch-audio-agents-grid.jpg",
+    "video": "assets/videos/sketch-audio-agents-grid.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-audio-reactive-agents-v2",
+    "title": "Audio Reactive Agents V2",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-audio-reactive-agents-v2/",
+    "poster": "assets/posters/sketch-audio-reactive-agents-v2.jpg",
+    "video": "assets/videos/sketch-audio-reactive-agents-v2.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-character-field",
+    "title": "Character Field",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-character-field/",
+    "poster": "assets/posters/sketch-character-field.jpg",
+    "video": "assets/videos/sketch-character-field.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-character-sandbox",
+    "title": "Character Sandbox",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-character-sandbox/",
+    "poster": "assets/posters/sketch-character-sandbox.jpg",
+    "video": "assets/videos/sketch-character-sandbox.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-color-explorer-v2",
+    "title": "Color Explorer V2",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-color-explorer-v2/",
+    "poster": "assets/posters/sketch-color-explorer-v2.jpg",
+    "video": "assets/videos/sketch-color-explorer-v2.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-data-forms",
+    "title": "Data Forms",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-data-forms/",
+    "poster": "assets/posters/sketch-data-forms.jpg",
+    "video": "assets/videos/sketch-data-forms.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-eixample",
+    "title": "Eixample",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-eixample/",
+    "poster": "assets/posters/sketch-eixample.jpg",
+    "video": "assets/videos/sketch-eixample.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-eixample-fullscreen-grid",
+    "title": "Eixample Fullscreen Grid",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-eixample-fullscreen-grid/",
+    "poster": "assets/posters/sketch-eixample-fullscreen-grid.jpg",
+    "video": "assets/videos/sketch-eixample-fullscreen-grid.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-field-notes",
+    "title": "Field Notes",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-field-notes/",
+    "poster": "assets/posters/sketch-field-notes.jpg",
+    "video": "assets/videos/sketch-field-notes.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-geo",
+    "title": "Geo",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-geo/",
+    "poster": "assets/posters/sketch-geo.jpg",
+    "video": "assets/videos/sketch-geo.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-idle",
+    "title": "Idle",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-idle/",
+    "poster": "assets/posters/sketch-idle.jpg",
+    "video": "assets/videos/sketch-idle.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-idle-crt",
+    "title": "Idle Crt",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-idle-crt/",
+    "poster": "assets/posters/sketch-idle-crt.jpg",
+    "video": "assets/videos/sketch-idle-crt.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-interaction-stack",
+    "title": "Interaction Stack",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-interaction-stack/",
+    "poster": "assets/posters/sketch-interaction-stack.jpg",
+    "video": "assets/videos/sketch-interaction-stack.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-jetbrains-mono",
+    "title": "Jetbrains Mono",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-jetbrains-mono/",
+    "poster": "assets/posters/sketch-jetbrains-mono.jpg",
+    "video": "assets/videos/sketch-jetbrains-mono.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-mesa",
+    "title": "Mesa",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-mesa/",
+    "poster": "assets/posters/sketch-mesa.jpg",
+    "video": "assets/videos/sketch-mesa.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-mode-toggle",
+    "title": "Mode Toggle",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-mode-toggle/",
+    "poster": "assets/posters/sketch-mode-toggle.jpg",
+    "video": "assets/videos/sketch-mode-toggle.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-moog-phase-grid",
+    "title": "Moog Phase Grid",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-moog-phase-grid/",
+    "poster": "assets/posters/sketch-moog-phase-grid.jpg",
+    "video": "assets/videos/sketch-moog-phase-grid.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-position-in-queue",
+    "title": "Position In Queue",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-position-in-queue/",
+    "poster": "assets/posters/sketch-position-in-queue.jpg",
+    "video": "assets/videos/sketch-position-in-queue.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-pretext-canvas",
+    "title": "Pretext Canvas",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-pretext-canvas/",
+    "poster": "assets/posters/sketch-pretext-canvas.jpg",
+    "video": "assets/videos/sketch-pretext-canvas.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-pretext-dom",
+    "title": "Pretext Dom",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-pretext-dom/",
+    "poster": "assets/posters/sketch-pretext-dom.jpg",
+    "video": "assets/videos/sketch-pretext-dom.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-sprig",
+    "title": "Sprig",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-sprig/",
+    "poster": "assets/posters/sketch-sprig.jpg",
+    "video": "assets/videos/sketch-sprig.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-sticky-banner",
+    "title": "Sticky Banner",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-sticky-banner/",
+    "poster": "assets/posters/sketch-sticky-banner.jpg",
+    "video": "assets/videos/sketch-sticky-banner.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-terminal-cli",
+    "title": "Terminal Cli",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-terminal-cli/",
+    "poster": "assets/posters/sketch-terminal-cli.jpg",
+    "video": "assets/videos/sketch-terminal-cli.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-theme",
+    "title": "Theme",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-theme/",
+    "poster": "assets/posters/sketch-theme.jpg",
+    "video": "assets/videos/sketch-theme.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-torus-sheet",
+    "title": "Torus Sheet",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-torus-sheet/",
+    "poster": "assets/posters/sketch-torus-sheet.jpg",
+    "video": "assets/videos/sketch-torus-sheet.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-tube-driven",
+    "title": "Tube Driven",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-tube-driven/",
+    "poster": "assets/posters/sketch-tube-driven.jpg",
+    "video": "assets/videos/sketch-tube-driven.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-ube-field-audio",
+    "title": "Ube Field Audio",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-ube-field-audio/",
+    "poster": "assets/posters/sketch-ube-field-audio.jpg",
+    "video": "assets/videos/sketch-ube-field-audio.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-walks-thread",
+    "title": "Walks Thread",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-walks-thread/",
+    "poster": "assets/posters/sketch-walks-thread.jpg",
+    "video": "assets/videos/sketch-walks-thread.mp4",
+    "disabled": false
+  },
+  {
+    "slug": "sketch-word-flock",
+    "title": "Word Flock",
+    "tier": "daily",
+    "href": "../daily-sketch/sketch-word-flock/",
+    "poster": "assets/posters/sketch-word-flock.jpg",
+    "video": "assets/videos/sketch-word-flock.mp4",
     "disabled": false
   }
 ]

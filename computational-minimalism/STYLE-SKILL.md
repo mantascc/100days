@@ -188,8 +188,8 @@ node style-skill.js "Reference" --accent=blue
 --text-primary: #ffffff;     /* Titles, essential */
 --text-default: #f5f5f7;     /* Body text */
 --text-secondary: #a8aab8;   /* Labels, metadata */
---text-tertiary: #666666;    /* Hints, disabled */
---text-ghost: #333333;       /* Barely visible */
+--text-tertiary: #8f919d;    /* Hints, disabled */
+--text-ghost: #80828d;       /* Quiet floor — smallest type */
 ```
 
 **Spacing (4px base):**

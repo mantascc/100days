@@ -34,8 +34,8 @@
 | `--text-primary` | `#ffffff` | Titles, essential |
 | `--text-default` | `#f5f5f7` | Body text |
 | `--text-secondary` | `#a8aab8` | Labels, metadata |
-| `--text-tertiary` | `#666666` | Hints, disabled |
-| `--text-ghost` | `#333333` | Barely visible |
+| `--text-tertiary` | `#8f919d` | Hints, disabled |
+| `--text-ghost` | `#80828d` | Quiet floor — smallest type |
 
 ### Structural
 
@@ -281,8 +281,8 @@ Casey Reas, Vera Molnár, early demoscene, oscilloscope aesthetics, terminal int
   --text-primary: #ffffff;
   --text-default: #f5f5f7;
   --text-secondary: #a8aab8;
-  --text-tertiary: #666666;
-  --text-ghost: #333333;
+  --text-tertiary: #8f919d;
+  --text-ghost: #80828d;
   
   /* Borders */
   --border-subtle: #1a1a1a;
