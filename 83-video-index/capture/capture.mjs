@@ -94,9 +94,12 @@ async function loadScenarios() {
 }
 
 async function captureOne(scenario) {
-    const sketchPath = path.join(REPO_ROOT, scenario.meta.slug, 'index.html');
+    // A few sketches keep their page in a subfolder (a bundled app, a variant
+    // hub); meta.path is the repo-relative directory to load instead of the slug.
+    const dir = scenario.meta.path ?? scenario.meta.slug;
+    const sketchPath = path.join(REPO_ROOT, dir, 'index.html');
     if (!existsSync(sketchPath)) throw new Error(`missing sketch: ${sketchPath}`);
-    const url = `http://127.0.0.1:${SERVE_PORT}/${scenario.meta.slug}/`;
+    const url = `http://127.0.0.1:${SERVE_PORT}/${dir}/`;
 
     // Fresh raw dir per run for predictable file lookup.
     const scenarioRawDir = path.join(RAW_DIR, scenario.meta.slug);
@@ -172,7 +175,11 @@ async function writeGalleryJson(scenarios) {
         .map((s) => ({
             slug: s.meta.slug,
             title: s.meta.title,
-            href: `../${s.meta.slug}/`,
+            // `indexed` is a numbered piece, `daily` a daily-sketch folder.
+            // The gallery on this page shows only the former; downstream
+            // consumers can take the whole manifest.
+            tier: s.meta.tier ?? 'indexed',
+            href: `../${s.meta.path ?? s.meta.slug}/`,
             poster: `assets/posters/${s.meta.slug}.jpg`,
             video: existsSync(path.join(VIDEO_OUT, `${s.meta.slug}.mp4`))
                 ? `assets/videos/${s.meta.slug}.mp4`
@@ -181,10 +188,11 @@ async function writeGalleryJson(scenarios) {
         }));
     // Newest first: descending by leading number in slug.
     entries.sort((a, b) => {
+        if (a.tier !== b.tier) return a.tier === 'indexed' ? -1 : 1;
         const na = parseInt(a.slug.match(/^(\d+)/)?.[1] ?? '0', 10);
         const nb = parseInt(b.slug.match(/^(\d+)/)?.[1] ?? '0', 10);
         if (na !== nb) return nb - na;
-        return b.slug.localeCompare(a.slug);
+        return a.tier === 'daily' ? a.slug.localeCompare(b.slug) : b.slug.localeCompare(a.slug);
     });
     await writeFile(GALLERY_JSON, JSON.stringify(entries, null, 2) + '\n');
 }

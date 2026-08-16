@@ -11,7 +11,12 @@ const lightMode =
 
 async function init() {
     const data = await fetch('assets/gallery.json').then((r) => r.json());
-    for (const item of data) GRID.appendChild(makeTile(item));
+    // This gallery is the indexed sketchbook. Daily sketches are captured
+    // into the same manifest for other consumers, but are not shown here.
+    for (const item of data) {
+        if ((item.tier ?? 'indexed') !== 'indexed') continue;
+        GRID.appendChild(makeTile(item));
+    }
 
     if (!isCoarsePointer) return;            // desktop uses hover (handled per-tile)
     if (lightMode) return;                   // mobile + reduced-motion or slow net: posters + per-tile play btn

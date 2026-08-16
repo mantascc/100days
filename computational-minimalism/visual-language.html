@@ -26,8 +26,8 @@
             --text-primary: #ffffff;
             --text-default: #f5f5f7;
             --text-secondary: #a8aab8;
-            --text-tertiary: #666666;
-            --text-ghost: #333333;
+            --text-tertiary: #8f919d;
+            --text-ghost: #80828d;
 
             /* Structural */
             --border-subtle: #1a1a1a;
@@ -201,7 +201,7 @@
         .tick-mark {
             width: 8px;
             height: 1px;
-            background: var(--text-ghost);
+            background: var(--border-default);
             transition: width 100ms linear, background 100ms linear;
             flex-shrink: 0;
         }
@@ -1231,7 +1231,7 @@
         .cm-chapter-viewer .cm-chapter-dot {
             width: 6px;
             height: 6px;
-            background: var(--text-ghost);
+            background: var(--border-default);
             cursor: pointer;
             transition: background var(--duration-fast) var(--ease-snap);
         }
@@ -2224,7 +2224,7 @@
         <div class="component-desc">hover reveal. appears instantly (duration-fast), no theatrical entrance.</div>
         <div class="component-demo" style="padding-top: var(--space-12);">
             <div class="cm-tooltip-host">
-                <span style="border-bottom: 1px dashed var(--text-ghost); color: var(--text-secondary); font-size: var(--text-sm); cursor: default;">hover this element</span>
+                <span style="border-bottom: 1px dashed var(--border-default); color: var(--text-secondary); font-size: var(--text-sm); cursor: default;">hover this element</span>
                 <div class="cm-tooltip">perlin noise — ken perlin, 1983</div>
             </div>
         </div>
