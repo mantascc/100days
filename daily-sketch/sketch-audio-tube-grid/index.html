@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sketch-audio-tube-grid</title>
+<meta name="description" content="Sixteen tubes, one room. The 92 CRT pipeline locked to its EMISSION variant, with sixteen different abstract generators listening to the same microphone.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --void: #050706;
+    --ink: #cfeee0;
+    --muted: rgba(207, 238, 224, 0.42);
+    --dim: rgba(207, 238, 224, 0.20);
+    --hair: rgba(207, 238, 224, 0.10);
+    --tile: 164px;
+    --gap: 14px;
+    --cols: 4;
+    --font: "IBM Plex Mono", "SF Mono", Monaco, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+
+  body {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 32px 18px 48px;
+    background: radial-gradient(circle at 50% 34%, #0a0d0c 0%, #030504 62%, #000 100%);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    width: min(100%, calc(var(--cols) * var(--tile) + (var(--cols) - 1) * var(--gap)));
+  }
+
+  /* ---------- masthead ---------- */
+
+  .mast {
+    width: 100%;
+    display: flex; align-items: end; justify-content: space-between; gap: 18px;
+    color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    font-size: 10px; line-height: 1.5;
+  }
+  .mast strong { color: var(--ink); font-weight: 400; }
+  .mast .idx { color: var(--dim); text-align: right; }
+
+  /* ---------- rig ---------- */
+
+  .rig {
+    width: 100%;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 0;
+    border-top: 1px solid var(--hair);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  button {
+    font: inherit; font-size: 10px;
+    letter-spacing: 0.20em; text-transform: uppercase;
+    color: var(--muted); background: transparent;
+    border: 1px solid var(--hair);
+    padding: 6px 10px; cursor: pointer;
+    transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+  }
+  button:hover { color: var(--ink); border-color: var(--dim); }
+  button:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  button.on {
+    color: var(--ink);
+    border-color: var(--ink);
+    background: rgba(207, 238, 224, 0.07);
+  }
+  button.live { border-color: #7dffc4; color: #d8fff0; }
+
+  .knob { display: flex; align-items: center; gap: 8px; }
+  .spacer { flex: 1; min-width: 6px; }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 92px; height: 18px; background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--dim); }
+  input[type="range"]::-moz-range-track { height: 1px; background: var(--dim); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 3px; height: 13px; margin-top: -6px;
+    background: var(--ink); border: 0; border-radius: 0;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 3px; height: 13px; background: var(--ink); border: 0; border-radius: 0;
+  }
+  input[type="range"]:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+
+  .val { color: var(--ink); font-variant-numeric: tabular-nums; min-width: 34px; }
+
+  /* ---------- legend + band meter ---------- */
+
+  .legend {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .legend .b { color: var(--muted); }
+
+  .meter { display: flex; align-items: flex-end; gap: 5px; height: 13px; }
+  .meter .bnd {
+    position: relative; width: 20px; height: 100%;
+    border-bottom: 1px solid var(--hair);
+  }
+  .meter .bnd i {
+    position: absolute; left: 0; bottom: 0; width: 100%; height: 100%;
+    background: var(--muted);
+    transform: scaleY(0); transform-origin: 50% 100%;
+    display: block;
+  }
+
+  /* ---------- grid ---------- */
+
+  .grid { display: grid; grid-template-columns: repeat(var(--cols), var(--tile)); gap: var(--gap); }
+
+  .unit { display: grid; gap: 6px; }
+
+  .cell {
+    position: relative;
+    width: var(--tile); height: var(--tile);
+    overflow: hidden; border-radius: 20px; background: #000;
+    box-shadow:
+      0 0 0 1px rgba(120, 255, 200, 0.05) inset,
+      0 0 0 1px rgba(0, 0, 0, 0.6),
+      0 16px 38px rgba(0, 0, 0, 0.7);
+    isolation: isolate;
+  }
+  .cell:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+  .cell::before {
+    content: ""; position: absolute; inset: 0; z-index: 3;
+    pointer-events: none; border-radius: inherit;
+    background: radial-gradient(120% 90% at 50% 42%, transparent 44%, rgba(0,0,0,0.55) 78%, #000 100%);
+  }
+  .cell::after {
+    content: ""; position: absolute; inset: 0; z-index: 4;
+    pointer-events: none; border-radius: inherit;
+    opacity: 0.26; mix-blend-mode: multiply;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.55) 0 1px, transparent 1px 3px);
+  }
+
+  canvas { display: block; width: 100%; height: 100%; }
+
+  /* datasheet, on the tube itself */
+  .osd {
+    position: absolute; inset: 0; z-index: 5;
+    display: grid; align-content: center; gap: 3px;
+    padding: 0 13px; border-radius: inherit;
+    background: rgba(3, 6, 5, 0.84);
+    color: #b9f5d8;
+    font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(120, 255, 200, 0.5);
+    opacity: 0; transition: opacity 130ms ease; pointer-events: none;
+  }
+  .cell:hover .osd, .cell:focus-visible .osd { opacity: 1; }
+
+  .osd .row {
+    position: relative;
+    display: flex; justify-content: space-between; gap: 6px;
+    align-items: baseline; white-space: nowrap;
+  }
+  .osd .row.head {
+    color: #e6fff4;
+    border-bottom: 1px solid rgba(185, 245, 216, 0.22);
+    padding-bottom: 4px; margin-bottom: 3px;
+  }
+  .osd .row.on { color: #fff; }
+  .osd .row.on::before { content: "▸"; position: absolute; left: -8px; }
+  .osd .row .v { font-variant-numeric: tabular-nums; }
+  .osd .foot {
+    margin-top: 4px; padding-top: 4px;
+    border-top: 1px solid rgba(185, 245, 216, 0.22);
+    color: rgba(185, 245, 216, 0.62);
+    white-space: normal; line-height: 1.5;
+  }
+
+  .cap {
+    display: flex; justify-content: space-between; gap: 8px;
+    font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .cap .b { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .lvl { height: 1px; background: var(--hair); position: relative; overflow: hidden; }
+  .lvl i {
+    position: absolute; inset: 0; display: block; background: var(--ink);
+    transform: scaleX(0); transform-origin: 0 50%;
+  }
+
+  .note {
+    width: 100%;
+    font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--dim); line-height: 1.7; max-width: 66ch;
+  }
+
+  @media (max-width: 820px) {
+    :root { --cols: 2; --tile: min(44vw, 190px); --gap: 12px; }
+    body { place-items: start center; padding: 18px 12px 36px; }
+    input[type="range"] { width: 72px; }
+    .mast { flex-direction: column; align-items: flex-start; gap: 5px; }
+    .mast .idx { text-align: left; }
+    .legend { flex-wrap: wrap; row-gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="shell" aria-label="Audio tube grid — sixteen generators, one signal chain">
+
+  <div class="mast">
+    <div><strong>sketch</strong> / audio tube grid</div>
+    <div class="idx">crt · emission variant<br>sixteen tubes · one room</div>
+  </div>
+
+  <div class="rig">
+    <button id="mic" type="button">listen</button>
+    <button id="reseed" type="button">reseed</button>
+    <span class="spacer"></span>
+    <label class="knob" for="gain">gain
+      <input id="gain" type="range" min="50" max="600" value="180" step="5"
+             aria-label="Input gain, percent">
+      <span id="gainVal" class="val">180%</span>
+    </label>
+    <label class="knob" for="drive">drive
+      <input id="drive" type="range" min="0" max="150" value="100" step="1"
+             aria-label="How hard audio modulates the tube, percent">
+      <span id="driveVal" class="val">100%</span>
+    </label>
+    <label class="knob" for="emis">emission
+      <input id="emis" type="range" min="30" max="190" value="130" step="1"
+             aria-label="Emission, percent">
+      <span id="emisVal" class="val">130%</span>
+    </label>
+    <label class="knob" for="hue">phosphor
+      <input id="hue" type="range" min="15" max="210" value="150" step="1"
+             aria-label="Phosphor coating hue, degrees">
+      <span id="hueVal" class="val">150°</span>
+    </label>
+  </div>
+
+  <div class="legend">
+    <span id="status">signal ▸ simulated · press listen for the room</span>
+    <span class="meter" id="meter" aria-hidden="true"></span>
+  </div>
+
+  <section class="grid" id="grid" aria-label="Sixteen tubes"></section>
+
+  <p class="note">One signal chain, sixteen generators. Every tube runs the identical EMISSION
+     pipeline at the identical settings, so every difference on screen is the drawing, not the
+     treatment — the inverse of <a href="../../92-tube-tolerance/" style="color:var(--muted)">92</a>.
+     Hover a tube for its readout.</p>
+
+</main>
+
+<script>
+(() => {
+"use strict";
+
+/* ────────────────────────────────────────────────────────────
+   Audio tube grid.
+
+   92 held the signal still and swept the tube. This holds the tube
+   still and sweeps the signal: one CRT pipeline, locked to a single
+   named variant, and sixteen different abstract generators fed from
+   the same microphone.
+
+   Sixteen tubes is enough that the pipeline had to get cheaper than
+   92's. The change: guns are composited into one beam buffer first,
+   then the beam is warped once — instead of warping each gun. Same
+   fringe, a third of the draws.
+   ──────────────────────────────────────────────────────────── */
+
+/* ---------- the variant ----------
+   The shape 91-retro-primitives' `window.VARIANT` object had, with
+   92's axis names and units. Nothing here varies per tube — that is
+   the whole premise. Four of these are exposed as knobs; the rest are
+   the variant's identity and stay put. */
+
+const EMISSION = {
+  name:     'emission',
+  spot:      0.92,   // px   subject blur — the sharpest this tube gets
+  converge:  1.30,   // px   gun misregistration at rest
+  geometry:  6.0,    // %    pincushion, with rotation and overscan riding along
+  persist:   74,     // ms   phosphor decay
+  noise:     0.30,   // 0..1 grain density
+  emission:  1.30,   // 1 = nominal; this variant idles hot
+  bloom:     1.45,   // both halo passes, radius and alpha together
+  phosphor:  150     // deg  coating hue
+};
+
+const TAU    = Math.PI * 2;
+const GUNS   = ['#ff0000', '#00ff00', '#0000ff'];
+const STRIPS = 10;
+const NBINS  = 192;     // spectrum bins we actually use (~8 kHz at 48k/1024)
+const NWAVE  = 128;     // time-domain samples we keep
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const clamp   = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+const clamp01 = v => clamp(v, 0, 1);
+const $       = id => document.getElementById(id);
+
+function mulberry32(a) {
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- geometry of the sheet ---------- */
+
+let TILE, SCALE, PX;
+
+function readTile() {
+  // Measure it. `getPropertyValue('--tile')` returns the literal token —
+  // "min(43vw, 164px)" — not a length, so parsing it silently pins TILE to
+  // the fallback at every viewport where the tile is not already 164px.
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;visibility:hidden;width:var(--tile);height:0';
+  document.body.appendChild(probe);
+  TILE = Math.round(probe.getBoundingClientRect().width) || 164;
+  probe.remove();
+  SCALE = Math.min(window.devicePixelRatio || 1, 1.25);
+  PX    = Math.round(TILE * SCALE);
+}
+readTile();
+
+/* ────────────────────────────────────────────────────────────
+   The signal
+   ──────────────────────────────────────────────────────────── */
+
+/* Six bands, in bin indices. Deliberately uneven — hearing is. */
+const BANDS = [
+  { key: 'sub',  label: 'sub',  lo: 0,   hi: 4   },
+  { key: 'bass', label: 'bass', lo: 4,   hi: 14  },
+  { key: 'low',  label: 'low',  lo: 14,  hi: 38  },
+  { key: 'mid',  label: 'mid',  lo: 38,  hi: 82  },
+  { key: 'high', label: 'high', lo: 82,  hi: 140 },
+  { key: 'air',  label: 'air',  lo: 140, hi: 192 }
+];
+
+const bins  = new Float32Array(NBINS);   // smoothed, 0..1
+const prev  = new Float32Array(NBINS);   // last frame, for spectral flux
+const wave  = new Float32Array(NWAVE);   // -1..1
+
+const A = {
+  bins, wave,
+  b: { sub: 0, bass: 0, low: 0, mid: 0, high: 0, air: 0 },
+  amp: 0, hit: 0, peak: 0,
+
+  // Sample the spectrum at a fraction of the sheet's width. Warped, because
+  // a linear FFT axis puts everything interesting in the leftmost eighth.
+  at(f) {
+    const i = Math.floor(Math.pow(clamp01(f), 1.55) * (NBINS - 1));
+    return bins[i];
+  },
+  // Average of `at` over the i-th of n equal slices — for bars, meshes, grids.
+  seg(i, n) {
+    let s = 0;
+    for (let k = 0; k < 4; k++) s += A.at((i + k / 4) / n);
+    return s / 4;
+  },
+  band(key) { return key === 'amp' ? A.amp : (A.b[key] ?? A.amp); }
+};
+
+let analyser = null, freqRaw = null, waveRaw = null, audioCtx = null;
+let micState = 'sim';   // sim | live | denied | insecure
+
+/* --- simulated signal, so the sheet is alive before permission ---
+   Not a fake spectrum drawn from noise: a kick, a snare on 3, a hat on
+   eighths, and two pads. The generators need something with structure
+   or they all read as the same jitter. */
+function simulate(t) {
+  const beat = t * 1.9;
+  const ph   = beat % 1;
+  const bar  = Math.floor(beat) % 8;
+  const kick = (bar % 2 === 0 ? 1 : 0.38) * Math.pow(1 - ph, 5);
+  const snr  = (bar % 4 === 2 ? Math.pow(1 - ph, 7) * 0.85 : 0);
+  const hat  = Math.pow(1 - ((beat * 2) % 1), 10) * 0.55;
+  const pad  = 0.30 + 0.20 * Math.sin(t * 0.31) + 0.13 * Math.sin(t * 0.13 + 1.7);
+
+  for (let i = 0; i < NBINS; i++) {
+    const f = i / NBINS;
+    let v = kick * Math.exp(-f * 26)
+          + snr  * Math.exp(-Math.pow((f - 0.15) / 0.13, 2))
+          + hat  * Math.pow(f, 1.3) * 0.9
+          + pad  * 0.70 * Math.exp(-Math.pow((f - 0.09) / 0.09, 2))
+          + pad  * 0.45 * Math.exp(-Math.pow((f - 0.29) / 0.17, 2));
+    v *= 0.72 + 0.42 * Math.sin(i * 0.71 + t * 2.1 + i * i * 0.013);
+    bins[i] = clamp01(v);
+  }
+
+  for (let i = 0; i < NWAVE; i++) {
+    const x = i / NWAVE;
+    wave[i] = clamp(
+      Math.sin(x * TAU * 3  + t * 6) * (0.18 + kick * 0.7) +
+      Math.sin(x * TAU * 11 + t * 3) * 0.22 * pad +
+      Math.sin(x * TAU * 29 - t * 9) * 0.14 * hat, -1, 1);
+  }
+  return kick * 0.8 + snr * 0.7 + hat * 0.3;
+}
+
+function readMic() {
+  analyser.getByteFrequencyData(freqRaw);
+  analyser.getByteTimeDomainData(waveRaw);
+  const g = state.gain;
+
+  let flux = 0;
+  for (let i = 0; i < NBINS; i++) {
+    const v = clamp01((freqRaw[i] / 255) * g);
+    flux += Math.max(0, v - prev[i]);
+    // asymmetric smoothing: rise fast, fall slow — transients survive
+    bins[i] = v > bins[i] ? bins[i] + (v - bins[i]) * 0.62
+                          : bins[i] + (v - bins[i]) * 0.16;
+  }
+
+  const step = waveRaw.length / NWAVE;
+  for (let i = 0; i < NWAVE; i++)
+    wave[i] = clamp(((waveRaw[Math.floor(i * step)] - 128) / 128) * g, -1, 1);
+
+  return clamp01(flux / NBINS * 9);
+}
+
+function readSignal(t) {
+  prev.set(bins);
+  const raw = micState === 'live' ? readMic() : simulate(t) * state.gain * 0.6;
+
+  // bands
+  let peakV = 0, peakI = 0, total = 0;
+  for (const bd of BANDS) {
+    let s = 0;
+    for (let i = bd.lo; i < bd.hi; i++) {
+      s += bins[i];
+      if (bins[i] > peakV) { peakV = bins[i]; peakI = i; }
+    }
+    const v = clamp01(s / (bd.hi - bd.lo));
+    A.b[bd.key] += (v - A.b[bd.key]) * 0.30;
+    total += A.b[bd.key];
+  }
+  A.peak = peakI;
+  A.amp += (clamp01(total / BANDS.length * 1.35) - A.amp) * 0.28;
+  A.hit  = Math.max(A.hit * 0.86, clamp01(raw));
+}
+
+/* ────────────────────────────────────────────────────────────
+   The sixteen generators
+
+   Each draws white marks on a transparent tile in logical (0..S)
+   coordinates. Filling opaque #000 removes hidden lines: black adds
+   nothing once the tile is composited under `lighter`.
+
+   Every one is a composition, not a single mark — a fixed structure
+   (frame, ladder, graticule, orbit path) that stays put and a live
+   part that moves against it. Motion is only legible against
+   something that doesn't move.
+   ──────────────────────────────────────────────────────────── */
+
+const mem = (m, k, fn) => (k in m ? m[k] : (m[k] = fn()));
+const W   = a => `rgba(255,255,255,${a})`;
+
+// Anything that averages the spectrum before drawing it — a ridgeline, a
+// terrain row — flattens the quiet detail into a straight line. A gamma
+// lift puts the shape back without touching the loud end.
+const lift = v => Math.pow(clamp01(v), 0.58);
+
+function frame(g, S, a = 0.20) {          // the shared outer furniture
+  const p = S * 0.055, e = S * 0.045;
+  g.strokeStyle = W(a); g.lineWidth = 1;
+  g.beginPath();
+  for (const [sx, sy] of [[1,1],[-1,1],[1,-1],[-1,-1]]) {
+    const px = S / 2 - sx * (S / 2 - p), py = S / 2 - sy * (S / 2 - p);
+    g.moveTo(px + sx * e, py); g.lineTo(px, py); g.lineTo(px, py + sy * e);
+  }
+  g.stroke();
+}
+
+const GENS = [
+
+/* 01 ── stacked waveform horizons, newest in front */
+{ key: 'ridge', label: 'ridge', band: 'low',
+  note: 'ten spectra deep, newest in front, hidden lines removed',
+  draw(g, S, t, m) {
+    const ROWS = 8, pad = S * 0.09, w = S - pad * 2, h = S - pad * 2;
+    const snaps = mem(m, 'snaps', () => Array.from({ length: ROWS }, () => new Float32Array(40)));
+    if ((m.k = (m.k || 0) + 1) % 4 === 0) {
+      snaps.pop();
+      const s = new Float32Array(40);
+      for (let i = 0; i < 40; i++) s[i] = lift(A.at(i / 40));
+      snaps.unshift(s);
+    }
+    for (let r = ROWS - 1; r >= 0; r--) {
+      const y = pad + h * (0.08 + 0.86 * ((ROWS - 1 - r) / (ROWS - 1)));
+      // amp stays just under the row spacing: any taller and a front row's
+      // black fill swallows the one behind it and the stack reads as rules
+      const s = snaps[r], amp = S * 0.105 * (1 - r / ROWS * 0.24);
+      // fill and stroke are separate paths: the fill closes down to the
+      // baseline to hide the row behind, the stroke never draws that baseline
+      g.beginPath();
+      g.moveTo(pad, y + 1);
+      for (let i = 0; i < 40; i++) g.lineTo(pad + w * (i / 39), y - s[i] * amp);
+      g.lineTo(S - pad, y + 1); g.closePath();
+      g.fillStyle = '#000'; g.fill();
+      g.beginPath();
+      for (let i = 0; i < 40; i++) {
+        const x = pad + w * (i / 39), yy = y - s[i] * amp;
+        i ? g.lineTo(x, yy) : g.moveTo(x, yy);
+      }
+      g.strokeStyle = W(0.95 - r * 0.058); g.lineWidth = r === 0 ? 1.6 : 1;
+      g.stroke();
+    }
+    g.strokeStyle = W(0.24); g.lineWidth = 1;
+    g.beginPath();
+    for (let i = 0; i <= 8; i++) {
+      const x = pad + w * (i / 8), d = i % 2 ? S * 0.014 : S * 0.026;
+      g.moveTo(x, S - pad * 0.5); g.lineTo(x, S - pad * 0.5 - d);
+    }
+    g.moveTo(pad, S - pad * 0.5); g.lineTo(S - pad, S - pad * 0.5);
+    g.stroke();
+  } },
+
+/* 02 ── the spectrum bent into a circle */
+{ key: 'radial', label: 'radial', band: 'mid',
+  note: 'spectrum as spokes; the marked spoke is the loudest bin',
+  draw(g, S, t, m) {
+    const c = S / 2, r0 = S * 0.155, r1 = S * 0.40, N = 64;
+    g.strokeStyle = W(0.20); g.lineWidth = 1;
+    g.beginPath(); g.arc(c, c, r1, 0, TAU); g.stroke();
+    g.beginPath();
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * TAU, d = i % 6 === 0 ? S * 0.035 : S * 0.016;
+      g.moveTo(c + Math.cos(a) * r1, c + Math.sin(a) * r1);
+      g.lineTo(c + Math.cos(a) * (r1 + d), c + Math.sin(a) * (r1 + d));
+    }
+    g.stroke();
+
+    g.lineWidth = Math.max(1, S * 0.008);
+    g.strokeStyle = W(0.88);
+    g.beginPath();
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * TAU - Math.PI / 2 + t * 0.06;
+      const v = clamp01(A.at(i / N) * 1.25), len = r0 + (r1 - r0) * v;
+      g.moveTo(c + Math.cos(a) * r0, c + Math.sin(a) * r0);
+      g.lineTo(c + Math.cos(a) * len, c + Math.sin(a) * len);
+    }
+    g.stroke();
+
+    const pa = (A.peak / NBINS) * TAU - Math.PI / 2 + t * 0.06;
+    g.strokeStyle = W(0.95); g.lineWidth = 1.2;
+    g.beginPath(); g.arc(c, c, r1 + S * 0.055, pa - 0.16, pa + 0.16); g.stroke();
+    g.beginPath(); g.arc(c, c, r0 * 0.62, 0, TAU); g.stroke();
+    g.beginPath(); g.arc(c, c, r0 * 0.20 + A.amp * S * 0.05, 0, TAU); g.fillStyle = W(0.9); g.fill();
+  } },
+
+/* 03 ── oscilloscope, time domain against a graticule */
+{ key: 'scope', label: 'scope', band: 'amp',
+  note: 'time domain, 128 samples, triggered on the first rising zero',
+  draw(g, S, t, m) {
+    const pad = S * 0.11, w = S - pad * 2, h = S - pad * 2, mid = S / 2;
+    g.strokeStyle = W(0.15); g.lineWidth = 1;
+    g.beginPath();
+    for (let i = 0; i <= 8; i++) {
+      const p = pad + (w * i) / 8;
+      g.moveTo(pad, p); g.lineTo(S - pad, p);
+      g.moveTo(p, pad); g.lineTo(p, S - pad);
+    }
+    g.stroke();
+    g.strokeStyle = W(0.40);
+    g.beginPath();
+    g.moveTo(pad, mid); g.lineTo(S - pad, mid);
+    g.moveTo(mid, pad); g.lineTo(mid, S - pad);
+    for (let i = 1; i < 40; i++) {
+      const x = pad + (w * i) / 40, y = pad + (h * i) / 40;
+      g.moveTo(x, mid - S * 0.012); g.lineTo(x, mid + S * 0.012);
+      g.moveTo(mid - S * 0.012, y); g.lineTo(mid + S * 0.012, y);
+    }
+    g.stroke();
+
+    let trig = 0;
+    for (let i = 1; i < NWAVE - 1; i++)
+      if (wave[i - 1] <= 0 && wave[i] > 0) { trig = i; break; }
+
+    g.strokeStyle = W(0.95); g.lineWidth = 1.5;
+    g.beginPath();
+    for (let i = 0; i < NWAVE; i++) {
+      const s = wave[(i + trig) % NWAVE];
+      const x = pad + w * (i / (NWAVE - 1)), y = mid - s * h * 0.42;
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.stroke();
+
+    g.fillStyle = W(0.8);
+    g.fillRect(pad - S * 0.035, mid - 1, S * 0.026, 2);
+    frame(g, S, 0.28);
+  } },
+
+/* 04 ── columns with falling peak-hold caps */
+{ key: 'bars', label: 'bars', band: 'mid',
+  note: 'twenty bands; caps hold the peak and fall at a fixed rate',
+  draw(g, S, t, m) {
+    const N = 20, pad = S * 0.10, w = S - pad * 2, base = S - pad * 1.1, h = S * 0.62;
+    const pk = mem(m, 'pk', () => new Float32Array(N));
+    const bw = w / N;
+
+    g.strokeStyle = W(0.13); g.lineWidth = 1;
+    g.beginPath();
+    for (let i = 1; i <= 4; i++) { const y = base - h * (i / 4); g.moveTo(pad, y); g.lineTo(S - pad, y); }
+    g.stroke();
+
+    for (let i = 0; i < N; i++) {
+      const v = A.seg(i, N);
+      pk[i] = Math.max(pk[i] - 0.007, v);
+      const x = pad + bw * i + bw * 0.16, cw = bw * 0.68;
+      g.fillStyle = W(0.80);
+      g.fillRect(x, base - v * h, cw, v * h);
+      g.fillStyle = W(0.95);
+      g.fillRect(x, base - pk[i] * h - 1.5, cw, 1.5);
+    }
+
+    g.strokeStyle = W(0.42); g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(pad, base); g.lineTo(S - pad, base);
+    for (let i = 0; i <= N; i += 4) { const x = pad + bw * i; g.moveTo(x, base); g.lineTo(x, base + S * 0.022); }
+    g.stroke();
+  } },
+
+/* 05 ── concentric rings, one band each, gaps rotating */
+{ key: 'rings', label: 'rings', band: 'bass',
+  note: 'one ring per band; the gap rotates, the radius breathes',
+  draw(g, S, t, m) {
+    const c = S / 2;
+    BANDS.forEach((bd, i) => {
+      const v = A.b[bd.key];
+      const r = S * (0.075 + i * 0.062) * (1 + v * 0.30);
+      const a0 = t * (0.25 + i * 0.14) * (i % 2 ? -1 : 1);
+      const gapw = 0.34 - v * 0.22;
+      g.strokeStyle = W(0.22 + v * 0.72);
+      g.lineWidth = 1 + v * 2.4;
+      g.beginPath(); g.arc(c, c, r, a0 + gapw, a0 + TAU - gapw); g.stroke();
+      g.lineWidth = 1; g.strokeStyle = W(0.5);
+      g.beginPath();
+      g.moveTo(c + Math.cos(a0 + gapw) * (r - S * 0.016), c + Math.sin(a0 + gapw) * (r - S * 0.016));
+      g.lineTo(c + Math.cos(a0 + gapw) * (r + S * 0.016), c + Math.sin(a0 + gapw) * (r + S * 0.016));
+      g.stroke();
+    });
+    const sa = -t * 0.5;
+    g.strokeStyle = W(0.30); g.lineWidth = 1;
+    g.beginPath(); g.moveTo(c, c); g.lineTo(c + Math.cos(sa) * S * 0.44, c + Math.sin(sa) * S * 0.44); g.stroke();
+    g.fillStyle = W(0.95);
+    g.beginPath(); g.arc(c, c, S * 0.012 + A.amp * S * 0.03, 0, TAU); g.fill();
+  } },
+
+/* 06 ── dot matrix driven by a radial spectrum field */
+{ key: 'matrix', label: 'matrix', band: 'high',
+  note: 'a 13×13 field sampled by distance; the top decile gets a box',
+  draw(g, S, t, m) {
+    const N = 13, pad = S * 0.13, sp = (S - pad * 2) / (N - 1), c = (N - 1) / 2;
+    for (let r = 0; r < N; r++) for (let q = 0; q < N; q++) {
+      const dx = (q - c) / c, dy = (r - c) / c;
+      const d  = Math.min(1, Math.hypot(dx, dy) / 1.414);
+      const v  = clamp01(A.at(d) * 1.5 * (0.55 + 0.55 * Math.sin(d * 9 - t * 2.6 + q * 0.2)));
+      const x  = pad + q * sp, y = pad + r * sp;
+      if (v < 0.04) { g.fillStyle = W(0.22); g.fillRect(x - 0.6, y - 0.6, 1.2, 1.2); continue; }
+      g.fillStyle = W(0.45 + v * 0.55);
+      g.beginPath(); g.arc(x, y, 0.9 + v * sp * 0.46, 0, TAU); g.fill();
+      if (v > 0.62) {
+        g.strokeStyle = W(0.55); g.lineWidth = 1;
+        g.strokeRect(x - sp * 0.34, y - sp * 0.34, sp * 0.68, sp * 0.68);
+      }
+    }
+    frame(g, S, 0.30);
+  } },
+
+/* 07 ── lissajous, ratio picked by where the energy sits */
+{ key: 'lissa', label: 'lissajous', band: 'mid',
+  note: 'ratio snaps to a small set; the head is the bright end',
+  draw(g, S, t, m) {
+    const c = S / 2, r = S * 0.34;
+    const RATIOS = [[1,2],[2,3],[3,4],[3,5],[4,5],[5,6]];
+    const want = Math.floor(clamp01(A.b.mid * 1.6 + A.b.high * 0.8) * (RATIOS.length - 0.01));
+    m.rat = m.rat === undefined ? want : m.rat;
+    if ((m.k = (m.k || 0) + 1) % 45 === 0) m.rat = want;      // don't twitch
+    const [p, q] = RATIOS[m.rat];
+    const ph = t * 0.28;
+
+    g.strokeStyle = W(0.16); g.lineWidth = 1;
+    g.strokeRect(c - r, c - r, r * 2, r * 2);
+    g.beginPath();
+    g.moveTo(c - r, c); g.lineTo(c + r, c); g.moveTo(c, c - r); g.lineTo(c, c + r);
+    for (let i = 1; i < 10; i++) {
+      const o = r * (i / 10);
+      g.moveTo(c - o, c - S * 0.012); g.lineTo(c - o, c + S * 0.012);
+      g.moveTo(c + o, c - S * 0.012); g.lineTo(c + o, c + S * 0.012);
+    }
+    g.stroke();
+
+    const N = 300, amp = 0.55 + A.amp * 0.45;
+    g.lineWidth = 1.4;
+    for (let i = 0; i < N; i++) {
+      const u0 = (i / N) * TAU, u1 = ((i + 1) / N) * TAU;
+      g.strokeStyle = W(0.10 + 0.85 * Math.pow(i / N, 2.4));
+      g.beginPath();
+      g.moveTo(c + Math.sin(p * u0 + ph) * r * amp, c + Math.sin(q * u0) * r * amp);
+      g.lineTo(c + Math.sin(p * u1 + ph) * r * amp, c + Math.sin(q * u1) * r * amp);
+      g.stroke();
+    }
+    g.fillStyle = W(1);
+    g.beginPath();
+    g.arc(c + Math.sin(ph) * r * amp, c + Math.sin(0) * r * amp, 2.4 + A.amp * 3, 0, TAU);
+    g.fill();
+  } },
+
+/* 08 ── five bodies, each on its own band */
+{ key: 'orbit', label: 'orbit', band: 'bass',
+  note: 'five bodies; band sets the radius, phosphor draws the trail',
+  draw(g, S, t, m, rnd) {
+    const c = S / 2;
+    const bodies = mem(m, 'bd', () => Array.from({ length: 5 }, (_, i) => ({
+      band: BANDS[(i + 1) % BANDS.length].key,
+      r: 0.13 + i * 0.058, e: 0.55 + rnd() * 0.45,
+      tilt: rnd() * TAU, sp: (0.30 + rnd() * 0.7) * (rnd() > 0.75 ? -1 : 1),
+      ph: rnd() * TAU
+    })));
+
+    for (const b of bodies) {
+      const v = A.band(b.band), R = S * b.r * (1 + v * 0.42);
+      g.save(); g.translate(c, c); g.rotate(b.tilt);
+      g.strokeStyle = W(0.14); g.lineWidth = 1;
+      g.setLineDash([2, 4]);
+      g.beginPath(); g.ellipse(0, 0, R, R * b.e, 0, 0, TAU); g.stroke();
+      g.setLineDash([]);
+      const a = b.ph + t * b.sp;
+      const x = Math.cos(a) * R, y = Math.sin(a) * R * b.e;
+      g.strokeStyle = W(0.45 + v * 0.5); g.lineWidth = 1 + v * 1.6;
+      g.beginPath(); g.ellipse(0, 0, R, R * b.e, 0, a - 0.5 - v, a); g.stroke();
+      g.fillStyle = W(0.85 + v * 0.15);
+      g.beginPath(); g.arc(x, y, 1.4 + v * 3.2, 0, TAU); g.fill();
+      g.restore();
+    }
+
+    g.strokeStyle = W(0.5); g.lineWidth = 1;
+    g.beginPath(); g.arc(c, c, S * 0.045 + A.b.sub * S * 0.02, 0, TAU); g.stroke();
+    g.fillStyle = W(0.9);
+    g.beginPath(); g.arc(c, c, S * 0.014, 0, TAU); g.fill();
+  } },
+
+/* 09 ── radar; blips are spectral peaks, lit as the sweep passes */
+{ key: 'sweep', label: 'sweep', band: 'high',
+  note: 'blips are held peaks — the beam lights them, phosphor keeps them',
+  draw(g, S, t, m) {
+    const c = S / 2, R = S * 0.40, a = -t * 0.85 % TAU;
+    g.strokeStyle = W(0.17); g.lineWidth = 1;
+    for (let i = 1; i <= 3; i++) { g.beginPath(); g.arc(c, c, R * (i / 3), 0, TAU); g.stroke(); }
+    g.beginPath();
+    for (let i = 0; i < 36; i++) {
+      const ta = (i / 36) * TAU, d = i % 9 === 0 ? S * 0.04 : S * 0.017;
+      g.moveTo(c + Math.cos(ta) * R, c + Math.sin(ta) * R);
+      g.lineTo(c + Math.cos(ta) * (R - d), c + Math.sin(ta) * (R - d));
+    }
+    g.moveTo(c - R, c); g.lineTo(c + R, c); g.moveTo(c, c - R); g.lineTo(c, c + R);
+    g.stroke();
+
+    // the wedge, faked as a fan of fading lines
+    for (let i = 0; i < 16; i++) {
+      g.strokeStyle = W(0.42 * (1 - i / 16));
+      g.lineWidth = 1;
+      const wa = a + i * 0.035;
+      g.beginPath(); g.moveTo(c, c); g.lineTo(c + Math.cos(wa) * R, c + Math.sin(wa) * R); g.stroke();
+    }
+    g.strokeStyle = W(0.9); g.lineWidth = 1.3;
+    g.beginPath(); g.moveTo(c, c); g.lineTo(c + Math.cos(a) * R, c + Math.sin(a) * R); g.stroke();
+
+    // 48 targets at fixed bearings; each carries its band's level
+    const N = 48;
+    for (let i = 0; i < N; i++) {
+      const ba = (i / N) * TAU;
+      let d = ((ba - a) % TAU + TAU) % TAU;                 // how long since the beam passed
+      if (d > 0.55) continue;
+      const v = A.at(i / N);
+      if (v < 0.10) continue;
+      const rr = R * (0.18 + v * 0.78);
+      g.fillStyle = W(clamp01((1 - d / 0.55) * (0.4 + v * 0.6)));
+      g.beginPath(); g.arc(c + Math.cos(ba) * rr, c + Math.sin(ba) * rr, 1 + v * 3.4, 0, TAU); g.fill();
+    }
+  } },
+
+/* 10 ── spiral whose stroke thickness is the spectrum along its length */
+{ key: 'spiral', label: 'spiral', band: 'low',
+  note: 'four turns; thickness reads the spectrum from centre out',
+  draw(g, S, t, m) {
+    const c = S / 2, turns = 4, N = 420, R = S * 0.40;
+    g.strokeStyle = W(0.16); g.lineWidth = 1;
+    g.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * TAU, d = i % 2 ? S * 0.03 : S * 0.05;
+      g.moveTo(c + Math.cos(a) * R, c + Math.sin(a) * R);
+      g.lineTo(c + Math.cos(a) * (R + d), c + Math.sin(a) * (R + d));
+    }
+    g.arc(c, c, R, 0, TAU);
+    g.stroke();
+
+    let px = c, py = c;
+    for (let i = 0; i < N; i++) {
+      const u = i / N, a = u * TAU * turns + t * 0.22, r = R * Math.pow(u, 0.86);
+      const x = c + Math.cos(a) * r, y = c + Math.sin(a) * r;
+      const v = A.at(u);
+      if (i) {
+        g.strokeStyle = W(0.20 + v * 0.75);
+        g.lineWidth = 0.6 + v * (S * 0.045);
+        g.beginPath(); g.moveTo(px, py); g.lineTo(x, y); g.stroke();
+      }
+      px = x; py = y;
+    }
+    g.fillStyle = W(0.9);
+    g.beginPath(); g.arc(c, c, 1.6, 0, TAU); g.fill();
+  } },
+
+/* 11 ── nested polygons, counter-rotating */
+{ key: 'poly', label: 'poly', band: 'sub',
+  note: 'sides 3 to 8, alternating spin; vertices carry the band level',
+  draw(g, S, t, m) {
+    const c = S / 2;
+    for (let n = 8; n >= 3; n--) {
+      const i = 8 - n, v = A.band(BANDS[i % BANDS.length].key);
+      const R = S * (0.10 + i * 0.058) * (1 + v * 0.24);
+      const a0 = t * (0.14 + i * 0.055) * (i % 2 ? -1 : 1);
+      g.strokeStyle = W(0.24 + v * 0.66); g.lineWidth = 1 + v * 1.5;
+      g.beginPath();
+      for (let k = 0; k <= n; k++) {
+        const a = a0 + (k / n) * TAU;
+        const x = c + Math.cos(a) * R, y = c + Math.sin(a) * R;
+        k ? g.lineTo(x, y) : g.moveTo(x, y);
+      }
+      g.closePath(); g.stroke();
+      g.fillStyle = W(0.55 + v * 0.45);
+      for (let k = 0; k < n; k++) {
+        const a = a0 + (k / n) * TAU, s = 1 + v * 2.2;
+        g.fillRect(c + Math.cos(a) * R - s, c + Math.sin(a) * R - s, s * 2, s * 2);
+      }
+    }
+    g.strokeStyle = W(0.5); g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(c - S * 0.03, c); g.lineTo(c + S * 0.03, c);
+    g.moveTo(c, c - S * 0.03); g.lineTo(c, c + S * 0.03);
+    g.stroke();
+  } },
+
+/* 12 ── waterfall terrain in perspective */
+{ key: 'mesh', label: 'mesh', band: 'mid',
+  note: 'spectral history in perspective; near row is now',
+  draw(g, S, t, m) {
+    const ROWS = 10, COLS = 20;
+    const hist = mem(m, 'h', () => Array.from({ length: ROWS }, () => new Float32Array(COLS)));
+    if ((m.k = (m.k || 0) + 1) % 4 === 0) {
+      hist.pop();
+      const s = new Float32Array(COLS);
+      for (let i = 0; i < COLS; i++) s[i] = lift(A.at((i + 0.5) / COLS));
+      hist.unshift(s);
+    }
+    const c = S / 2, hz = S * 0.24;
+
+    g.strokeStyle = W(0.18); g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(S * 0.08, hz); g.lineTo(S * 0.92, hz);
+    g.moveTo(c - S * 0.02, hz - S * 0.03); g.lineTo(c + S * 0.02, hz - S * 0.03);
+    g.stroke();
+
+    for (let r = ROWS - 1; r >= 0; r--) {
+      const u = r / (ROWS - 1);
+      const y   = hz + (S * 0.88 - hz) * Math.pow(1 - u, 1.7);
+      const wid = S * 0.14 + (S * 0.88 - S * 0.14) * Math.pow(1 - u, 1.35);
+      // same rule as ridge — under the near-row spacing, or the terrain
+      // in front eats the terrain behind
+      const amp = S * 0.125 * Math.pow(1 - u, 0.85);
+      const s = hist[r], x0 = c - wid / 2;
+      g.beginPath(); g.moveTo(x0, y + 1);
+      for (let i = 0; i < COLS; i++) g.lineTo(x0 + wid * (i / (COLS - 1)), y - s[i] * amp);
+      g.lineTo(c + wid / 2, y + 1); g.closePath();
+      g.fillStyle = '#000'; g.fill();
+      g.beginPath();
+      for (let i = 0; i < COLS; i++) {
+        const x = x0 + wid * (i / (COLS - 1)), yy = y - s[i] * amp;
+        i ? g.lineTo(x, yy) : g.moveTo(x, yy);
+      }
+      g.strokeStyle = W(0.92 - u * 0.58); g.lineWidth = r === 0 ? 1.6 : 1;
+      g.stroke();
+      // the rails, so the perspective reads even when the terrain is flat
+      g.strokeStyle = W(0.16); g.lineWidth = 1;
+      g.beginPath();
+      g.moveTo(x0, y); g.lineTo(x0 - S * 0.014, y);
+      g.moveTo(c + wid / 2, y); g.lineTo(c + wid / 2 + S * 0.014, y);
+      g.stroke();
+    }
+  } },
+
+/* 13 ── a fixed composition of plates, each gated by one bin */
+{ key: 'blocks', label: 'blocks', band: 'bass',
+  note: 'a seeded composition; a plate fills when its bin crosses',
+  draw(g, S, t, m, rnd) {
+    const plates = mem(m, 'p', () => {
+      // recursive splits, so the composition is a layout rather than scatter
+      let rects = [{ x: 0.08, y: 0.08, w: 0.84, h: 0.84 }];
+      for (let pass = 0; pass < 5; pass++) {
+        const next = [];
+        for (const r of rects) {
+          if (rnd() < 0.16 || r.w < 0.115 || r.h < 0.115) { next.push(r); continue; }
+          const vert = r.w > r.h ? rnd() < 0.78 : rnd() < 0.22;
+          const f = 0.34 + rnd() * 0.32, gp = 0.018;
+          if (vert) {
+            next.push({ x: r.x, y: r.y, w: r.w * f - gp, h: r.h },
+                      { x: r.x + r.w * f, y: r.y, w: r.w * (1 - f), h: r.h });
+          } else {
+            next.push({ x: r.x, y: r.y, w: r.w, h: r.h * f - gp },
+                      { x: r.x, y: r.y + r.h * f, w: r.w, h: r.h * (1 - f) });
+          }
+        }
+        rects = next;
+      }
+      return rects.map((r, i) => ({ ...r, bin: (i * 7 + 3) % 40 / 40, thr: 0.16 + rnd() * 0.34 }));
+    });
+
+    for (const p of plates) {
+      const v = A.at(p.bin);
+      const x = p.x * S, y = p.y * S, w = p.w * S, h = p.h * S;
+      if (v > p.thr) {
+        g.fillStyle = W(clamp01(0.20 + (v - p.thr) * 1.5));
+        g.fillRect(x, y, w, h);
+      }
+      g.strokeStyle = W(0.22 + v * 0.42); g.lineWidth = 1;
+      g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+      if (w > S * 0.16 && h > S * 0.16) {          // corner tick, drawing-office habit
+        g.beginPath();
+        g.moveTo(x + 4, y + 9); g.lineTo(x + 4, y + 4); g.lineTo(x + 9, y + 4);
+        g.stroke();
+      }
+    }
+    frame(g, S, 0.30);
+  } },
+
+/* 14 ── starburst; hairlines with fixed phases, spikes on transients */
+{ key: 'burst', label: 'burst', band: 'air',
+  note: '112 hairlines with fixed phases; transients throw long spikes',
+  draw(g, S, t, m, rnd) {
+    const N = 112, c = S / 2, r0 = S * 0.06, R = S * 0.42;
+    const seedv = mem(m, 's', () => Array.from({ length: N }, () => rnd()));
+    const spike = mem(m, 'sp', () => new Float32Array(N));
+
+    for (let i = 0; i < N; i++) {
+      if (A.hit > 0.35 && seedv[i] > 1 - A.hit * 0.5) spike[i] = 1;
+      spike[i] *= 0.90;
+    }
+
+    g.lineWidth = 1;
+    g.beginPath();
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * TAU;
+      const v = A.at(seedv[i]) * (0.55 + 0.45 * Math.sin(t * 1.6 + seedv[i] * 20));
+      const len = r0 + (R - r0) * clamp01(v * 1.9 + spike[i] * 0.85);
+      g.moveTo(c + Math.cos(a) * r0, c + Math.sin(a) * r0);
+      g.lineTo(c + Math.cos(a) * len, c + Math.sin(a) * len);
+    }
+    g.strokeStyle = W(0.72); g.stroke();
+
+    g.strokeStyle = W(0.85); g.lineWidth = 1.4;
+    g.beginPath();
+    for (let i = 0; i < N; i++) {
+      if (spike[i] < 0.25) continue;
+      const a = (i / N) * TAU, len = R * (1 + spike[i] * 0.16);
+      g.moveTo(c + Math.cos(a) * R * 0.8, c + Math.sin(a) * R * 0.8);
+      g.lineTo(c + Math.cos(a) * len, c + Math.sin(a) * len);
+    }
+    g.stroke();
+
+    g.strokeStyle = W(0.24); g.lineWidth = 1;
+    for (let i = 0; i < 3; i++) {
+      const a = t * 0.18 + i * (TAU / 3);
+      g.beginPath(); g.arc(c, c, R + S * 0.045, a, a + 0.7); g.stroke();
+    }
+    g.fillStyle = W(0.9);
+    g.beginPath(); g.arc(c, c, r0 * (0.4 + A.b.air * 0.9), 0, TAU); g.fill();
+  } },
+
+/* 15 ── two line fields beating against each other */
+{ key: 'moire', label: 'moiré', band: 'high',
+  note: 'two rulings, one rotating; the beat is the only reactive part',
+  draw(g, S, t, m, rnd) {
+    const c = S / 2, R = S * 0.42;
+    const base = mem(m, 'a', () => rnd() * Math.PI);
+    g.save();
+    g.beginPath(); g.arc(c, c, R, 0, TAU); g.clip();
+
+    // The pitch has to stay well clear of the bloom radius or the two
+    // rulings just sum to a lit disc and the beat is gone.
+    // Fringe spacing is pitch / sin(angle). The pitch has to stay clear of
+    // the bloom radius or the rulings sum to a lit disc, and the angle has
+    // to stay small or the fringes are too fine to survive the same blur —
+    // so both live in a narrow window, and the window is the piece.
+    const pitch = S * (0.055 + 0.020 * A.b.low);
+    const span  = S * 1.6;
+    const draw = (ang, alpha, p) => {
+      g.save(); g.translate(c, c); g.rotate(ang);
+      g.strokeStyle = W(alpha); g.lineWidth = 1.2;
+      g.beginPath();
+      for (let x = -span / 2; x < span / 2; x += p) { g.moveTo(x, -span / 2); g.lineTo(x, span / 2); }
+      g.stroke(); g.restore();
+    };
+    draw(base, 0.40, pitch);
+    draw(base + 0.16 + A.b.high * 0.55 + Math.sin(t * 0.35) * 0.10, 0.40, pitch);
+    g.restore();
+
+    g.strokeStyle = W(0.30); g.lineWidth = 1;
+    g.beginPath(); g.arc(c, c, R, 0, TAU); g.stroke();
+    g.beginPath();
+    for (let i = 0; i <= 10; i++) {
+      const x = c - R + (R * 2) * (i / 10), d = i % 5 === 0 ? S * 0.035 : S * 0.018;
+      g.moveTo(x, S - S * 0.03); g.lineTo(x, S - S * 0.03 - d);
+    }
+    g.stroke();
+  } },
+
+/* 16 ── particles thrown on transients */
+{ key: 'plume', label: 'plume', band: 'amp',
+  note: 'emits on onsets; drag and a lateral drift, funnel guides fixed',
+  draw(g, S, t, m, rnd) {
+    const ps = mem(m, 'ps', () => []);
+    const c = S / 2;
+
+    const n = Math.round(A.hit * 14 + A.amp * 4 + 0.4);
+    for (let i = 0; i < n && ps.length < 260; i++)
+      ps.push({ x: c + (rnd() - 0.5) * S * 0.10, y: S * 0.86,
+                vx: (rnd() - 0.5) * 0.9, vy: -(1.1 + rnd() * 2.6) * (0.55 + A.hit),
+                life: 1, sz: 0.7 + rnd() * 1.9 });
+
+    for (let i = ps.length - 1; i >= 0; i--) {
+      const p = ps[i];
+      p.vy += 0.028; p.vx *= 0.985; p.vy *= 0.985;
+      p.vx += Math.sin(p.y * 0.06 + t * 1.4) * 0.035;
+      p.x += p.vx; p.y += p.vy; p.life -= 0.008;
+      if (p.life <= 0 || p.y > S * 0.95) { ps.splice(i, 1); continue; }
+      g.fillStyle = W(clamp01(p.life) * 0.95);
+      g.beginPath(); g.arc(p.x, p.y, p.sz * (0.45 + p.life * 0.9), 0, TAU); g.fill();
+    }
+
+    g.strokeStyle = W(0.20); g.lineWidth = 1;
+    g.beginPath();
+    for (const s of [-1, 1]) {
+      g.moveTo(c + s * S * 0.07, S * 0.86);
+      g.quadraticCurveTo(c + s * S * 0.26, S * 0.46, c + s * S * 0.34, S * 0.10);
+    }
+    g.moveTo(S * 0.10, S * 0.88); g.lineTo(S * 0.90, S * 0.88);
+    for (let i = 0; i <= 6; i++) {
+      const y = S * 0.88 - (S * 0.72) * (i / 6), d = i % 3 === 0 ? S * 0.040 : S * 0.020;
+      g.moveTo(S * 0.10, y); g.lineTo(S * 0.10 + d, y);
+    }
+    g.stroke();
+  } }
+];
+
+/* ────────────────────────────────────────────────────────────
+   The tube — one pipeline, sixteen times
+   ──────────────────────────────────────────────────────────── */
+
+let beam, bctx, tint, tctx, grain, gctx, gimg;
+
+function makeBuffers() {
+  beam = document.createElement('canvas'); beam.width = beam.height = PX;
+  bctx = beam.getContext('2d');
+  tint = document.createElement('canvas'); tint.width = tint.height = PX;
+  tctx = tint.getContext('2d');
+
+  grain = document.createElement('canvas'); grain.width = grain.height = TILE;
+  gctx  = grain.getContext('2d');
+  gimg  = gctx.createImageData(TILE, TILE);
+  regenGrain();
+}
+
+function regenGrain() {
+  const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random();
+    d[i] = 232; d[i + 1] = 244; d[i + 2] = 238;
+    d[i + 3] = v > 0.84 ? (v - 0.84) * 640 : 0;
+  }
+  gctx.putImageData(gimg, 0, 0);
+}
+
+// The guns, summed into one beam buffer. 92 warped each gun separately;
+// at sixteen tubes that is three times too many draws, and the beam has
+// the same misregistration in it either way.
+function buildBeam(art, conv, ang) {
+  bctx.setTransform(1, 0, 0, 1, 0, 0);
+  bctx.globalCompositeOperation = 'source-over';
+  bctx.clearRect(0, 0, PX, PX);
+  bctx.globalCompositeOperation = 'lighter';
+
+  const off = [
+    {  x:  Math.cos(ang) * conv,        y:  Math.sin(ang) * conv * 0.7 },
+    {  x:  0,                           y:  0 },
+    {  x: -Math.cos(ang) * conv * 0.85, y: -Math.sin(ang) * conv * 0.6 }
+  ];
+  const scl = [1 + conv * 0.004, 1, 1 - conv * 0.0034];
+
+  for (let ch = 0; ch < 3; ch++) {
+    tctx.setTransform(1, 0, 0, 1, 0, 0);
+    tctx.globalCompositeOperation = 'source-over';
+    tctx.clearRect(0, 0, PX, PX);
+    tctx.drawImage(art, 0, 0);
+    tctx.globalCompositeOperation = 'multiply';
+    tctx.fillStyle = GUNS[ch];
+    tctx.fillRect(0, 0, PX, PX);
+    tctx.globalCompositeOperation = 'destination-in';   // restore the art's alpha
+    tctx.drawImage(art, 0, 0);
+
+    bctx.save();
+    bctx.translate(PX / 2, PX / 2);
+    bctx.scale(scl[ch], scl[ch]);
+    bctx.translate(off[ch].x * SCALE, off[ch].y * SCALE);
+    bctx.drawImage(tint, -PX / 2, -PX / 2);
+    bctx.restore();
+  }
+  bctx.globalCompositeOperation = 'source-over';
+}
+
+// Pincushion, rotation and overscan, as horizontal strips scaled about
+// centre. The later blur hides the seams, so the blur is load-bearing.
+function warp(dst, pin, rot, over) {
+  const S = TILE;
+  dst.save();
+  dst.translate(S / 2, S / 2);
+  dst.rotate(rot);
+  dst.scale(over, over);
+  for (let i = 0; i < STRIPS; i++) {
+    const sh = S / STRIPS, y0 = i * sh;
+    const yc = ((y0 + sh / 2) / S) * 2 - 1;
+    const w  = S * (1 + pin * (yc * yc - 1 / 3));
+    dst.drawImage(beam, 0, y0 * SCALE, S * SCALE, sh * SCALE,
+                        -w / 2, y0 - S / 2, w, sh + 0.6);
+  }
+  dst.restore();
+}
+
+const V = EMISSION;
+const PIN  = (V.geometry / 100) * 1.7;
+const ROT  = V.geometry * 0.0006;
+const OVER = 1 + V.geometry * 0.0016;
+
+// The tube's own geometry throws the picture outward: overscan, plus the
+// pincushion widening the top and bottom strips by pin·⅔. Left alone it
+// pushes roughly 8% of every composition off the tile — which reads as a
+// crop, and reads worst on a phone where the tile is small enough to see.
+// So the generators draw into an inset frame sized from the optics they are
+// about to go through, rather than from a number picked by eye.
+const SAFE = 1 / (OVER * (1 + PIN * (2 / 3)) * 1.02);
+
+function renderCell(c, t) {
+  const S = TILE, D = state.drive;
+  const lv = c.level;
+
+  // Audio → tube. At drive 0 every reading is the variant's own value,
+  // which is what makes the sliders readable.
+  const emis  = clamp(state.emission * (1 + D * (lv * 1.15 + A.hit * 0.40 - 0.26)), 0.10, 2.0);
+  const bloom = clamp(V.bloom        * (1 + D * (lv * 0.70 - 0.14)),                0.10, 2.4);
+  const conv  = V.converge * (1 + D * A.hit * 1.9);
+  const ms    = V.persist  * (1 + D * (0.85 - lv * 0.65));
+  const fade  = clamp(1 - Math.exp(-16.7 / ms), 0.012, 1);
+
+  // 1 — the drawing
+  const g = c.actx;
+  g.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  g.clearRect(0, 0, S, S);
+  g.translate(S * (1 - SAFE) / 2, S * (1 - SAFE) / 2);
+  g.scale(SAFE, SAFE);
+  g.lineJoin = 'round'; g.lineCap = 'butt';
+  g.globalCompositeOperation = 'source-over';
+  GENS[c.gen].draw(g, S, t, c.mem, c.rnd);
+
+  // 2 — guns
+  buildBeam(c.art, conv, c.ang);
+
+  // 3 — phosphor: faded, never cleared
+  const p = c.pctx;
+  p.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  p.globalCompositeOperation = 'source-over';
+  p.fillStyle = `rgba(0,0,0,${fade})`;
+  p.fillRect(0, 0, S, S);
+  p.globalCompositeOperation = 'lighter';
+  warp(p, PIN, ROT, OVER);
+  p.globalCompositeOperation = 'source-over';
+
+  // 4 — bloom, bloom, subject. Nothing renders crisp.
+  const o = c.octx;
+  o.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  o.globalCompositeOperation = 'source-over';
+  o.fillStyle = '#000';
+  o.fillRect(0, 0, S, S);
+  o.globalCompositeOperation = 'screen';
+  if (QUALITY > 0) {
+    o.filter = `blur(${(4 + 13 * bloom).toFixed(1)}px)`;
+    o.globalAlpha = clamp(0.52 * bloom, 0, 1) * clamp(emis, 0, 1.2);
+    o.drawImage(c.phos, 0, 0, S, S);
+  }
+  o.filter = `blur(${(1.6 + 5 * bloom).toFixed(1)}px)`;
+  o.globalAlpha = clamp(0.44 * bloom, 0, 1) * clamp(emis, 0, 1.2);
+  o.drawImage(c.phos, 0, 0, S, S);
+  o.filter = `blur(${V.spot.toFixed(2)}px)`;
+  o.globalAlpha = clamp(emis, 0, 1);
+  o.drawImage(c.phos, 0, 0, S, S);
+  if (emis > 1) {                       // over-emission burns, it does not clip
+    o.globalAlpha = clamp(emis - 1, 0, 1);
+    o.drawImage(c.phos, 0, 0, S, S);
+  }
+  o.filter = 'none';
+  o.globalAlpha = 1;
+  o.globalCompositeOperation = 'source-over';
+
+  // 5 — vignette, grain
+  o.fillStyle = c.vig;
+  o.fillRect(0, 0, S, S);
+  o.globalCompositeOperation = 'screen';
+  o.globalAlpha = V.noise;
+  o.drawImage(grain, 0, 0, S, S);
+  o.globalAlpha = 1;
+
+  // 6 — coating: hue from the phosphor, luminosity from the picture.
+  // Last, so it tints the grain too — which is what sells it as light.
+  o.globalCompositeOperation = 'color';
+  o.globalAlpha = 0.62;
+  o.fillStyle = `hsl(${state.hue}, 74%, 55%)`;
+  o.fillRect(0, 0, S, S);
+  o.globalAlpha = 1;
+
+  o.globalCompositeOperation = 'screen';
+  o.fillStyle = c.gloss;
+  o.fillRect(0, 0, S, S * 0.5);
+  o.globalCompositeOperation = 'source-over';
+
+  c.emis = emis; c.bloom = bloom; c.ms = ms; c.conv = conv;
+}
+
+/* ────────────────────────────────────────────────────────────
+   The sheet
+   ──────────────────────────────────────────────────────────── */
+
+const state = { gain: 1.8, drive: 1.0, emission: 1.30, hue: 150, seed: 1 };
+let QUALITY = 1;                       // 1 = both halo passes, 0 = one
+let cells = [], hovered = null;
+
+const gridEl = $('grid');
+
+function build() {
+  gridEl.innerHTML = '';
+  cells = [];
+
+  GENS.forEach((gen, i) => {
+    const fig = document.createElement('figure');
+    fig.className = 'unit';
+
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.tabIndex = 0;
+    cell.setAttribute('role', 'img');
+    cell.setAttribute('aria-label',
+      `${gen.label}. ${gen.note}. Keyed to the ${gen.band} band.`);
+
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = PX;
+    cell.appendChild(cv);
+
+    const osd = document.createElement('div');
+    osd.className = 'osd';
+    cell.appendChild(osd);
+
+    const lvl = document.createElement('div');
+    lvl.className = 'lvl';
+    const lvlIn = document.createElement('i');
+    lvl.appendChild(lvlIn);
+
+    const cap = document.createElement('figcaption');
+    cap.className = 'cap';
+    cap.innerHTML = `<span class="a">${String(i + 1).padStart(2, '0')} ${gen.label}</span>` +
+                    `<span class="b" data-v>${gen.band}</span>`;
+
+    fig.append(cell, lvl, cap);
+    gridEl.appendChild(fig);
+
+    const art = document.createElement('canvas'); art.width = art.height = PX;
+    const ph  = document.createElement('canvas'); ph.width  = ph.height  = PX;
+    const pc  = ph.getContext('2d');
+    pc.fillStyle = '#000'; pc.fillRect(0, 0, PX, PX);
+
+    const oc = cv.getContext('2d', { alpha: false });
+    const S  = TILE;
+    const vg = oc.createRadialGradient(S / 2, S * 0.47, S * 0.07, S / 2, S / 2, S * 0.70);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(0.55, 'rgba(0,0,0,0.15)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.80)');
+    const gl = oc.createLinearGradient(0, 0, 0, S * 0.5);
+    gl.addColorStop(0, 'rgba(200,240,225,0.055)');
+    gl.addColorStop(1, 'rgba(0,0,0,0)');
+
+    const seed = (state.seed * 2654435761 + i * 40503) >>> 0;
+
+    const c = {
+      gen: i, cell, osd, cap: cap.querySelector('[data-v]'), lvl: lvlIn,
+      art, actx: art.getContext('2d'),
+      phos: ph, pctx: pc,
+      octx: oc, vig: vg, gloss: gl,
+      mem: {}, rnd: mulberry32(seed),
+      ang: (seed % 360) * Math.PI / 180,
+      level: 0, emis: 1, bloom: 1, ms: V.persist, conv: V.converge
+    };
+
+    cell.addEventListener('pointerenter', () => { hovered = c; paintOsd(c); });
+    cell.addEventListener('pointerleave', () => { if (hovered === c) hovered = null; });
+    cell.addEventListener('focus', () => { hovered = c; paintOsd(c); });
+    cell.addEventListener('blur',  () => { if (hovered === c) hovered = null; });
+
+    cells.push(c);
+  });
+}
+
+function paintOsd(c) {
+  const gen = GENS[c.gen];
+  const rows = [
+    ['band',     gen.band],
+    ['level',    Math.round(c.level * 100) + '%'],
+    ['emission', Math.round(c.emis * 100) + '%'],
+    ['bloom',    Math.round(c.bloom * 100) + '%'],
+    ['persist',  Math.round(c.ms) + 'ms'],
+    ['converge', '+' + c.conv.toFixed(2) + 'px'],
+    ['spot',     V.spot.toFixed(2) + 'px'],
+    ['phosphor', state.hue + '°']
+  ];
+  c.osd.innerHTML =
+    `<div class="row head"><span>${gen.label}</span>
+       <span class="v">${String(c.gen + 1).padStart(2, '0')}/16</span></div>` +
+    rows.map(([k, v], i) =>
+      `<div class="row${i < 2 ? ' on' : ''}"><span>${k}</span><span class="v">${v}</span></div>`)
+      .join('') +
+    `<div class="foot">${gen.note}</div>`;
+}
+
+/* ---------- band meter ---------- */
+
+const meterEl = $('meter');
+const meterBars = BANDS.map(bd => {
+  const d = document.createElement('span');
+  d.className = 'bnd';
+  d.title = bd.label;
+  const i = document.createElement('i');
+  d.appendChild(i);
+  meterEl.appendChild(d);
+  return i;
+});
+
+/* ---------- controls ---------- */
+
+const knob = (id, valId, fmt, apply) => {
+  const el = $(id), out = $(valId);
+  el.addEventListener('input', () => {
+    apply(+el.value);
+    out.textContent = fmt(+el.value);
+  });
+};
+
+knob('gain',  'gainVal',  v => v + '%', v => state.gain = v / 100);
+knob('drive', 'driveVal', v => v + '%', v => state.drive = v / 100);
+knob('emis',  'emisVal',  v => v + '%', v => state.emission = v / 100);
+knob('hue',   'hueVal',   v => v + '°', v => state.hue = v);
+
+$('reseed').addEventListener('click', () => {
+  state.seed = (Math.random() * 0xFFFFFF) | 0;
+  build();
+});
+
+const micBtn = $('mic'), statusEl = $('status');
+
+function setStatus() {
+  const txt = {
+    sim:      'signal ▸ simulated · press listen for the room',
+    live:     'signal ▸ microphone · sixteen tubes, one room',
+    denied:   'signal ▸ simulated · microphone refused',
+    insecure: 'signal ▸ simulated · mic needs https or localhost'
+  }[micState];
+  statusEl.textContent = txt;
+  micBtn.textContent = micState === 'live' ? 'listening' : 'listen';
+  micBtn.classList.toggle('live', micState === 'live');
+}
+
+async function startMic() {
+  if (micState === 'live') {                    // toggle back to the sim
+    if (audioCtx) audioCtx.suspend();
+    analyser = null; micState = 'sim'; setStatus();
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia) { micState = 'insecure'; setStatus(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+    const src = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.55;
+    freqRaw = new Uint8Array(analyser.frequencyBinCount);
+    waveRaw = new Uint8Array(analyser.fftSize);
+    src.connect(analyser);
+    micState = 'live';
+  } catch (e) {
+    micState = (location.protocol === 'file:' || !window.isSecureContext) ? 'insecure' : 'denied';
+  }
+  setStatus();
+}
+micBtn.addEventListener('click', startMic);
+
+/* ---------- resize ---------- */
+
+let rz;
+addEventListener('resize', () => {
+  clearTimeout(rz);
+  rz = setTimeout(() => {
+    const was = TILE;
+    readTile();
+    if (TILE === was) return;
+    makeBuffers();
+    build();
+  }, 180);
+});
+
+/* ---------- loop ---------- */
+
+let tick = 0, last = 0, avg = 16, slow = 0;
+
+function loop(now) {
+  requestAnimationFrame(loop);
+
+  const dt = last ? now - last : 16;
+  last = now;
+  avg += (dt - avg) * 0.05;
+
+  // Sixteen tubes is enough that a slow machine should be allowed to drop
+  // the outer halo rather than the frame rate. Two steps, hysteretic.
+  if (avg > 30 && QUALITY === 1 && ++slow > 40) { QUALITY = 0; slow = 0; }
+  else if (avg < 19 && QUALITY === 0 && ++slow > 120) { QUALITY = 1; slow = 0; }
+  else if (avg <= 30 && avg >= 19) slow = 0;
+
+  const t = REDUCE && micState !== 'live' ? 2.4 : now * 0.001;
+
+  readSignal(t);
+
+  if ((tick = (tick + 1) % 3) === 0 && !(REDUCE && micState !== 'live')) regenGrain();
+
+  for (const c of cells) {
+    const target = A.band(GENS[c.gen].band);
+    c.level += (target - c.level) * 0.22;
+    renderCell(c, t);
+    c.lvl.style.transform = `scaleX(${c.level.toFixed(3)})`;
+  }
+
+  if ((tick === 0)) {
+    BANDS.forEach((bd, i) => {
+      meterBars[i].style.transform = `scaleY(${A.b[bd.key].toFixed(3)})`;
+    });
+    cells.forEach(c => { c.cap.textContent = Math.round(c.level * 100) + '%'; });
+    if (hovered) paintOsd(hovered);
+  }
+}
+
+/* ---------- go ---------- */
+
+state.seed = (Math.random() * 0xFFFFFF) | 0;
+makeBuffers();
+build();
+setStatus();
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
