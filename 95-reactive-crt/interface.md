@@ -215,6 +215,12 @@ something the viewer switched on deliberately.
   variant.
 
 ## imagination
+Landed the same week as [94-relationships](../94-relationships/), which is also
+sixteen cells, also a specimen sheet, and also holds one thing constant so the
+sixteen differences are legible — edges there, generators here. Neither knew about
+the other; that the form arrived twice from different directions is the argument
+for it.
+
 Sits between [92-tube-tolerance](../92-tube-tolerance/) and
 [sketch-tube-driven](../daily-sketch/sketch-tube-driven/), and inverts both. Presses
 `techniques/crt-tube-treatment` onto the audio-reactive line running through
