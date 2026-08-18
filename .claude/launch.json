@@ -4,146 +4,303 @@
     {
       "name": "imagination-layers-root",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8842"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8842"
+      ],
       "port": 8842,
       "url": "http://localhost:8842"
     },
     {
       "name": "sketch-imagination-layers",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8841", "--directory", "daily-sketch/sketch-imagination-layers"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8841",
+        "--directory",
+        "daily-sketch/sketch-imagination-layers"
+      ],
       "port": 8841
     },
     {
       "name": "100days",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8000", "--directory", "/Users/mantas/Desktop/min7is/100days"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8000",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days"
+      ],
       "port": 8000
     },
     {
       "name": "aesthetic-genome",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "/Users/mantas/Desktop/min7is/100days/aesthetic-genome"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8080",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days/aesthetic-genome"
+      ],
       "port": 8080
     },
     {
       "name": "68-moog-phase",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8813", "--directory", "/Users/mantas/Desktop/min7is/100days/68-moog-phase"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8813",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days/68-moog-phase"
+      ],
       "port": 8813
     },
     {
       "name": "64-viz-grouped",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8812", "--directory", "/Users/mantas/Desktop/min7is/100days/64-viz-grouped"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8812",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days/64-viz-grouped"
+      ],
       "port": 8812
     },
     {
       "name": "sketch-anna-portfolio",
       "runtimeExecutable": "/usr/local/bin/python3.12",
-      "runtimeArgs": ["-c", "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-anna-portfolio'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8007),H); httpd.serve_forever()"],
+      "runtimeArgs": [
+        "-c",
+        "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-anna-portfolio'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8007),H); httpd.serve_forever()"
+      ],
       "port": 8007
     },
     {
       "name": "sketch-color-explorer-v2",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8811", "--directory", "daily-sketch/sketch-color-explorer-v2"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8811",
+        "--directory",
+        "daily-sketch/sketch-color-explorer-v2"
+      ],
       "port": 8811
     },
     {
       "name": "sketch-color-explorer",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8810", "--directory", "daily-sketch/sketch-color-explorer"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8810",
+        "--directory",
+        "daily-sketch/sketch-color-explorer"
+      ],
       "port": 8810
     },
     {
       "name": "sketch-ube-field-audio",
       "runtimeExecutable": "/usr/local/bin/python3.10",
-      "runtimeArgs": ["-c", "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-ube-field-audio'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8009),H); httpd.serve_forever()"],
+      "runtimeArgs": [
+        "-c",
+        "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-ube-field-audio'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8009),H); httpd.serve_forever()"
+      ],
       "port": 8009
     },
     {
       "name": "sketch-ascii-field-gallery",
       "runtimeExecutable": "/usr/local/bin/python3.10",
-      "runtimeArgs": ["-c", "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-ascii-field-gallery'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8008),H); httpd.serve_forever()"],
+      "runtimeArgs": [
+        "-c",
+        "import http.server,socketserver,functools; H=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-ascii-field-gallery'); socketserver.TCPServer.allow_reuse_address=True; httpd=socketserver.TCPServer(('127.0.0.1',8008),H); httpd.serve_forever()"
+      ],
       "port": 8008
     },
     {
       "name": "sketch-terminal-cli",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8803", "--directory", "daily-sketch/sketch-terminal-cli"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8803",
+        "--directory",
+        "daily-sketch/sketch-terminal-cli"
+      ],
       "port": 8803
     },
     {
       "name": "74-particles",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8821", "--directory", "/Users/mantas/Desktop/min7is/100days/74-particles"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8821",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days/74-particles"
+      ],
       "port": 8821
     },
     {
       "name": "sketch-eixample-tiles",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8820", "--directory", "/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-eixample-tiles"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8820",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days/daily-sketch/sketch-eixample-tiles"
+      ],
       "port": 8820
     },
     {
       "name": "sketch-agent-streaming-patterns",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8830", "--directory", "daily-sketch/sketch-agent-streaming-patterns"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8830",
+        "--directory",
+        "daily-sketch/sketch-agent-streaming-patterns"
+      ],
       "port": 8830
     },
     {
       "name": "sketch-eixample-fullscreen-grid",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8822", "--directory", "daily-sketch/sketch-eixample-fullscreen-grid"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8822",
+        "--directory",
+        "daily-sketch/sketch-eixample-fullscreen-grid"
+      ],
       "port": 8822
     },
     {
       "name": "88-eixample",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8080", "--directory", "88-eixample"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8080",
+        "--directory",
+        "88-eixample"
+      ],
       "port": 8080
     },
     {
       "name": "89-sprite-states",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8823", "--directory", "89-sprite-states"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8823",
+        "--directory",
+        "89-sprite-states"
+      ],
       "port": 8823
     },
     {
       "name": "sketch-moog-phase-grid",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8831", "--directory", "daily-sketch/sketch-moog-phase-grid"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8831",
+        "--directory",
+        "daily-sketch/sketch-moog-phase-grid"
+      ],
       "port": 8831
     },
     {
       "name": "sketch-audio-reactive-agents-v2",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8832", "--directory", "daily-sketch/sketch-audio-reactive-agents-v2"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8832",
+        "--directory",
+        "daily-sketch/sketch-audio-reactive-agents-v2"
+      ],
       "port": 8832
     },
     {
       "name": "90-aida001",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8833", "--directory", "90-aida001"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8833",
+        "--directory",
+        "90-aida001"
+      ],
       "port": 8833
     },
     {
       "name": "sketch-torus-sheet",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8851", "--directory", "daily-sketch/sketch-torus-sheet"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8851",
+        "--directory",
+        "daily-sketch/sketch-torus-sheet"
+      ],
       "port": 8851
+    },
+    {
+      "name": "95-reactive-crt",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8854",
+        "--directory",
+        "95-reactive-crt"
+      ],
+      "port": 8854
+    },
+    {
+      "name": "sketch-audio-tube-grid",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8853",
+        "--directory",
+        "daily-sketch/sketch-audio-tube-grid"
+      ],
+      "port": 8853
     },
     {
       "name": "sketch-tube-driven",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8852", "--directory", "daily-sketch/sketch-tube-driven"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8852",
+        "--directory",
+        "daily-sketch/sketch-tube-driven"
+      ],
       "port": 8852
     },
     {
       "name": "imagination-snapshots",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8840", "--directory", "/Users/mantas/Desktop/min7is/100days/imagination/snapshots"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8840",
+        "--directory",
+        "/Users/mantas/Desktop/min7is/100days/imagination/snapshots"
+      ],
       "port": 8840
     }
   ]

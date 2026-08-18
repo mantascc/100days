@@ -1,5 +1,10 @@
 [
   {
+    "id": "95-reactive-crt",
+    "path": "100days/95-reactive-crt",
+    "description": "Reactive CRT — sixteen tubes, one room: the 92-tube-tolerance CRT pipeline locked to a single EMISSION variant while sixteen different generators (ridge, radial, scope, bars, rings, matrix, lissajous, orbit, sweep, spiral, poly, mesh, blocks, burst, moiré, plume) draw the same microphone into it; band level and onsets drive emission, bloom, persistence and gun convergence, so a loud hit fringes the whole cell"
+  },
+  {
     "id": "93-imagination-layers",
     "path": "100days/93-imagination-layers",
     "description": "Imagination Layers — the imagination/ context layer as a stack of planes, one per entity type, with the inhale coverage ledger as the ground; select anything and filaments run between an entity and the sketches it spawned"
@@ -12,7 +17,7 @@
   {
     "id": "91-retro-primitives",
     "path": "100days/91-retro-primitives",
-    "description": "Retro Primitives \u2014 CRT tube treatment as a palette-swap family across four variants (phosphor \u00b7 cryo \u00b7 signal \u00b7 graphite); each runs circle/square/triangle/ellipse in a 2\u00d72 tube grid with bloom, live grain, and static scanlines"
+    "description": "Retro Primitives — CRT tube treatment as a palette-swap family across four variants (phosphor · cryo · signal · graphite); each runs circle/square/triangle/ellipse in a 2×2 tube grid with bloom, live grain, and static scanlines"
   },
   {
     "id": "90-aida001",
@@ -57,7 +62,7 @@
   {
     "id": "82-z-axis",
     "path": "100days/82-z-axis",
-    "description": "Z-Axis \u2014 nine micro-explorations of depth as a UI material, switched via a floating controller"
+    "description": "Z-Axis — nine micro-explorations of depth as a UI material, switched via a floating controller"
   },
   {
     "id": "79-idle-states",
@@ -342,117 +347,117 @@
   {
     "id": "55-ascii-loading",
     "path": "100days/55-ascii-loading",
-    "description": "ASCII Loading \u2014 dual-grid crystallization animation with face emergence and progress bar"
+    "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar"
   },
   {
     "id": "56-constrained-variation",
     "path": "100days/56-constrained-variation",
-    "description": "Constrained Variation \u2014 fix the scaffold, switch the algorithm, compare simultaneously"
+    "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously"
   },
   {
     "id": "57-color-themes",
     "path": "100days/57-color-themes",
-    "description": "Five chapters, three palettes: Peach, Clay, and Aus \u2014 same sketch system remapped through different color identities"
+    "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities"
   },
   {
     "id": "58-shapes",
     "path": "100days/58-shapes",
-    "description": "Geometric shapes explorer \u2014 lines, arcs, and curves organized into chapters with animated parameter tweaking"
+    "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking"
   },
   {
     "id": "59-font-explorer",
     "path": "100days/59-font-explorer",
-    "description": "Font Explorer \u2014 skill to visualize any font"
+    "description": "Font Explorer — skill to visualize any font"
   },
   {
     "id": "60-agentic-patterns",
     "path": "100days/60-agentic-patterns",
-    "description": "Agentic Patterns \u2014 interactive reference for AI agent design patterns"
+    "description": "Agentic Patterns — interactive reference for AI agent design patterns"
   },
   {
     "id": "61-hitl-patterns",
     "path": "100days/61-hitl-patterns",
-    "description": "Human in the Loop \u2014 four patterns across a single autonomy axis"
+    "description": "Human in the Loop — four patterns across a single autonomy axis"
   },
   {
     "id": "62-terminal-cli",
     "path": "100days/62-terminal-cli",
-    "description": "Terminal REPL \u2014 minimal shell interface with boot sequence, command streaming, and ASCII cat"
+    "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat"
   },
   {
     "id": "63-ube-kaizen",
     "path": "100days/63-ube-kaizen",
-    "description": "Ube Kaizen \u2014 enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings"
+    "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings"
   },
   {
     "id": "63-constellation-map",
     "path": "100days/63-constellation-map",
-    "description": "Constellation \u2014 the first 52 sketches plotted as eight concept constellations (network, clustering, statistical, temporal, spatial, audio, visual, emergence) on canvas, with a replay that re-assembles the map"
+    "description": "Constellation — the first 52 sketches plotted as eight concept constellations (network, clustering, statistical, temporal, spatial, audio, visual, emergence) on canvas, with a replay that re-assembles the map"
   },
   {
     "id": "64-viz-grouped",
     "path": "100days/64-viz-grouped",
-    "description": "Viz Grouped \u2014 reference gallery of visualization types grouped by analytical goal"
+    "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal"
   },
   {
     "id": "65-mode-toggle",
     "path": "100days/65-mode-toggle",
-    "description": "Mode Toggle \u2014 component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations"
+    "description": "Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations"
   },
   {
     "id": "66-ascii-field-gallery",
     "path": "100days/66-ascii-field-gallery",
-    "description": "ASCII Field Gallery \u2014 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp"
+    "description": "ASCII Field Gallery — 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp"
   },
   {
     "id": "67-audio-reactive-ascii",
     "path": "100days/67-audio-reactive-ascii",
-    "description": "Audio Reactive ASCII Field \u2014 ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning"
+    "description": "Audio Reactive ASCII Field — ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning"
   },
   {
     "id": "68-moog-phase",
     "path": "100days/68-moog-phase",
-    "description": "Moog Phase \u2014 XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner"
+    "description": "Moog Phase — XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner"
   },
   {
     "id": "69-clear-channel",
     "path": "100days/69-clear-channel",
-    "description": "Clear Channel \u2014 visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system"
+    "description": "Clear Channel — visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system"
   },
   {
     "id": "70-clear-channel-2",
     "path": "100days/70-clear-channel-2",
-    "description": "Clear Channel \u2014 introduction: a design system for computational aesthetics; working with data as raw material"
+    "description": "Clear Channel — introduction: a design system for computational aesthetics; working with data as raw material"
   },
   {
     "id": "71-index-100days",
     "path": "100days/71-index-100days",
-    "description": "Index \u2014 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags"
+    "description": "Index — 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags"
   },
   {
     "id": "72-snapshots-v2",
     "path": "100days/72-snapshots-v2",
-    "description": "Snapshots v2 \u2014 photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos \u2192 settling \u2192 locked) and chaotic bursty image loading"
+    "description": "Snapshots v2 — photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos → settling → locked) and chaotic bursty image loading"
   },
   {
     "id": "73-svg-layouts",
     "path": "100days/73-svg-layouts",
-    "description": "SVG Layouts \u2014 schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations"
+    "description": "SVG Layouts — schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations"
   },
   {
     "id": "74-particles",
     "path": "100days/74-particles",
-    "description": "Particles \u2014 soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold"
+    "description": "Particles — soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold"
   },
   {
     "id": "75-layout-playground",
     "path": "100days/75-layout-playground",
-    "description": "Layout Playground \u2014 a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure"
+    "description": "Layout Playground — a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure"
   },
   {
     "id": "76-layout-depth",
     "path": "100days/76-layout-depth",
-    "description": "Layout Depth \u2014 depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window"
+    "description": "Layout Depth — depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window"
   },
   {
     "id": "77-ascii-sheet-documentation",
