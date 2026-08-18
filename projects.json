@@ -2,52 +2,52 @@
   {
     "id": "95-reactive-crt",
     "path": "100days/95-reactive-crt",
-    "description": "Reactive CRT — sixteen tubes, one room: the 92-tube-tolerance CRT pipeline locked to a single EMISSION variant while sixteen different generators (ridge, radial, scope, bars, rings, matrix, lissajous, orbit, sweep, spiral, poly, mesh, blocks, burst, moiré, plume) draw the same microphone into it; band level and onsets drive emission, bloom, persistence and gun convergence, so a loud hit fringes the whole cell"
+    "description": "Reactive CRT — sixteen generators drawing the same microphone into one CRT pipeline; level and onsets drive emission, bloom and convergence"
   },
   {
     "id": "94-relationships",
     "path": "100days/94-relationships",
-    "description": "Relationships — a specimen sheet of relationship itself: sixteen live micro-simulations, each isolating one type of edge (directed, mutual, asymmetric, ephemeral · latent, cycle, transitive, broken · hierarchy, hub, peer, broker · dependency, mutualism, parasitic, similarity); pulses with comet tails carry direction, nodes glow on arrival"
+    "description": "Relationships — a specimen sheet of the edge itself: sixteen live micro-simulations, one per relationship type, with pulses carrying direction"
   },
   {
     "id": "93-imagination-layers",
     "path": "100days/93-imagination-layers",
-    "description": "Imagination Layers — the imagination/ context layer as a stack of planes, one per entity type, with the inhale coverage ledger as the ground; select anything and filaments run between an entity and the sketches it spawned"
+    "description": "Imagination Layers — the imagination/ context layer as a stack of planes, one per entity type; select anything to see what it spawned"
   },
   {
     "id": "92-tube-tolerance",
     "path": "100days/92-tube-tolerance",
-    "description": "Tube Tolerance — a texture instrument for the CRT tube treatment: one test card shared by nine tubes, with eight pipeline axes (spot, converge, geometry, persist, noise, emission, bloom, phosphor) exposed as full sweepable ranges; batch samples a bell around nominal, sweep steps one axis end to end, cross plots two as a 3×3"
+    "description": "Tube Tolerance — a texture instrument for the CRT treatment: one test card, nine tubes, eight pipeline axes to batch, sweep or cross-plot"
   },
   {
     "id": "91-retro-primitives",
     "path": "100days/91-retro-primitives",
-    "description": "Retro Primitives — CRT tube treatment as a palette-swap family across four variants (phosphor · cryo · signal · graphite); each runs circle/square/triangle/ellipse in a 2×2 tube grid with bloom, live grain, and static scanlines"
+    "description": "Retro Primitives — CRT tube treatment as a palette-swap family across four variants, each running four primitives in a 2×2 tube grid"
   },
   {
     "id": "90-aida001",
     "path": "100days/90-aida001",
-    "description": "AIDA001 — first audio-visual sketch: agent swarm drifts and jitters to three self-recorded loops or live mic, with a media-player island and a drawer exposing the RMS→animation sensitivity vector"
+    "description": "AIDA001 — first audio-visual sketch: an agent swarm drifting to three self-recorded loops or live mic, with the RMS→animation vector exposed"
   },
   {
     "id": "89-sprite-states",
     "path": "100days/89-sprite-states",
-    "description": "Sprite States — clear-channel docs for the create-sprite four-state atlas (idle · working · attention · error); 2×2 live demo at 80×80 with the tool packed alongside"
+    "description": "Sprite States — clear-channel docs for the create-sprite four-state atlas (idle · working · attention · error), with a 2×2 live demo"
   },
   {
     "id": "88-eixample",
     "path": "100days/88-eixample",
-    "description": "Eixample — hand-painted 16×16 pictograph reframed as a generative grid language across three modes (original, shuffle, sampling); deterministic per (mode, №, palette)"
+    "description": "Eixample — a hand-painted 16×16 pictograph reframed as a generative grid language across three modes, deterministic per seed"
   },
   {
     "id": "87-attention-distribution",
     "path": "100days/87-attention-distribution",
-    "description": "Attention Distribution — nine ways to read one simulation of 100 dot-agents distributing finite attention across 5 voices, as a 3×3 grid of small multiples"
+    "description": "Attention Distribution — nine ways to read one simulation of 100 dot-agents splitting finite attention across five voices"
   },
   {
     "id": "86-agent-stream-scrub",
     "path": "100days/86-agent-stream-scrub",
-    "description": "Agent-Stream Scrub — scrubbable two-track reference for eight agent-streaming patterns: surface track (what the user sees) versus mechanism track (gates, retries, interrupts)"
+    "description": "Agent-Stream Scrub — a scrubbable two-track reference for eight agent-streaming patterns: what the user sees versus what the machine does"
   },
   {
     "id": "85-agent-stream-glyphs",
