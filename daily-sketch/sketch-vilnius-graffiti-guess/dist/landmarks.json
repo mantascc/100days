@@ -1,0 +1,7 @@
+[
+ {"id":"gediminas","name":"Gedimino bokštas","lat":54.68676,"lng":25.29069,"image":"assets/landmarks/gediminas.png","source":"https://mapcarta.com/W24569542"},
+ {"id":"seimas","name":"Seimas","lat":54.69111,"lng":25.26194,"image":"assets/landmarks/seimas.png","source":"https://en.wikipedia.org/wiki/Seimas_Palace"},
+ {"id":"tauro","name":"Tauro kalnas","lat":54.6848,"lng":25.2719,"image":"assets/landmarks/tauro.png","source":"https://commons.wikimedia.org/wiki/Category:Tauro_kalnas"},
+ {"id":"hales","name":"Halės turgus","lat":54.67337,"lng":25.28651,"image":"assets/landmarks/hales.png","source":"https://mapcarta.com/de/W26282639"},
+ {"id":"rotuse","name":"Rotušė","lat":54.67811,"lng":25.2869,"image":"assets/landmarks/rotuse.png","source":"https://mapcarta.com/W111866535"}
+]

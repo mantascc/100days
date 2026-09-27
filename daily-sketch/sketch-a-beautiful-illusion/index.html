@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="The machine generates the pattern. The human supplies the mind. An interactive editorial sketch."><title>A Beautiful Illusion</title><style>
+:root{--background:#141615;--foreground:#deded5;color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:var(--background);color:var(--foreground)}
+*{box-sizing:border-box}body{margin:0}main{width:100%;overflow:hidden}.masthead{height:68px;margin:0 42px;border-bottom:1px solid #323731;display:flex;align-items:center;justify-content:space-between;font:12px 'Courier New',monospace;letter-spacing:.08em;color:#adb1a5}.slash{color:#65705e;margin:0 12px}
+.stage{position:relative;height:59svh;min-height:320px;max-height:780px;margin:0 42px;border-bottom:1px solid #42483e;isolation:isolate}.stage-label{position:absolute;left:0;top:25px;font:11px 'Courier New',monospace;letter-spacing:.07em;color:#777f71;pointer-events:none;z-index:1}canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;outline:none;cursor:crosshair}canvas:focus-visible{outline:1px solid #a6ab98;outline-offset:-5px}figcaption{position:absolute;bottom:24px;left:0;pointer-events:none;font-size:12px;color:#a4aa9c}.instrument{position:absolute;right:0;bottom:22px;display:flex;align-items:center;gap:18px;font:10px 'Courier New',monospace;color:#818976;pointer-events:none}.ruler{position:relative;width:100px;height:10px;border-bottom:1px solid #414b3d;background:repeating-linear-gradient(90deg,transparent 0,transparent 9px,#414b3d 9px,#414b3d 10px);background-size:100% 4px;background-repeat:no-repeat;background-position:bottom}.ruler i{position:absolute;left:49px;width:2px;height:10px;background:#b69471}.touch{display:none}
+article{max-width:1280px;margin:0 auto;padding:43px 42px 70px;display:grid;grid-template-columns:1fr 3fr 1fr;gap:24px}.essay-margin{padding-top:12px;font:11px/1.7 'Courier New',monospace;letter-spacing:.06em;color:#818a79;display:flex;flex-direction:column;gap:6px}.essay-margin span+span{font-size:10px;color:#656f5e}.essay-body{min-width:0}h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(36px,4.5vw,65px);font-weight:400;letter-spacing:-.045em;line-height:1.1;margin:0}.standfirst{font:clamp(19px,2vw,25px)/1.45 Georgia,'Times New Roman',serif;color:#aeb5a4;margin:23px 0 65px}.prose{font:19px/1.8 Georgia,'Times New Roman',serif;color:#c2c5bb}.prose p{margin:0 0 26px}.prose h2{font:normal 30px/1.3 Georgia,'Times New Roman',serif;letter-spacing:-.025em;color:#deded5;margin:56px 0 23px}.prose blockquote{font-size:clamp(30px,3.4vw,46px);font-weight:400;letter-spacing:-.025em;line-height:1.22;color:#d0b395;margin:54px 0;padding:0 0 0 26px;border-left:1px solid #77634f}.prose .closing{font-size:25px;line-height:1.5;color:#deded5;margin:45px 0}.essay-footer{border-top:1px solid #363d32;margin-top:55px;padding-top:22px;font:12px/1.7 Arial,Helvetica,sans-serif;color:#89927f}.essay-footer p{margin:0 0 18px}.essay-footer a{display:inline-block;color:#b9c0ae;text-underline-offset:5px;text-decoration:underline;padding:8px 0}.essay-footer a:hover{color:#deded5}.essay-footer a:focus-visible{outline:1px solid #b9c0ae;outline-offset:5px}
+@media(pointer:coarse){.desktop{display:none}.touch{display:inline}}@media(min-width:1500px){article{grid-template-columns:1fr 740px 1fr}}
+@media(max-width:850px){article{grid-template-columns:1fr;max-width:720px;padding-top:30px}.essay-margin{flex-direction:row;justify-content:space-between;padding-top:0}.standfirst{margin-bottom:45px}.instrument .ruler{display:none}.stage{height:57svh}}
+@media(max-width:550px){.masthead{height:58px;margin:0 22px;font-size:10px}.slash{margin:0 6px}.stage{margin:0 22px;min-height:290px;height:53svh}.stage-label{font-size:10px;top:20px}figcaption{bottom:18px;font-size:11px}.instrument{bottom:19px;font-size:9px}article{padding:26px 22px 45px;gap:20px}.essay-margin{font-size:10px}.essay-margin span+span{font-size:9px}h1{font-size:38px}.standfirst{font-size:20px;margin-top:18px}.prose{font-size:18px;line-height:1.75}.prose h2{font-size:28px}.prose blockquote{margin:40px 0;padding-left:20px}.prose .closing{font-size:23px}}
+</style></head><body><main id="top"><header class="masthead"><span>100 DAYS OF SKETCHES</span><span>001 <span class="slash">/</span> PERCEPTION</span></header><figure class="stage" aria-labelledby="figure-caption"><div class="stage-label" aria-hidden="true">FIG. 01 — A STUDY IN PERSPECTIVE</div><canvas tabindex="0" aria-label="Interactive language fragments. Move your pointer, drag sideways on touch, or focus here and use arrow keys to change perspective. Near the center, the fragments align into a human face."></canvas><figcaption id="figure-caption"><span class="desktop">Move slowly. Find a point of view.</span><span class="touch">Drag sideways. Find a point of view.</span></figcaption><div class="instrument" aria-hidden="true"><div class="ruler"><i></i></div><span>19.7° / −6.2°</span></div></figure><article aria-labelledby="essay-title"><div class="essay-margin"><span>FIELD NOTES</span><span>LANGUAGE &amp; PERCEPTION</span></div><div class="essay-body"><h1 id="essay-title">A Beautiful Illusion</h1><p class="standfirst">The machine generates the pattern.<br/>The human supplies the mind.</p><div class="prose"><p>At first, there is only a field of fragments. A word. A number. Half a sentence. Nothing seems to belong to anything else. Then you move, and something begins to look back.</p><p>A face emerges from the language. It was never a solid object hiding behind the words. It exists in their alignment, from where you happen to be standing. Move again, and it comes apart.</p><p>This sketch begins with that small perceptual event: the moment a pattern becomes a presence.</p><h2>A trace of thought</h2><p>Human cognition is more than what we can say. We perceive, attend, remember, learn, reason, and plan. We feel, want, and move through the world in bodies. Language carries traces of this activity, but it is not the whole of it.</p><p>Large language models learn from those traces. In language, they encounter the ways we describe an experience, follow an argument, express doubt, or imagine another person’s life. What they produce can carry the shape of these acts with remarkable fluency.</p><p>For the person reading, that fluency matters. Language is one of the ways we recognize a mind beyond our own. A sentence that sounds thoughtful invites us to imagine a thinker. A reply that sounds caring invites us to feel someone cares.</p><blockquote>We look at the traces<br/>and see a mind.</blockquote><p>That inference can feel immediate. We do not usually stop between a sentence and our sense of the person behind it. We bring expectations, memories, and a lifetime of conversations to what we read.</p><h2>The observer completes it</h2><p>Here, the fragments stay where they are. Your position changes their relationship to one another. For a moment, scattered marks become something unmistakably human.</p><p>The face is an analogy, not an answer to whether a machine can think or feel. It makes one part of the encounter visible: our participation in what we perceive. The pattern offers a possibility. The observer completes it.</p><p>There is something beautiful in that meeting. A system produces language; a person discovers meaning, character, perhaps even companionship within it. The experience can be compelling while the nature of what stands behind it remains an open question.</p><p class="closing">How much of the mind we see is in the pattern, and how much do we bring to it?</p></div><footer class="essay-footer"><p>A daily experiment in language, perspective, and perceived mind.</p><a href="#top">Return to the illustration ↑</a></footer></div></article></main><script>const WORDS = ['I', 'you', 'we', 'if', 'am', 'is', 'was', 'why', 'feel', 'think', 'as', 'the', 'and', 'a', 'of', 'it', 'to', 'me', 'us', 'be', '0.72', '0.08', '∑', '∂', 'λ', '→', 'xᵢ', '∇', 'hₜ', '[ ]', '01', 'P(x)', '…', 'soft', 'max', 'trace', 'when', 'this', 'seems', 'like', 'mind', 'perhaps', 'I remember', 'as if', 'not yet'];
+const bell = (x, y, cx, cy, sx, sy) => Math.exp(-(((x - cx) / sx) ** 2) - ((y - cy) / sy) ** 2);
+function faceLight(x, y) {
+    const width = y > .22 ? .69 - (y - .22) * .25 : .72;
+    const q = (x / width) ** 2 + ((y + .12) / 1.03) ** 2;
+    if (q > 1) {
+        // A narrow neck and a trace of shoulders ground the head.
+        if (y > .83 && y < 1.17 && Math.abs(x) < .23 + (y - .83) * .1)
+            return .20;
+        if (y >= 1.17 && y < 1.36 && Math.abs(x) < .25 + (y - 1.17) * 3.2)
+            return .13;
+        return 0;
+    }
+    const z = Math.sqrt(1 - q);
+    let light = .20 + .47 * z - .20 * x;
+    // Temple, cheek planes, eye sockets, eyelids, pupils, nose and mouth.
+    light += .15 * bell(x, y, -.38, .19, .18, .22);
+    for (const side of [-1, 1]) {
+        const ex = side * .285;
+        light -= .43 * bell(x, y, ex, -.18, .20, .105);
+        light += .31 * bell(x, y, ex, -.16, .14, .033);
+        light -= .40 * bell(x, y, ex, -.16, .038, .052);
+        light -= .35 * bell(x, y, ex, -.31, .18, .037);
+        light += .16 * bell(x, y, ex, -.07, .17, .026);
+        light -= .22 * bell(x, y, side * .115, .27, .048, .031);
+    }
+    light += .36 * bell(x, y, -.034, .04, .055, .27);
+    light -= .27 * bell(x, y, .095, .095, .055, .22);
+    light += .22 * bell(x, y, 0, .24, .09, .06);
+    light -= .19 * bell(x, y, 0, .32, .10, .035);
+    const lip = .47 - .033 * Math.exp(-((x / .085) ** 2)) + .05 * (x / .25) ** 2;
+    light -= .43 * Math.exp(-(((y - lip) / .021) ** 2) - (x / .235) ** 6);
+    light += .16 * bell(x, y, 0, .535, .19, .037);
+    light -= .20 * bell(x, y, 0, .60, .20, .051);
+    light += .18 * bell(x, y, -.035, .72, .23, .10);
+    return Math.max(.035, Math.min(.92, light));
+}
+function makeFragments() {
+    let seed = 127;
+    const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    const fragments = [];
+    for (let y = -1.16; y < 1.36; y += .030) {
+        for (let x = -.79 + random() * .018; x < .79;) {
+            const light = faceLight(x, y);
+            const text = WORDS[Math.floor(random() * WORDS.length)];
+            const size = .023 + random() * .009;
+            if (light > 0 && random() < .94) {
+                const z = (random() - .5) * 3.8;
+                const factor = (5 - z) / 5;
+                fragments.push({ x: x * factor, y: y * factor, z, text, light, size, accent: random() < .022 });
+            }
+            x += Math.max(.026, text.length * size * .56 + .012);
+        }
+    }
+    for (let i = 0; i < 85; i++) {
+        fragments.push({ x: (random() - .5) * 4.8, y: (random() - .5) * 3.3, z: (random() - .5) * 3.8, text: WORDS[Math.floor(random() * WORDS.length)], light: .08 + random() * .13, size: .025 + random() * .021, accent: random() < .1 });
+    }
+    return fragments.sort((a, b) => a.z - b.z);
+}
+const canvasRef = { current: document.querySelector('canvas') };
+const readoutRef = { current: document.querySelector('.instrument > span') };
+const tickRef = { current: document.querySelector('.ruler i') };
+const canvas = canvasRef.current;
+const ctx = canvas.getContext('2d');
+const fragments = makeFragments();
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let width = 0, height = 0, frame = 0, last = 0;
+const target = { x: .82, y: -.26 };
+const view = { ...target };
+let dirty = true;
+const resize = () => { width = canvas.clientWidth; height = canvas.clientHeight; const dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = width * dpr; canvas.height = height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); dirty = true; };
+const pointer = (event) => { const bounds = canvas.getBoundingClientRect(); target.x = ((event.clientX - bounds.left) / width - .5) * 2.7; target.y = event.pointerType === 'touch' ? 0 : ((event.clientY - bounds.top) / height - .47) * 1.9; dirty = true; };
+const key = (event) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key))
+        return;
+    event.preventDefault();
+    target.x = Math.max(-1.35, Math.min(1.35, target.x + (event.key === 'ArrowLeft' ? -.045 : event.key === 'ArrowRight' ? .045 : 0)));
+    target.y = Math.max(-.9, Math.min(1, target.y + (event.key === 'ArrowUp' ? -.045 : event.key === 'ArrowDown' ? .045 : 0)));
+    dirty = true;
+};
+const draw = (time) => {
+    frame = requestAnimationFrame(draw);
+    const delta = Math.min(64, time - last);
+    last = time;
+    const dx = target.x - view.x, dy = target.y - view.y;
+    if (!dirty && Math.abs(dx) + Math.abs(dy) < .0001)
+        return;
+    const ease = reduced ? 1 : 1 - Math.exp(-delta / 130);
+    view.x += dx * ease;
+    view.y += dy * ease;
+    dirty = false;
+    ctx.clearRect(0, 0, width, height);
+    const scale = Math.min(width * .32, height * .285);
+    const cx = width * .5, cy = height * .48;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const f of fragments) {
+        // Off-axis pinhole projection, shifted back to the focal plane.
+        // At view=(0,0), all independently placed depths project to the portrait.
+        const p = 5 / (5 - f.z);
+        const px = cx + (f.x * p + view.x * (1 - p) * 2.9) * scale;
+        const py = cy + (f.y * p + view.y * (1 - p) * 2.9) * scale;
+        const size = Math.max(3.5, f.size * p * scale);
+        if (px < -80 || px > width + 80 || py < 30 || py > height - 48)
+            continue;
+        ctx.font = `${size.toFixed(1)}px "Courier New", monospace`;
+        ctx.fillStyle = f.accent ? `rgba(193,132,86,${f.light * .9})` : `rgba(225,222,210,${f.light})`;
+        ctx.fillText(f.text, px, py);
+    }
+    if (readoutRef.current)
+        readoutRef.current.textContent = `${(view.x * 24).toFixed(1)}° / ${(view.y * 24).toFixed(1)}°`;
+    if (tickRef.current)
+        tickRef.current.style.transform = `translateX(${Math.max(-48, Math.min(48, view.x * 36))}px)`;
+};
+resize();
+const observer = new ResizeObserver(resize);
+observer.observe(canvas);
+frame = requestAnimationFrame(draw);
+window.addEventListener('resize', resize);
+canvas.addEventListener('pointermove', pointer);
+canvas.addEventListener('pointerdown', pointer);
+canvas.addEventListener('keydown', key);
+</script></body></html>
