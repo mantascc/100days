@@ -1,5 +1,10 @@
 [
   {
+    "id": "96-beautiful-illusion",
+    "path": "100days/96-beautiful-illusion",
+    "description": "Beautiful Illusion — language fragments align into a face as perspective shifts; an interactive essay on language and perceived mind"
+  },
+  {
     "id": "95-reactive-crt",
     "path": "100days/95-reactive-crt",
     "description": "Reactive CRT — sixteen generators drawing the same microphone into one CRT pipeline; level and onsets drive emission, bloom and convergence"

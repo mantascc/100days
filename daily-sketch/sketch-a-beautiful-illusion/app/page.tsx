@@ -116,33 +116,23 @@ export default function Home() {
     return()=>{cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('resize',resize);canvas.removeEventListener('pointermove',pointer);canvas.removeEventListener('pointerdown',pointer);canvas.removeEventListener('keydown',key);};
   },[]);
   return <main>
-    <header className="masthead"><span>100 DAYS OF SKETCHES</span><span>001 <span className="slash">/</span> PERCEPTION</span></header>
-    <figure className="stage" aria-labelledby="figure-caption">
-      <div className="stage-label" aria-hidden="true">FIG. 01 — A STUDY IN PERSPECTIVE</div>
+    <header className="masthead"><span>Mintis</span><span>001</span></header>
+    <figure className="stage" aria-label="A study in perspective">
       <canvas ref={canvasRef} tabIndex={0} aria-label="Interactive language fragments. Move your pointer, drag sideways on touch, or focus here and use arrow keys to change perspective. Near the center, the fragments align into a human face." />
-      <figcaption id="figure-caption"><span className="desktop">Move slowly. Find a point of view.</span><span className="touch">Drag sideways. Find a point of view.</span></figcaption>
       <div className="instrument" aria-hidden="true"><div className="ruler"><i ref={tickRef}/></div><span ref={readoutRef}>19.7° / −6.2°</span></div>
     </figure>
     <article aria-labelledby="essay-title">
-      <div className="essay-margin"><span>FIELD NOTES</span><span>LANGUAGE &amp; PERCEPTION</span></div>
+      <div className="essay-margin"><span>FIELDWORK</span><ul className="essay-tags" aria-label="Tags"><li>language</li><li>perception</li></ul></div>
       <div className="essay-body">
         <h1 id="essay-title">A Beautiful Illusion</h1>
-        <p className="standfirst">The machine generates the pattern.<br/>The human supplies the mind.</p>
+        <p className="standfirst">Large language models operate through language. Human cognition does not.</p>
         <div className="prose">
-          <p>At first, there is only a field of fragments. A word. A number. Half a sentence. Nothing seems to belong to anything else. Then you move, and something begins to look back.</p>
-          <p>A face emerges from the language. It was never a solid object hiding behind the words. It exists in their alignment, from where you happen to be standing. Move again, and it comes apart.</p>
-          <p>This sketch begins with that small perceptual event: the moment a pattern becomes a presence.</p>
-          <h2>A trace of thought</h2>
-          <p>Human cognition is more than what we can say. We perceive, attend, remember, learn, reason, and plan. We feel, want, and move through the world in bodies. Language carries traces of this activity, but it is not the whole of it.</p>
-          <p>Large language models learn from those traces. In language, they encounter the ways we describe an experience, follow an argument, express doubt, or imagine another person’s life. What they produce can carry the shape of these acts with remarkable fluency.</p>
-          <p>For the person reading, that fluency matters. Language is one of the ways we recognize a mind beyond our own. A sentence that sounds thoughtful invites us to imagine a thinker. A reply that sounds caring invites us to feel someone cares.</p>
-          <blockquote>We look at the traces<br/>and see a mind.</blockquote>
-          <p>That inference can feel immediate. We do not usually stop between a sentence and our sense of the person behind it. We bring expectations, memories, and a lifetime of conversations to what we read.</p>
-          <h2>The observer completes it</h2>
-          <p>Here, the fragments stay where they are. Your position changes their relationship to one another. For a moment, scattered marks become something unmistakably human.</p>
-          <p>The face is an analogy, not an answer to whether a machine can think or feel. It makes one part of the encounter visible: our participation in what we perceive. The pattern offers a possibility. The observer completes it.</p>
-          <p>There is something beautiful in that meeting. A system produces language; a person discovers meaning, character, perhaps even companionship within it. The experience can be compelling while the nature of what stands behind it remains an open question.</p>
-          <p className="closing">How much of the mind we see is in the pattern, and how much do we bring to it?</p>
+          <p>We perceive, remember, feel, move, want, plan, and speak. Language carries traces of these processes, but it is only one surface through which cognition becomes visible.</p>
+          <p>Still, for us, language is powerful evidence of mind. When we encounter coherence, doubt, humor, care, or intention, we do not experience only words. We infer a thinker behind them.</p>
+          <blockquote>The beautiful illusion begins there.</blockquote>
+          <p>The language is real. But the sense of a complete mind behind it may be partly constructed by the observer.</p>
+          <p>Large language models produce linguistic traces with remarkable fluency. We encounter those traces using the same perceptual habits through which we have always recognized other minds.</p>
+          <p className="closing">We look at the traces and recognize something that resembles mind. What feels like presence emerges in the encounter between the pattern and the observer.</p>
         </div>
         <footer className="essay-footer"><p>A daily experiment in language, perspective, and perceived mind.</p><a href="#top" onClick={(event)=>{event.preventDefault();window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});canvasRef.current?.focus({preventScroll:true});}}>Return to the illustration ↑</a></footer>
       </div>

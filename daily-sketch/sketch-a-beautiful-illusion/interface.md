@@ -17,3 +17,6 @@ Open index.html directly or serve this directory. No installation is needed for 
 
 ## status
 Includes the editorial revision. The existing privately hosted Sites version predates that revision; moving the local files does not republish it.
+
+## numbered edition
+Promoted to [96-beautiful-illusion](../../96-beautiful-illusion/). The current edition uses the approved language-and-mind essay, a Mintis / 001 masthead, FIELDWORK, and separate language and perception tags. Figure and interaction captions are removed.
