@@ -134,7 +134,7 @@ export default function Home() {
           <p>Large language models produce linguistic traces with remarkable fluency. We encounter those traces using the same perceptual habits through which we have always recognized other minds.</p>
           <p className="closing">We look at the traces and recognize something that resembles mind. What feels like presence emerges in the encounter between the pattern and the observer.</p>
         </div>
-        <footer className="essay-footer"><p>A daily experiment in language, perspective, and perceived mind.</p><a href="#top" onClick={(event)=>{event.preventDefault();window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});canvasRef.current?.focus({preventScroll:true});}}>Return to the illustration ↑</a></footer>
+        <footer className="essay-footer"><a href="#top" onClick={(event)=>{event.preventDefault();window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});canvasRef.current?.focus({preventScroll:true});}}>Return to the illustration ↑</a></footer>
       </div>
     </article>
   </main>;
