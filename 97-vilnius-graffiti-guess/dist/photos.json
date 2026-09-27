@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "title": "Words on a snowy wall",
+    "image": "assets/photos/graffiti-01.webp",
+    "lat": 54.681763554658524,
+    "lng": 25.29359143884481,
+    "width": 670,
+    "height": 502,
+    "sourceFile": "1.jpg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  },
+  {
+    "id": 2,
+    "title": "Three bright bins",
+    "image": "assets/photos/graffiti-02.webp",
+    "lat": 54.67924249943086,
+    "lng": 25.274806467027517,
+    "width": 900,
+    "height": 517,
+    "sourceFile": "2.jpg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  },
+  {
+    "id": 3,
+    "title": "Layers of the city",
+    "image": "assets/photos/graffiti-03.webp",
+    "lat": 54.68376615831231,
+    "lng": 25.279360614336667,
+    "width": 1800,
+    "height": 1413,
+    "sourceFile": "3.jpg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  },
+  {
+    "id": 4,
+    "title": "Courtyard characters",
+    "image": "assets/photos/graffiti-04.webp",
+    "lat": 54.681040566287564,
+    "lng": 25.282922195520193,
+    "width": 1024,
+    "height": 680,
+    "sourceFile": "4.jpg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  },
+  {
+    "id": 5,
+    "title": "The top hat",
+    "image": "assets/photos/graffiti-05.webp",
+    "lat": 54.672468740853425,
+    "lng": 25.279868669330785,
+    "width": 516,
+    "height": 343,
+    "sourceFile": "5.jpg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  },
+  {
+    "id": 6,
+    "title": "Vilnius full of space",
+    "image": "assets/photos/graffiti-06.webp",
+    "lat": 54.68974064212535,
+    "lng": 25.2872136034804,
+    "width": 640,
+    "height": 480,
+    "sourceFile": "6.jpeg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  },
+  {
+    "id": 7,
+    "title": "A hand on the wall",
+    "image": "assets/photos/graffiti-07.webp",
+    "lat": 54.68489934060395,
+    "lng": 25.28380958985619,
+    "width": 678,
+    "height": 452,
+    "sourceFile": "7.jpeg",
+    "coordinateEvidence": "Location supplied by the project owner.",
+    "provenance": "User-supplied image; original photographer, capture date, and license not provided."
+  }
+]

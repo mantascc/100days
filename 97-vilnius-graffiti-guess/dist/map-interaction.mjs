@@ -2,7 +2,7 @@ import {MapCamera,worldPoint} from './map-camera.mjs';
 const NS='http://www.w3.org/2000/svg';
 export function setupMap({root,geometry,locations,landmarks,onChange,onTap}) {
  const wrap=root.parentElement,geo=root.querySelector('#geography');
- const camera=new MapCamera(wrap.clientWidth,wrap.clientHeight,[...locations,...landmarks]);
+ const camera=new MapCamera(wrap.clientWidth,wrap.clientHeight,[...locations,...landmarks],[...locations,...landmarks.filter(p=>!p.overviewOnly)]);
  for(const item of geometry){
   const path=document.createElementNS(NS,'path');
   path.setAttribute('d',item.points.map((p,i)=>`${i?'L':'M'}${worldPoint(...p).map(n=>n.toFixed(1)).join(',')}`).join(' ')+(item.type==='water'?'Z':''));
@@ -13,8 +13,8 @@ export function setupMap({root,geometry,locations,landmarks,onChange,onTap}) {
   path.setAttribute('stroke-linejoin','round');path.setAttribute('stroke-linecap','round');geo.append(path);
  }
  let pending=0;
- function render(){pending=0;root.setAttribute('viewBox',`0 0 ${camera.width} ${camera.height}`);root.querySelectorAll(':scope > rect').forEach(r=>{r.setAttribute('width',camera.width);r.setAttribute('height',camera.height)});geo.setAttribute('transform',camera.transform);document.getElementById('zoom-in').disabled=camera.zoom>=8;document.getElementById('zoom-out').disabled=camera.zoom<=.75;
-  const meters=camera.scale*500>105?100:500;const bar=document.getElementById('map-scale');bar.style.width=`${meters*camera.scale}px`;bar.textContent=`${meters} m`;onChange();
+ function render(){pending=0;root.setAttribute('viewBox',`0 0 ${camera.width} ${camera.height}`);root.querySelectorAll(':scope > rect').forEach(r=>{r.setAttribute('width',camera.width);r.setAttribute('height',camera.height)});geo.setAttribute('transform',camera.transform);document.getElementById('zoom-in').disabled=camera.zoom>=8;document.getElementById('zoom-out').disabled=camera.zoom<=camera.minZoom+.00001;
+  const meters=[50,100,200,500,1000,2000,5000].find(m=>m*camera.scale>=45)??5000;const bar=document.getElementById('map-scale');bar.style.width=`${meters*camera.scale}px`;bar.textContent=`${meters} m`;onChange();
  }
  function schedule(){if(!pending)pending=requestAnimationFrame(render);}
  const local=e=>{const r=root.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
@@ -33,7 +33,8 @@ export function setupMap({root,geometry,locations,landmarks,onChange,onTap}) {
  root.addEventListener('wheel',e=>{e.preventDefault();const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?camera.height:1);camera.zoomAt(Math.exp(-delta*.002),local(e));schedule()},{passive:false});
  root.addEventListener('dblclick',e=>{if(e.target.closest('[data-dot],[data-landmark]'))return;e.preventDefault();camera.zoomAt(1.6,local(e));schedule()});
  root.addEventListener('keydown',e=>{if(e.target!==root)return;const moves={ArrowLeft:[60,0],ArrowRight:[-60,0],ArrowUp:[0,60],ArrowDown:[0,-60]};if(moves[e.key])camera.pan(...moves[e.key]);else if(e.key==='+'||e.key==='=')camera.zoomAt(1.4);else if(e.key==='-')camera.zoomAt(1/1.4);else if(e.key==='Home'||e.key==='0')camera.fit();else return;e.preventDefault();schedule();});
- document.getElementById('zoom-in').onclick=()=>{camera.zoomAt(1.4);schedule()};document.getElementById('zoom-out').onclick=()=>{camera.zoomAt(1/1.4);schedule()};document.getElementById('map-fit').onclick=()=>{camera.fit();schedule()};
+ document.getElementById('zoom-in').onclick=()=>{camera.zoomAt(1.4);schedule()};document.getElementById('zoom-out').onclick=()=>{camera.zoomAt(1/1.4);schedule()};document.getElementById('map-central').onclick=()=>{camera.fit('central');schedule()};
+ document.getElementById('map-fit').onclick=()=>{camera.fit();schedule()};
  new ResizeObserver(()=>{if(wrap.clientWidth&&wrap.clientHeight){camera.resize(wrap.clientWidth,wrap.clientHeight);schedule()}}).observe(wrap);
  return {camera,render,fit(){camera.fit();render()}};
 }

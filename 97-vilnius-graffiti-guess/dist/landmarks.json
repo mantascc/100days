@@ -1,0 +1,79 @@
+[
+  {
+    "id": "gediminas",
+    "name": "Gedimino bokštas",
+    "lat": 54.68676,
+    "lng": 25.29069,
+    "image": "assets/landmarks/gediminas.png",
+    "source": "https://mapcarta.com/W24569542"
+  },
+  {
+    "id": "seimas",
+    "name": "Seimas",
+    "lat": 54.69111,
+    "lng": 25.26194,
+    "image": "assets/landmarks/seimas.png",
+    "source": "https://en.wikipedia.org/wiki/Seimas_Palace"
+  },
+  {
+    "id": "tauro",
+    "name": "Tauro kalnas",
+    "lat": 54.6848,
+    "lng": 25.2719,
+    "image": "assets/landmarks/tauro.png",
+    "source": "https://commons.wikimedia.org/wiki/Category:Tauro_kalnas"
+  },
+  {
+    "id": "hales",
+    "name": "Halės turgus",
+    "lat": 54.67337,
+    "lng": 25.28651,
+    "image": "assets/landmarks/hales.png",
+    "source": "https://mapcarta.com/de/W26282639"
+  },
+  {
+    "id": "rotuse",
+    "name": "Rotušė",
+    "lat": 54.67811,
+    "lng": 25.2869,
+    "image": "assets/landmarks/rotuse.png",
+    "source": "https://mapcarta.com/W111866535"
+  },
+  {
+    "id": "tv-bokstas",
+    "name": "TV bokštas",
+    "lat": 54.68715,
+    "lng": 25.21472,
+    "image": "assets/landmarks/tv-bokstas.png",
+    "source": "https://mapcarta.com/N4515277514",
+    "coordinateNote": "OSM communications tower node 4515277514; tower footing.",
+    "overviewOnly": true
+  },
+  {
+    "id": "triju-kryziu",
+    "name": "Trijų Kryžių kalnas",
+    "lat": 54.6867361,
+    "lng": 25.2975461,
+    "image": "assets/landmarks/triju-kryziu.png",
+    "source": "https://www.wikidata.org/wiki/Q83238",
+    "coordinateNote": "Monument on the hill; Wikidata P625 sourced to OpenStreetMap, converted from DMS."
+  },
+  {
+    "id": "baltasis-tiltas",
+    "name": "Baltasis tiltas",
+    "lat": 54.69318,
+    "lng": 25.27324,
+    "image": "assets/landmarks/baltasis-tiltas.png",
+    "source": "https://mapcarta.com/W391282314",
+    "coordinateNote": "Center of OSM bridge way 391282314, rather than the adjacent food hall."
+  },
+  {
+    "id": "ausros-vartai",
+    "name": "Aušros vartai",
+    "lat": 54.67432,
+    "lng": 25.28954,
+    "image": "assets/landmarks/ausros-vartai.png",
+    "source": "https://en.wikipedia.org/wiki/Gate_of_Dawn",
+    "coordinateNote": "Gate building location."
+  }
+]
