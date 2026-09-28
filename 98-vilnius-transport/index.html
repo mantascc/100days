@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>98 · Vilnius transport</title>
+  <link rel="stylesheet" href="vendor/leaflet.css">
+  <style>
+    :root {
+      --page: #f7f7f3; --text: #242824; --muted: #666e66; --line: #d6dad2;
+      --accent: #386349; --hover: #e7ece4; --point: #436f4e; --point-edge: #274c32;
+      --missing: #848c83; --tile-invert: 0; --tile-brightness: 1.16; --tile-opacity: .5;
+      --halo-radius: 0px; --halo: transparent;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--text); font: 13px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    main { max-width: 1200px; margin: auto; padding: 22px max(24px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); }
+    h1 { font-size: 19px; font-weight: 500; margin: 12px 0 4px; }
+    p { margin: 4px 0; }
+    a { color: inherit; text-underline-offset: 3px; }
+    .muted, footer { color: var(--muted); }
+    button, input { font: inherit; accent-color: var(--accent); }
+    button { min-height: 44px; background: transparent; color: inherit; border: 1px solid var(--line); padding: 6px 12px; cursor: pointer; touch-action: manipulation; }
+    button:hover { background: var(--hover); }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .controls { margin: 18px 0 16px; }
+    .time-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
+    #play { min-width: 90px; }
+    #window-label { font-size: 16px; }
+    #timeline { --progress: 0%; display: block; width: 100%; min-width: 0; height: 44px; margin: 4px 0 0; padding: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: ew-resize; touch-action: pan-y; }
+    #timeline::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--accent) var(--progress), var(--line) var(--progress)); }
+    #timeline::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -10px; border-radius: 50%; border: 2px solid var(--page); background: var(--accent); }
+    #timeline::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line); }
+    #timeline::-moz-range-progress { height: 4px; background: var(--accent); }
+    #timeline::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--page); background: var(--accent); }
+    .ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+    .solar-row { margin: 6px 0; font-size: 11px; }
+    #light-phase { color: var(--accent); margin-left: auto; font-size: 11px; }
+    #summary { min-height: 21px; }
+    #map { height: min(58vh, 650px); min-height: 360px; margin: 12px 0; background: var(--page); }
+    /* A pale monochrome reference layer; passenger marks retain their contrast. */
+    .leaflet-tile-pane { filter: grayscale(1) invert(var(--tile-invert)) contrast(.9) brightness(var(--tile-brightness)); opacity: var(--tile-opacity); }
+    .leaflet-container { font-family: inherit; }
+    .leaflet-bar { border: 1px solid var(--line) !important; border-radius: 0; box-shadow: none; }
+    .leaflet-bar a, .leaflet-bar a:hover, .leaflet-bar a.leaflet-disabled { background: var(--page); color: var(--muted); }
+    .leaflet-bar a:first-child, .leaflet-bar a:last-child { border-radius: 0; }
+    .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; }
+    .leaflet-control-scale-line { border-color: var(--line); color: var(--muted); background: var(--page); }
+    .leaflet-control-attribution { font-size: 10px; background: var(--page) !important; color: var(--muted); }
+    .leaflet-container a { color: var(--muted); }
+    #map .leaflet-overlay-pane > svg { filter: drop-shadow(0 0 var(--halo-radius) var(--halo)); }
+    .leaflet-interactive[data-observed="true"] { fill: var(--point); stroke: var(--point-edge); }
+    .leaflet-interactive[data-observed="false"] { fill: var(--missing); stroke: var(--missing); }
+    .leaflet-interactive:focus { outline: none; stroke: var(--text); stroke-width: 3px; }
+    .stop-popup .leaflet-popup-content-wrapper, .stop-popup .leaflet-popup-tip { background: var(--hover); color: var(--text); box-shadow: none; }
+    .stop-popup .leaflet-popup-content-wrapper { border: 1px solid var(--line); border-radius: 0; }
+    .stop-popup .leaflet-popup-content { max-width: calc(100vw - 140px); margin: 16px 34px 16px 14px; font: 12px/1.5 ui-monospace, monospace; overflow-wrap: anywhere; }
+    .stop-popup .leaflet-popup-content p { margin: 5px 0; }
+    .stop-popup .leaflet-popup-content p:first-child { font-weight: 600; }
+    .leaflet-container .stop-popup a.leaflet-popup-close-button { width: 44px; height: 44px; line-height: 44px; font-size: 22px; color: var(--muted); }
+    #map-status { font-size: 11px; }
+    #map-status:empty, #inspection p:empty { display: none; }
+    #inspection { min-height: 52px; padding: 12px 0; }
+    #stop-name { font-weight: 600; }
+    footer { border-top: 1px solid var(--line); padding-top: 10px; font-size: 11px; }
+    footer summary { cursor: pointer; min-height: 44px; display: list-item; align-content: center; }
+    footer details p { max-width: 85ch; margin: 8px 0; }
+    footer summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; font-size: 11px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { display: inline-block; border-radius: 50%; background: var(--point); border: 1px solid var(--point-edge); box-shadow: 0 0 var(--halo-radius) var(--halo); }
+    .legend .missing { background: transparent; border: 1px dashed var(--missing); width: 7px; height: 7px; }
+    .legend .zero { background: transparent; width: 7px; height: 7px; }
+    @media (max-width: 600px) {
+      main { padding: 16px max(12px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+      h1 { font-size: clamp(16px, 4.8vw, 19px); }
+      .sample-date { font-size: 12px; }
+      .controls { margin: 14px 0; }
+      .time-row { gap: 8px 12px; }
+      #play { min-width: 72px; }
+      #window-label { font-size: 16px; white-space: nowrap; }
+      #summary { font-size: 11px; min-height: 1.55em; margin-bottom: 0; }
+      #map { height: clamp(320px, 55svh, 480px); min-height: 320px; }
+      .legend { gap: 8px 14px; }
+      #inspection { min-height: 52px; overflow-wrap: anywhere; }
+      footer { font-size: 12px; overflow-wrap: anywhere; }
+      footer p { margin: 10px 0; }
+    }
+    @media (max-height: 500px) and (orientation: landscape) { #map { height: 75svh; min-height: 240px; } }
+  </style>
+</head>
+<body>
+<main>
+  <a class="muted" href="../index.html">← 100 days</a>
+  <h1>Vilnius · passenger flow</h1>
+  <p class="sample-date">15 September 2025 · Vilnius time</p>
+  <section class="controls" aria-label="Playback and time controls">
+    <div class="time-row">
+      <button id="play" type="button" disabled aria-pressed="false">Play</button>
+      <label id="window-label" for="timeline">00:00–00:30</label>
+      <span id="light-phase">Daylight follows time</span>
+    </div>
+    <input id="timeline" type="range" min="0" max="47" step="1" value="0" disabled aria-label="Time of day, 30-minute window">
+    <div class="ticks" aria-hidden="true"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+    <p id="solar-times" class="solar-row muted"></p>
+    <p class="muted" id="summary" aria-live="off">Loading saved observations…</p>
+  </section>
+  <div id="map" role="region" aria-label="Vilnius street map with passenger boardings at stops"></div>
+  <p id="map-status" class="muted" role="status"></p>
+  <div class="legend" id="legend" aria-label="Circle area legend">
+    <span><i class="missing"></i>no observation</span>
+    <span><i class="zero"></i>observed zero</span>
+  </div>
+  <div id="inspection" aria-live="polite" aria-atomic="true">
+    <p id="stop-name">Tap or hover a stop for details.</p>
+    <p id="stop-counts" class="muted"></p>
+    <p id="stop-time" class="muted"></p>
+  </div>
+  <footer>
+    <p>Sensor-equipped vehicles only; coverage varies. Missing data ≠ zero passengers.</p>
+    <details>
+      <summary>About the data &amp; controls</summary>
+      <p>32,999 saved observations across this day, grouped into 30-minute windows. Playback advances one window per second. Drag the timeline to explore; tap, hover, or Tab to a stop for details.</p>
+      <p>Circle area represents boardings on a fixed scale across time and zoom. Circles animate between measured windows; counts describe the selected window. Hollow circles distinguish observed zero from missing observations; night halos are decorative.</p>
+      <p>Raw DILAX sensor counts, grouped by arrival time. Source timestamps have no UTC offset; this sketch assumes Vilnius local time (Europe/Vilnius). Lighting follows each window’s midpoint. The map shows current geography.</p>
+      <p>Solar times: <a href="https://sunrise-sunset.org/">Sunrise-Sunset.org</a>. Data: SĮ „Susisiekimo paslaugos“ / Valstybės duomenų agentūra · <a href="https://data.gov.lt/datasets/3901/">official source</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a href="README.md">sample notes</a></p>
+    </details>
+  </footer>
+  <noscript>This sketch needs JavaScript to display its saved data.</noscript>
+</main>
+<script src="vendor/leaflet.js"></script>
+<script src="data/sample.js"></script>
+<script src="data/solar.js"></script>
+<script src="sketch.js"></script>
+</body>
+</html>
