@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101612">
+<title>99 · CLARITY</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main><h1 class="sketch-title">CLARITY</h1><section id="specimens" aria-label="CLARITY — translucent geometric specimens"></section></main>
+<button id="settings-toggle" aria-haspopup="dialog" aria-controls="settings" aria-expanded="false">☷ Controls</button>
+<dialog id="settings" aria-labelledby="settings-title">
+<div class="popup-head"><h1 id="settings-title">CLARITY <span>/ MATERIAL</span></h1><button id="settings-close" aria-label="Close controls" autofocus>×</button></div>
+<nav aria-label="Material presets"><div id="presets"></div></nav>
+<p id="material-note" aria-live="polite"></p>
+<div id="controls"></div>
+<div class="actions"><button id="shuffle">↗ Mutate</button><button id="pause" aria-pressed="false">Ⅱ Pause</button><button id="reset">↺ Reset</button><button id="export">↓ Save PNG</button></div>
+</dialog>
+<dialog id="viewer" aria-labelledby="viewer-title"><div class="viewer-head"><span id="viewer-title"></span><button id="close" autofocus>Close ×</button></div><canvas id="detail" aria-label="Enlarged specimen; drag to rotate"></canvas></dialog>
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,5 +1,10 @@
 [
   {
+    "id": "99-clarity",
+    "path": "100days/99-clarity",
+    "description": "CLARITY — translucent geometric primitives, grain, bleeding light and reflections; an optical material playground"
+  },
+  {
     "id": "98-vilnius-transport",
     "path": "100days/98-vilnius-transport",
     "description": "Vilnius Transport — a day of measured passenger activity; scrub through time as the city shifts from night lights to daylight"
