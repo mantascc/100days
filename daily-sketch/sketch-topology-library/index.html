@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sketch-topology-library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+  <style>
+    :root{
+      --bg:#0a0a0a;--panel:#101010;--panel2:#151515;--line:#2a2a2a;
+      --text:#f5f5f7;--muted:#8b8b8b;--ghost:#494949;--accent:#f5a623;
+      --mono:'IBM Plex Mono',monospace;
+    }
+    *{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--mono)}
+    body{overflow:hidden}
+    .shell{display:grid;grid-template-columns:260px 1fr 270px;height:100vh}
+    .rail,.info{background:var(--panel);border-right:1px solid var(--line);padding:22px}
+    .info{border-right:0;border-left:1px solid var(--line)}
+    .eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+    h1{font-size:16px;font-weight:500;margin:0 0 8px}.sub{font-size:11px;line-height:1.5;color:var(--muted);margin-bottom:24px}
+    .list{display:flex;flex-direction:column;gap:6px}
+    button{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;text-align:left;padding:11px 12px;cursor:pointer}
+    button:hover{color:var(--text);border-color:#4a4a4a}.active{color:var(--text);border-color:var(--accent);background:#17130d}
+    .stage{position:relative;min-width:0;display:flex;align-items:center;justify-content:center;background:
+      radial-gradient(circle at 50% 50%,#121212 0,#0b0b0b 48%,#080808 100%)}
+    canvas{width:100%;height:100%;display:block}
+    .legend{position:absolute;left:20px;bottom:18px;font-size:10px;color:var(--muted);display:flex;gap:16px;align-items:center}
+    .key{display:flex;gap:6px;align-items:center}.dot{width:7px;height:7px;border-radius:50%;background:var(--text)}.dot.a{background:var(--accent)}
+    .info h2{font-size:18px;margin:0 0 8px}.kicker{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);margin-bottom:14px}
+    .info p{font-size:11px;line-height:1.6;color:#b8b8b8}
+    .meta{margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+    .meta-row{margin-bottom:14px}.meta-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+    .meta-value{font-size:11px;line-height:1.5}
+    .mintis{position:absolute;top:20px;left:20px;border:1px solid var(--line);padding:8px 10px;font-size:10px;color:var(--muted);background:rgba(10,10,10,.8)}
+    @media(max-width:900px){.shell{grid-template-columns:190px 1fr}.info{display:none}}
+    @media(max-width:640px){.shell{grid-template-columns:1fr}.rail{position:absolute;z-index:3;width:180px;height:100%;background:rgba(16,16,16,.94)}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="eyebrow">Topology Library</div>
+      <h1>same dots,<br>different system</h1>
+      <div class="sub">Browse formations. The agents stay constant; only the relationships change.</div>
+      <div class="list" id="list"></div>
+    </aside>
+
+    <main class="stage">
+      <div class="mintis">MINTIS / “How should we explore this?”</div>
+      <canvas id="c"></canvas>
+      <div class="legend">
+        <div class="key"><span class="dot"></span> dot</div>
+        <div class="key"><span class="dot a"></span> active flow</div>
+        <div>click a dot to inspect</div>
+      </div>
+    </main>
+
+    <aside class="info">
+      <div class="eyebrow">Formation specimen</div>
+      <div class="kicker" id="kind"></div>
+      <h2 id="title"></h2>
+      <p id="desc"></p>
+      <div class="meta">
+        <div class="meta-row"><div class="meta-label">tends to produce</div><div class="meta-value" id="produce"></div></div>
+        <div class="meta-row"><div class="meta-label">failure mode</div><div class="meta-value" id="failure"></div></div>
+        <div class="meta-row"><div class="meta-label">human intervention</div><div class="meta-value" id="human"></div></div>
+        <div class="meta-row"><div class="meta-label">selected dot</div><div class="meta-value" id="selected">none</div></div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+const C = document.getElementById('c'), ctx = C.getContext('2d');
+const DPR = Math.min(2, devicePixelRatio || 1);
+const COLORS={text:'#f5f5f7',muted:'#777',ghost:'#333',accent:'#f5a623'};
+const DOTS=['maker','critic','curator','systems','interaction','engineer'];
+
+const formations=[
+  {id:'council',label:'01  council',kind:'parallel deliberation',
+   desc:'Every dot sees the same Mintis and contributes a partial view before a synthesis step.',
+   produce:'breadth, disagreement, surfaced assumptions',
+   failure:'consensus theater or too much parallel noise',
+   human:'choose what gets synthesized and what remains unresolved'},
+  {id:'makerCritic',label:'02  maker–critic',kind:'adversarial pair',
+   desc:'One dot proposes, one challenges, and the artifact loops between them until a stopping condition is met.',
+   produce:'iteration, pressure-testing, sharper artifacts',
+   failure:'endless critique or defensive local optimization',
+   human:'set the bar and decide when critique has earned its keep'},
+  {id:'pipeline',label:'03  pipeline',kind:'sequential handoff',
+   desc:'Work passes through specialized stages. Each dot transforms the artifact and hands it forward.',
+   produce:'clarity of responsibility and repeatability',
+   failure:'lossy handoffs and brittle dependency on order',
+   human:'inspect boundaries and intervene where context is lost'},
+  {id:'star',label:'04  star',kind:'orchestrated routing',
+   desc:'A central coordinator routes the Mintis to specialists and gathers their results.',
+   produce:'fast coordination and clear control',
+   failure:'coordinator bottleneck and hidden central bias',
+   human:'inspect routing choices and override delegation'},
+  {id:'peer',label:'05  peer network',kind:'distributed exchange',
+   desc:'Dots exchange partial views directly. No single node owns the whole state.',
+   produce:'emergence, cross-pollination, resilient local adaptation',
+   failure:'loops, duplication, diffusion of responsibility',
+   human:'shape incentives, permissions, and stopping conditions'},
+  {id:'lens',label:'06  lens stack',kind:'persistent perspectives',
+   desc:'The same object is inspected through distinct lenses that should not collapse into one universal judge.',
+   produce:'legibility of difference and multi-perspective critique',
+   failure:'false synthesis or one lens dominating the others',
+   human:'keep perspectives distinct long enough to reveal what one view misses'}
+];
+
+let active=0, selected=-1;
+const list=document.getElementById('list');
+formations.forEach((f,i)=>{
+  const b=document.createElement('button'); b.textContent=f.label;
+  b.onclick=()=>{active=i;selected=-1;sync();};
+  list.appendChild(b);
+});
+function sync(){
+  [...list.children].forEach((b,i)=>b.classList.toggle('active',i===active));
+  const f=formations[active];
+  title.textContent=f.id==='makerCritic'?'Maker–Critic':f.id==='peer'?'Peer Network':f.id==='lens'?'Lens Stack':f.id[0].toUpperCase()+f.id.slice(1);
+  kind.textContent=f.kind; desc.textContent=f.desc; produce.textContent=f.produce; failure.textContent=f.failure; human.textContent=f.human;
+  document.getElementById('selected').textContent=selected<0?'none':DOTS[selected];
+}
+sync();
+
+function resize(){
+  const r=C.getBoundingClientRect(); C.width=r.width*DPR; C.height=r.height*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener('resize',resize); resize();
+
+function points(w,h){
+  const cx=w/2,cy=h/2;
+  const six=[[-.32,-.25],[0,-.34],[.32,-.25],[-.32,.25],[0,.34],[.32,.25]].map(([x,y])=>[cx+x*w*.78,cy+y*h*.78]);
+  switch(formations[active].id){
+    case 'council': return Array.from({length:6},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/6;return[cx+Math.cos(a)*Math.min(w,h)*.28,cy+Math.sin(a)*Math.min(w,h)*.28]});
+    case 'makerCritic': return [[w*.32,h*.5],[w*.68,h*.5],[w*.5,h*.25],[w*.5,h*.75],[w*.22,h*.25],[w*.78,h*.75]];
+    case 'pipeline': return Array.from({length:6},(_,i)=>[w*(.15+i*.14),cy+(i%2?12:-12)]);
+    case 'star': return [[cx,cy],...Array.from({length:5},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/5;return[cx+Math.cos(a)*Math.min(w,h)*.3,cy+Math.sin(a)*Math.min(w,h)*.3]})];
+    case 'peer': return Array.from({length:6},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/6;return[cx+Math.cos(a)*Math.min(w,h)*.31,cy+Math.sin(a)*Math.min(w,h)*.31]});
+    case 'lens': return six.map((p,i)=>[p[0],h*.2+i*h*.12]);
+  }
+}
+function edges(){
+  const id=formations[active].id, e=[];
+  if(id==='council') for(let i=0;i<6;i++) e.push([i,(i+1)%6],[i,(i+3)%6]);
+  if(id==='makerCritic') e.push([0,1],[1,0],[2,0],[3,1],[4,0],[5,1]);
+  if(id==='pipeline') for(let i=0;i<5;i++) e.push([i,i+1]);
+  if(id==='star') for(let i=1;i<6;i++) e.push([0,i],[i,0]);
+  if(id==='peer') for(let i=0;i<6;i++) for(let j=i+1;j<6;j++) if((i+j)%2===0||j===i+1) e.push([i,j],[j,i]);
+  if(id==='lens') for(let i=0;i<5;i++) e.push([i,i+1]);
+  return e;
+}
+function line(a,b,alpha=.7){
+  ctx.strokeStyle='rgba(110,110,110,'+alpha+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+}
+function pulse(a,b,p){
+  const x=a[0]+(b[0]-a[0])*p,y=a[1]+(b[1]-a[1])*p;
+  ctx.fillStyle=COLORS.accent;ctx.shadowColor=COLORS.accent;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(x,y,3.2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+}
+function draw(t){
+  const w=C.clientWidth,h=C.clientHeight;ctx.clearRect(0,0,w,h);
+  const pts=points(w,h), es=edges();
+  es.forEach((e,i)=>{line(pts[e[0]],pts[e[1]],.48); const p=(t*.00012+i*.17)%1; pulse(pts[e[0]],pts[e[1]],p);});
+  pts.forEach((p,i)=>{
+    ctx.fillStyle=i===selected?COLORS.accent:COLORS.text;ctx.beginPath();ctx.arc(p[0],p[1],i===selected?7:5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=COLORS.muted;ctx.font='10px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(DOTS[i],p[0],p[1]+20);
+  });
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+C.addEventListener('click',e=>{
+  const r=C.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pts=points(C.clientWidth,C.clientHeight);
+  let best=-1,d=24;
+  pts.forEach((p,i)=>{const dd=Math.hypot(x-p[0],y-p[1]);if(dd<d){d=dd;best=i}});
+  selected=best;sync();
+});
+</script>
+</body>
+</html>
