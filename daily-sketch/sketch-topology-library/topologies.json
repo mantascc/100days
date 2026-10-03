@@ -1,0 +1,77 @@
+{
+  "dots": ["maker", "critic", "curator", "systems", "interaction", "engineer"],
+  "topologies": [
+    {
+      "id": "council",
+      "title": "Council",
+      "label": "01  council",
+      "kind": "parallel deliberation",
+      "layout": "ring",
+      "edges": [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,3],[1,4],[2,5]],
+      "description": "Every dot sees the same Mintis and contributes a partial view before a synthesis step.",
+      "produces": "breadth, disagreement, surfaced assumptions",
+      "failure": "consensus theater or too much parallel noise",
+      "human": "choose what gets synthesized and what remains unresolved"
+    },
+    {
+      "id": "maker-critic",
+      "title": "Maker–Critic",
+      "label": "02  maker–critic",
+      "kind": "adversarial pair",
+      "layout": "maker-critic",
+      "edges": [[0,1],[1,0],[2,0],[3,1],[4,0],[5,1]],
+      "description": "One dot proposes, one challenges, and the artifact loops between them until a stopping condition is met.",
+      "produces": "iteration, pressure-testing, sharper artifacts",
+      "failure": "endless critique or defensive local optimization",
+      "human": "set the bar and decide when critique has earned its keep"
+    },
+    {
+      "id": "pipeline",
+      "title": "Pipeline",
+      "label": "03  pipeline",
+      "kind": "sequential handoff",
+      "layout": "pipeline",
+      "edges": [[0,1],[1,2],[2,3],[3,4],[4,5]],
+      "description": "Work passes through specialized stages. Each dot transforms the artifact and hands it forward.",
+      "produces": "clarity of responsibility and repeatability",
+      "failure": "lossy handoffs and brittle dependency on order",
+      "human": "inspect boundaries and intervene where context is lost"
+    },
+    {
+      "id": "star",
+      "title": "Star",
+      "label": "04  star",
+      "kind": "orchestrated routing",
+      "layout": "star",
+      "edges": [[0,1],[1,0],[0,2],[2,0],[0,3],[3,0],[0,4],[4,0],[0,5],[5,0]],
+      "description": "A central coordinator routes the Mintis to specialists and gathers their results.",
+      "produces": "fast coordination and clear control",
+      "failure": "coordinator bottleneck and hidden central bias",
+      "human": "inspect routing choices and override delegation"
+    },
+    {
+      "id": "peer-network",
+      "title": "Peer Network",
+      "label": "05  peer network",
+      "kind": "distributed exchange",
+      "layout": "ring",
+      "edges": [[0,1],[1,0],[1,2],[2,1],[2,3],[3,2],[3,4],[4,3],[4,5],[5,4],[5,0],[0,5],[0,2],[2,4],[4,0]],
+      "description": "Dots exchange partial views directly. No single node owns the whole state.",
+      "produces": "emergence, cross-pollination, resilient local adaptation",
+      "failure": "loops, duplication, diffusion of responsibility",
+      "human": "shape incentives, permissions, and stopping conditions"
+    },
+    {
+      "id": "lens-stack",
+      "title": "Lens Stack",
+      "label": "06  lens stack",
+      "kind": "persistent perspectives",
+      "layout": "stack",
+      "edges": [[0,1],[1,2],[2,3],[3,4],[4,5]],
+      "description": "The same object is inspected through distinct lenses that should not collapse into one universal judge.",
+      "produces": "legibility of difference and multi-perspective critique",
+      "failure": "false synthesis or one lens dominating the others",
+      "human": "keep perspectives distinct long enough to reveal what one view misses"
+    }
+  ]
+}
