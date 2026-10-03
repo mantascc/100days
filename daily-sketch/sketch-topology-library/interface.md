@@ -48,3 +48,20 @@ pattern of flow. The same named dots persist across every topology.
 What is the minimum visual grammar required for a person to understand that
 the behavior of an intelligent system can come from its relationships rather
 than its parts?
+
+
+## topology data schema
+The library is data-driven through `topologies.json`.
+
+Each topology defines:
+- `id` and display metadata
+- `layout` — the spatial formation primitive
+- `edges` — directed information-flow pairs by dot index
+- `produces`
+- `failure`
+- `human` — the human intervention point
+
+The persistent dot vocabulary is also declared in the same file.
+
+Adding a formation should usually mean adding one JSON object. New rendering code
+is only needed when a topology requires a genuinely new spatial layout primitive.
