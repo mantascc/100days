@@ -74,109 +74,143 @@
 const C = document.getElementById('c'), ctx = C.getContext('2d');
 const DPR = Math.min(2, devicePixelRatio || 1);
 const COLORS={text:'#f5f5f7',muted:'#777',ghost:'#333',accent:'#f5a623'};
-const DOTS=['maker','critic','curator','systems','interaction','engineer'];
 
-const formations=[
-  {id:'council',label:'01  council',kind:'parallel deliberation',
-   desc:'Every dot sees the same Mintis and contributes a partial view before a synthesis step.',
-   produce:'breadth, disagreement, surfaced assumptions',
-   failure:'consensus theater or too much parallel noise',
-   human:'choose what gets synthesized and what remains unresolved'},
-  {id:'makerCritic',label:'02  maker–critic',kind:'adversarial pair',
-   desc:'One dot proposes, one challenges, and the artifact loops between them until a stopping condition is met.',
-   produce:'iteration, pressure-testing, sharper artifacts',
-   failure:'endless critique or defensive local optimization',
-   human:'set the bar and decide when critique has earned its keep'},
-  {id:'pipeline',label:'03  pipeline',kind:'sequential handoff',
-   desc:'Work passes through specialized stages. Each dot transforms the artifact and hands it forward.',
-   produce:'clarity of responsibility and repeatability',
-   failure:'lossy handoffs and brittle dependency on order',
-   human:'inspect boundaries and intervene where context is lost'},
-  {id:'star',label:'04  star',kind:'orchestrated routing',
-   desc:'A central coordinator routes the Mintis to specialists and gathers their results.',
-   produce:'fast coordination and clear control',
-   failure:'coordinator bottleneck and hidden central bias',
-   human:'inspect routing choices and override delegation'},
-  {id:'peer',label:'05  peer network',kind:'distributed exchange',
-   desc:'Dots exchange partial views directly. No single node owns the whole state.',
-   produce:'emergence, cross-pollination, resilient local adaptation',
-   failure:'loops, duplication, diffusion of responsibility',
-   human:'shape incentives, permissions, and stopping conditions'},
-  {id:'lens',label:'06  lens stack',kind:'persistent perspectives',
-   desc:'The same object is inspected through distinct lenses that should not collapse into one universal judge.',
-   produce:'legibility of difference and multi-perspective critique',
-   failure:'false synthesis or one lens dominating the others',
-   human:'keep perspectives distinct long enough to reveal what one view misses'}
-];
-
+let DOTS=[];
+let formations=[];
 let active=0, selected=-1;
 const list=document.getElementById('list');
-formations.forEach((f,i)=>{
-  const b=document.createElement('button'); b.textContent=f.label;
-  b.onclick=()=>{active=i;selected=-1;sync();};
-  list.appendChild(b);
-});
+
+function buildList(){
+  list.innerHTML='';
+  formations.forEach((f,i)=>{
+    const b=document.createElement('button');
+    b.textContent=f.label;
+    b.onclick=()=>{active=i;selected=-1;sync();};
+    list.appendChild(b);
+  });
+}
+
 function sync(){
   [...list.children].forEach((b,i)=>b.classList.toggle('active',i===active));
   const f=formations[active];
-  title.textContent=f.id==='makerCritic'?'Maker–Critic':f.id==='peer'?'Peer Network':f.id==='lens'?'Lens Stack':f.id[0].toUpperCase()+f.id.slice(1);
-  kind.textContent=f.kind; desc.textContent=f.desc; produce.textContent=f.produce; failure.textContent=f.failure; human.textContent=f.human;
+  if(!f) return;
+  title.textContent=f.title;
+  kind.textContent=f.kind;
+  desc.textContent=f.description;
+  produce.textContent=f.produces;
+  failure.textContent=f.failure;
+  human.textContent=f.human;
   document.getElementById('selected').textContent=selected<0?'none':DOTS[selected];
 }
-sync();
 
 function resize(){
-  const r=C.getBoundingClientRect(); C.width=r.width*DPR; C.height=r.height*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+  const r=C.getBoundingClientRect();
+  C.width=r.width*DPR;
+  C.height=r.height*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
 }
-addEventListener('resize',resize); resize();
+addEventListener('resize',resize);
+resize();
+
+function ringPoints(w,h,n,r=.29){
+  const cx=w/2,cy=h/2;
+  return Array.from({length:n},(_,i)=>{
+    const a=-Math.PI/2+i*Math.PI*2/n;
+    return[cx+Math.cos(a)*Math.min(w,h)*r,cy+Math.sin(a)*Math.min(w,h)*r];
+  });
+}
 
 function points(w,h){
-  const cx=w/2,cy=h/2;
-  const six=[[-.32,-.25],[0,-.34],[.32,-.25],[-.32,.25],[0,.34],[.32,.25]].map(([x,y])=>[cx+x*w*.78,cy+y*h*.78]);
-  switch(formations[active].id){
-    case 'council': return Array.from({length:6},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/6;return[cx+Math.cos(a)*Math.min(w,h)*.28,cy+Math.sin(a)*Math.min(w,h)*.28]});
-    case 'makerCritic': return [[w*.32,h*.5],[w*.68,h*.5],[w*.5,h*.25],[w*.5,h*.75],[w*.22,h*.25],[w*.78,h*.75]];
-    case 'pipeline': return Array.from({length:6},(_,i)=>[w*(.15+i*.14),cy+(i%2?12:-12)]);
-    case 'star': return [[cx,cy],...Array.from({length:5},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/5;return[cx+Math.cos(a)*Math.min(w,h)*.3,cy+Math.sin(a)*Math.min(w,h)*.3]})];
-    case 'peer': return Array.from({length:6},(_,i)=>{const a=-Math.PI/2+i*Math.PI*2/6;return[cx+Math.cos(a)*Math.min(w,h)*.31,cy+Math.sin(a)*Math.min(w,h)*.31]});
-    case 'lens': return six.map((p,i)=>[p[0],h*.2+i*h*.12]);
+  const f=formations[active];
+  const cx=w/2,cy=h/2,n=DOTS.length;
+  switch(f.layout){
+    case 'ring': return ringPoints(w,h,n,.3);
+    case 'star': return [[cx,cy],...ringPoints(w,h,n-1,.31)];
+    case 'pipeline': return Array.from({length:n},(_,i)=>[w*(.15+i*(.7/(n-1))),cy+(i%2?12:-12)]);
+    case 'maker-critic': return [[w*.32,h*.5],[w*.68,h*.5],[w*.5,h*.25],[w*.5,h*.75],[w*.22,h*.25],[w*.78,h*.75]];
+    case 'stack': return Array.from({length:n},(_,i)=>[cx,h*(.2+i*(.6/(n-1)))]);
+    default: return ringPoints(w,h,n,.3);
   }
 }
-function edges(){
-  const id=formations[active].id, e=[];
-  if(id==='council') for(let i=0;i<6;i++) e.push([i,(i+1)%6],[i,(i+3)%6]);
-  if(id==='makerCritic') e.push([0,1],[1,0],[2,0],[3,1],[4,0],[5,1]);
-  if(id==='pipeline') for(let i=0;i<5;i++) e.push([i,i+1]);
-  if(id==='star') for(let i=1;i<6;i++) e.push([0,i],[i,0]);
-  if(id==='peer') for(let i=0;i<6;i++) for(let j=i+1;j<6;j++) if((i+j)%2===0||j===i+1) e.push([i,j],[j,i]);
-  if(id==='lens') for(let i=0;i<5;i++) e.push([i,i+1]);
-  return e;
-}
+
 function line(a,b,alpha=.7){
-  ctx.strokeStyle='rgba(110,110,110,'+alpha+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+  ctx.strokeStyle='rgba(110,110,110,'+alpha+')';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(a[0],a[1]);
+  ctx.lineTo(b[0],b[1]);
+  ctx.stroke();
 }
+
 function pulse(a,b,p){
   const x=a[0]+(b[0]-a[0])*p,y=a[1]+(b[1]-a[1])*p;
-  ctx.fillStyle=COLORS.accent;ctx.shadowColor=COLORS.accent;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(x,y,3.2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle=COLORS.accent;
+  ctx.shadowColor=COLORS.accent;
+  ctx.shadowBlur=10;
+  ctx.beginPath();
+  ctx.arc(x,y,3.2,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur=0;
 }
+
 function draw(t){
-  const w=C.clientWidth,h=C.clientHeight;ctx.clearRect(0,0,w,h);
-  const pts=points(w,h), es=edges();
-  es.forEach((e,i)=>{line(pts[e[0]],pts[e[1]],.48); const p=(t*.00012+i*.17)%1; pulse(pts[e[0]],pts[e[1]],p);});
-  pts.forEach((p,i)=>{
-    ctx.fillStyle=i===selected?COLORS.accent:COLORS.text;ctx.beginPath();ctx.arc(p[0],p[1],i===selected?7:5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=COLORS.muted;ctx.font='10px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(DOTS[i],p[0],p[1]+20);
+  const w=C.clientWidth,h=C.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  if(!formations.length){ requestAnimationFrame(draw); return; }
+
+  const pts=points(w,h);
+  const es=formations[active].edges || [];
+  es.forEach((e,i)=>{
+    const a=pts[e[0]],b=pts[e[1]];
+    if(!a||!b) return;
+    line(a,b,.48);
+    pulse(a,b,(t*.00012+i*.17)%1);
   });
+
+  pts.forEach((p,i)=>{
+    ctx.fillStyle=i===selected?COLORS.accent:COLORS.text;
+    ctx.beginPath();
+    ctx.arc(p[0],p[1],i===selected?7:5,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle=COLORS.muted;
+    ctx.font='10px IBM Plex Mono';
+    ctx.textAlign='center';
+    ctx.fillText(DOTS[i] || ('dot '+(i+1)),p[0],p[1]+20);
+  });
+
   requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
 
 C.addEventListener('click',e=>{
-  const r=C.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pts=points(C.clientWidth,C.clientHeight);
+  if(!formations.length) return;
+  const r=C.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  const pts=points(C.clientWidth,C.clientHeight);
   let best=-1,d=24;
-  pts.forEach((p,i)=>{const dd=Math.hypot(x-p[0],y-p[1]);if(dd<d){d=dd;best=i}});
-  selected=best;sync();
+  pts.forEach((p,i)=>{
+    const dd=Math.hypot(x-p[0],y-p[1]);
+    if(dd<d){d=dd;best=i;}
+  });
+  selected=best;
+  sync();
 });
+
+fetch('./topologies.json')
+  .then(r=>{
+    if(!r.ok) throw new Error('Could not load topologies.json');
+    return r.json();
+  })
+  .then(data=>{
+    DOTS=data.dots || [];
+    formations=data.topologies || [];
+    buildList();
+    sync();
+  })
+  .catch(err=>{
+    list.innerHTML='<div class="sub">Topology data failed to load.</div>';
+    console.error(err);
+  });
 </script>
 </body>
 </html>
