@@ -2,501 +2,701 @@
   {
     "id": "99-clarity",
     "path": "100days/99-clarity",
-    "description": "CLARITY — translucent geometric primitives, grain, bleeding light and reflections; an optical material playground"
+    "description": "CLARITY — translucent geometric primitives, grain, bleeding light and reflections; an optical material playground",
+    "date": "2026-09-29",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "98-vilnius-transport",
     "path": "100days/98-vilnius-transport",
-    "description": "Vilnius Transport — a day of measured passenger activity; scrub through time as the city shifts from night lights to daylight"
+    "description": "Vilnius Transport — a day of measured passenger activity; scrub through time as the city shifts from night lights to daylight",
+    "date": "2026-09-28",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "97-vilnius-graffiti-guess",
     "path": "100days/97-vilnius-graffiti-guess",
-    "description": "Vilnius Graffiti Guess — seven photos, seven map dots; find each wall with pixel landmarks as your guide"
+    "description": "Vilnius Graffiti Guess — seven photos, seven map dots; find each wall with pixel landmarks as your guide",
+    "date": "2026-09-27",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "96-beautiful-illusion",
     "path": "100days/96-beautiful-illusion",
-    "description": "Beautiful Illusion — language fragments align into a face as perspective shifts; an interactive essay on language and perceived mind"
+    "description": "Beautiful Illusion — language fragments align into a face as perspective shifts; an interactive essay on language and perceived mind",
+    "date": "2026-09-27",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "95-reactive-crt",
     "path": "100days/95-reactive-crt",
-    "description": "Reactive CRT — sixteen generators drawing the same microphone into one CRT pipeline; level and onsets drive emission, bloom and convergence"
+    "description": "Reactive CRT — sixteen generators drawing the same microphone into one CRT pipeline; level and onsets drive emission, bloom and convergence",
+    "date": "2026-08-18",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "94-relationships",
     "path": "100days/94-relationships",
-    "description": "Relationships — a specimen sheet of the edge itself: sixteen live micro-simulations, one per relationship type, with pulses carrying direction"
+    "description": "Relationships — a specimen sheet of the edge itself: sixteen live micro-simulations, one per relationship type, with pulses carrying direction",
+    "date": "2026-08-15",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "93-imagination-layers",
     "path": "100days/93-imagination-layers",
-    "description": "Imagination Layers — the imagination/ context layer as a stack of planes, one per entity type; select anything to see what it spawned"
+    "description": "Imagination Layers — the imagination/ context layer as a stack of planes, one per entity type; select anything to see what it spawned",
+    "date": "2026-08-10",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "92-tube-tolerance",
     "path": "100days/92-tube-tolerance",
-    "description": "Tube Tolerance — a texture instrument for the CRT treatment: one test card, nine tubes, eight pipeline axes to batch, sweep or cross-plot"
+    "description": "Tube Tolerance — a texture instrument for the CRT treatment: one test card, nine tubes, eight pipeline axes to batch, sweep or cross-plot",
+    "date": "2026-08-09",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "91-retro-primitives",
     "path": "100days/91-retro-primitives",
-    "description": "Retro Primitives — CRT tube treatment as a palette-swap family across four variants, each running four primitives in a 2×2 tube grid"
+    "description": "Retro Primitives — CRT tube treatment as a palette-swap family across four variants, each running four primitives in a 2×2 tube grid",
+    "date": "2026-08-02",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "90-aida001",
     "path": "100days/90-aida001",
-    "description": "AIDA001 — first audio-visual sketch: an agent swarm drifting to three self-recorded loops or live mic, with the RMS→animation vector exposed"
+    "description": "AIDA001 — first audio-visual sketch: an agent swarm drifting to three self-recorded loops or live mic, with the RMS→animation vector exposed",
+    "date": "2026-07-15",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "89-sprite-states",
     "path": "100days/89-sprite-states",
-    "description": "Sprite States — clear-channel docs for the create-sprite four-state atlas (idle · working · attention · error), with a 2×2 live demo"
+    "description": "Sprite States — clear-channel docs for the create-sprite four-state atlas (idle · working · attention · error), with a 2×2 live demo",
+    "date": "2026-07-01",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "88-eixample",
     "path": "100days/88-eixample",
-    "description": "Eixample — a hand-painted 16×16 pictograph reframed as a generative grid language across three modes, deterministic per seed"
+    "description": "Eixample — a hand-painted 16×16 pictograph reframed as a generative grid language across three modes, deterministic per seed",
+    "date": "2026-06-30",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "87-attention-distribution",
     "path": "100days/87-attention-distribution",
-    "description": "Attention Distribution — nine ways to read one simulation of 100 dot-agents splitting finite attention across five voices"
+    "description": "Attention Distribution — nine ways to read one simulation of 100 dot-agents splitting finite attention across five voices",
+    "date": "2026-06-29",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "86-agent-stream-scrub",
     "path": "100days/86-agent-stream-scrub",
-    "description": "Agent-Stream Scrub — a scrubbable two-track reference for eight agent-streaming patterns: what the user sees versus what the machine does"
+    "description": "Agent-Stream Scrub — a scrubbable two-track reference for eight agent-streaming patterns: what the user sees versus what the machine does",
+    "date": "2026-06-17",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "85-agent-stream-glyphs",
     "path": "100days/85-agent-stream-glyphs",
-    "description": "Agent-Stream Glyphs — twelve agent-streaming patterns as hash-seeded animated thumbnails, with category filters and a click-to-feature overlay"
+    "description": "Agent-Stream Glyphs — twelve agent-streaming patterns as hash-seeded animated thumbnails, with category filters and a click-to-feature overlay",
+    "date": "2026-06-17",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "84-id-card",
     "path": "100days/84-id-card",
-    "description": "ID Card — living credential with a particle void, mouse-reactive 3D tilt, and generated barcode"
+    "description": "ID Card — living credential with a particle void, mouse-reactive 3D tilt, and generated barcode",
+    "date": "2026-06-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "83-video-index",
     "path": "100days/83-video-index",
-    "description": "Video Index — grid of every previous sketch as a 3–4s loop, recorded by a headless Chromium running LLM-authored Playwright scenarios"
+    "description": "Video Index — grid of every previous sketch as a 3–4s loop, recorded by a headless Chromium running LLM-authored Playwright scenarios",
+    "date": "2026-06-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "82-z-axis",
     "path": "100days/82-z-axis",
-    "description": "Z-Axis — nine micro-explorations of depth as a UI material, switched via a floating controller"
+    "description": "Z-Axis — nine micro-explorations of depth as a UI material, switched via a floating controller",
+    "date": "2026-06-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "79-idle-states",
     "path": "100days/79-idle-states",
-    "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across ambient and instrumented pages"
+    "description": "Idle States — eight visual interpretations of idle/patience as a 2×2 typology across ambient and instrumented pages",
+    "date": "2026-05-26",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "78-ascii-sheets-docs",
     "path": "100days/78-ascii-sheets-docs",
-    "description": "ASCII Sheets — showcase for the ASCII sheet primitive: twelve use-case tiles and a five-formula gallery, with glyph and palette rails that retheme the hero"
+    "description": "ASCII Sheets — showcase for the ASCII sheet primitive: twelve use-case tiles and a five-formula gallery, with glyph and palette rails that retheme the hero",
+    "date": "2026-05-20",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "01-entropy",
     "path": "100days/01-entropy",
-    "description": "Interactive entropy visualization with animated particles"
+    "description": "Interactive entropy visualization with animated particles",
+    "date": "2025-10-21",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "02-vicsek-model",
     "path": "100days/02-vicsek-model",
-    "description": "Vicsek model flocking behavior simulation"
+    "description": "Vicsek model flocking behavior simulation",
+    "date": "2025-09-10",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "03-chaos-agent",
     "path": "100days/03-chaos-agent",
-    "description": "Particle clustering with chaotic agents"
+    "description": "Particle clustering with chaotic agents",
+    "date": "2025-09-11",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "04-random-walk",
     "path": "100days/04-random-walk",
-    "description": "Stochastic random walk patterns on canvas"
+    "description": "Stochastic random walk patterns on canvas",
+    "date": "2025-09-12",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "05-fall",
     "path": "100days/05-fall",
-    "description": "Gravity and particle physics with falling objects"
+    "description": "Gravity and particle physics with falling objects",
+    "date": "2025-09-13",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "06-orbital",
     "path": "100days/06-orbital",
-    "description": "Celestial mechanics with orbital planets"
+    "description": "Celestial mechanics with orbital planets",
+    "date": "2025-09-14",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "07-apophenia",
     "path": "100days/07-apophenia",
-    "description": "Apophenia proximity links on grid"
+    "description": "Apophenia proximity links on grid",
+    "date": "2025-09-16",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "08-graph-clusters",
     "path": "100days/08-graph-clusters",
-    "description": "Cluster detection with parameter tuning"
+    "description": "Cluster detection with parameter tuning",
+    "date": "2025-09-17",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "09-planar-graph",
     "path": "100days/09-planar-graph",
-    "description": "Linked agents network visualization"
+    "description": "Linked agents network visualization",
+    "date": "2025-09-18",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "10-audio-reactive-agents",
     "path": "100days/10-audio-reactive-agents",
-    "description": "Audio-reactive agents with spatial positioning"
+    "description": "Audio-reactive agents with spatial positioning",
+    "date": "2025-09-21",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "11-brownian-tree",
     "path": "100days/11-brownian-tree",
-    "description": "Interactive message storage system (Node.js/Express)"
+    "description": "Interactive message storage system (Node.js/Express)",
+    "date": "2025-09-21",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "12-wind-field",
     "path": "100days/12-wind-field",
-    "description": "Perlin noise wind simulation"
+    "description": "Perlin noise wind simulation",
+    "date": "2025-09-24",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "13-image-flow-field",
     "path": "100days/13-image-flow-field",
-    "description": "Wave pattern generation with ripple effects"
+    "description": "Wave pattern generation with ripple effects",
+    "date": "2025-09-26",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "14-dna-mutations",
     "path": "100days/14-dna-mutations",
-    "description": "Dynamic cluster visualization with signals"
+    "description": "Dynamic cluster visualization with signals",
+    "date": "2025-09-28",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "15-binary-camera-grid",
     "path": "100days/15-binary-camera-grid",
-    "description": "Interactive 2D grid navigation with zoom"
+    "description": "Interactive 2D grid navigation with zoom",
+    "date": "2025-10-01",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "15b-binary-camera-grid-v2",
     "path": "100days/15b-binary-camera-grid-v2",
-    "description": "Grid camera variant"
+    "description": "Grid camera variant",
+    "date": "2026-02-20",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "16-hub-spoke-network",
     "path": "100days/16-hub-spoke-network",
-    "description": "Force graph visualization"
+    "description": "Force graph visualization",
+    "date": "2025-10-02",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "17-audio-reactive-network",
     "path": "100days/17-audio-reactive-network",
-    "description": "Text-to-speech with animated typography"
+    "description": "Text-to-speech with animated typography",
+    "date": "2025-10-03",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "18-cellular-automaton",
     "path": "100days/18-cellular-automaton",
-    "description": "Conway's Game of Life variant"
+    "description": "Conway's Game of Life variant",
+    "date": "2025-10-06",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "19-coworker-network",
     "path": "100days/19-coworker-network",
-    "description": "Force-directed graph of coworker interactions (React/D3)"
+    "description": "Force-directed graph of coworker interactions (React/D3)",
+    "date": "2025-10-08",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "20-schelling-model",
     "path": "100days/20-schelling-model",
-    "description": "Schelling model of segregation simulation"
+    "description": "Schelling model of segregation simulation",
+    "date": "2025-10-10",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "21-interaction-heatmap",
     "path": "100days/21-interaction-heatmap",
-    "description": "30-day agent interaction heatmap"
+    "description": "30-day agent interaction heatmap",
+    "date": "2025-10-13",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "22-directed-network",
     "path": "100days/22-directed-network",
-    "description": "Graph network visualization"
+    "description": "Graph network visualization",
+    "date": "2025-10-13",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "23-interactive-typography",
     "path": "100days/23-interactive-typography",
-    "description": "Touch/mouse event handler demo"
+    "description": "Touch/mouse event handler demo",
+    "date": "2025-10-14",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "24-rock-paper-scissors",
     "path": "100days/24-rock-paper-scissors",
-    "description": "Rock paper scissors game"
+    "description": "Rock paper scissors game",
+    "date": "2025-10-16",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "25-spotlight-grid",
     "path": "100days/25-spotlight-grid",
-    "description": "Density and color-controlled particle effect"
+    "description": "Density and color-controlled particle effect",
+    "date": "2025-10-22",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "26-widget-dashboard",
     "path": "100days/26-widget-dashboard",
-    "description": "Dynamic widget dashboard layout"
+    "description": "Dynamic widget dashboard layout",
+    "date": "2025-10-23",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "27-muse",
     "path": "100days/27-muse",
-    "description": "Muse v0 - music/creative tool prototype"
+    "description": "Muse v0 - music/creative tool prototype",
+    "date": "2025-10-28",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "28-liquid-glass",
     "path": "100days/28-liquid-glass",
-    "description": "Liquid glass morphism effect"
+    "description": "Liquid glass morphism effect",
+    "date": "2025-10-30",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "29-progress-indicators",
     "path": "100days/29-progress-indicators",
-    "description": "Text generation UI showing thinking states"
+    "description": "Text generation UI showing thinking states",
+    "date": "2025-10-31",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "30-thinking-states",
     "path": "100days/30-thinking-states",
-    "description": "Experimental loading indicators exploring thinking metaphors"
+    "description": "Experimental loading indicators exploring thinking metaphors",
+    "date": "2025-11-06",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "31-cli-material-palette",
     "path": "100days/31-cli-material-palette",
-    "description": "CLI material color palette"
+    "description": "CLI material color palette",
+    "date": "2025-11-07",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "32-genart-cards",
     "path": "100days/32-genart-cards",
-    "description": "Chaotic entropy pattern generation"
+    "description": "Chaotic entropy pattern generation",
+    "date": "2025-11-11",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "33-three-body-problem",
     "path": "100days/33-three-body-problem",
-    "description": "Temporal slitscan imaging effect"
+    "description": "Temporal slitscan imaging effect",
+    "date": "2025-11-13",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "34-particle-text-morph",
     "path": "100days/34-particle-text-morph",
-    "description": "Text morphing with particle transitions"
+    "description": "Text morphing with particle transitions",
+    "date": "2025-11-17",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "35-flight-path-viz",
     "path": "100days/35-flight-path-viz",
-    "description": "Great circle flight path animation (Leaflet/Turf.js)"
+    "description": "Great circle flight path animation (Leaflet/Turf.js)",
+    "date": "2025-11-18",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "36-spinning-globe",
     "path": "100days/36-spinning-globe",
-    "description": "Vite React TypeScript project"
+    "description": "Vite React TypeScript project",
+    "date": "2025-11-25",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "37-sentiment-analyzer",
     "path": "100days/37-sentiment-analyzer",
-    "description": "Real-time text sentiment analysis with industrial visualization (React/TypeScript)"
+    "description": "Real-time text sentiment analysis with industrial visualization (React/TypeScript)",
+    "date": "2025-11-26",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "38-baltic-pattern",
     "path": "100days/38-baltic-pattern",
-    "description": "Generative Baltic pattern"
+    "description": "Generative Baltic pattern",
+    "date": "2025-12-03",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "39-wave-morph",
     "path": "100days/39-wave-morph",
-    "description": "Morphing wave patterns"
+    "description": "Morphing wave patterns",
+    "date": "2025-12-12",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "40-cube-grid-rules",
     "path": "100days/40-cube-grid-rules",
-    "description": "Cube grid rules engine"
+    "description": "Cube grid rules engine",
+    "date": "2025-12-12",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "41-metaball",
     "path": "100days/41-metaball",
-    "description": "Metaball physics and animation"
+    "description": "Metaball physics and animation",
+    "date": "2025-12-12",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "42-metaball-grid",
     "path": "100days/42-metaball-grid",
-    "description": "Grid-based metaball effects"
+    "description": "Grid-based metaball effects",
+    "date": "2025-12-15",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "43-style-seed",
     "path": "100days/43-style-seed",
-    "description": "Sketch project"
+    "description": "Sketch project",
+    "date": "2026-02-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "44-whiff",
     "path": "100days/44-whiff",
-    "description": "Whiff project"
+    "description": "Whiff project",
+    "date": "2026-02-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "45-gravity-pills",
     "path": "100days/45-gravity-pills",
-    "description": "Gravity pills particle simulation"
+    "description": "Gravity pills particle simulation",
+    "date": "2026-01-20",
+    "dateSource": "github-repo-created"
   },
   {
     "id": "46-oklch-vs-hsl",
     "path": "100days/46-oklch-vs-hsl",
-    "description": "OKLCH vs HSL gradient comparison"
+    "description": "OKLCH vs HSL gradient comparison",
+    "date": "2026-02-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "47-2gif",
     "path": "100days/47-2gif",
-    "description": "Sketch project"
+    "description": "Sketch project",
+    "date": "2026-02-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "49-grid-trace",
     "path": "100days/49-grid-trace",
-    "description": "Grid Trace - Interactive grid path visualization with Geist Pixel font"
+    "description": "Grid Trace - Interactive grid path visualization with Geist Pixel font",
+    "date": "2026-02-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "50-execution-trace-graph",
     "path": "100days/50-execution-trace-graph",
-    "description": "Execution Trace Graph - AI response visualized as a traversal through a skill graph"
+    "description": "Execution Trace Graph - AI response visualized as a traversal through a skill graph",
+    "date": "2026-02-10",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "51-resonant-lattice",
     "path": "100days/51-resonant-lattice",
-    "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes"
+    "description": "Resonant Lattice - Interactive physics grid with mass-spring damper nodes",
+    "date": "2026-02-13",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "52-reaction-diffusion",
     "path": "100days/52-reaction-diffusion",
-    "description": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls"
+    "description": "Reaction-Diffusion - Gray-Scott model simulation with interactive parameter controls",
+    "date": "2026-02-16",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "53-ascii-grid",
     "path": "100days/53-ascii-grid",
-    "description": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes"
+    "description": "ASCII Animated Grid - Hypnotic 100x100 text grid with 5 distinct physical simulation modes",
+    "date": "2026-02-16",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "54-concept-graph",
     "path": "100days/54-concept-graph",
-    "description": "Interactive force-directed graph visualizing relationships between projects and data concepts"
+    "description": "Interactive force-directed graph visualizing relationships between projects and data concepts",
+    "date": "2026-02-20",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "55-ascii-loading",
     "path": "100days/55-ascii-loading",
-    "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar"
+    "description": "ASCII Loading — dual-grid crystallization animation with face emergence and progress bar",
+    "date": "2026-02-24",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "56-constrained-variation",
     "path": "100days/56-constrained-variation",
-    "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously"
+    "description": "Constrained Variation — fix the scaffold, switch the algorithm, compare simultaneously",
+    "date": "2026-02-27",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "57-color-themes",
     "path": "100days/57-color-themes",
-    "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities"
+    "description": "Five chapters, three palettes: Peach, Clay, and Aus — same sketch system remapped through different color identities",
+    "date": "2026-03-03",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "58-shapes",
     "path": "100days/58-shapes",
-    "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking"
+    "description": "Geometric shapes explorer — lines, arcs, and curves organized into chapters with animated parameter tweaking",
+    "date": "2026-03-05",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "59-font-explorer",
     "path": "100days/59-font-explorer",
-    "description": "Font Explorer — skill to visualize any font"
+    "description": "Font Explorer — skill to visualize any font",
+    "date": "2026-03-10",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "60-agentic-patterns",
     "path": "100days/60-agentic-patterns",
-    "description": "Agentic Patterns — interactive reference for AI agent design patterns"
+    "description": "Agentic Patterns — interactive reference for AI agent design patterns",
+    "date": "2026-03-20",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "61-hitl-patterns",
     "path": "100days/61-hitl-patterns",
-    "description": "Human in the Loop — four patterns across a single autonomy axis"
+    "description": "Human in the Loop — four patterns across a single autonomy axis",
+    "date": "2026-03-24",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "62-terminal-cli",
     "path": "100days/62-terminal-cli",
-    "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat"
+    "description": "Terminal REPL — minimal shell interface with boot sequence, command streaming, and ASCII cat",
+    "date": "2026-04-01",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "63-ube-kaizen",
     "path": "100days/63-ube-kaizen",
-    "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings"
+    "description": "Ube Kaizen — enter 3 colors and explore them as accents, tints, blends, data viz, and typographic pairings",
+    "date": "2026-04-03",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "63-constellation-map",
     "path": "100days/63-constellation-map",
-    "description": "Constellation — the first 52 sketches plotted as eight concept constellations (network, clustering, statistical, temporal, spatial, audio, visual, emergence) on canvas, with a replay that re-assembles the map"
+    "description": "Constellation — the first 52 sketches plotted as eight concept constellations (network, clustering, statistical, temporal, spatial, audio, visual, emergence) on canvas, with a replay that re-assembles the map",
+    "date": "2026-04-21",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "64-viz-grouped",
     "path": "100days/64-viz-grouped",
-    "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal"
+    "description": "Viz Grouped — reference gallery of visualization types grouped by analytical goal",
+    "date": "2026-04-03",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "65-mode-toggle",
     "path": "100days/65-mode-toggle",
-    "description": "Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations"
+    "description": "Mode Toggle — component reference sheet exploring a binary toggle across 9 families, composed examples, and 10 input combinations",
+    "date": "2026-04-07",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "66-ascii-field-gallery",
     "path": "100days/66-ascii-field-gallery",
-    "description": "ASCII Field Gallery — 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp"
+    "description": "ASCII Field Gallery — 8 animated ASCII wave fields rendered on canvas, each a distinct sine/cosine interference formula through a dot-density glyph ramp",
+    "date": "2026-04-12",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "67-audio-reactive-ascii",
     "path": "100days/67-audio-reactive-ascii",
-    "description": "Audio Reactive ASCII Field — ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning"
+    "description": "Audio Reactive ASCII Field — ube wave field driven by microphone input; 8 character vocabularies, floating control bar, settings modal for reactivity tuning",
+    "date": "2026-04-12",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "68-moog-phase",
     "path": "100days/68-moog-phase",
-    "description": "Moog Phase — XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner"
+    "description": "Moog Phase — XY phase portrait of a Moog sequence; WAV player with looped playback, snapshot export, and friction-reactive ASCII field banner",
+    "date": "2026-04-12",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "69-clear-channel",
     "path": "100days/69-clear-channel",
-    "description": "Clear Channel — visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system"
+    "description": "Clear Channel — visual language reference: design tokens, typography scale, spacing, motion, and live component demos for the computational aesthetics system",
+    "date": "2026-04-21",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "70-clear-channel-2",
     "path": "100days/70-clear-channel-2",
-    "description": "Clear Channel — introduction: a design system for computational aesthetics; working with data as raw material"
+    "description": "Clear Channel — introduction: a design system for computational aesthetics; working with data as raw material",
+    "date": "2026-04-21",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "71-index-100days",
     "path": "100days/71-index-100days",
-    "description": "Index — 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags"
+    "description": "Index — 100 days landing page: glyph thumbnail grid with live animated per-project glyphs and theme tags",
+    "date": "2026-04-21",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "72-snapshots-v2",
     "path": "100days/72-snapshots-v2",
-    "description": "Snapshots v2 — photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos → settling → locked) and chaotic bursty image loading"
+    "description": "Snapshots v2 — photo gallery reimagined through the Clear Channel system: square year-grouped tiles with ASCII glyph loaders (chaos → settling → locked) and chaotic bursty image loading",
+    "date": "2026-04-22",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "73-svg-layouts",
     "path": "100days/73-svg-layouts",
-    "description": "SVG Layouts — schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations"
+    "description": "SVG Layouts — schematic inline-SVG mockups of agent and code workspaces; takes carousel, CSS-variable theme system, and choreographed panel/streaming animations",
+    "date": "2026-05-08",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "74-particles",
     "path": "100days/74-particles",
-    "description": "Particles — soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold"
+    "description": "Particles — soft dots drifting on multi-harmonic sinusoidal paths that pause and recoil on contact; floating variant control with a metaball mode that fuses blobs via additive blending and a contrast() alpha threshold",
+    "date": "2026-05-13",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "75-layout-playground",
     "path": "100days/75-layout-playground",
-    "description": "Layout Playground — a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure"
+    "description": "Layout Playground — a low-fidelity sandbox for layout-system exploration; macOS-style shell with a floating sidebar, centered canvas, and tool window, all wireframed to focus on structure",
+    "date": "2026-05-14",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "76-layout-depth",
     "path": "100days/76-layout-depth",
-    "description": "Layout Depth — depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window"
+    "description": "Layout Depth — depth-model variant of the layout playground; raised central card with side panels dissolved into the background so only their icons float on the shell, plus a drag-to-resize right window",
+    "date": "2026-05-18",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "77-ascii-sheet-documentation",
     "path": "100days/77-ascii-sheet-documentation",
-    "description": "ASCII Sheet Documentation — promotional component showcase for a fixed ASCII texture and backdrop-filter banner, with scroll-reactive use cases, presets, and config snapshot"
+    "description": "ASCII Sheet Documentation — promotional component showcase for a fixed ASCII texture and backdrop-filter banner, with scroll-reactive use cases, presets, and config snapshot",
+    "date": "2026-05-20",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "80-network",
     "path": "100days/80-network",
-    "description": "Network — D3 force-directed graph with four relationship types (follows, friends, mentions, blocked) encoded by color, width, dash, and arrow; same-pair edges fan out as symmetric quadratic curves and a legend toggles each layer, reheating the simulation so the layout re-settles"
+    "description": "Network — D3 force-directed graph with four relationship types (follows, friends, mentions, blocked) encoded by color, width, dash, and arrow; same-pair edges fan out as symmetric quadratic curves and a legend toggles each layer, reheating the simulation so the layout re-settles",
+    "date": "2026-06-04",
+    "dateSource": "100days-first-commit"
   },
   {
     "id": "81-lens-wave",
     "path": "100days/81-lens-wave",
-    "description": "Lens Wave — WebGL fragment shader that warps a live text texture through layered sine displacement, non-uniform lens scaling, chromatic aberration, and a tinted multi-tap bloom; floating control island edits the text, snap freezes a frame onto a sweater mockup, and export composites the full-res PNG"
+    "description": "Lens Wave — WebGL fragment shader that warps a live text texture through layered sine displacement, non-uniform lens scaling, chromatic aberration, and a tinted multi-tap bloom; floating control island edits the text, snap freezes a frame onto a sweater mockup, and export composites the full-res PNG",
+    "date": "2026-06-05",
+    "dateSource": "100days-first-commit"
   }
 ]
